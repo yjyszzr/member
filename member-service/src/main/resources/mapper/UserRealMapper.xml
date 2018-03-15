@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.UserRealMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserReal">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="real_id" jdbcType="INTEGER" property="realId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="real_name" jdbcType="VARCHAR" property="realName" />
+    <result column="id_code" jdbcType="VARCHAR" property="idCode" />
+    <result column="card_pic1" jdbcType="VARCHAR" property="cardPic1" />
+    <result column="card_pic2" jdbcType="VARCHAR" property="cardPic2" />
+    <result column="card_pic3" jdbcType="VARCHAR" property="cardPic3" />
+    <result column="address_now" jdbcType="VARCHAR" property="addressNow" />
+    <result column="address_info" jdbcType="VARCHAR" property="addressInfo" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+  </resultMap>
+</mapper>
