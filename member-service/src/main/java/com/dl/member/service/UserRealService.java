@@ -1,5 +1,6 @@
 package com.dl.member.service;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import javax.annotation.Resource;
@@ -70,15 +71,19 @@ public class UserRealService extends AbstractService<UserReal> {
     public BaseResult<UserRealDTO> realNameAuth(String realName,String iDCode) {
     	Integer userId = SessionUtil.getUserId();
     	//TODO 身份证二元素校验接口
+    	try {
+			realName = URLDecoder.decode(realName, "UTF-8");
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
     	BaseResult<String> realNameRst = this.realNameAuth2(realName, iDCode);
     	if(realNameRst.getCode() != 0) {
     		return ResultGenerator.genResult(realNameRst.getCode(), realNameRst.getMsg());
     	}
     	
-    	
     	this.saveUserReal(realName,iDCode);
     	User updateUser = new User();
-    	updateUser.setIsReal(false);
+    	updateUser.setIsReal(true);
     	userService.update(updateUser);
     	return ResultGenerator.genSuccessResult("实名认证成功");
     }

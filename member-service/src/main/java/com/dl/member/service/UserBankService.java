@@ -1,4 +1,5 @@
 package com.dl.member.service;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +67,11 @@ public class UserBankService extends AbstractService<UserBank> {
 	public BaseResult<UserBankDTO> addBankCard(String realName,String bankCardNo,String idCard){
 		Integer userId = SessionUtil.getUserId();
 		UserBankDTO userBankDTO = new UserBankDTO();
+    	try {
+			realName = URLDecoder.decode(realName, "UTF-8");
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
 		BaseResult<String> atuhRst = this.bankCardAuth3(realName, bankCardNo,idCard);
 		if(atuhRst.getCode() == 0) {
 			userBankDTO = this.queryUserBankType(bankCardNo);
