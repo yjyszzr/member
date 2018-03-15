@@ -1,7 +1,6 @@
 package com.dl.member.param;
 
 import java.io.Serializable;
-import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,6 +13,6 @@ public class UserBonusParam implements Serializable {
 	@ApiModelProperty("订单号")
 	private String orderSn;
 	
-	@ApiModelProperty("用户红包id集合")
-	private List<Integer> userBonusIdList;
+	@ApiModelProperty("用户红包id")
+	private Integer userBonusId;
 }
