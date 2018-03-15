@@ -57,6 +57,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
      * @return
      */
     public BaseResult<UserLoginDTO> loginByPass(UserLoginWithPassParam userLoginMobileParam) {
+    	log.error("enter login");
         String mobile = userLoginMobileParam.getMobile();
         String password = userLoginMobileParam.getPassword();
         UserLoginDTO userLoginDTO = new UserLoginDTO();
