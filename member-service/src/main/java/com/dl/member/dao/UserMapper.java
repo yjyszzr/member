@@ -1,5 +1,7 @@
 package com.dl.member.dao;
 
+import java.math.BigDecimal;
+
 import org.apache.ibatis.annotations.Param;
 
 import com.dl.base.mapper.Mapper;
@@ -10,4 +12,13 @@ public interface UserMapper extends Mapper<User> {
 	int insertWithReturnId(User user);
 	
 	User queryUserExceptPass(@Param("userId") Integer userId);
+	
+	/**
+	 * 更新用户账户资金
+	 * @param userId
+	 * @param userMoney
+	 * @param userMoneyLimit
+	 * @return
+	 */
+	int updateUserMoneyAndUserMoneyLimit(@Param("userId") Integer userId,@Param("userMoney") BigDecimal userMoney,@Param("userMoneyLimit") BigDecimal userMoneyLimit);
 }

@@ -7,7 +7,14 @@ public enum MemberEnums {
 	USER_ACCOUNT_FROZEN(301013,"您的账号已经被冻结，请联系客服"),
 	NO_REGISTER(301014,"该手机号还未注册，请先注册"),
 	VERIFY_BANKCARD_EROOR(301015,"银行卡验证失败"),
-	SMSCODE_WRONG(301016,"请输入正确的验证码");
+	SMSCODE_WRONG(301016,"请输入正确的验证码"),
+	BONUS_UNEXITS(301017,"红包不存在"),
+	PARAMS_NOT_NULL(301018,"参数不能为空"),
+	BONUS_USED(301019,"红包已使用"),
+	BONUS_EXPIRE(301020,"红包已过期"),
+	BONUS_UNUSED(301021,"红包未使用"),
+	MONEY_IS_NOT_ENOUGH(301022,"用户余额不足"),
+	USERACCOUNTS_ALREADY_REDUCE(301023,"用户账户已扣款");
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	
 //	NO_SHOP_MEM(301014,"用户不是店铺会员"),

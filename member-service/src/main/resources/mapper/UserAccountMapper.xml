@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.UserAccountMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserAccount">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="account_sn" jdbcType="VARCHAR" property="accountSn" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="admin_user" jdbcType="VARCHAR" property="adminUser" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="cur_balance" jdbcType="DECIMAL" property="curBalance" />
+    <result column="user_surplus" jdbcType="DECIMAL" property="userSurplus" />
+    <result column="user_surplus_limit" jdbcType="DECIMAL" property="userSurplusLimit" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="last_time" jdbcType="INTEGER" property="lastTime" />
+    <result column="process_type" jdbcType="TINYINT" property="processType" />
+    <result column="payment_code" jdbcType="VARCHAR" property="paymentCode" />
+    <result column="payment_name" jdbcType="VARCHAR" property="paymentName" />
+    <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
+    <result column="parent_sn" jdbcType="VARCHAR" property="parentSn" />
+    <result column="note" jdbcType="LONGVARCHAR" property="note" />
+  </resultMap>
+</mapper>
