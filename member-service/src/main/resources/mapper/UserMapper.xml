@@ -69,7 +69,7 @@
   </update>
   
   <update id="updateUserMoneyAndUserMoneyLimit">
-  	UPDATE szy_user SET user_money = #{userMoney} ,user_money_limit = #{userMoneyLimit} WHERE user_id = #{userId}
+  	UPDATE dl_user SET user_money = #{userMoney} ,user_money_limit = #{userMoneyLimit} WHERE user_id = #{userId}
   </update>
   
   <select id="queryUserExceptPass" resultMap="BaseResultMap">

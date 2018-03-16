@@ -57,8 +57,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @return
 	 */
 	@Transactional
-	public void updateUserBonusStatusUsed(Integer userBonusId, String sn) {
-		if(userBonusId == null || StringUtils.isEmpty(sn)) {
+	public void updateUserBonusStatusUsed(Integer userBonusId, String orderSn) {
+		if(userBonusId == null || StringUtils.isEmpty(orderSn)) {
 			throw new ServiceException(MemberEnums.PARAMS_NOT_NULL.getcode(),MemberEnums.PARAMS_NOT_NULL.getMsg());
 		}
 		
@@ -79,9 +79,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}
 
 		UserBonus usedUserBonus = new UserBonus();
-		usedUserBonus.setUserBonusId(userBonusId);
+		usedUserBonus.setUserBonusId(userBonus.getUserBonusId());
 		usedUserBonus.setUsedTime(DateUtil.getCurrentTimeLong());
-		usedUserBonus.setOrderSn(sn);
+		usedUserBonus.setOrderSn(orderSn);
 		usedUserBonus.setUserId(SessionUtil.getUserId());
 		usedUserBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_USED);
 		this.update(usedUserBonus);

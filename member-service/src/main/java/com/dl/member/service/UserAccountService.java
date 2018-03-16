@@ -1,11 +1,9 @@
 package com.dl.member.service;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
-
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
-
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserAccountMapper;
 import com.dl.member.dao.UserMapper;
@@ -17,15 +15,12 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
-
 import javax.annotation.Resource;
 
 @Service
@@ -100,7 +95,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
      */
     @Transactional
     private SurplusPaymentCallbackDTO countReduceMoney(BigDecimal surplus, User user) {
-        BigDecimal money = new BigDecimal(0);
+        BigDecimal money = BigDecimal.ZERO;
         BigDecimal user_money = BigDecimal.ZERO; //用户账户扣减过后的可提现余额
         BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户扣减过后的不可提现余额
         BigDecimal usedUserMoney = null;//订单使用的可提现余额
@@ -144,7 +139,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param String orderSn,String surplus
      */
     @Transactional
-    private SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(BigDecimal surplus, User user) {
+    public SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(BigDecimal surplus,Integer userId) {
+    	User user = userService.findById(userId);
         BigDecimal money = BigDecimal.ZERO;
         BigDecimal user_money = new BigDecimal(0); //用户账户剩下的可提现余额
         BigDecimal user_money_limit = new BigDecimal(0);// 用户账户剩下的不可提现余额
@@ -170,7 +166,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         uap.setAdminUser(user.getUserName());
         uap.setAddTime(DateUtil.getCurrentTimeLong());
         String accountSn = this.createAccountSn(String.valueOf(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND_ROLLBACK));
-        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND);
+        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND_ROLLBACK);
         uap.setAccountSn(accountSn);
         uap.setAmount(surplus);
         uap.setCurBalance(curBalance);

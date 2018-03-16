@@ -22,35 +22,5 @@ public class UserBonusController {
     @Resource
     private UserBonusService userBonusService;
 
-    @PostMapping("/add")
-    public BaseResult add(UserBonus userBonus) {
-        userBonusService.save(userBonus);
-        return ResultGenerator.genSuccessResult();
-    }
 
-    @PostMapping("/delete")
-    public BaseResult delete(@RequestParam Integer id) {
-        userBonusService.deleteById(id);
-        return ResultGenerator.genSuccessResult();
-    }
-
-    @PostMapping("/update")
-    public BaseResult update(UserBonus userBonus) {
-        userBonusService.update(userBonus);
-        return ResultGenerator.genSuccessResult();
-    }
-
-    @PostMapping("/detail")
-    public BaseResult detail(@RequestParam Integer id) {
-        UserBonus userBonus = userBonusService.findById(id);
-        return ResultGenerator.genSuccessResult(null,userBonus);
-    }
-
-    @PostMapping("/list")
-    public BaseResult list(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "0") Integer size) {
-        PageHelper.startPage(page, size);
-        List<UserBonus> list = userBonusService.findAll();
-        PageInfo pageInfo = new PageInfo(list);
-        return ResultGenerator.genSuccessResult(null,pageInfo);
-    }
 }
