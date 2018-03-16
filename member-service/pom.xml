@@ -165,6 +165,16 @@
             <scope>test</scope>
         </dependency>
 
+        <!--  <dependency>
+            <groupId>com.aliyuncs</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyuncs</groupId>
+            <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+            <version>1.0.0</version>
+        </dependency> -->
         <!-- 配置中心
         <dependency>
             <groupId>com.ctrip.framework.apollo</groupId>

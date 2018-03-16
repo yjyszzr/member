@@ -15,7 +15,7 @@ public class UserRealDTO {
 	@ApiModelProperty("真实姓名")
     private String realName;
 	@ApiModelProperty("身份证号")
-	private String iDCode;
+	private String idCode;
 	@ApiModelProperty("cardPic1")
 	private String cardPic1;	
 	@ApiModelProperty("cardPic2")

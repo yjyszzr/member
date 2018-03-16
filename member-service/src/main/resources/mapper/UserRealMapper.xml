@@ -14,7 +14,7 @@
     <result column="card_pic3" jdbcType="VARCHAR" property="cardPic3" />
     <result column="address_now" jdbcType="VARCHAR" property="addressNow" />
     <result column="address_info" jdbcType="VARCHAR" property="addressInfo" />
-    <result column="status" jdbcType="BIT" property="status" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="reason" jdbcType="VARCHAR" property="reason" />
   </resultMap>

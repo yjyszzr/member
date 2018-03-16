@@ -23,6 +23,7 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
+import com.dl.member.configurer.MemberConfig;
 import com.dl.member.dao.UserRealMapper;
 import com.dl.member.dto.UserRealDTO;
 import com.dl.member.model.User;
@@ -44,6 +45,9 @@ public class UserRealService extends AbstractService<UserReal> {
 	
 	@Resource
 	private RestTemplate restTemplate;    
+	
+	@Resource
+	private MemberConfig memberConfig;
     
     @Transactional
     public void saveUserReal(String realName,String idCode) {
@@ -57,7 +61,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	userReal.setCardPic2("");
     	userReal.setCardPic3("");
     	userReal.setReason("");
-    	userReal.setStatus(true);
+    	userReal.setStatus("1");
     	this.save(userReal);
     }
     
@@ -102,8 +106,8 @@ public class UserRealService extends AbstractService<UserReal> {
 		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
 		headers.setContentType(type);
 
-		StringBuffer url = new StringBuffer("http://op.juhe.cn/idcard/query");
-		url.append("?key=" + "ef645dba9355f6cc0447051966701cde");
+		StringBuffer url = new StringBuffer(memberConfig.getRalNameApiURL());
+		url.append("?key=" + memberConfig.getRealNameKey());
 		url.append("&realname=" + realName);
 		url.append("&idcard=" + idcard);
 		String rst = rest.getForObject(url.toString(), String.class);
@@ -137,7 +141,7 @@ public class UserRealService extends AbstractService<UserReal> {
      */
     public UserRealDTO queryUserReal(){
     	Integer userId = SessionUtil.getUserId();
-    	UserReal userReal = this.findById(userId);
+    	UserReal userReal = this.findBy("userId", userId);
     	UserRealDTO userRealDTO = new UserRealDTO();
     	if(null == userRealDTO) {
     		return null;

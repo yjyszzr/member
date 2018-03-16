@@ -1,10 +1,7 @@
 package com.dl.member.service;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.Resource;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,7 +9,6 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.configurer.RestTemplateConfig;
@@ -22,15 +18,13 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.SessionUtil;
+import com.dl.member.configurer.MemberConfig;
 import com.dl.member.dao.UserBankMapper;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.UserBank;
-
 import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 @Slf4j
@@ -46,6 +40,9 @@ public class UserBankService extends AbstractService<UserBank> {
 	
 	@Resource
 	private RestTemplate restTemplate;
+	
+	@Resource
+	private MemberConfig memberConfig;
     
     @Transactional
     public void saveUserBank(UserBankDTO userBankDTO) {
@@ -73,13 +70,13 @@ public class UserBankService extends AbstractService<UserBank> {
      * @return
      */
 	public BaseResult<UserBankDTO> addBankCard(String bankCardNo){
-		UserBank userBank = this.findBy("card_no", bankCardNo);
+		UserBank userBank = this.findBy("cardNo", bankCardNo);
 		if(null != userBank) {
 			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg());
 		}
 		
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
-		String idCard = userRealDTO.getIDCode();
+		String idCard = userRealDTO.getIdCode();
 		String realName = userRealDTO.getRealName();
 		UserBankDTO userBankDTO = new UserBankDTO();
 		BaseResult<String> atuhRst = this.bankCardAuth3(realName, bankCardNo,idCard);
@@ -108,12 +105,12 @@ public class UserBankService extends AbstractService<UserBank> {
 		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
 		headers.setContentType(type);
 
-		StringBuffer url = new StringBuffer("http://v.juhe.cn/verifybankcard3/query");
-		url.append("?key=" + "64ef489c912d56440f52be2de8991ca2");
+		StringBuffer url = new StringBuffer(memberConfig.getBankAuth3ApiUrl());
+		url.append("?key=" + memberConfig.getBankAuth3Key());
 		url.append("&realname=" + realName);
 		url.append("&bankcard=" + cardNo);
 		url.append("&idcard=" + idcard);
-		url.append("&sign=" + "JHbad76ab18dffdedbceba688fdfc9c796");
+		url.append("&sign=" + memberConfig.getBankAuth3Sign());
 		String rst = rest.getForObject(url.toString(), String.class);
 
 		JSONObject json = null;
@@ -145,9 +142,9 @@ public class UserBankService extends AbstractService<UserBank> {
 		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
 		headers.setContentType(type);
 
-		StringBuffer url = new StringBuffer("http://bankcardsilk.api.juhe.cn/bankcardsilk/query.php");
-		url.append("?key=" + "4f084b2f83477b851dc40404dbef23ce");
-		url.append("&num=" + "6214830100586527");
+		StringBuffer url = new StringBuffer(memberConfig.getBankTypeUrl());
+		url.append("?key=" + memberConfig.getBankTypeKey());
+		url.append("&num=" + cardNo);
 		String rst = rest.getForObject(url.toString(), String.class);
 
 		JSONObject json = null;

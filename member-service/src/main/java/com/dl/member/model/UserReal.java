@@ -62,7 +62,7 @@ public class UserReal {
     /**
      * 是否通过实名认证
      */
-    private Boolean status;
+    private String status;
 
     /**
      * 申请时间
@@ -242,7 +242,7 @@ public class UserReal {
      *
      * @return status - 是否通过实名认证
      */
-    public Boolean getStatus() {
+    public String getStatus() {
         return status;
     }
 
@@ -251,7 +251,7 @@ public class UserReal {
      *
      * @param status 是否通过实名认证
      */
-    public void setStatus(Boolean status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
