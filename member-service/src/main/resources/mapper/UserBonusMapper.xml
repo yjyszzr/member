@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.UserBonusMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserBonus">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="user_bonus_id" jdbcType="INTEGER" property="userBonusId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="bonus_id" jdbcType="INTEGER" property="bonusId" />
+    <result column="bonus_sn" jdbcType="VARCHAR" property="bonusSn" />
+    <result column="bonus_price" jdbcType="DECIMAL" property="bonusPrice" />
+    <result column="receive_time" jdbcType="INTEGER" property="receiveTime" />
+    <result column="used_time" jdbcType="INTEGER" property="usedTime" />
+    <result column="start_time" jdbcType="INTEGER" property="startTime" />
+    <result column="end_time" jdbcType="INTEGER" property="endTime" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
+    <result column="bonus_status" jdbcType="BIT" property="bonusStatus" />
+    <result column="is_delete" jdbcType="BIT" property="isDelete" />
+  </resultMap>
+</mapper>

@@ -68,6 +68,10 @@
 		 WHERE user_id=#{userId}  
   </update>
   
+  <update id="updateUserMoneyAndUserMoneyLimit">
+  	UPDATE dl_user SET user_money = #{userMoney} ,user_money_limit = #{userMoneyLimit} WHERE user_id = #{userId}
+  </update>
+  
   <select id="queryUserExceptPass" resultMap="BaseResultMap">
   	 	SELECT 
   	 	user_name,mobile,email,nickname,sex,birthday,detail_address,
