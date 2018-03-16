@@ -144,7 +144,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param String orderSn,String surplus
      */
     @Transactional
-    public SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(BigDecimal surplus,Integer userId) {
+    public SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(BigDecimal surplus) {
+    	Integer userId= SessionUtil.getUserId();
     	User user = userService.findById(userId);
         BigDecimal money = BigDecimal.ZERO;
         BigDecimal user_money = new BigDecimal(0); //用户账户剩下的可提现余额
@@ -194,10 +195,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
      *
      * @return
      */
-    public PageInfo<UserAccountDTO> getUserAccountList(Integer page, Integer pageSize) {
+    public PageInfo<UserAccountDTO> getUserAccountList(Integer pageNum, Integer pageSize) {
         List<UserAccountDTO> userAccountListDTO = new ArrayList<>();
         Integer userId = SessionUtil.getUserId();
-        PageHelper.startPage(page, pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         List<UserAccount> userAccountList = userAccountMapper.queryUserAccountList(userId);
         if (userAccountList.size() == 0) {
             return new PageInfo<UserAccountDTO>(userAccountListDTO);
@@ -209,18 +210,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setId(s.getId());
             userAccountDTO.setAccountSn(s.getAccountSn());
             userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(s.getAddTime()), DateUtil.datetimeFormat));
-            String note = s.getNote();
-            if (note.contains("<br>")) {
-                userAccountDTO.setProcessTypeName(note.substring(0, note.indexOf("<br>")));
-            } else {
-                userAccountDTO.setProcessTypeName(note);
-            }
-
-            if (s.getAmount().compareTo(BigDecimal.ZERO) == 1) {
-                userAccountDTO.setChangeAmount("+" + s.getAmount());
-            } else {
-                userAccountDTO.setChangeAmount(String.valueOf(s.getAmount()));
-            }
+            userAccountDTO.setProcessTypeName(s.getNote());
+            String changeAmount = s.getAmount().compareTo(BigDecimal.ZERO) == 1?"+" + s.getAmount():String.valueOf(s.getAmount());
+            userAccountDTO.setChangeAmount(changeAmount);
             userAccountListDTO.add(userAccountDTO);
         });
 

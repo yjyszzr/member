@@ -136,9 +136,13 @@ public class UserRealService extends AbstractService<UserReal> {
      * @return
      */
     public UserRealDTO queryUserReal(){
-    	Integer userId = null;
+    	Integer userId = SessionUtil.getUserId();
     	UserReal userReal = this.findById(userId);
     	UserRealDTO userRealDTO = new UserRealDTO();
+    	if(null == userRealDTO) {
+    		return null;
+    	}
+    	
     	try {
 			BeanUtils.copyProperties(userRealDTO, userReal);
 		} catch (Exception e) {

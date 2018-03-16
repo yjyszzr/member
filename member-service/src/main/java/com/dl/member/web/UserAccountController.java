@@ -2,11 +2,16 @@ package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.UserAccountDTO;
+import com.dl.member.param.PageParam;
 import com.dl.member.param.RollackSurplusPayParam;
+import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.service.UserAccountService;
 import com.dl.member.service.UserBonusService;
+import com.github.pagehelper.PageInfo;
+
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,7 +51,7 @@ public class UserAccountController {
     @ApiOperation(value="回滚账户的余额和订单的余额", notes="回滚账户的余额和订单的余额",hidden=false)
     @PostMapping("/rollbackUserAccountChangeByPay")
     public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(@RequestBody RollackSurplusPayParam rollackSurplusPayParam) {
-    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.rollbackUserAccountChangeByPay(rollackSurplusPayParam.getSurplus(),rollackSurplusPayParam.getUserId());
+    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.rollbackUserAccountChangeByPay(rollackSurplusPayParam.getSurplus());
     	return ResultGenerator.genSuccessResult("回滚扣减余额成功",surplusPaymentCallbackDTO);
     }
     
@@ -71,5 +76,19 @@ public class UserAccountController {
 	public BaseResult<String> rollbackChangeUserAccountByCreateOrder(@RequestBody UserBonusParam userBonusParam) {
     	return userBonusService.rollbackChangeUserAccountByCreateOrder(userBonusParam);
 	}
+    
+    
+	/** 
+	 * 查询用户账户明细列表
+	 * @param UserBonusParam
+	 * @return
+	 */
+    @ApiOperation(value="查询用户账户明细列表", notes="查询用户账户明细列表",hidden=false)
+	@RequestMapping(path="/getUserAccountList", method=RequestMethod.POST)
+	public BaseResult<PageInfo<UserAccountDTO>> getUserAccountList(@RequestBody PageParam pageParam) {
+    	PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(pageParam.getPageNum(), pageParam.getPageSize()); 
+    	return ResultGenerator.genSuccessResult("查询用户账户明细列表",rst);
+	}
+    
     
 }

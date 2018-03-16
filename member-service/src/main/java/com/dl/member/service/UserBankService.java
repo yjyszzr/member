@@ -24,16 +24,22 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.dao.UserBankMapper;
 import com.dl.member.dto.UserBankDTO;
+import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.UserBank;
 
 import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 @Slf4j
 public class UserBankService extends AbstractService<UserBank> {
     @Resource
     private UserBankMapper userBankMapper;
+    
+    @Resource
+    private UserRealService userRealService;
     
 	@Resource
 	private RestTemplateConfig restTemplateConfig;
@@ -49,6 +55,8 @@ public class UserBankService extends AbstractService<UserBank> {
     	userBank.setRealName(userBankDTO.getRealName());
     	userBank.setCardNo(userBankDTO.getCardNo());
     	userBank.setStatus("0");
+    	userBank.setBankLogo(userBankDTO.getBankLogo());
+    	userBank.setBankName(userBankDTO.getBankName());
     	
     	try {
     		this.save(userBank);
@@ -64,14 +72,16 @@ public class UserBankService extends AbstractService<UserBank> {
      * @param idCard
      * @return
      */
-	public BaseResult<UserBankDTO> addBankCard(String realName,String bankCardNo,String idCard){
-		Integer userId = SessionUtil.getUserId();
-		UserBankDTO userBankDTO = new UserBankDTO();
-    	try {
-			realName = URLDecoder.decode(realName, "UTF-8");
-		} catch (Exception e) {
-			log.error(e.getMessage());
+	public BaseResult<UserBankDTO> addBankCard(String bankCardNo){
+		UserBank userBank = this.findBy("card_no", bankCardNo);
+		if(null != userBank) {
+			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg());
 		}
+		
+		UserRealDTO userRealDTO = userRealService.queryUserReal();
+		String idCard = userRealDTO.getIDCode();
+		String realName = userRealDTO.getRealName();
+		UserBankDTO userBankDTO = new UserBankDTO();
 		BaseResult<String> atuhRst = this.bankCardAuth3(realName, bankCardNo,idCard);
 		if(atuhRst.getCode() == 0) {
 			userBankDTO = this.queryUserBankType(bankCardNo);

@@ -15,8 +15,6 @@ import lombok.Data;
 @Data
 public class RollackSurplusPayParam {
 
-	@ApiModelProperty("userId")
-	private Integer userId;
     @ApiModelProperty("扣减的账户余额")
     private BigDecimal surplus;
 }

@@ -33,8 +33,35 @@ public class UserBank {
      * 0-非当前默认,1-当前默认
      */
     private String status;
-
+    
     /**
+     * 银行卡logo
+     */
+    private String bankLogo;
+    
+    /**
+     * 银行卡名称
+     */
+    private String bankName;
+    
+
+    public String getBankLogo() {
+		return bankLogo;
+	}
+
+	public void setBankLogo(String bankLogo) {
+		this.bankLogo = bankLogo;
+	}
+
+	public String getBankName() {
+		return bankName;
+	}
+
+	public void setBankName(String bankName) {
+		this.bankName = bankName;
+	}
+
+	/**
      * 获取主键id
      *
      * @return id - 主键id
