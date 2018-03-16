@@ -54,7 +54,7 @@ public interface IUserAccountService {
 	 * @return
 	 */	
 	@RequestMapping(path="/user/account/rollbackUserAccountChangeByPay", method=RequestMethod.POST)
-	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(RollackSurplusPayParam rollackSurplusPayParam);
+	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam);
 	
 	
 //	

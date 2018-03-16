@@ -144,7 +144,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param String orderSn,String surplus
      */
     @Transactional
-    public SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(BigDecimal surplus) {
+    public SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(BigDecimal surplus,String orderSn) {
     	Integer userId= SessionUtil.getUserId();
     	User user = userService.findById(userId);
         BigDecimal money = BigDecimal.ZERO;
@@ -178,7 +178,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         uap.setCurBalance(curBalance);
         uap.setPaymentCode("");
         uap.setPaymentName("");
-        uap.setOrderSn("");
+        uap.setOrderSn(orderSn);
         uap.setParentSn("");
         this.save(uap);
         

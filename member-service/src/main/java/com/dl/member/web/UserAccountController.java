@@ -50,8 +50,8 @@ public class UserAccountController {
     
     @ApiOperation(value="回滚账户的余额和订单的余额", notes="回滚账户的余额和订单的余额",hidden=false)
     @PostMapping("/rollbackUserAccountChangeByPay")
-    public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(@RequestBody RollackSurplusPayParam rollackSurplusPayParam) {
-    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.rollbackUserAccountChangeByPay(rollackSurplusPayParam.getSurplus());
+    public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(@RequestBody SurplusPayParam surplusPayParam) {
+    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.rollbackUserAccountChangeByPay(surplusPayParam.getSurplus(),surplusPayParam.getOrderSn());
     	return ResultGenerator.genSuccessResult("回滚扣减余额成功",surplusPaymentCallbackDTO);
     }
     
