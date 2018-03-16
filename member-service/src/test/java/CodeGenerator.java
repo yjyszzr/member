@@ -1,5 +1,21 @@
-﻿import com.google.common.base.CaseFormat;
-import freemarker.template.TemplateExceptionHandler;
+import static com.dl.member.core.ProjectConstant.BASE_PACKAGE;
+import static com.dl.member.core.ProjectConstant.CONTROLLER_PACKAGE;
+import static com.dl.member.core.ProjectConstant.MAPPER_BASE;
+import static com.dl.member.core.ProjectConstant.MAPPER_PACKAGE;
+import static com.dl.member.core.ProjectConstant.MODEL_PACKAGE;
+import static com.dl.member.core.ProjectConstant.SERVICE_IMPL_PACKAGE;
+import static com.dl.member.core.ProjectConstant.SERVICE_PACKAGE;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.mybatis.generator.api.MyBatisGenerator;
 import org.mybatis.generator.config.Configuration;
@@ -14,27 +30,14 @@ import org.mybatis.generator.config.PropertyRegistry;
 import org.mybatis.generator.config.SqlMapGeneratorConfiguration;
 import org.mybatis.generator.config.TableConfiguration;
 import org.mybatis.generator.internal.DefaultShellCallback;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static com.dl.member.core.ProjectConstant.BASE_PACKAGE;
-import static com.dl.member.core.ProjectConstant.CONTROLLER_PACKAGE;
-import static com.dl.member.core.ProjectConstant.MAPPER_BASE;
-import static com.dl.member.core.ProjectConstant.MAPPER_PACKAGE;
-import static com.dl.member.core.ProjectConstant.MODEL_PACKAGE;
-import static com.dl.member.core.ProjectConstant.SERVICE_IMPL_PACKAGE;
-import static com.dl.member.core.ProjectConstant.SERVICE_PACKAGE;
+import com.google.common.base.CaseFormat;
 
+import freemarker.template.TemplateExceptionHandler;
 
 public class CodeGenerator {
-    private static final String JDBC_URL = "jdbc:mysql://39.106.18.39:3306/cxm_test";
+
+	private static final String JDBC_URL = "jdbc:mysql://39.106.18.39:3306/cxm_test";
     private static final String JDBC_USERNAME = "caixiaomi";
     private static final String JDBC_PASSWORD = "caixiaomi";
     private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
@@ -238,5 +241,4 @@ public class CodeGenerator {
     private static String packageConvertPath(String packageName) {
         return String.format("/%s/", packageName.contains(".") ? packageName.replaceAll("\\.", "/") : packageName);
     }
-
 }
