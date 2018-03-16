@@ -19,4 +19,16 @@
     <result column="bonus_status" jdbcType="BIT" property="bonusStatus" />
     <result column="is_delete" jdbcType="BIT" property="isDelete" />
   </resultMap>
+  
+  <select id="queryUserBonusList" resultType="String" resultMap="BaseResultMap">
+	  	SELECT * FROM dl_user_bonus WHERE user_id = #{userId}   
+	  	AND  bonus_status = 0 
+	  	AND  is_delete = 0  
+	  	AND  start_time &lt;= #{curTime} 
+	  	AND  end_time &gt;= #{curTime}
+	  	AND  user_bonus_id IN
+    	<foreach collection="userBonusIds" index="index" item="userBonusId" open="(" separator="," close=")" >
+      		#{userBonusId}
+    	</foreach>
+  </select> 
 </mapper>

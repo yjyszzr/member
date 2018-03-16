@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.dl.base.result.BaseResult;
 //import com.pgt.base.result.BaseResult;
 //import com.pgt.shop.member.dto.UserBonusCountDTO;
 //import com.pgt.shop.member.dto.UserBonusDTO;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 //import com.pgt.shop.member.param.UserBonusIdArrParam;
 //import com.pgt.shop.member.param.UserBonusIdsParam;
 //import com.pgt.shop.member.param.ValidUserBonusParam;
+import com.dl.member.dto.UserBonusDTO;
+import com.dl.member.param.UserBonusIdParam;
 
 
 /**
@@ -28,6 +32,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @FeignClient(value = "member-service")
 public interface IUserBonusService {
+	
+	
+	  /**
+	  * 根userBonusId查询红包
+	  *
+	  * @return
+	  */
+	 @PostMapping("/bonus/queryUserBonus")    
+	 BaseResult<UserBonusDTO> queryUserBonus(@RequestBody UserBonusIdParam userBonusIdParam);
 
 //	 /**
 //	 * 获取结算页的店铺红包列表

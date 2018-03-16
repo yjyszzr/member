@@ -1,6 +1,8 @@
 package com.dl.member.service;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
@@ -8,6 +10,7 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserAccountMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
@@ -15,10 +18,12 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Resource;
@@ -183,6 +188,52 @@ public class UserAccountService extends AbstractService<UserAccount> {
         
         return surplusPaymentCallbackDTO;
     }
+ 
+    /**
+     * 查询用户余额明细列表
+     *
+     * @return
+     */
+    public PageInfo<UserAccountDTO> getUserAccountList(Integer page, Integer pageSize) {
+        List<UserAccountDTO> userAccountListDTO = new ArrayList<>();
+        Integer userId = SessionUtil.getUserId();
+        PageHelper.startPage(page, pageSize);
+        List<UserAccount> userAccountList = userAccountMapper.queryUserAccountList(userId);
+        if (userAccountList.size() == 0) {
+            return new PageInfo<UserAccountDTO>(userAccountListDTO);
+        }
+
+        PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
+        userAccountList.forEach(s -> {
+            UserAccountDTO userAccountDTO = new UserAccountDTO();
+            userAccountDTO.setId(s.getId());
+            userAccountDTO.setAccountSn(s.getAccountSn());
+            userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(s.getAddTime()), DateUtil.datetimeFormat));
+            String note = s.getNote();
+            if (note.contains("<br>")) {
+                userAccountDTO.setProcessTypeName(note.substring(0, note.indexOf("<br>")));
+            } else {
+                userAccountDTO.setProcessTypeName(note);
+            }
+
+            if (s.getAmount().compareTo(BigDecimal.ZERO) == 1) {
+                userAccountDTO.setChangeAmount("+" + s.getAmount());
+            } else {
+                userAccountDTO.setChangeAmount(String.valueOf(s.getAmount()));
+            }
+            userAccountListDTO.add(userAccountDTO);
+        });
+
+        PageInfo<UserAccountDTO> result = new PageInfo<UserAccountDTO>();
+        try {
+			BeanUtils.copyProperties(pageInfo, result);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		} 
+        
+        result.setList(userAccountListDTO);
+        return result;
+    }    
     
     /**
      * 生成流水号

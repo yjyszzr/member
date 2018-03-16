@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.param.RollackSurplusPayParam;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
 //import com.pgt.shop.member.param.CancelChangeParam;
 //import com.pgt.shop.member.param.ConfirmOrderParam;
@@ -53,7 +54,7 @@ public interface IUserAccountService {
 	 * @return
 	 */	
 	@RequestMapping(path="/user/account/rollbackUserAccountChangeByPay", method=RequestMethod.POST)
-	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam);
+	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(RollackSurplusPayParam rollackSurplusPayParam);
 	
 	
 //	

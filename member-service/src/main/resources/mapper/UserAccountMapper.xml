@@ -22,4 +22,8 @@
     <result column="parent_sn" jdbcType="VARCHAR" property="parentSn" />
     <result column="note" jdbcType="LONGVARCHAR" property="note" />
   </resultMap>
+  
+  <select id="queryUserAccountList"  resultMap="BaseResultMap">
+  		SELECT *  FROM dl_user_account a WHERE a.user_id=#{userId} ORDER BY add_time DESC
+  </select>
 </mapper>

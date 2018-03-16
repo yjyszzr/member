@@ -7,6 +7,7 @@ import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBonusMapper;
+import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
@@ -118,6 +119,30 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			usedUserBonus.setUserId(SessionUtil.getUserId());
 			usedUserBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
 			this.update(usedUserBonus);
+	}
+	
+	
+	/**
+	 * 查询单个红包的数据
+	 *
+	 * @param userBonusIds
+	 * @return
+	 */
+	public UserBonusDTO queryUserBonus(Integer userBonusId) {
+		Integer curTime = DateUtil.getCurrentTimeLong();
+		Integer userId = SessionUtil.getUserId();
+		Integer[] userBonusIdArr = new Integer[] {userBonusId};
+		
+		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusList(userBonusIdArr,userId,curTime);
+		if (userBonusList.size() == 0) {
+			return null;
+		}
+
+		UserBonus userBonus = userBonusList.get(0);
+		UserBonusDTO userBonusDTO = new UserBonusDTO();
+		userBonusDTO.setUserBonusId(userBonus.getUserBonusId());
+		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
+		return userBonusDTO;
 	}
 
 }
