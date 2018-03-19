@@ -24,6 +24,7 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
+import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserRealMapper;
 import com.dl.member.dto.UserRealDTO;
 import com.dl.member.model.User;
@@ -54,6 +55,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	UserReal userReal = new UserReal();
     	userReal.setRealName(realName);
     	userReal.setIdCode(idCode);
+    	userReal.setUserId(SessionUtil.getUserId());
     	userReal.setAddressInfo("");
     	userReal.setAddressNow("");
     	userReal.setAddTime(DateUtil.getCurrentTimeLong());
@@ -61,7 +63,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	userReal.setCardPic2("");
     	userReal.setCardPic3("");
     	userReal.setReason("");
-    	userReal.setStatus("1");
+    	userReal.setStatus(ProjectConstant.USER_IS_REAL);
     	this.save(userReal);
     }
     
@@ -74,12 +76,15 @@ public class UserRealService extends AbstractService<UserReal> {
      */
     public BaseResult<UserRealDTO> realNameAuth(String realName,String iDCode) {
     	Integer userId = SessionUtil.getUserId();
+    	User user = userService.findById(userId);
+    	
     	//TODO 身份证二元素校验接口
     	try {
 			realName = URLDecoder.decode(realName, "UTF-8");
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
+    	
     	BaseResult<String> realNameRst = this.realNameAuth2(realName, iDCode);
     	if(realNameRst.getCode() != 0) {
     		return ResultGenerator.genResult(realNameRst.getCode(), realNameRst.getMsg());
@@ -87,7 +92,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	
     	this.saveUserReal(realName,iDCode);
     	User updateUser = new User();
-    	updateUser.setIsReal(true);
+    	updateUser.setIsReal(ProjectConstant.USER_IS_REAL);
     	userService.update(updateUser);
     	return ResultGenerator.genSuccessResult("实名认证成功");
     }
@@ -127,10 +132,10 @@ public class UserRealService extends AbstractService<UserReal> {
 			if("1".equals(res)) {
 				return ResultGenerator.genSuccessResult(reason);
 			}else {
-				return ResultGenerator.genBadRequestResult(reason);
+				return ResultGenerator.genFailResult(reason);
 			}
 		}else {
-			return ResultGenerator.genBadRequestResult("调用第三方实名认证失败");
+			return ResultGenerator.genFailResult("调用第三方实名认证失败");
 		}
 		
 	}    

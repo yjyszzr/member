@@ -13,4 +13,11 @@
     <result column="bank_logo" jdbcType="VARCHAR" property="bankLogo" />
     <result column="bank_name" jdbcType="VARCHAR" property="bankName" />
   </resultMap>
+  
+ <update id="batchUpdateUserBankStatus">
+  	UPDATE user_bank SET status = #{status}  WHERE id in
+  	<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+         #{item}  
+    </foreach>
+  </update>
 </mapper>

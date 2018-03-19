@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
-* Created by CodeGenerator on 2018/03/12.
+* Created by zhangzirong on 2018/03/12.
 */
 @RestController
 @RequestMapping("/user/real")
@@ -39,6 +39,6 @@ public class UserRealController {
     @PostMapping("/userRealInfo")
     public BaseResult<UserRealDTO> queryUserReal(@RequestBody StrParam strParam){
     	UserRealDTO userRealDTO = userRealService.queryUserReal();
-    	return ResultGenerator.genSuccessResult("登录成功", userRealDTO);
+    	return ResultGenerator.genSuccessResult("查询实名认证信息成功", userRealDTO);
     }
 }

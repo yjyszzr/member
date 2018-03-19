@@ -211,7 +211,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		 userLoginDTO.setMobile(userInfo.getMobile());
 		 userLoginDTO.setHeadImg(userInfo.getHeadImg());
 		 userLoginDTO.setNickName(userInfo.getNickname());
-		 userLoginDTO.setIsReal(userInfo.getIsReal().equals(true)?"1":"0");
+		 userLoginDTO.setIsReal(userInfo.getIsReal().equals(ProjectConstant.USER_IS_REAL)?"1":"0");
 		 userLoginDTO.setToken(TokenUtil.genToken(userInfo.getUserId(), Integer.valueOf(loginSource)));
 		 return userLoginDTO;
     }

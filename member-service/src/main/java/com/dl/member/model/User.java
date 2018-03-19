@@ -172,7 +172,7 @@ public class User {
      * 是否通过实名认证
      */
     @Column(name = "is_real")
-    private Boolean isReal;
+    private String isReal;
 
     /**
      * 会员备注
@@ -699,7 +699,7 @@ public class User {
      *
      * @return is_real - 是否通过实名认证
      */
-    public Boolean getIsReal() {
+    public String getIsReal() {
         return isReal;
     }
 
@@ -708,7 +708,7 @@ public class User {
      *
      * @param isReal 是否通过实名认证
      */
-    public void setIsReal(Boolean isReal) {
+    public void setIsReal(String isReal) {
         this.isReal = isReal;
     }
 

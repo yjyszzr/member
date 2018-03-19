@@ -50,7 +50,7 @@ public class UserService extends AbstractService<User> {
 		UserDTO userDTO = new UserDTO();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
-			userDTO.setIsReal(user.getIsReal().equals(true)?"1":"0");
+			userDTO.setIsReal(user.getIsReal().equals(1)?"1":"0");
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}
@@ -89,7 +89,7 @@ public class UserService extends AbstractService<User> {
 		user.setPassword(Encryption.encryption(userParam.getPassWord(), loginsalt));
 		user.setRankPoint(0);
 		user.setPassWrongCount(0);
-		user.setIsReal(false);
+		user.setIsReal(ProjectConstant.USER_IS_REAL);
 		int rst = userMapper.insertWithReturnId(user);
 		if(1 != rst) {
 			return 0;

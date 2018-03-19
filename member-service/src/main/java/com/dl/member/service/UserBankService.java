@@ -1,8 +1,12 @@
 package com.dl.member.service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -19,12 +23,15 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
+import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBankMapper;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.UserBank;
 import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 @Slf4j
@@ -51,9 +58,20 @@ public class UserBankService extends AbstractService<UserBank> {
     	userBank.setUserId(userId);
     	userBank.setRealName(userBankDTO.getRealName());
     	userBank.setCardNo(userBankDTO.getCardNo());
-    	userBank.setStatus("0");
+    	userBank.setStatus(ProjectConstant.USER_BANK_DEFAULT);
     	userBank.setBankLogo(userBankDTO.getBankLogo());
     	userBank.setBankName(userBankDTO.getBankName());
+    	
+    	//把已经添加的银行卡 设为非默认
+		Condition condition = new Condition(UserBank.class);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("user_id=", userId);
+		List<UserBank> userBankList = this.findByCondition(condition);
+		if(!CollectionUtils.isEmpty(userBankList)) {
+			 userBankList.removeIf(s->s.getCardNo().equals(userBankDTO.getCardNo()));
+			 List<Integer> userBankIds = userBankList.stream().map(s->s.getId()).collect(Collectors.toList());
+			 int updateRst = userBankMapper.batchUpdateUserBankStatus(ProjectConstant.USER_BANK_NO_DEFAULT, userBankIds);
+		}
     	
     	try {
     		this.save(userBank);
@@ -126,7 +144,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		if("1".equals(res)) {
 			return ResultGenerator.genSuccessResult("银行卡校验成功",message);
 		}else {
-			return ResultGenerator.genBadRequestResult(message);
+			return ResultGenerator.genFailResult(message);
 		}
 	}
 	
@@ -171,8 +189,12 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * @return
 	 */
 	public BaseResult<List<UserBankDTO>> queryUserBankList(){
-		Integer userId = null;
-		List<UserBank> userBankList = this.findByIds(String.valueOf(userId));
+		Integer userId = SessionUtil.getUserId();
+		Condition condition = new Condition(UserBank.class);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("user_id=", userId);
+		List<UserBank> userBankList = this.findByCondition(condition);
+		
 		List<UserBankDTO>  userBankDTOList = new ArrayList<>();
 		for(UserBank userBank:userBankList) {
 			UserBankDTO userBankDTO = new UserBankDTO();
