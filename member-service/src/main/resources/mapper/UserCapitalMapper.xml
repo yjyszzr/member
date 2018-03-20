@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.UserCapitalMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserCapital">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="recharge_sn" jdbcType="VARCHAR" property="rechargeSn" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="account_id" jdbcType="INTEGER" property="accountId" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="process_type" jdbcType="BIT" property="processType" />
+    <result column="payment_code" jdbcType="VARCHAR" property="paymentCode" />
+    <result column="payment_name" jdbcType="VARCHAR" property="paymentName" />
+    <result column="pay_time" jdbcType="INTEGER" property="payTime" />
+    <result column="payment_id" jdbcType="VARCHAR" property="paymentId" />
+    <result column="donation_id" jdbcType="VARCHAR" property="donationId" />
+  </resultMap>
+</mapper>

@@ -1,7 +1,10 @@
 package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.UserBankDTO;
+import com.dl.member.dto.WithDrawShowDTO;
 import com.dl.member.param.BankCardParam;
+import com.dl.member.param.IDParam;
+import com.dl.member.param.StrParam;
 import com.dl.member.service.UserBankService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,14 +33,34 @@ public class UserBankController {
     public BaseResult<UserBankDTO> addBankCard(@RequestBody BankCardParam bankCardParam){
     	return userBankService.addBankCard(bankCardParam.getBankCardNo());
     }
-    
+
     /**
-     * 查询银行卡信息
+     * 查询银行卡列表
      * @return
      */
-    @ApiOperation(value = "查询银行卡信息", notes = "查询银行卡信息")
-    @PostMapping("/userBankList")
-    public BaseResult<List<UserBankDTO>> queryUserBankList(){
+    @ApiOperation(value = "查询银行卡列表", notes = "查询银行卡列表")
+    @PostMapping("/queryUserBankList")
+    public BaseResult<List<UserBankDTO>> queryUserBankList(@RequestBody StrParam strParam){
     	return userBankService.queryUserBankList();
+    }
+    
+    /**
+     * 设置银行卡为当前默认
+     * @return
+     */
+    @ApiOperation(value = "设置银行卡为当前默认", notes = "设置银行卡为当前默认")
+    @PostMapping("/updateUserBankDefault")
+    public BaseResult<String> updateUserBankDefault(@RequestBody IDParam iDParam){
+    	return userBankService.updateUserBankDefault(iDParam.getId());
+    }
+    
+    /**
+     * 提现界面的数据显示：当前可提现余额和当前默认银行卡信息
+     * @return
+     */
+    @ApiOperation(value = "提现界面的数据显示", notes = "提现界面的数据显示")
+    @PostMapping("/queryWithDrawShow")
+    public BaseResult<WithDrawShowDTO> queryWithDrawShow(@RequestBody StrParam strParam){
+    	return userBankService.queryWithDrawShow();
     }
 }

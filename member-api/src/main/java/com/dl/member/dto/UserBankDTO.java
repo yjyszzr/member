@@ -34,5 +34,8 @@ public class UserBankDTO {
 	@ApiModelProperty("银行卡名称")
     private String bankName;
 	
+	@ApiModelProperty("卡类型")
+    private String cardType;
+	
 	
 }

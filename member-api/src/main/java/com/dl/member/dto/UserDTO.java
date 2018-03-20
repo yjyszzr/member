@@ -71,13 +71,13 @@ public class UserDTO {
      * 可提现余额(中的钱)
      */
     @Column(name = "user_money")
-    private BigDecimal userMoney;
+    private String userMoney;
 
     /**
      * 不可提现余额(充值的钱)
      */
     @Column(name = "user_money_limit")
-    private BigDecimal userMoneyLimit;
+    private String userMoneyLimit;
 
     /**
      * 冻结金额
@@ -382,7 +382,7 @@ public class UserDTO {
      *
      * @return user_money - 可提现余额(中的钱)
      */
-    public BigDecimal getUserMoney() {
+    public String getUserMoney() {
         return userMoney;
     }
 
@@ -391,7 +391,7 @@ public class UserDTO {
      *
      * @param userMoney 可提现余额(中的钱)
      */
-    public void setUserMoney(BigDecimal userMoney) {
+    public void setUserMoney(String userMoney) {
         this.userMoney = userMoney;
     }
 
@@ -400,7 +400,7 @@ public class UserDTO {
      *
      * @return user_money_limit - 不可提现余额(充值的钱)
      */
-    public BigDecimal getUserMoneyLimit() {
+    public String getUserMoneyLimit() {
         return userMoneyLimit;
     }
 
@@ -409,7 +409,7 @@ public class UserDTO {
      *
      * @param userMoneyLimit 不可提现余额(充值的钱)
      */
-    public void setUserMoneyLimit(BigDecimal userMoneyLimit) {
+    public void setUserMoneyLimit(String userMoneyLimit) {
         this.userMoneyLimit = userMoneyLimit;
     }
 

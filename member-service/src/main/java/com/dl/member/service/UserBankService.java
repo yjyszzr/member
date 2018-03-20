@@ -27,7 +27,9 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBankMapper;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.UserRealDTO;
+import com.dl.member.dto.WithDrawShowDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.User;
 import com.dl.member.model.UserBank;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
@@ -50,6 +52,9 @@ public class UserBankService extends AbstractService<UserBank> {
 	
 	@Resource
 	private MemberConfig memberConfig;
+	
+	@Resource
+	private UserService userService;
     
     @Transactional
     public void saveUserBank(UserBankDTO userBankDTO) {
@@ -88,23 +93,33 @@ public class UserBankService extends AbstractService<UserBank> {
      * @return
      */
 	public BaseResult<UserBankDTO> addBankCard(String bankCardNo){
+		UserRealDTO userRealDTO = userRealService.queryUserReal();
+		if(null == userRealDTO) {
+			return ResultGenerator.genResult(MemberEnums.NOT_REAL_AUTH.getcode(), MemberEnums.NOT_REAL_AUTH.NOT_REAL_AUTH.getMsg());
+		}
+		
 		UserBank userBank = this.findBy("cardNo", bankCardNo);
 		if(null != userBank) {
 			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg());
 		}
 		
-		UserRealDTO userRealDTO = userRealService.queryUserReal();
+		BaseResult<UserBankDTO> detectRst = this.detectUserBank(bankCardNo);
+		if(detectRst.getCode() != 0) {
+			return ResultGenerator.genResult(detectRst.getCode(), detectRst.getMsg());
+		}
+		
+		UserBankDTO userBankDTO = detectRst.getData();
 		String idCard = userRealDTO.getIdCode();
 		String realName = userRealDTO.getRealName();
-		UserBankDTO userBankDTO = new UserBankDTO();
+		
 		BaseResult<String> atuhRst = this.bankCardAuth3(realName, bankCardNo,idCard);
-		if(atuhRst.getCode() == 0) {
-			userBankDTO = this.queryUserBankType(bankCardNo);
-		}else {
-			throw new ServiceException(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg());
+		if(atuhRst.getCode() != 0) {
+			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg());
 		}
+		
 		userBankDTO.setRealName(realName);
 		userBankDTO.setCardNo(bankCardNo);
+		userBankDTO.setStatus(ProjectConstant.USER_BANK_DEFAULT);
 		this.saveUserBank(userBankDTO);
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
@@ -147,22 +162,22 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genFailResult(message);
 		}
 	}
-	
+
 	/**
-	 * 查询银行卡类型信息
+	 * 查询银行卡种类
 	 * @param cardNo
 	 * @return
 	 */
-	public UserBankDTO queryUserBankType(String cardNo) {
+	public BaseResult<UserBankDTO> detectUserBank(String cardNo) {
 		ClientHttpRequestFactory clientFactory = restTemplateConfig.simpleClientHttpRequestFactory();
 		RestTemplate rest = restTemplateConfig.restTemplate(clientFactory);
 		HttpHeaders headers = new HttpHeaders();
 		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
 		headers.setContentType(type);
 
-		StringBuffer url = new StringBuffer(memberConfig.getBankTypeUrl());
-		url.append("?key=" + memberConfig.getBankTypeKey());
-		url.append("&num=" + cardNo);
+		StringBuffer url = new StringBuffer(memberConfig.getDetectBankTypeUrl());
+		url.append("?key=" + memberConfig.getDetectBankTypeKey());
+		url.append("&bankcard=" + cardNo);
 		String rst = rest.getForObject(url.toString(), String.class);
 
 		JSONObject json = null;
@@ -176,13 +191,86 @@ public class UserBankService extends AbstractService<UserBank> {
 		Integer errorCode = (Integer)json.getInteger("error_code");
 		if(0 == errorCode) {
 			UserBankDTO userBankDTO = new UserBankDTO();
-			userBankDTO.setBankName(json_tmp.getString("bank")+json_tmp.getString("type"));
+			userBankDTO.setBankName(json_tmp.getString("bank"));
 			userBankDTO.setBankLogo(json_tmp.getString("logo"));
-			return userBankDTO;
+			userBankDTO.setCardType(json_tmp.getString("cardtype"));
+			if(!"借记卡".equals(json_tmp.getString("cardtype"))) {
+				return ResultGenerator.genResult(MemberEnums.NOT_DEBIT_CARD.getcode(), MemberEnums.NOT_DEBIT_CARD.getMsg());
+			}
+			
+			return ResultGenerator.genSuccessResult("查询银行卡种类成功", userBankDTO) ;
 		}else {
-			return null;
+			return ResultGenerator.genFailResult(json_tmp.getString("reason"), null);
 		}
 	}
+	
+	
+	/**
+	 * 查询银行卡类型信息
+	 * @param cardNo
+	 * @return
+	 */
+//	public BaseResult<UserBankDTO> queryUserBankType(String cardNo) {
+//		ClientHttpRequestFactory clientFactory = restTemplateConfig.simpleClientHttpRequestFactory();
+//		RestTemplate rest = restTemplateConfig.restTemplate(clientFactory);
+//		HttpHeaders headers = new HttpHeaders();
+//		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
+//		headers.setContentType(type);
+//
+//		StringBuffer url = new StringBuffer(memberConfig.getBankTypeUrl());
+//		url.append("?key=" + memberConfig.getBankTypeKey());
+//		url.append("&num=" + cardNo);
+//		String rst = rest.getForObject(url.toString(), String.class);
+//
+//		JSONObject json = null;
+//		try {
+//			json = JSON.parseObject(rst);
+//		} catch (Exception e) {
+//			log.error(e.getMessage());
+//		}
+//
+//		JSONObject json_tmp = (JSONObject) json.get("result");
+//		Integer errorCode = (Integer)json.getInteger("error_code");
+//		if(0 == errorCode) {
+//			UserBankDTO userBankDTO = new UserBankDTO();
+//			userBankDTO.setBankName(json_tmp.getString("bank")+json_tmp.getString("type"));
+//			userBankDTO.setBankLogo(json_tmp.getString("logo"));
+//			return ResultGenerator.genSuccessResult("查询银行卡种类成功", userBankDTO) ;
+//		}else {
+//			return ResultGenerator.genFailResult(json_tmp.getString("reason"), null);
+//		}
+//	}
+
+	/**
+	 * 提现界面的数据显示：当前可提现余额和当前默认银行卡信息
+	 * @return
+	 */
+	public BaseResult<WithDrawShowDTO> queryWithDrawShow(){
+		Integer userId = SessionUtil.getUserId();
+		User user = userService.findById(userId);
+		
+		Condition condition = new Condition(UserBank.class);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("user_id=", userId);
+		List<UserBank> userBankList = this.findByCondition(condition);
+		
+		StringBuffer label = new StringBuffer();
+		if(!CollectionUtils.isEmpty(userBankList)) {
+			userBankList.stream().filter(s->s.getStatus().equals(ProjectConstant.USER_BANK_DEFAULT));
+			UserBank userBank = userBankList.get(0);		
+			String cardNo = userBank.getCardNo();
+			label.append(userBank.getBankName()+"(储蓄卡)"+cardNo.substring(cardNo.length()-4, cardNo.length()));
+		}else {
+			label.toString();
+		}
+
+		WithDrawShowDTO withDrawShowDTO = new WithDrawShowDTO();
+		withDrawShowDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+		withDrawShowDTO.setDefaultBankCardLabel(label.toString());
+
+		return ResultGenerator.genSuccessResult("查询提现界面的数据显示信息成功",withDrawShowDTO);
+	}
+	
 	
 	/**
 	 * 查询用户银行卡列表
@@ -206,5 +294,20 @@ public class UserBankService extends AbstractService<UserBank> {
 			userBankDTOList.add(userBankDTO);
 		}
 		return ResultGenerator.genSuccessResult("查询银行卡列表成功",userBankDTOList);
+	}
+	
+	/**
+	 * 更改银行卡状态
+	 * @return
+	 */
+	public BaseResult<String> updateUserBankDefault(Integer userBankId){
+		Integer userId = SessionUtil.getUserId();
+		List<Integer> ids = new ArrayList<>();
+		ids.add(userBankId);
+		int updateRst = userBankMapper.batchUpdateUserBankStatus(ProjectConstant.USER_BANK_DEFAULT, ids);	
+		if(1 != updateRst) {
+			log.error("更新银行卡状态失败");
+		}
+		return ResultGenerator.genSuccessResult("更改银行卡状态成功");
 	}
 }

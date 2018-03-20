@@ -8,5 +8,5 @@ import com.dl.base.mapper.Mapper;
 import com.dl.member.model.UserBank;
 
 public interface UserBankMapper extends Mapper<UserBank> {
-	int batchUpdateUserBankStatus(@Param("status") String status,List<Integer> ids);
+	int batchUpdateUserBankStatus(@Param("status") String status,@Param("list") List<Integer> list);
 }

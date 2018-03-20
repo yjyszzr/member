@@ -56,6 +56,13 @@ public interface IUserAccountService {
 	@RequestMapping(path="/user/account/rollbackUserAccountChangeByPay", method=RequestMethod.POST)
 	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam);
 	
+//	/**
+//	 * 用户申请提现接口
+//	 * @param userRefundParam
+//	 * @return
+//	 */	
+//	@RequestMapping(path="/user/account/createReCharege", method=RequestMethod.POST)
+//	public BaseResult<UserCapitalDTO> createReCharege(@RequestBody UserCapitalParam userCapitalParam);
 	
 //	
 //	/**

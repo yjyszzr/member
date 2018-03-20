@@ -82,7 +82,7 @@ public class SmsController {
     	}
     	
     	//缓存验证码
-    	int expiredTime = ProjectConstant.SMS_REDIS_EXPIRED * 10;
+    	int expiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
     	String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
     	stringRedisTemplate.opsForValue().set(key, strRandom4, expiredTime, TimeUnit.SECONDS);
     	

@@ -20,16 +20,17 @@ public class ProjectConstant {
     public static final String REGISTER_TPLID = "66686";
     public static final String LOGIN_TPLID = "66839";
     public static final String RESETPASS_TPLID = "66838";
+    
 	/**
 	 * 缓存存放验证码的有效时长
 	 */
-	public final static int SMS_REDIS_EXPIRED = 48000;
-    
+	public final static int SMS_REDIS_EXPIRED = 60;
     public static final String USER_DEFAULT_HEADING_IMG = "http://i9-static.jjwxc.net/novelimage.php?novelid=3385656&coverid=100&ver=d8d2de8a8fb398618c161418abc58f04";
+    public static final String JUHEIMAGE_URL = "http://images.juheapi.com/banklogo/";
     public static final String LOGIN_SOURCE_ANDROID = "1";
     public static final String LOGIN_SOURCE_IOS = "2";
     public static final String LOGIN_SOURCE_PC = "3";
-    public static final String LOGIN_SOURCE_H5 = "4"; 
+    public static final String LOGIN_SOURCE_H5 = "4";
     
     public static final String ANDROID = "android";
     public static final String IOS = "ios";

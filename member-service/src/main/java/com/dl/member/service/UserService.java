@@ -50,7 +50,8 @@ public class UserService extends AbstractService<User> {
 		UserDTO userDTO = new UserDTO();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
-			userDTO.setIsReal(user.getIsReal().equals(1)?"1":"0");
+			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+			userDTO.setIsReal(user.getIsReal().equals("1")?"1":"0");
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}
@@ -154,6 +155,8 @@ public class UserService extends AbstractService<User> {
 		UserDTO userDTO = new UserDTO();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
+			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}

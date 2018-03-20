@@ -15,7 +15,9 @@ public enum MemberEnums {
 	BONUS_UNUSED(301021,"红包未使用"),
 	MONEY_IS_NOT_ENOUGH(301022,"用户余额不足"),
 	USERACCOUNTS_ALREADY_REDUCE(301023,"用户账户已扣款"),
-	BANKCARD_ALREADY_AUTH(301024,"该银行卡号已经认证过");
+	BANKCARD_ALREADY_AUTH(301024,"该银行卡号已经认证过"),
+	NOT_DEBIT_CARD(301025,"不支持添加非储蓄卡"),
+	NOT_REAL_AUTH(301026,"未进行实名认证");
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	
 //	NO_SHOP_MEM(301014,"用户不是店铺会员"),

@@ -31,6 +31,13 @@ public class MemberConfig {
 	
 	@Value("${juhe.bankType.key}")
 	private String bankTypeKey;
+		
+	//juhe 查询银行卡种类
+	@Value("${juhe.detectBankType.api.url}")
+	private String detectBankTypeUrl;
+	
+	@Value("${juhe.detectBankType.key}")
+	private String detectBankTypeKey;
 	
 	//juhe 短信接口
 	@Value("${juhe.sms.api.url}")
