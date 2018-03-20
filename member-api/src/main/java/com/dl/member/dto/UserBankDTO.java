@@ -14,10 +14,7 @@ import lombok.Data;
 @Data
 public class UserBankDTO {
 	@ApiModelProperty("银行卡主键")
-    private Integer userBankId;
-
-	@ApiModelProperty("用户id")
-    private Integer userId;
+    private String userBankId;
 
 	@ApiModelProperty("真实姓名")
     private String realName;

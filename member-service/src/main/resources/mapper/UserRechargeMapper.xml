@@ -19,4 +19,21 @@
     <result column="payment_id" jdbcType="VARCHAR" property="paymentId" />
     <result column="donation_id" jdbcType="VARCHAR" property="donationId" />
   </resultMap>
+  
+  <insert id="insertUserRecharge"  parameterType="com.dl.member.model.UserRecharge">
+     INSERT INTO dl_user_recharge(recharge_sn,user_id,amount,add_time,status)
+     VALUES((#{recharge_sn},#{user_id},#{amount},#{add_time},#{status});
+  </insert>
+  
+  
+  <update id="updateUserRechargeBySelective" parameterType="com.dl.member.model.UserRecharge">
+   	 UPDATE dl_user_recharge
+		 <trim prefix="set" suffixOverrides=",">
+		  <if test="paymentCode!=null">payment_code=#{paymentCode},</if>
+		  <if test="paymentName">payment_name=#{paymentName},</if>
+		  <if test="payTime!=null">pay_time=#{payTime},</if>
+		  <if test="paymentId!=null">payment_id=#{paymentId},</if>
+		 </trim>
+	 WHERE id = #{id}  
+  </update>
 </mapper>

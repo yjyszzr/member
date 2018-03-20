@@ -38,7 +38,7 @@ public class UserRecharge {
     /**
      * 提现或充值状态,1-已完成，0-未完成
      */
-    private Boolean status;
+    private String status;
 
     /**
      * 类型0-提现 1-充值
@@ -181,7 +181,7 @@ public class UserRecharge {
      *
      * @return status - 提现或充值状态,1-已完成，0-未完成
      */
-    public Boolean getStatus() {
+    public String getStatus() {
         return status;
     }
 
@@ -190,7 +190,7 @@ public class UserRecharge {
      *
      * @param status 提现或充值状态,1-已完成，0-未完成
      */
-    public void setStatus(Boolean status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

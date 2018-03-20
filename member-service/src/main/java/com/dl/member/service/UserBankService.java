@@ -1,4 +1,5 @@
 package com.dl.member.service;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collector;
@@ -21,6 +22,7 @@ import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
+import com.dl.base.util.RandomUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
@@ -277,17 +279,16 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * @return
 	 */
 	public BaseResult<List<UserBankDTO>> queryUserBankList(){
-		Integer userId = SessionUtil.getUserId();
-		Condition condition = new Condition(UserBank.class);
-		Criteria criteria = condition.createCriteria();
-		criteria.andCondition("user_id=", userId);
-		List<UserBank> userBankList = this.findByCondition(condition);
+		Integer userId = SessionUtil.getUserId();		
+		List<UserBank> userBankList = userBankMapper.queryUserBonusList(userId);
 		
 		List<UserBankDTO>  userBankDTOList = new ArrayList<>();
 		for(UserBank userBank:userBankList) {
 			UserBankDTO userBankDTO = new UserBankDTO();
 			try {
 				BeanUtils.copyProperties(userBankDTO, userBank);
+				userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
+				userBankDTO.setCardNo(this.hiddenBankCardNo(userBank.getCardNo()));
 			} catch (Exception e) {
 				throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 			} 
@@ -297,16 +298,65 @@ public class UserBankService extends AbstractService<UserBank> {
 	}
 	
 	/**
+	 * 隐藏银行卡号第5位到倒数第5位
+	 * @param cardNo
+	 * @return
+	 */
+	public String  hiddenBankCardNo(String cardNo) {
+		String subStr = cardNo.substring(4, cardNo.length() - 4);
+		String hiddenStr = RandomUtil.generateUpperString(subStr.length());
+		return cardNo.replace(subStr, hiddenStr);
+	}
+	
+	/**
+	 * 删除银行卡
+	 * @param userBankId
+	 * @return
+	 */
+	public BaseResult<UserBankDTO> deleteUserBank(Integer userBankId){
+		Integer userId = SessionUtil.getUserId();
+		int rst = userBankMapper.updateUserBankDelete(userBankId);
+		if(1 != rst) {
+			log.error("删除银行卡成功失败");
+		}
+		
+		UserBankDTO userBankDTO = new UserBankDTO();
+		List<UserBank> uerBankList = userBankMapper.queryUserBonusList(userId);
+		if(uerBankList.size() == 0) {
+			return ResultGenerator.genResult(MemberEnums.NO_BANKCARDS.getcode(), MemberEnums.NO_BANKCARDS.getMsg());
+		}else {
+			UserBank userBank = uerBankList.get(0);
+			try {
+				BeanUtils.copyProperties(userBankDTO, userBank);
+				userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
+			} catch (Exception e) {
+				log.error(e.getMessage());
+			} 
+		}
+		
+		return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTO);
+	}
+	
+	/**
 	 * 更改银行卡状态
 	 * @return
 	 */
 	public BaseResult<String> updateUserBankDefault(Integer userBankId){
 		Integer userId = SessionUtil.getUserId();
+		Condition condition = new Condition(UserBank.class);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("user_id=", userId);
+		List<UserBank> userBankList = this.findByCondition(condition);
+		if(userBankList.size() == 1) {
+			return ResultGenerator.genResult(MemberEnums.CURRENT_ONE_CARD.getcode(), MemberEnums.CURRENT_ONE_CARD.getMsg());
+		}
+		
 		List<Integer> ids = new ArrayList<>();
 		ids.add(userBankId);
 		int updateRst = userBankMapper.batchUpdateUserBankStatus(ProjectConstant.USER_BANK_DEFAULT, ids);	
 		if(1 != updateRst) {
-			log.error("更新银行卡状态失败");
+			log.error("数据库更新银行卡状态失败");
+			return ResultGenerator.genFailResult("更新银行卡状态失败");
 		}
 		return ResultGenerator.genSuccessResult("更改银行卡状态成功");
 	}

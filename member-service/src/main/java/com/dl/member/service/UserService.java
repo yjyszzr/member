@@ -156,6 +156,10 @@ public class UserService extends AbstractService<User> {
 		UserDTO userDTO = new UserDTO();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
+			String strRandom4 = RandomUtil.generateUpperString(4);
+			String mobile = user.getMobile();
+			mobile = mobile.replace(mobile.substring(3, 7), strRandom4);
+			userDTO.setMobile(mobile);
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
 		} catch (Exception e) {

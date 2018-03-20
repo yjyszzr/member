@@ -14,12 +14,6 @@ import lombok.Data;
 @ApiModel("用户信息")
 @Data
 public class UserDTO {
-    /**
-     * 用户ID
-     */
-    @Id
-    @Column(name = "user_id")
-    private Integer userId;
 
     /**
      * 用户名
@@ -193,23 +187,6 @@ public class UserDTO {
     @Column(name = "user_remark")
     private String userRemark;
 
-    /**
-     * 获取用户ID
-     *
-     * @return user_id - 用户ID
-     */
-    public Integer getUserId() {
-        return userId;
-    }
-
-    /**
-     * 设置用户ID
-     *
-     * @param userId 用户ID
-     */
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
 
     /**
      * 获取用户名

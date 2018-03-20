@@ -18,8 +18,6 @@ public class UserLoginDTO implements Serializable {
     private static final long serialVersionUID = 3986112934396561329L;
     @ApiModelProperty("token")
     private String token;
-    @ApiModelProperty("用户id")
-    private Integer userId;
     @ApiModelProperty("用户手机号")
     private String mobile;
     @ApiModelProperty("用户昵称")

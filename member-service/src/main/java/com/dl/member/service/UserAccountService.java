@@ -1,6 +1,9 @@
 package com.dl.member.service;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
+import com.dl.member.param.UpdateUserRechargeParam;
+import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.param.OrderSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -12,12 +15,15 @@ import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.api.IOrderService;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
+import com.dl.dto.OrderDTO;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -40,6 +46,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
     @Resource
     private UserService userService;
     
+    @Resource
+    private IOrderService orderService;
+    
     /**
      * @param String orderSn,String surplus
      * @return
@@ -59,7 +68,20 @@ public class UserAccountService extends AbstractService<UserAccount> {
         if (surplus.compareTo(BigDecimal.ZERO) == -1) {
             return ResultGenerator.genBadRequestResult("扣减余额不能为负数");
         }
-
+        
+        OrderSnParam orderSnParam = new OrderSnParam();
+        orderSnParam.setOrderSn(orderSn);
+        BaseResult<OrderDTO> orderRst = orderService.getOrderInfoByOrderSn(orderSnParam);
+        if(orderRst.getCode() != 0) {
+        	return ResultGenerator.genResult(orderRst.getCode(), orderRst.getMsg());
+        }
+        
+        OrderDTO orderDTO = orderRst.getData();
+        if(orderDTO != null) {
+        	return ResultGenerator.genSuccessResult("获取订单信息成功");
+        }
+        
+        
         Condition c = new Condition(UserAccount.class);
         Criteria criteria = c.createCriteria();
         criteria.andCondition("order_sn =", orderSn);
@@ -189,6 +211,47 @@ public class UserAccountService extends AbstractService<UserAccount> {
         
         return surplusPaymentCallbackDTO;
     }
+    
+    /**
+     * 创建充值单
+     * @param amount
+     * @return
+     */
+    public BaseResult<String> createReCharege(BigDecimal amount){
+    	
+		return null;
+    }
+    
+    /**
+     * 更新充值单
+     * @param updateUserRechargeParam
+     * @return
+     */
+    public BaseResult<String> updateReCharege(UpdateUserRechargeParam updateUserRechargeParam){
+    	
+    	return null;
+    }
+    
+    /**
+     * 创建提现单
+     * @param amount
+     * @return
+     */
+    public BaseResult<String> createUserWithdraw(BigDecimal amount){
+    	
+		return null;
+    }
+    
+    /**
+     * 更新提现单
+     * @param amount
+     * @return
+     */
+    public BaseResult<String> updateUserWithdraw(UpdateUserWithdrawParam updateUserWithdrawParam){
+    	
+		return null;
+    }
+    
  
     /**
      * 查询用户余额明细列表

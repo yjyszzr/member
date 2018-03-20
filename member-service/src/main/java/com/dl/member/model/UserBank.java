@@ -39,6 +39,12 @@ public class UserBank {
      */
     private String bankLogo;
     
+	/**
+     * 是否删除
+     */
+    private Integer isDelete;
+    
+    
     /**
      * 银行卡名称
      */
@@ -61,6 +67,15 @@ public class UserBank {
 		this.bankName = bankName;
 	}
 
+	
+    public Integer getIsDelete() {
+		return isDelete;
+	}
+
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
+	}
+	
 	/**
      * 获取主键id
      *
