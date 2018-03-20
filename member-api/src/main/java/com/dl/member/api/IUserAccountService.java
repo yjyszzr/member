@@ -6,12 +6,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.UserRechargeDTO;
+import com.dl.member.param.AmountParam;
 import com.dl.member.param.RollackSurplusPayParam;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
 //import com.pgt.shop.member.param.CancelChangeParam;
 //import com.pgt.shop.member.param.ConfirmOrderParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserBonusParam;
+import com.dl.member.param.UpdateUserRechargeParam;
+import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserWithdrawParam;
 //import com.pgt.shop.member.param.UserCapitalParam;
 //import com.pgt.shop.member.param.UserRefundParam;
 
@@ -56,13 +61,38 @@ public interface IUserAccountService {
 	@RequestMapping(path="/user/account/rollbackUserAccountChangeByPay", method=RequestMethod.POST)
 	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam);
 	
-//	/**
-//	 * 用户申请提现接口
-//	 * @param userRefundParam
-//	 * @return
-//	 */	
-//	@RequestMapping(path="/user/account/createReCharege", method=RequestMethod.POST)
-//	public BaseResult<UserCapitalDTO> createReCharege(@RequestBody UserCapitalParam userCapitalParam);
+	/**
+	 * 用户生成充值单
+	 * @param amountParam
+	 * @return
+	 */	
+	@RequestMapping(path="/user/account/createReCharege", method=RequestMethod.POST)
+	public BaseResult<UserRechargeDTO> createReCharege(@RequestBody AmountParam amountParam);
+	
+	/**
+	 * 更新用户充值单
+	 * @param userRechargeParam
+	 * @return
+	 */	
+	@RequestMapping(path="/user/account/updateReCharege", method=RequestMethod.POST)
+	public BaseResult<UserRechargeDTO> updateReCharege(@RequestBody UpdateUserRechargeParam updateUserRechargeParam);
+	
+	/**
+	 * 用户生成提现单
+	 * @param updateUserWithdrawParam
+	 * @return
+	 */	
+	@RequestMapping(path="/user/account/createUserWithdraw", method=RequestMethod.POST)
+	public BaseResult<UserRechargeDTO> createUserWithdraw(@RequestBody UserWithdrawParam userWithdrawParam);
+	
+	
+	/**
+	 * 更新用户提现单
+	 * @param updateUserWithdrawParam
+	 * @return
+	 */	
+	@RequestMapping(path="/user/account/updateUserWithdraw", method=RequestMethod.POST)
+	public BaseResult<UserRechargeDTO> updateUserWithdraw(@RequestBody UpdateUserWithdrawParam updateUserWithdrawParam);
 	
 //	
 //	/**

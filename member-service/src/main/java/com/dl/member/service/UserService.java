@@ -52,6 +52,7 @@ public class UserService extends AbstractService<User> {
 			BeanUtils.copyProperties(userDTO, user);
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setIsReal(user.getIsReal().equals("1")?"1":"0");
+			userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit())));
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}

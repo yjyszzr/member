@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.UserWithdrawMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserWithdraw">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="withdrawal_sn" jdbcType="VARCHAR" property="withdrawalSn" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="account_id" jdbcType="INTEGER" property="accountId" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="real_name" jdbcType="VARCHAR" property="realName" />
+    <result column="card_no" jdbcType="VARCHAR" property="cardNo" />
+    <result column="pay_time" jdbcType="INTEGER" property="payTime" />
+    <result column="payment_id" jdbcType="VARCHAR" property="paymentId" />
+  </resultMap>
+</mapper>
