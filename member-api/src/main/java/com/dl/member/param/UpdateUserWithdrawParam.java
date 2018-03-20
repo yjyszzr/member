@@ -12,6 +12,10 @@ import lombok.Data;
 @ApiModel("用户提现参数类")
 @Data
 public class UpdateUserWithdrawParam {
+	
+	
+	@ApiModelProperty("提现单号")
+    private String withdrawalSn;
 
 	@ApiModelProperty("提现单状态：0-未完成提现 1-已完成提现")
     private String status;

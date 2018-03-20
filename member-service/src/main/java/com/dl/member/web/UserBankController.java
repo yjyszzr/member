@@ -44,6 +44,17 @@ public class UserBankController {
     	return userBankService.queryUserBankList();
     }
     
+    
+    /**
+     * 删除银行卡
+     * @return
+     */
+    @ApiOperation(value = "删除银行卡", notes = "删除银行卡")
+    @PostMapping("/deleteUserBank")
+    public BaseResult<UserBankDTO> deleteUserBank(@RequestBody IDParam iDParam){
+    	return userBankService.deleteUserBank(iDParam.getId());
+    }
+    
     /**
      * 设置银行卡为当前默认
      * @return

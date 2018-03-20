@@ -9,6 +9,9 @@ import lombok.Data;
 @Data
 public class UpdateUserRechargeParam {
 	
+	@ApiModelProperty("充值单号")
+    private String rechargeSn;
+	
 	@ApiModelProperty("充值单状态：0-未完成充值 1-已完成充值")
     private String status;
 	

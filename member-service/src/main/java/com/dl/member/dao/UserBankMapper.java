@@ -12,5 +12,5 @@ public interface UserBankMapper extends Mapper<UserBank> {
 
 	int updateUserBankDelete(@Param("id") Integer id);
 	
-	List<UserBank> queryUserBonusList(@Param("user_id") Integer userId);
+	List<UserBank> queryUserBankList(@Param("userId") Integer userId);
 }

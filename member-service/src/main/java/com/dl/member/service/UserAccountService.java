@@ -75,12 +75,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         if(orderRst.getCode() != 0) {
         	return ResultGenerator.genResult(orderRst.getCode(), orderRst.getMsg());
         }
-        
         OrderDTO orderDTO = orderRst.getData();
-        if(orderDTO != null) {
-        	return ResultGenerator.genSuccessResult("获取订单信息成功");
-        }
-        
         
         Condition c = new Condition(UserAccount.class);
         Criteria criteria = c.createCriteria();

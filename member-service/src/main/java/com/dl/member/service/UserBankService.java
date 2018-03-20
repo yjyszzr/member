@@ -280,7 +280,7 @@ public class UserBankService extends AbstractService<UserBank> {
 	 */
 	public BaseResult<List<UserBankDTO>> queryUserBankList(){
 		Integer userId = SessionUtil.getUserId();		
-		List<UserBank> userBankList = userBankMapper.queryUserBonusList(userId);
+		List<UserBank> userBankList = userBankMapper.queryUserBankList(userId);
 		
 		List<UserBankDTO>  userBankDTOList = new ArrayList<>();
 		for(UserBank userBank:userBankList) {
@@ -317,11 +317,11 @@ public class UserBankService extends AbstractService<UserBank> {
 		Integer userId = SessionUtil.getUserId();
 		int rst = userBankMapper.updateUserBankDelete(userBankId);
 		if(1 != rst) {
-			log.error("删除银行卡成功失败");
+			log.error("删除银行卡失败");
 		}
 		
 		UserBankDTO userBankDTO = new UserBankDTO();
-		List<UserBank> uerBankList = userBankMapper.queryUserBonusList(userId);
+		List<UserBank> uerBankList = userBankMapper.queryUserBankList(userId);
 		if(uerBankList.size() == 0) {
 			return ResultGenerator.genResult(MemberEnums.NO_BANKCARDS.getcode(), MemberEnums.NO_BANKCARDS.getMsg());
 		}else {
