@@ -53,6 +53,11 @@ public class UserService extends AbstractService<User> {
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setIsReal(user.getIsReal().equals("1")?"1":"0");
 			userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit())));
+			String mobile = user.getMobile();
+			String strStar4 = RandomUtil.generateStarString(4);
+			String mobileStr = "";
+//			mobileStr.append(mobile.replace(mobile.substring(3, 7), strStar4));
+			userDTO.setMobile(mobileStr);
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}

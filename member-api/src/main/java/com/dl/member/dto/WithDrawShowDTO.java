@@ -16,7 +16,10 @@ public class WithDrawShowDTO {
 	@ApiModelProperty("可提现余额")
     private String userMoney;
 
-	@ApiModelProperty("默认银行卡显示信息")
-    private String defaultBankCardLabel;
+	@ApiModelProperty("银行卡名")
+    private String bankName;
+	
+	@ApiModelProperty("银行卡后4位")
+    private String lastCardNo4;
 	
 }

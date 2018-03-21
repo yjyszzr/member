@@ -255,20 +255,18 @@ public class UserBankService extends AbstractService<UserBank> {
 		Criteria criteria = condition.createCriteria();
 		criteria.andCondition("user_id=", userId);
 		List<UserBank> userBankList = this.findByCondition(condition);
-		
+		WithDrawShowDTO withDrawShowDTO = new WithDrawShowDTO();
 		StringBuffer label = new StringBuffer();
 		if(!CollectionUtils.isEmpty(userBankList)) {
 			userBankList.stream().filter(s->s.getStatus().equals(ProjectConstant.USER_BANK_DEFAULT));
-			UserBank userBank = userBankList.get(0);		
+			UserBank userBank = userBankList.get(0);	
 			String cardNo = userBank.getCardNo();
-			label.append(userBank.getBankName()+"(储蓄卡)"+cardNo.substring(cardNo.length()-4, cardNo.length()));
+			withDrawShowDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+			withDrawShowDTO.setBankName(userBank.getBankName());
+			withDrawShowDTO.setLastCardNo4(cardNo.substring(cardNo.length()-4, cardNo.length()));
 		}else {
-			label.toString();
+			return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "用户没有添加银行卡");
 		}
-
-		WithDrawShowDTO withDrawShowDTO = new WithDrawShowDTO();
-		withDrawShowDTO.setUserMoney(String.valueOf(user.getUserMoney()));
-		withDrawShowDTO.setDefaultBankCardLabel(label.toString());
 
 		return ResultGenerator.genSuccessResult("查询提现界面的数据显示信息成功",withDrawShowDTO);
 	}
@@ -304,7 +302,7 @@ public class UserBankService extends AbstractService<UserBank> {
 	 */
 	public String  hiddenBankCardNo(String cardNo) {
 		String subStr = cardNo.substring(4, cardNo.length() - 4);
-		String hiddenStr = RandomUtil.generateUpperString(subStr.length());
+		String hiddenStr = RandomUtil.generateStarString(subStr.length());
 		return cardNo.replace(subStr, hiddenStr);
 	}
 	
