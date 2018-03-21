@@ -352,7 +352,7 @@ public class UserBankService extends AbstractService<UserBank> {
 				} catch (Exception e) {
 					log.error(e.getMessage());
 				} 
-				return null;
+				return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTO);
 			}
 		}
 	}
