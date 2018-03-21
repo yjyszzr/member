@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 public class WithDrawShowDTO {
 	@ApiModelProperty("用户银行卡id")
-    private Integer userBankId;
+    private String userBankId;
 	
 	@ApiModelProperty("可提现余额")
     private String userMoney;

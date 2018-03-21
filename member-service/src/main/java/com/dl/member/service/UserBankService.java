@@ -268,9 +268,12 @@ public class UserBankService extends AbstractService<UserBank> {
 			String defaultBankLabel = userBank.getBankName()+"储蓄卡"+cardNo;
 			withDrawShowDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			withDrawShowDTO.setDefaultBankLabel(defaultBankLabel);
-			withDrawShowDTO.setUserBankId(userBank.getId());
+			withDrawShowDTO.setUserBankId(String.valueOf(userBank.getId()));
 		}else {
-			return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "用户没有添加银行卡");
+			withDrawShowDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+			withDrawShowDTO.setDefaultBankLabel("");
+			withDrawShowDTO.setUserBankId("");
+			return ResultGenerator.genSuccessResult("查询提现界面的数据显示信息成功",withDrawShowDTO);
 		}
 
 		return ResultGenerator.genSuccessResult("查询提现界面的数据显示信息成功",withDrawShowDTO);
