@@ -255,15 +255,20 @@ public class UserBankService extends AbstractService<UserBank> {
 		Condition condition = new Condition(UserBank.class);
 		Criteria criteria = condition.createCriteria();
 		criteria.andCondition("user_id=", userId);
+		criteria.andCondition("status=", "1");
+		criteria.andCondition("is_delete=", "0");
 		List<UserBank> userBankList = this.findByCondition(condition);
 		WithDrawShowDTO withDrawShowDTO = new WithDrawShowDTO();
+		
 		if(!CollectionUtils.isEmpty(userBankList)) {
 			userBankList.stream().filter(s->s.getStatus().equals(ProjectConstant.USER_BANK_DEFAULT));
 			UserBank userBank = userBankList.get(0);	
 			String cardNo = userBank.getCardNo();
+			cardNo = cardNo.substring(cardNo.length()-4, cardNo.length());
+			String defaultBankLabel = userBank.getBankName()+"储蓄卡"+cardNo;
 			withDrawShowDTO.setUserMoney(String.valueOf(user.getUserMoney()));
-			withDrawShowDTO.setBankName(userBank.getBankName());
-			withDrawShowDTO.setLastCardNo4(cardNo.substring(cardNo.length()-4, cardNo.length()));
+			withDrawShowDTO.setDefaultBankLabel(defaultBankLabel);
+			withDrawShowDTO.setUserBankId(userBank.getId());
 		}else {
 			return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "用户没有添加银行卡");
 		}
@@ -340,8 +345,10 @@ public class UserBankService extends AbstractService<UserBank> {
 				}
 				
 				try {
-					BeanUtils.copyProperties(userBankDTO, userBank);
+					BeanUtils.copyProperties(userBankDTO, userBankDefault);
+					String cardNo = userBankDefault.getCardNo();
 					userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
+					userBankDTO.setLastCardNo4(cardNo.substring(cardNo.length()-4, cardNo.length()));
 				} catch (Exception e) {
 					log.error(e.getMessage());
 				} 

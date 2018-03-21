@@ -13,13 +13,16 @@ import lombok.Data;
 @ApiModel("用户提现显示界面信息")
 @Data
 public class WithDrawShowDTO {
+	@ApiModelProperty("用户银行卡id")
+    private Integer userBankId;
+	
 	@ApiModelProperty("可提现余额")
     private String userMoney;
 
 	@ApiModelProperty("银行卡名")
     private String bankName;
 	
-	@ApiModelProperty("银行卡后4位")
-    private String lastCardNo4;
+	@ApiModelProperty("默认银行卡标签")
+    private String defaultBankLabel;
 	
 }

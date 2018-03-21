@@ -13,4 +13,5 @@ public interface UserBankMapper extends Mapper<UserBank> {
 	int updateUserBank(UserBank userBank);
 	
 	List<UserBank> queryUserBankList(@Param("userId") Integer userId);
+	
 }

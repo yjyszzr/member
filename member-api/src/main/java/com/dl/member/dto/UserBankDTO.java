@@ -34,5 +34,8 @@ public class UserBankDTO {
 	@ApiModelProperty("卡类型")
     private String cardType;
 	
+	@ApiModelProperty("银行卡号后4位")
+    private String lastCardNo4;
+	
 	
 }

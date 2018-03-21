@@ -57,7 +57,7 @@ public class UserService extends AbstractService<User> {
 			
 			String realName = "";
 			UserRealDTO userRealDTO = userRealService.queryUserReal();
-			if(userRealDTO == null) {
+			if(userRealDTO != null) {
 				realName = userRealDTO.getRealName();
 			}
 			
