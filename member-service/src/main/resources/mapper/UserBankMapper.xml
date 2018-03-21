@@ -12,7 +12,8 @@
     <result column="status" jdbcType="VARCHAR" property="status" />
     <result column="bank_logo" jdbcType="VARCHAR" property="bankLogo" />
     <result column="bank_name" jdbcType="VARCHAR" property="bankName" />
-    <result column="update_time" jdbcType="INTEGER" property="updateTime" />
+    <result column="last_time" jdbcType="INTEGER" property="lastTime" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
   </resultMap>
   
@@ -23,11 +24,17 @@
     </foreach>
   </update>
   
-  <update id="updateUserBankDelete">
-  	UPDATE dl_user_bank SET is_delete = 1  WHERE id = #{id}
+  <update id="updateUserBank" parameterType="com.dl.member.model.UserBank">
+  	UPDATE dl_user_bank 
+		 <trim prefix="set" suffixOverrides=",">
+		  <if test="isDelete!=null">is_delete=#{isDelete},</if>
+		  <if test="status!=null">status=#{status},</if>
+		  <if test="lastTime!=null">last_time=#{lastTime},</if>
+		 </trim>
+    WHERE id = #{id} 	
   </update>
   
   <select id ="queryUserBankList" resultMap="BaseResultMap">
-  	select * from dl_user_bank where user_id = #{userId} and is_delete = 0 order by update_time
+  	select * from dl_user_bank where user_id = #{userId} and is_delete = 0 order by add_time
   </select>
 </mapper>

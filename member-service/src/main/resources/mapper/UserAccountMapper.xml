@@ -11,8 +11,6 @@
     <result column="admin_user" jdbcType="VARCHAR" property="adminUser" />
     <result column="amount" jdbcType="DECIMAL" property="amount" />
     <result column="cur_balance" jdbcType="DECIMAL" property="curBalance" />
-    <result column="user_surplus" jdbcType="DECIMAL" property="userSurplus" />
-    <result column="user_surplus_limit" jdbcType="DECIMAL" property="userSurplusLimit" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="last_time" jdbcType="INTEGER" property="lastTime" />
     <result column="process_type" jdbcType="TINYINT" property="processType" />
@@ -26,4 +24,12 @@
   <select id="queryUserAccountList"  resultMap="BaseResultMap">
   		SELECT *  FROM dl_user_account a WHERE a.user_id=#{userId} ORDER BY add_time DESC
   </select>
+  
+  <insert id="insertUserAccount">
+  	INSERT INTO dl_user_account(account_sn,user_id,admin_user,amount,
+  	cur_balance,add_time,last_time,process_type,payment_code,payment_name,
+  	order_sn,parent_sn,note) 
+  	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},
+  	#{curBalance},#{addTime},#{lastTime},#{processType},#{paymentCode},#{paymentName},#{orderSn},#{parentSn},#{note});
+  </insert>
 </mapper>

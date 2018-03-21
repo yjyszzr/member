@@ -1,5 +1,6 @@
 package com.dl.member.service;
 import com.dl.member.model.UserRecharge;
+import com.dl.member.param.UpdateUserRechargeParam;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,6 +46,27 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
     		log.error("");
     	}
 		return 0;
+    }
+    
+    
+    /**
+     * 更新充值单
+     * @param amount
+     * @return
+     */
+    public int updateReCharege(UpdateUserRechargeParam updateUserRechargeParam){
+    	Integer userId = SessionUtil.getUserId();
+    	UserRecharge userRecharge = new UserRecharge();
+    	userRecharge.setPaymentCode(updateUserRechargeParam.getPaymentCode());
+    	userRecharge.setPaymentId(updateUserRechargeParam.getPaymentId());
+    	userRecharge.setPaymentName(updateUserRechargeParam.getPaymentName());
+    	userRecharge.setPayTime(updateUserRechargeParam.getPayTime());
+    	userRecharge.setStatus(updateUserRechargeParam.getStatus());
+    	int rst = userRechargeMapper.updateByPrimaryKey(userRecharge);
+    	if(1 != rst) {
+    		log.error("更新数据库充值单失败");
+    	}
+		return rst;
     }
     
     /**

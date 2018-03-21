@@ -38,17 +38,6 @@ public class UserAccount {
     @Column(name = "cur_balance")
     private BigDecimal curBalance;
 
-    /**
-     * 可提现余额支付
-     */
-    @Column(name = "user_surplus")
-    private BigDecimal userSurplus;
-
-    /**
-     * 不可提现余额支付
-     */
-    @Column(name = "user_surplus_limit")
-    private BigDecimal userSurplusLimit;
 
     /**
      * 添加时间
@@ -193,42 +182,6 @@ public class UserAccount {
      */
     public void setCurBalance(BigDecimal curBalance) {
         this.curBalance = curBalance;
-    }
-
-    /**
-     * 获取可提现余额支付
-     *
-     * @return user_surplus - 可提现余额支付
-     */
-    public BigDecimal getUserSurplus() {
-        return userSurplus;
-    }
-
-    /**
-     * 设置可提现余额支付
-     *
-     * @param userSurplus 可提现余额支付
-     */
-    public void setUserSurplus(BigDecimal userSurplus) {
-        this.userSurplus = userSurplus;
-    }
-
-    /**
-     * 获取不可提现余额支付
-     *
-     * @return user_surplus_limit - 不可提现余额支付
-     */
-    public BigDecimal getUserSurplusLimit() {
-        return userSurplusLimit;
-    }
-
-    /**
-     * 设置不可提现余额支付
-     *
-     * @param userSurplusLimit 不可提现余额支付
-     */
-    public void setUserSurplusLimit(BigDecimal userSurplusLimit) {
-        this.userSurplusLimit = userSurplusLimit;
     }
 
     /**

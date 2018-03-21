@@ -38,7 +38,7 @@ public class UserWithdraw {
     /**
      * 提现状态,1-已完成，0-未完成
      */
-    private Boolean status;
+    private Integer status;
 
     /**
      * 支付代码
@@ -169,7 +169,7 @@ public class UserWithdraw {
      *
      * @return status - 提现状态,1-已完成，0-未完成
      */
-    public Boolean getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
@@ -178,7 +178,7 @@ public class UserWithdraw {
      *
      * @param status 提现状态,1-已完成，0-未完成
      */
-    public void setStatus(Boolean status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

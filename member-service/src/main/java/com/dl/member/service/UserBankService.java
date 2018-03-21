@@ -1,10 +1,7 @@
 package com.dl.member.service;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,6 +19,7 @@ import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
+import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
@@ -33,6 +31,7 @@ import com.dl.member.dto.WithDrawShowDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.model.UserBank;
+import com.dl.member.param.DeleteBankCardParam;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
@@ -68,6 +67,8 @@ public class UserBankService extends AbstractService<UserBank> {
     	userBank.setStatus(ProjectConstant.USER_BANK_DEFAULT);
     	userBank.setBankLogo(userBankDTO.getBankLogo());
     	userBank.setBankName(userBankDTO.getBankName());
+    	userBank.setAddTime(DateUtil.getCurrentTimeLong());
+    	userBank.setLastTime(DateUtil.getCurrentTimeLong());
     	
     	//把已经添加的银行卡 设为非默认
 		Condition condition = new Condition(UserBank.class);
@@ -256,7 +257,6 @@ public class UserBankService extends AbstractService<UserBank> {
 		criteria.andCondition("user_id=", userId);
 		List<UserBank> userBankList = this.findByCondition(condition);
 		WithDrawShowDTO withDrawShowDTO = new WithDrawShowDTO();
-		StringBuffer label = new StringBuffer();
 		if(!CollectionUtils.isEmpty(userBankList)) {
 			userBankList.stream().filter(s->s.getStatus().equals(ProjectConstant.USER_BANK_DEFAULT));
 			UserBank userBank = userBankList.get(0);	
@@ -311,28 +311,43 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * @param userBankId
 	 * @return
 	 */
-	public BaseResult<UserBankDTO> deleteUserBank(Integer userBankId){
+	public BaseResult<UserBankDTO> deleteUserBank(DeleteBankCardParam deleteBankCardParam){
 		Integer userId = SessionUtil.getUserId();
-		int rst = userBankMapper.updateUserBankDelete(userBankId);
+		UserBank userBank = new UserBank();
+		userBank.setId(deleteBankCardParam.getId());
+		userBank.setStatus("1");
+		userBank.setLastTime(DateUtil.getCurrentTimeLong());
+		int rst = userBankMapper.updateUserBank(userBank);
 		if(1 != rst) {
 			log.error("删除银行卡失败");
 		}
 		
-		UserBankDTO userBankDTO = new UserBankDTO();
-		List<UserBank> uerBankList = userBankMapper.queryUserBankList(userId);
-		if(uerBankList.size() == 0) {
-			return ResultGenerator.genResult(MemberEnums.NO_BANKCARDS.getcode(), MemberEnums.NO_BANKCARDS.getMsg());
-		}else {
-			UserBank userBank = uerBankList.get(0);
-			try {
-				BeanUtils.copyProperties(userBankDTO, userBank);
-				userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
-			} catch (Exception e) {
-				log.error(e.getMessage());
-			} 
+		if("0".equals(deleteBankCardParam.getStatus())) {//非默认
+			return ResultGenerator.genSuccessResult("删除银行卡成功");
+		}else {//默认
+			UserBankDTO userBankDTO = new UserBankDTO();
+			List<UserBank> uerBankList = userBankMapper.queryUserBankList(userId);
+			if(uerBankList.size() == 0) {
+				return ResultGenerator.genSuccessResult("删除银行卡成功");
+			}else {
+				UserBank userBankDefault = uerBankList.get(0);
+				UserBank updateUserBank = new UserBank();
+				updateUserBank.setId(userBankDefault.getId());
+				updateUserBank.setStatus("1");
+				int updateRst = userBankMapper.updateUserBank(updateUserBank);
+				if(1 != updateRst) {
+					log.error("更新银行卡失败");
+				}
+				
+				try {
+					BeanUtils.copyProperties(userBankDTO, userBank);
+					userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
+				} catch (Exception e) {
+					log.error(e.getMessage());
+				} 
+				return null;
+			}
 		}
-		
-		return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTO);
 	}
 	
 	/**
@@ -349,13 +364,35 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genResult(MemberEnums.CURRENT_ONE_CARD.getcode(), MemberEnums.CURRENT_ONE_CARD.getMsg());
 		}
 		
-		List<Integer> ids = new ArrayList<>();
-		ids.add(userBankId);
-		int updateRst = userBankMapper.batchUpdateUserBankStatus(ProjectConstant.USER_BANK_DEFAULT, ids);	
+		
+		UserBank userBank = new UserBank();
+		userBank.setId(userBankId);
+		userBank.setStatus("1");
+		userBank.setLastTime(DateUtil.getCurrentTimeLong());
+		int updateRst = userBankMapper.updateUserBank(userBank);	
 		if(1 != updateRst) {
 			log.error("数据库更新银行卡状态失败");
 			return ResultGenerator.genFailResult("更新银行卡状态失败");
 		}
+		
+		Condition conditionNew  = new Condition(UserBank.class);
+		Criteria criteriaNew = conditionNew.createCriteria();
+		criteriaNew.andCondition("user_id=", userId);
+		criteriaNew.andCondition("status=", "1");
+		criteriaNew.andCondition("is_delete=", "0");
+		List<UserBank> userBankListNew = this.findByCondition(conditionNew);
+		UserBank userBankNew = userBankListNew.get(0);
+		
+		UserBank userBankNewNew = new UserBank();
+		userBankNewNew.setId(userBankNew.getId());
+		userBankNewNew.setStatus("0");
+		userBankNewNew.setLastTime(DateUtil.getCurrentTimeLong());
+		int updateNewRst = userBankMapper.updateUserBank(userBankNewNew);
+		if(1 != updateNewRst) {
+			log.error("数据库更新银行卡状态失败");
+			return ResultGenerator.genFailResult("更新银行卡状态失败");
+		}
+
 		return ResultGenerator.genSuccessResult("更改银行卡状态成功");
 	}
 }

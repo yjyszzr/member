@@ -10,7 +10,7 @@ import com.dl.member.model.UserBank;
 public interface UserBankMapper extends Mapper<UserBank> {
 	int batchUpdateUserBankStatus(@Param("status") String status,@Param("list") List<Integer> list);
 
-	int updateUserBankDelete(@Param("id") Integer id);
+	int updateUserBank(UserBank userBank);
 	
 	List<UserBank> queryUserBankList(@Param("userId") Integer userId);
 }

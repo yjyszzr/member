@@ -23,11 +23,25 @@ public class UserBank {
     @Column(name = "real_name")
     private String realName;
 
-    /**
+	/**
+	 * 添加时间
+	 */
+	@Column(name = "add_time")
+	private Integer addTime;
+	
+	
+	/**
      * 银行卡号
      */
     @Column(name = "card_no")
     private String cardNo;
+ 
+    /**
+     * 最后更新时间
+     */
+    @Column(name = "last_time")
+    private Integer lastTime;
+    
 
     /**
      * 0-非当前默认,1-当前默认
@@ -42,9 +56,26 @@ public class UserBank {
 	/**
      * 是否删除
      */
+    @Column(name = "is_delete")
     private Integer isDelete;
     
+ 
+	public Integer getAddTime() {
+		return addTime;
+	}
+
+	public void setAddTime(Integer addTime) {
+		this.addTime = addTime;
+	}
     
+	
+    public Integer getLastTime() {
+		return lastTime;
+	}
+
+	public void setLastTime(Integer lastTime) {
+		this.lastTime = lastTime;
+	}
     /**
      * 银行卡名称
      */

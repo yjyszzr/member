@@ -3,6 +3,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.WithDrawShowDTO;
 import com.dl.member.param.BankCardParam;
+import com.dl.member.param.DeleteBankCardParam;
 import com.dl.member.param.IDParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.service.UserBankService;
@@ -51,8 +52,8 @@ public class UserBankController {
      */
     @ApiOperation(value = "删除银行卡", notes = "删除银行卡")
     @PostMapping("/deleteUserBank")
-    public BaseResult<UserBankDTO> deleteUserBank(@RequestBody IDParam iDParam){
-    	return userBankService.deleteUserBank(iDParam.getId());
+    public BaseResult<UserBankDTO> deleteUserBank(@RequestBody DeleteBankCardParam deleteBankCardParam){
+    	return userBankService.deleteUserBank(deleteBankCardParam);
     }
     
     /**

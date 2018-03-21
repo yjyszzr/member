@@ -3,6 +3,7 @@ import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserAccountParam;
 import com.dl.param.OrderSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -110,6 +111,29 @@ public class UserAccountService extends AbstractService<UserAccount> {
         return ResultGenerator.genSuccessResult("余额支付后余额扣减成功",surplusPaymentCallbackDTO);
     }
     
+    /**
+     * 创建流水
+     */
+    public int saveUserAccount(UserAccountParam userAccountParam) {
+    	Integer userId = SessionUtil.getUserId();
+        UserAccount uap = new UserAccount();
+        String note = "";
+        uap.setNote(note);
+        uap.setUserId(userId);
+        uap.setAdminUser(userAccountParam.getUserName());
+        uap.setAddTime(DateUtil.getCurrentTimeLong());
+        String accountSn = this.createAccountSn(String.valueOf(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND));
+        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND);
+        uap.setAccountSn(accountSn);
+        uap.setAmount(userAccountParam.getAmount());
+        uap.setCurBalance(userAccountParam.getCurBalance());
+        uap.setPaymentCode(userAccountParam.getPaymentCode());
+        uap.setPaymentName(userAccountParam.getPaymentName());
+        uap.setOrderSn(userAccountParam.getOrderSn());
+        uap.setParentSn("");
+        this.save(uap);
+		return userId;
+    }
     
     /**
      * @see 余额支付时候扣减余额和订单支出，优先使用可提现余额
@@ -207,45 +231,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
         return surplusPaymentCallbackDTO;
     }
     
-    /**
-     * 创建充值单
-     * @param amount
-     * @return
-     */
-    public BaseResult<String> createReCharege(BigDecimal amount){
-    	
-		return null;
-    }
-    
-    /**
-     * 更新充值单
-     * @param updateUserRechargeParam
-     * @return
-     */
-    public BaseResult<String> updateReCharege(UpdateUserRechargeParam updateUserRechargeParam){
-    	
-    	return null;
-    }
-    
-    /**
-     * 创建提现单
-     * @param amount
-     * @return
-     */
-    public BaseResult<String> createUserWithdraw(BigDecimal amount){
-    	
-		return null;
-    }
-    
-    /**
-     * 更新提现单
-     * @param amount
-     * @return
-     */
-    public BaseResult<String> updateUserWithdraw(UpdateUserWithdrawParam updateUserWithdrawParam){
-    	
-		return null;
-    }
     
  
     /**

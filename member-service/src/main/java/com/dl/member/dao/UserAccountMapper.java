@@ -11,4 +11,6 @@ public interface UserAccountMapper extends Mapper<UserAccount> {
 	
 	List<UserAccount> queryUserAccountList(@Param("userId") Integer userId);
 	
+	int insertUserAccount(UserAccount userAccount); 
+	
 }

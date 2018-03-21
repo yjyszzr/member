@@ -27,6 +27,8 @@ public class UserDTO {
     private String mobile;
 
     private String email;
+    
+    private String realName;
 
     /**
      * 登录密码
@@ -719,4 +721,6 @@ public class UserDTO {
     public void setUserRemark(String userRemark) {
         this.userRemark = userRemark;
     }
+    
+    
 }

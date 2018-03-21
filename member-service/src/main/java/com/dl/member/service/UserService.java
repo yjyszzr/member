@@ -19,6 +19,7 @@ import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserDTO;
+import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.param.UserParam;
@@ -53,11 +54,18 @@ public class UserService extends AbstractService<User> {
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setIsReal(user.getIsReal().equals("1")?"1":"0");
 			userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit())));
+			
+			String realName = "";
+			UserRealDTO userRealDTO = userRealService.queryUserReal();
+			if(userRealDTO == null) {
+				realName = userRealDTO.getRealName();
+			}
+			
 			String mobile = user.getMobile();
 			String strStar4 = RandomUtil.generateStarString(4);
-			String mobileStr = "";
-//			mobileStr.append(mobile.replace(mobile.substring(3, 7), strStar4));
+			String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
 			userDTO.setMobile(mobileStr);
+			userDTO.setRealName(realName);
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}
