@@ -75,4 +75,16 @@ public class UserBankController {
     public BaseResult<WithDrawShowDTO> queryWithDrawShow(@RequestBody StrParam strParam){
     	return userBankService.queryWithDrawShow();
     }
+    
+    
+    /**
+     * 查询银行卡
+     * @return
+     */
+    @ApiOperation(value = "查询银行卡", notes = "查询银行卡")
+    @PostMapping("/queryUserBank")
+    public BaseResult<UserBankDTO> queryUserBank(@RequestBody IDParam IDParam){
+    	return userBankService.queryUserBank(IDParam.getId());
+    }
+    
 }

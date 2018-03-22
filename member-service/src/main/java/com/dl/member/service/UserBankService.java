@@ -157,13 +157,15 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 
 		JSONObject json_tmp = (JSONObject) json.get("result");
-		String res = json_tmp.getString("res");
-		String message = json_tmp.getString("message");
-		if("1".equals(res)) {
-			return ResultGenerator.genSuccessResult("银行卡校验成功",message);
+		Integer res = json_tmp.getInteger("res");
+		String reason = json_tmp.getString("reason");
+		Integer errorCode = (Integer)json.getInteger("error_code");
+		if(0 == errorCode) {
+			return ResultGenerator.genSuccessResult("银行卡校验成功",reason);
 		}else {
-			return ResultGenerator.genFailResult(message);
+			return ResultGenerator.genFailResult(reason);
 		}
+
 	}
 
 	/**
@@ -304,6 +306,32 @@ public class UserBankService extends AbstractService<UserBank> {
 	}
 	
 	/**
+	 * 查询银行卡
+	 * @param userBankId
+	 * @return
+	 */
+	public BaseResult<UserBankDTO> queryUserBank(Integer userBankId){
+		Condition condition  = new Condition(UserBank.class);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("id =", userBankId);
+		criteria.andCondition("is_delete=", "0");
+		List<UserBank> userBankList = this.findByCondition(condition);
+		if(userBankList.size() == 0) {
+			return ResultGenerator.genSuccessResult("查询银行卡成功",null);
+		}
+		
+		UserBank userBank = userBankList.get(0);
+		UserBankDTO userBankDTO = new UserBankDTO();
+		try {
+			BeanUtils.copyProperties(userBankDTO, userBank);
+			userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		} 
+		return ResultGenerator.genSuccessResult("查询银行卡成功",userBankDTO);
+	}
+	
+	/**
 	 * 隐藏银行卡号第5位到倒数第5位
 	 * @param cardNo
 	 * @return
@@ -373,8 +401,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		if(userBankList.size() == 1) {
 			return ResultGenerator.genResult(MemberEnums.CURRENT_ONE_CARD.getcode(), MemberEnums.CURRENT_ONE_CARD.getMsg());
 		}
-		
-		
+	
 		UserBank userBank = new UserBank();
 		userBank.setId(userBankId);
 		userBank.setStatus("1");
