@@ -1,7 +1,7 @@
 package com.dl.member.service;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -70,17 +70,6 @@ public class UserBankService extends AbstractService<UserBank> {
     	userBank.setAddTime(DateUtil.getCurrentTimeLong());
     	userBank.setLastTime(DateUtil.getCurrentTimeLong());
     	
-    	//把已经添加的银行卡 设为非默认
-		Condition condition = new Condition(UserBank.class);
-		Criteria criteria = condition.createCriteria();
-		criteria.andCondition("user_id=", userId);
-		List<UserBank> userBankList = this.findByCondition(condition);
-		if(!CollectionUtils.isEmpty(userBankList)) {
-			 userBankList.removeIf(s->s.getCardNo().equals(userBankDTO.getCardNo()));
-			 List<Integer> userBankIds = userBankList.stream().map(s->s.getId()).collect(Collectors.toList());
-			 int updateRst = userBankMapper.batchUpdateUserBankStatus(ProjectConstant.USER_BANK_NO_DEFAULT, userBankIds);
-		}
-    	
     	try {
     		this.save(userBank);
     	}catch (Exception e) {
@@ -95,39 +84,111 @@ public class UserBankService extends AbstractService<UserBank> {
      * @param idCard
      * @return
      */
+    @Transactional
 	public BaseResult<UserBankDTO> addBankCard(String bankCardNo){
+		//未实名认证
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		if(null == userRealDTO) {
 			return ResultGenerator.genResult(MemberEnums.NOT_REAL_AUTH.getcode(), MemberEnums.NOT_REAL_AUTH.NOT_REAL_AUTH.getMsg());
 		}
 		
-		UserBank userBank = this.findBy("cardNo", bankCardNo);
-		if(null != userBank) {
+		//已经添加过该银行卡
+		UserBank userBankAlready = new UserBank();
+		userBankAlready.setCardNo(bankCardNo);
+		userBankAlready.setIsDelete(ProjectConstant.NOT_DELETE);
+		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankAlready);
+		if(!CollectionUtils.isEmpty(userBankList)) {
 			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg());
 		}
 		
+		//查询银行卡具体信息，并过滤信用卡
 		BaseResult<UserBankDTO> detectRst = this.detectUserBank(bankCardNo);
 		if(detectRst.getCode() != 0) {
 			return ResultGenerator.genResult(detectRst.getCode(), detectRst.getMsg());
 		}
 		
+		//三元素校验
 		UserBankDTO userBankDTO = detectRst.getData();
 		String idCard = userRealDTO.getIdCode();
 		String realName = userRealDTO.getRealName();
-		
 		BaseResult<String> atuhRst = this.bankCardAuth3(realName, bankCardNo,idCard);
 		if(atuhRst.getCode() != 0) {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg());
 		}
 		
+		//保存到数据库
 		userBankDTO.setRealName(realName);
 		userBankDTO.setCardNo(bankCardNo);
 		userBankDTO.setStatus(ProjectConstant.USER_BANK_DEFAULT);
 		this.saveUserBank(userBankDTO);
+		
+		//把已经添加的默认银行卡 设为非默认
+		BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
+		if(userBankDTORst.getCode() != 0) {
+			return ResultGenerator.genFailResult(userBankDTORst.getMsg());
+		}
+		
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
-	
-	
+
+    /**
+     * 查询有效的银行卡根据默认或非默认状态
+     * @param status
+     * @return
+     */
+    public List<UserBank> querValidUserBank(String status) {
+		Integer userId = SessionUtil.getUserId();
+		UserBank userBank = new UserBank();
+		userBank.setUserId(userId);
+		userBank.setStatus(status);
+		userBank.setIsDelete(ProjectConstant.NOT_DELETE);
+		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBank);
+		if(CollectionUtils.isEmpty(userBankList)) {
+			return new ArrayList<UserBank>();
+		}
+		return userBankList;
+    }
+    
+    /**
+     * 把已经添加最近时间的的银行卡 设为默认或非默认
+     * @param status
+     * @return
+     */
+	public BaseResult<UserBankDTO> updateAlreadyAddCardStatus(String status) {
+		Integer userId = SessionUtil.getUserId();
+		UserBankDTO userBankDTO = new UserBankDTO();
+		List<UserBank> userBankList = this.querValidUserBank(status);
+		if(CollectionUtils.isEmpty(userBankList)) {
+			return ResultGenerator.genSuccessResult("查询银行卡种类成功", userBankDTO) ;
+		}
+		
+		UserBank userBank = userBankList.get(0);		
+		UserBank updateUserBank = new UserBank();
+		updateUserBank.setId(userBank.getId());
+		updateUserBank.setUserId(userId);
+		if(status.equals(ProjectConstant.USER_BANK_NO_DEFAULT)) {
+			updateUserBank.setStatus(ProjectConstant.USER_BANK_DEFAULT);
+		}else if(status.equals(ProjectConstant.USER_BANK_DEFAULT)) {
+			updateUserBank.setStatus(ProjectConstant.USER_BANK_NO_DEFAULT);
+		}
+		updateUserBank.setLastTime(DateUtil.getCurrentTimeLong());
+		int rst = userBankMapper.updateUserBank(updateUserBank);
+		if(1 != rst) {
+			log.error("数据库更新银行卡状态失败");
+		}
+		
+		UserBank noDefaultUserBank = this.findById(userBank.getId());
+		try {
+			BeanUtils.copyProperties(userBankDTO, noDefaultUserBank);
+			userBankDTO.setUserBankId(String.valueOf(noDefaultUserBank.getId()));
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		} 
+		
+		return ResultGenerator.genSuccessResult("查询银行卡种类成功", userBankDTO) ;
+	}
+    
+    
 	/**
 	 * 银行卡三元素校验
 	 * @param realName
@@ -156,10 +217,9 @@ public class UserBankService extends AbstractService<UserBank> {
 			log.error(e.getMessage());
 		}
 
-		JSONObject json_tmp = (JSONObject) json.get("result");
-		Integer res = json_tmp.getInteger("res");
-		String reason = json_tmp.getString("reason");
-		Integer errorCode = (Integer)json.getInteger("error_code");
+		JSONObject result = (JSONObject) json.get("result");
+		String reason = result.getString("reason");
+		Integer errorCode = json.getInteger("error_code");
 		if(0 == errorCode) {
 			return ResultGenerator.genSuccessResult("银行卡校验成功",reason);
 		}else {
@@ -192,20 +252,19 @@ public class UserBankService extends AbstractService<UserBank> {
 			log.error(e.getMessage());
 		}
 
-		JSONObject json_tmp = (JSONObject) json.get("result");
-		Integer errorCode = (Integer)json.getInteger("error_code");
+		UserBankDTO userBankDTO = new UserBankDTO();
+		JSONObject result = (JSONObject) json.get("result");
+		Integer errorCode = json.getInteger("error_code");
 		if(0 == errorCode) {
-			UserBankDTO userBankDTO = new UserBankDTO();
-			userBankDTO.setBankName(json_tmp.getString("bank"));
-			userBankDTO.setBankLogo(json_tmp.getString("logo"));
-			userBankDTO.setCardType(json_tmp.getString("cardtype"));
-			if(!"借记卡".equals(json_tmp.getString("cardtype"))) {
+			userBankDTO.setBankName(result.getString("bank"));
+			userBankDTO.setBankLogo(result.getString("logo"));
+			userBankDTO.setCardType(result.getString("cardtype"));
+			if(!"借记卡".equals(result.getString("cardtype"))) {
 				return ResultGenerator.genResult(MemberEnums.NOT_DEBIT_CARD.getcode(), MemberEnums.NOT_DEBIT_CARD.getMsg());
 			}
-			
 			return ResultGenerator.genSuccessResult("查询银行卡种类成功", userBankDTO) ;
 		}else {
-			return ResultGenerator.genFailResult(json_tmp.getString("reason"), null);
+			return ResultGenerator.genFailResult(result.getString("reason"), userBankDTO);
 		}
 	}
 	
@@ -254,28 +313,27 @@ public class UserBankService extends AbstractService<UserBank> {
 		Integer userId = SessionUtil.getUserId();
 		User user = userService.findById(userId);
 		
-		Condition condition = new Condition(UserBank.class);
-		Criteria criteria = condition.createCriteria();
-		criteria.andCondition("user_id=", userId);
-		criteria.andCondition("status=", "1");
-		criteria.andCondition("is_delete=", "0");
-		List<UserBank> userBankList = this.findByCondition(condition);
+		UserBank userBank = new UserBank();
+		userBank.setUserId(userId);
+		userBank.setStatus(ProjectConstant.USER_BANK_DEFAULT);
+		userBank.setIsDelete(ProjectConstant.NOT_DELETE);
+		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBank);
+		
 		WithDrawShowDTO withDrawShowDTO = new WithDrawShowDTO();
 		
 		if(!CollectionUtils.isEmpty(userBankList)) {
 			userBankList.stream().filter(s->s.getStatus().equals(ProjectConstant.USER_BANK_DEFAULT));
-			UserBank userBank = userBankList.get(0);	
-			String cardNo = userBank.getCardNo();
+			UserBank userBankDefault = userBankList.get(0);	
+			String cardNo = userBankDefault.getCardNo();
 			cardNo = cardNo.substring(cardNo.length()-4, cardNo.length());
-			String defaultBankLabel = userBank.getBankName()+"储蓄卡"+cardNo;
+			String defaultBankLabel = userBankDefault.getBankName()+"储蓄卡"+cardNo;
 			withDrawShowDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			withDrawShowDTO.setDefaultBankLabel(defaultBankLabel);
-			withDrawShowDTO.setUserBankId(String.valueOf(userBank.getId()));
+			withDrawShowDTO.setUserBankId(String.valueOf(userBankDefault.getId()));
 		}else {
 			withDrawShowDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			withDrawShowDTO.setDefaultBankLabel("");
 			withDrawShowDTO.setUserBankId("");
-			return ResultGenerator.genSuccessResult("查询提现界面的数据显示信息成功",withDrawShowDTO);
 		}
 
 		return ResultGenerator.genSuccessResult("查询提现界面的数据显示信息成功",withDrawShowDTO);
@@ -286,11 +344,14 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * 查询用户银行卡列表
 	 * @return
 	 */
-	public BaseResult<List<UserBankDTO>> queryUserBankList(){
+	public BaseResult<LinkedList<UserBankDTO>> queryUserBankList(){
 		Integer userId = SessionUtil.getUserId();		
-		List<UserBank> userBankList = userBankMapper.queryUserBankList(userId);
+		UserBank userBankParam = new UserBank();
+		userBankParam.setUserId(userId);
+		userBankParam.setIsDelete(ProjectConstant.NOT_DELETE);
+		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankParam);
 		
-		List<UserBankDTO>  userBankDTOList = new ArrayList<>();
+		LinkedList<UserBankDTO> userBankDTOList = new LinkedList<UserBankDTO>();
 		for(UserBank userBank:userBankList) {
 			UserBankDTO userBankDTO = new UserBankDTO();
 			try {
@@ -298,8 +359,12 @@ public class UserBankService extends AbstractService<UserBank> {
 				userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
 				userBankDTO.setCardNo(this.hiddenBankCardNo(userBank.getCardNo()));
 			} catch (Exception e) {
-				throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
+				log.error(e.getMessage());
+				return ResultGenerator.genFailResult(RespStatusEnum.SERVER_ERROR.getMsg(),userBankDTOList);
 			} 
+			if(ProjectConstant.USER_BANK_DEFAULT.equals(userBank.getStatus())) {
+				userBankDTOList.addFirst(userBankDTO);
+			}
 			userBankDTOList.add(userBankDTO);
 		}
 		return ResultGenerator.genSuccessResult("查询银行卡列表成功",userBankDTOList);
@@ -312,12 +377,12 @@ public class UserBankService extends AbstractService<UserBank> {
 	 */
 	public BaseResult<UserBankDTO> queryUserBank(Integer userBankId){
 		Integer userId = SessionUtil.getUserId();
-		Condition condition  = new Condition(UserBank.class);
-		Criteria criteria = condition.createCriteria();
-		criteria.andCondition("id =", userBankId);
-		criteria.andCondition("is_delete=", "0");
-		criteria.andCondition("user_id=", userId);
-		List<UserBank> userBankList = this.findByCondition(condition);
+		
+		UserBank userBankParam = new UserBank();
+		userBankParam.setUserId(userId);
+		userBankParam.setIsDelete(ProjectConstant.NOT_DELETE);
+		userBankParam.setId(userBankId);
+		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankParam);
 		if(userBankList.size() == 0) {
 			return ResultGenerator.genSuccessResult("查询银行卡成功",null);
 		}
@@ -352,8 +417,10 @@ public class UserBankService extends AbstractService<UserBank> {
 	public BaseResult<UserBankDTO> deleteUserBank(DeleteBankCardParam deleteBankCardParam){
 		Integer userId = SessionUtil.getUserId();
 		UserBank userBank = new UserBank();
-		userBank.setId(deleteBankCardParam.getId());
-		userBank.setStatus("1");
+		userBank.setId(Integer.valueOf(deleteBankCardParam.getId()));
+		userBank.setUserId(userId);
+		userBank.setStatus(ProjectConstant.USER_BANK_NO_DEFAULT);
+		userBank.setIsDelete(ProjectConstant.DELETE);
 		userBank.setLastTime(DateUtil.getCurrentTimeLong());
 		int rst = userBankMapper.updateUserBank(userBank);
 		if(1 != rst) {
@@ -361,75 +428,45 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 		
 		UserBankDTO userBankDTO = new UserBankDTO();
-		if("0".equals(deleteBankCardParam.getStatus())) {//非默认
+		if(ProjectConstant.USER_BANK_NO_DEFAULT.equals(deleteBankCardParam.getStatus())) {//删除的是非默认
 			return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTO);
-		}else {//默认
-			List<UserBank> uerBankList = userBankMapper.queryUserBankList(userId);
-			if(uerBankList.size() == 0) {
-				return ResultGenerator.genSuccessResult("删除银行卡成功");
-			}else {
-				UserBank userBankDefault = uerBankList.get(0);
-				UserBank updateUserBank = new UserBank();
-				updateUserBank.setId(userBankDefault.getId());
-				updateUserBank.setStatus("1");
-				int updateRst = userBankMapper.updateUserBank(updateUserBank);
-				if(1 != updateRst) {
-					log.error("更新银行卡失败");
-				}
-				
-				try {
-					BeanUtils.copyProperties(userBankDTO, userBankDefault);
-					String cardNo = userBankDefault.getCardNo();
-					userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
-					userBankDTO.setLastCardNo4(cardNo.substring(cardNo.length()-4, cardNo.length()));
-				} catch (Exception e) {
-					log.error(e.getMessage());
-				} 
-				return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTO);
-			}
+		}else {//删除的是默认
+			BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_NO_DEFAULT);
+			return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTORst.getData());
 		}
 	}
 	
 	/**
-	 * 更改银行卡状态
+	 * 更改银行卡状态为默认
 	 * @return
 	 */
 	public BaseResult<String> updateUserBankDefault(Integer userBankId){
-		Integer userId = SessionUtil.getUserId();
-		Condition condition = new Condition(UserBank.class);
-		Criteria criteria = condition.createCriteria();
-		criteria.andCondition("user_id=", userId);
-		List<UserBank> userBankList = this.findByCondition(condition);
-		if(userBankList.size() == 1) {
-			return ResultGenerator.genResult(MemberEnums.CURRENT_ONE_CARD.getcode(), MemberEnums.CURRENT_ONE_CARD.getMsg());
-		}
-	
-		UserBank userBank = new UserBank();
-		userBank.setId(userBankId);
-		userBank.setStatus("1");
-		userBank.setLastTime(DateUtil.getCurrentTimeLong());
-		int updateRst = userBankMapper.updateUserBank(userBank);	
-		if(1 != updateRst) {
-			log.error("数据库更新银行卡状态失败");
-			return ResultGenerator.genFailResult("更新银行卡状态失败");
-		}
+ 		Integer userId = SessionUtil.getUserId();
+		//当前一张银行卡不允许更改状态
+		UserBank userBankParam = new UserBank();
+		userBankParam.setUserId(userId);
+		userBankParam.setIsDelete(ProjectConstant.NOT_DELETE);
+		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankParam);
 		
-		Condition conditionNew  = new Condition(UserBank.class);
-		Criteria criteriaNew = conditionNew.createCriteria();
-		criteriaNew.andCondition("user_id=", userId);
-		criteriaNew.andCondition("status=", "1");
-		criteriaNew.andCondition("is_delete=", "0");
-		List<UserBank> userBankListNew = this.findByCondition(conditionNew);
-		UserBank userBankNew = userBankListNew.get(0);
-		
-		UserBank userBankNewNew = new UserBank();
-		userBankNewNew.setId(userBankNew.getId());
-		userBankNewNew.setStatus("0");
-		userBankNewNew.setLastTime(DateUtil.getCurrentTimeLong());
-		int updateNewRst = userBankMapper.updateUserBank(userBankNewNew);
-		if(1 != updateNewRst) {
-			log.error("数据库更新银行卡状态失败");
-			return ResultGenerator.genFailResult("更新银行卡状态失败");
+		if(CollectionUtils.isEmpty(userBankList)) {
+			return ResultGenerator.genFailResult("当前用户未添加银行卡");
+		}else {
+			if(userBankList.size() == 1) {
+				return ResultGenerator.genResult(MemberEnums.CURRENT_ONE_CARD.getcode(), MemberEnums.CURRENT_ONE_CARD.getMsg());
+			}else if(userBankList.size() > 1) {
+				UserBank updateUserBank = new UserBank();
+				updateUserBank.setId(userBankId);
+				updateUserBank.setUserId(userId);
+				updateUserBank.setStatus(ProjectConstant.USER_BANK_DEFAULT);
+				int updateRst = userBankMapper.updateUserBank(updateUserBank);
+				if(1 != updateRst) {
+					log.error("更新数据库银行卡状态失败");
+				}
+				BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
+				if(userBankDTORst.getCode() != 0) {
+					log.error(userBankDTORst.getMsg());
+				}
+			}
 		}
 
 		return ResultGenerator.genSuccessResult("更改银行卡状态成功");

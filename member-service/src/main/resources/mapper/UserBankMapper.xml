@@ -31,10 +31,32 @@
 		  <if test="status!=null">status=#{status},</if>
 		  <if test="lastTime!=null">last_time=#{lastTime},</if>
 		 </trim>
-    WHERE id = #{id} 	
+    WHERE id = #{id} and user_id=#{userId}
   </update>
   
-  <select id ="queryUserBankList" resultMap="BaseResultMap">
+  <!-- <select id ="queryUserBankList" resultMap="BaseResultMap">
   	select * from dl_user_bank where user_id = #{userId} and is_delete = 0 order by add_time
+  </select> -->
+  
+  <select id ="queryUserBankBySelective" parameterType="com.dl.member.model.UserBank" resultMap="BaseResultMap">
+  	select * from dl_user_bank 
+  	<where>
+	  	<if test="userId != null">
+	        AND user_id = #{userId}
+	    </if>
+	    <if test="isDelete != null">
+	        AND is_delete = #{isDelete}
+	    </if>
+	    <if test="cardNo != null">
+	        AND card_no = #{cardNo}
+	    </if>
+	    <if test="status != null">
+	        AND status = #{status}
+	    </if>
+	    <if test="id != null">
+	        AND id = #{id}
+	    </if>
+    </where>
+    order by add_time
   </select>
 </mapper>

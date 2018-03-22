@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
+
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -41,7 +43,7 @@ public class UserBankController {
      */
     @ApiOperation(value = "查询银行卡列表", notes = "查询银行卡列表")
     @PostMapping("/queryUserBankList")
-    public BaseResult<List<UserBankDTO>> queryUserBankList(@RequestBody StrParam strParam){
+    public BaseResult<LinkedList<UserBankDTO>> queryUserBankList(@RequestBody StrParam strParam){
     	return userBankService.queryUserBankList();
     }
     

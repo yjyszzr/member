@@ -44,7 +44,8 @@ public class ProjectConstant {
     public static final int BONUS_STATUS_UNUSED = 0;//红包未使用
     public static final int BONUS_STATUS_USED = 1;//红包已使用
     
-    public static final int IS_DELETE = 0;//是否可用，0代表未删除,1代表已删除
+    public static final int DELETE = 1;////1代表已删除
+    public static final int NOT_DELETE = 0;// 0代表未删除
     
     public static final Byte ACCOUNT_TYPE_TRADE_SURPLUS_SEND = 8; // 使用了部分或全部余额扣款类型
     public static final Byte ACCOUNT_TYPE_TRADE_SURPLUS_SEND_ROLLBACK = 9; // 使用了部分或全部余额扣款回滚类型

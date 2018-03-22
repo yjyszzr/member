@@ -72,7 +72,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		Criteria criteria = cUsed.createCriteria();
 		criteria.andCondition("user_bonus_id =", userBonusId);
 		criteria.andCondition("bonus_status =", ProjectConstant.BONUS_STATUS_USED);
-		criteria.andCondition("is_delete =" + ProjectConstant.IS_DELETE);
+		criteria.andCondition("is_delete =" + ProjectConstant.NOT_DELETE);
 		List<UserBonus> userBonusList = this.findByCondition(cUsed);
 		if (userBonusList.size() > 0) {
 			throw new ServiceException(MemberEnums.BONUS_USED.getcode(),
@@ -105,7 +105,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			Criteria criteria = cUsed.createCriteria();
 			criteria.andCondition("user_bonus_id =", userBonusId);
 			criteria.andCondition("bonus_status =", ProjectConstant.BONUS_STATUS_UNUSED);
-			criteria.andCondition("is_delete =", ProjectConstant.IS_DELETE);
+			criteria.andCondition("is_delete =", ProjectConstant.NOT_DELETE);
 			List<UserBonus> userBonusList = this.findByCondition(cUsed);
 			if (userBonusList.size() > 0) {
 				throw new ServiceException(MemberEnums.BONUS_UNUSED.getcode(),
