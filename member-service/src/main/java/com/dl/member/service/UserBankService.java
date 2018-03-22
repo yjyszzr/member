@@ -311,10 +311,12 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * @return
 	 */
 	public BaseResult<UserBankDTO> queryUserBank(Integer userBankId){
+		Integer userId = SessionUtil.getUserId();
 		Condition condition  = new Condition(UserBank.class);
 		Criteria criteria = condition.createCriteria();
 		criteria.andCondition("id =", userBankId);
 		criteria.andCondition("is_delete=", "0");
+		criteria.andCondition("user_id=", userId);
 		List<UserBank> userBankList = this.findByCondition(condition);
 		if(userBankList.size() == 0) {
 			return ResultGenerator.genSuccessResult("查询银行卡成功",null);
@@ -358,10 +360,10 @@ public class UserBankService extends AbstractService<UserBank> {
 			log.error("删除银行卡失败");
 		}
 		
+		UserBankDTO userBankDTO = new UserBankDTO();
 		if("0".equals(deleteBankCardParam.getStatus())) {//非默认
-			return ResultGenerator.genSuccessResult("删除银行卡成功");
+			return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTO);
 		}else {//默认
-			UserBankDTO userBankDTO = new UserBankDTO();
 			List<UserBank> uerBankList = userBankMapper.queryUserBankList(userId);
 			if(uerBankList.size() == 0) {
 				return ResultGenerator.genSuccessResult("删除银行卡成功");

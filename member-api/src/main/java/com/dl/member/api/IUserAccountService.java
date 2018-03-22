@@ -75,7 +75,7 @@ public interface IUserAccountService {
 	 * @return
 	 */	
 	@RequestMapping(path="/user/account/updateReCharege", method=RequestMethod.POST)
-	public BaseResult<UserRechargeDTO> updateReCharege(@RequestBody UpdateUserRechargeParam updateUserRechargeParam);
+	public BaseResult<String> updateReCharege(@RequestBody UpdateUserRechargeParam updateUserRechargeParam);
 	
 	/**
 	 * 用户生成提现单
@@ -92,7 +92,7 @@ public interface IUserAccountService {
 	 * @return
 	 */	
 	@RequestMapping(path="/user/account/updateUserWithdraw", method=RequestMethod.POST)
-	public BaseResult<UserRechargeDTO> updateUserWithdraw(@RequestBody UpdateUserWithdrawParam updateUserWithdrawParam);
+	public BaseResult<String> updateUserWithdraw(@RequestBody UpdateUserWithdrawParam updateUserWithdrawParam);
 	
 //	
 //	/**
