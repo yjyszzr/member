@@ -16,8 +16,8 @@
     <result column="end_time" jdbcType="INTEGER" property="endTime" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
-    <result column="bonus_status" jdbcType="BIT" property="bonusStatus" />
-    <result column="is_delete" jdbcType="BIT" property="isDelete" />
+    <result column="bonus_status" jdbcType="VARCHAR" property="bonusStatus" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
   </resultMap>
   
   <select id="queryUserBonusList" resultType="String" resultMap="BaseResultMap">
@@ -31,4 +31,32 @@
       		#{userBonusId}
     	</foreach>
   </select> 
+  
+    <select id="queryUserBonusBySelective" parameterType="com.dl.member.model.UserBonus" resultMap="BaseResultMap">
+	  	SELECT * FROM dl_user_bonus
+		<where>
+		  	<if test="userId != null">
+		        AND user_id = #{userId}
+		    </if>
+		    <if test="isDelete != null">
+		        AND is_delete = #{isDelete}
+		    </if>
+		    <if test="bonusStatus != null">
+		        AND bonus_status = #{bonusStatus}
+		    </if>
+		    <if test="bonusId != null">
+		        AND bonus_id = #{bonusId}
+		    </if>
+		    <if test="userBonusId != null">
+		        AND user_bonus_id = #{userBonusId}
+		    </if>
+		    <if test="startTime != null">
+		        AND start_time &lt;= #{startTime}
+		    </if>
+		    <if test="endTime != null">
+		        AND end_time &gt;= {endTime}
+		    </if>
+	    </where>
+	    order by add_time
+  </select>
 </mapper>

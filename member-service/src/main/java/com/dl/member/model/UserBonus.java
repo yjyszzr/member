@@ -79,7 +79,7 @@ public class UserBonus {
      * 是否可用
      */
     @Column(name = "is_delete")
-    private Boolean isDelete;
+    private Integer isDelete;
 
     /**
      * 获取用户红包编号
@@ -298,7 +298,7 @@ public class UserBonus {
      *
      * @return is_delete - 是否可用
      */
-    public Boolean getIsDelete() {
+    public Integer getIsDelete() {
         return isDelete;
     }
 
@@ -307,7 +307,7 @@ public class UserBonus {
      *
      * @param isDelete 是否可用
      */
-    public void setIsDelete(Boolean isDelete) {
+    public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
     }
 }

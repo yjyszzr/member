@@ -364,8 +364,10 @@ public class UserBankService extends AbstractService<UserBank> {
 			} 
 			if(ProjectConstant.USER_BANK_DEFAULT.equals(userBank.getStatus())) {
 				userBankDTOList.addFirst(userBankDTO);
+			}else {
+				userBankDTOList.add(userBankDTO);
 			}
-			userBankDTOList.add(userBankDTO);
+			
 		}
 		return ResultGenerator.genSuccessResult("查询银行卡列表成功",userBankDTOList);
 	}

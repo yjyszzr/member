@@ -9,6 +9,7 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
+import com.ctc.wstx.util.StringUtil;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -16,6 +17,7 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,9 @@ import javax.annotation.Resource;
 public class UserBonusService extends AbstractService<UserBonus> {
     @Resource
     private UserBonusMapper userBonusMapper;
+    
+    @Resource
+    private UserBonusShowDescService userBonusShowDescService;
     
 	/**
 	 * 下单时的账户变动：目前仅红包置为已使用 
@@ -120,7 +125,49 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			usedUserBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
 			this.update(usedUserBonus);
 	}
+
+	/**
+	 * 根据状态查询有效的红包集合 ""-全部   0-未使用 1-已使用 2-已过期
+	 * @param status
+	 * @return
+	 */
+//	public List<UserBonusDTO> queryBonusListByStatus(String status) {
+//		Integer userId = SessionUtil.getUserId();
+//		UserBonus userBonus = new UserBonus();
+//		userBonus.setUserId(userId);
+//		userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+//		if(!StringUtils.isEmpty(status)) {
+//			userBonus.setBonusStatus(Integer.valueOf(status));
+//		}
+//		
+//		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
+//		
+//		userBonusList.forEach(userBonus->{
+//			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(shopBonusDTO, userBonus)
+//			
+//			
+//		});
+//		
+//		return null;
+//	}
 	
+	/**
+	 * 统一构造返回前台红包列表的数据结构
+	 * @param shopBonusDTOList
+	 * @param userBonusList
+	 * @return
+	 */
+//	public UserBonusDTO createReturnUserBonusDTO(UserBonus userBonus){
+//		UserBonusDTO userBonusDTO = new UserBonusDTO();
+//		BeanUtils.copyProperties(shopBonusDTO, userBonus);
+//		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
+//		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
+//		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
+//		userBonusDTO.setLimitTime(userBonusShowDescService.getLimitTimeDesc(userBonus.getStartTime(),userBonus.getEndTime()));
+//		userBonusDTO.setMinGoodsAmount(userBonusShowDescService.getLimitOrderAmountDesc(userBonus.getMin_goods_amount()));
+//
+//		return userBonusDTO;
+//	}
 	
 	/**
 	 * 查询单个红包的数据
