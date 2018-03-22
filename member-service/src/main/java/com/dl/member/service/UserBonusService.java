@@ -9,7 +9,6 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
-import com.ctc.wstx.util.StringUtil;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -131,25 +130,25 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @param status
 	 * @return
 	 */
-//	public List<UserBonusDTO> queryBonusListByStatus(String status) {
-//		Integer userId = SessionUtil.getUserId();
-//		UserBonus userBonus = new UserBonus();
-//		userBonus.setUserId(userId);
-//		userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
-//		if(!StringUtils.isEmpty(status)) {
-//			userBonus.setBonusStatus(Integer.valueOf(status));
-//		}
-//		
-//		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
-//		
+	public List<UserBonusDTO> queryBonusListByStatus(String status) {
+		Integer userId = SessionUtil.getUserId();
+		UserBonus userBonus = new UserBonus();
+		userBonus.setUserId(userId);
+		userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+		if(!StringUtils.isEmpty(status)) {
+			userBonus.setBonusStatus(Integer.valueOf(status));
+		}
+		
+		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
+		
 //		userBonusList.forEach(userBonus->{
 //			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(shopBonusDTO, userBonus)
 //			
 //			
 //		});
-//		
-//		return null;
-//	}
+		
+		return null;
+	}
 	
 	/**
 	 * 统一构造返回前台红包列表的数据结构
