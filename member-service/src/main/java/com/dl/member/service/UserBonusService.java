@@ -16,7 +16,6 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +30,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
     @Resource
     private UserBonusMapper userBonusMapper;
     
-    @Resource
-    private UserBonusShowDescService userBonusShowDescService;
+//    @Resource
+//    private UserBonusShowDescService userBonusShowDescService;
     
 	/**
 	 * 下单时的账户变动：目前仅红包置为已使用 
