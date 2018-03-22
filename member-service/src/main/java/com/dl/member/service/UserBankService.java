@@ -456,6 +456,11 @@ public class UserBankService extends AbstractService<UserBank> {
 			if(userBankList.size() == 1) {
 				return ResultGenerator.genResult(MemberEnums.CURRENT_ONE_CARD.getcode(), MemberEnums.CURRENT_ONE_CARD.getMsg());
 			}else if(userBankList.size() > 1) {
+				BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
+				if(userBankDTORst.getCode() != 0) {
+					log.error(userBankDTORst.getMsg());
+				}
+				
 				UserBank updateUserBank = new UserBank();
 				updateUserBank.setId(userBankId);
 				updateUserBank.setUserId(userId);
@@ -464,10 +469,7 @@ public class UserBankService extends AbstractService<UserBank> {
 				if(1 != updateRst) {
 					log.error("更新数据库银行卡状态失败");
 				}
-				BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
-				if(userBankDTORst.getCode() != 0) {
-					log.error(userBankDTORst.getMsg());
-				}
+
 			}
 		}
 
