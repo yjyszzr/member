@@ -55,7 +55,7 @@ public class UserAccount {
      * 操作类型
      */
     @Column(name = "process_type")
-    private Byte processType;
+    private Integer processType;
 
     /**
      * 支付代码
@@ -225,7 +225,7 @@ public class UserAccount {
      *
      * @return process_type - 操作类型
      */
-    public Byte getProcessType() {
+    public Integer getProcessType() {
         return processType;
     }
 
@@ -234,7 +234,7 @@ public class UserAccount {
      *
      * @param processType 操作类型
      */
-    public void setProcessType(Byte processType) {
+    public void setProcessType(Integer processType) {
         this.processType = processType;
     }
 

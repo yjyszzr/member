@@ -86,7 +86,7 @@ public class UserAccountController {
     @ApiOperation(value="查询用户账户明细列表", notes="查询用户账户明细列表",hidden=false)
 	@RequestMapping(path="/getUserAccountList", method=RequestMethod.POST)
 	public BaseResult<PageInfo<UserAccountDTO>> getUserAccountList(@RequestBody PageParam pageParam) {
-    	PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(pageParam.getPageNum(), pageParam.getPageSize()); 
+    	PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(null,pageParam.getPageNum(), pageParam.getPageSize()); 
     	return ResultGenerator.genSuccessResult("查询用户账户明细列表",rst);
 	}
     

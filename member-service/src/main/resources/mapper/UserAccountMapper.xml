@@ -13,7 +13,7 @@
     <result column="cur_balance" jdbcType="DECIMAL" property="curBalance" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="last_time" jdbcType="INTEGER" property="lastTime" />
-    <result column="process_type" jdbcType="TINYINT" property="processType" />
+    <result column="process_type" jdbcType="INTEGER" property="processType" />
     <result column="payment_code" jdbcType="VARCHAR" property="paymentCode" />
     <result column="payment_name" jdbcType="VARCHAR" property="paymentName" />
     <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
@@ -21,8 +21,23 @@
     <result column="note" jdbcType="LONGVARCHAR" property="note" />
   </resultMap>
   
-  <select id="queryUserAccountList"  resultMap="BaseResultMap">
-  		SELECT *  FROM dl_user_account a WHERE a.user_id=#{userId} ORDER BY add_time DESC
+  <select id="queryUserAccountBySelective" parameterType="com.dl.member.model.UserAccount"  resultMap="BaseResultMap">
+  		SELECT *  FROM dl_user_account 
+	  	<where>
+		  	<if test="userId != null">
+		        AND user_id = #{userId}
+		    </if>
+		    <if test="processType != null">
+		        AND process_type = #{processType}
+		    </if>
+		    <if test="id != null">
+		        AND id = #{id}
+		    </if>
+		    <if test="accountSn != null">
+		        AND account_sn = #{accountSn}
+		    </if>
+	    </where>
+  		ORDER BY add_time DESC
   </select>
   
   <insert id="insertUserAccount">

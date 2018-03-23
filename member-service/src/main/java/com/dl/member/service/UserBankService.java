@@ -420,14 +420,12 @@ public class UserBankService extends AbstractService<UserBank> {
 	@Transactional
 	public BaseResult<UserBankDTO> deleteUserBank(DeleteBankCardParam deleteBankCardParam){
 		Integer userId = SessionUtil.getUserId();
-		
 		UserBankDTO userBankDTO = new UserBankDTO();
 		if(ProjectConstant.USER_BANK_NO_DEFAULT.equals(deleteBankCardParam.getStatus())) {//删除的是非默认
 			
 		}else {//删除的是默认
 			BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_NO_DEFAULT);
 			userBankDTO = userBankDTORst.getData();
-			return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTORst.getData());
 		}
 		
 		UserBank userBank = new UserBank();

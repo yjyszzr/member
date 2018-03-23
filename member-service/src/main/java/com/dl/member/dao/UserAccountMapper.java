@@ -9,7 +9,7 @@ import com.dl.member.model.UserAccount;
 
 public interface UserAccountMapper extends Mapper<UserAccount> {
 	
-	List<UserAccount> queryUserAccountList(@Param("userId") Integer userId);
+	List<UserAccount> queryUserAccountBySelective(UserAccount  userAccount);
 	
 	int insertUserAccount(UserAccount userAccount); 
 	

@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Resource;
@@ -231,23 +232,27 @@ public class UserAccountService extends AbstractService<UserAccount> {
         return surplusPaymentCallbackDTO;
     }
     
-    
  
     /**
      * 查询用户余额明细列表
      *
      * @return
      */
-    public PageInfo<UserAccountDTO> getUserAccountList(Integer pageNum, Integer pageSize) {
-        List<UserAccountDTO> userAccountListDTO = new ArrayList<>();
+    public PageInfo<UserAccountDTO> getUserAccountList(Integer processType,Integer pageNum, Integer pageSize) {
+        LinkedList<UserAccountDTO> userAccountListDTO = new LinkedList<>();
         Integer userId = SessionUtil.getUserId();
+        
+        UserAccount userAccount = new UserAccount();
+        userAccount.setUserId(userId);
+        userAccount.setProcessType(processType);
         PageHelper.startPage(pageNum, pageSize);
-        List<UserAccount> userAccountList = userAccountMapper.queryUserAccountList(userId);
+        List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
         if (userAccountList.size() == 0) {
             return new PageInfo<UserAccountDTO>(userAccountListDTO);
         }
 
         PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
+        
         userAccountList.forEach(s -> {
             UserAccountDTO userAccountDTO = new UserAccountDTO();
             userAccountDTO.setId(s.getId());

@@ -47,8 +47,8 @@ public class ProjectConstant {
     public static final int DELETE = 1;////1代表已删除
     public static final int NOT_DELETE = 0;// 0代表未删除
     
-    public static final Byte ACCOUNT_TYPE_TRADE_SURPLUS_SEND = 8; // 使用了部分或全部余额扣款类型
-    public static final Byte ACCOUNT_TYPE_TRADE_SURPLUS_SEND_ROLLBACK = 9; // 使用了部分或全部余额扣款回滚类型
+    public static final Integer ACCOUNT_TYPE_TRADE_SURPLUS_SEND = 8; // 使用了部分或全部余额扣款类型
+    public static final Integer ACCOUNT_TYPE_TRADE_SURPLUS_SEND_ROLLBACK = 9; // 使用了部分或全部余额扣款回滚类型
     
     public static final String USER_BANK_NO_DEFAULT = "0";//非当前默认银行卡
     public static final String USER_BANK_DEFAULT = "1";//当前默认银行卡

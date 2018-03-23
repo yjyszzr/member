@@ -1,6 +1,7 @@
 package com.dl.member.service;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.UserBonusParam;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import lombok.extern.slf4j.Slf4j;
@@ -135,7 +136,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @param status
 	 * @return
 	 */
-	public PageInfo<UserBonusDTO> queryBonusListByStatus(String status) {
+	public PageInfo<UserBonusDTO> queryBonusListByStatus(String status,Integer pageNum,Integer pageSize) {
 		Integer userId = SessionUtil.getUserId();
 		UserBonus userBonus = new UserBonus();
 		userBonus.setUserId(userId);
@@ -143,7 +144,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		if(!StringUtils.isEmpty(status)) {
 			userBonus.setBonusStatus(Integer.valueOf(status));
 		}
-		
+		PageHelper.startPage(pageNum, pageSize);
 		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
 		PageInfo<UserBonus> pageInfo = new PageInfo<UserBonus>(userBonusList);
 		
