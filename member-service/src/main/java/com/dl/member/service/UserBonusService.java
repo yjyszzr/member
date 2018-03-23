@@ -1,7 +1,9 @@
 package com.dl.member.service;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.UserBonusParam;
+import com.github.pagehelper.PageInfo;
 
+import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
 
@@ -16,22 +18,26 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 
 @Service
 @Transactional
+@Slf4j
 public class UserBonusService extends AbstractService<UserBonus> {
     @Resource
     private UserBonusMapper userBonusMapper;
     
-//    @Resource
-//    private UserBonusShowDescService userBonusShowDescService;
+    @Resource
+    private UserBonusShowDescService userBonusShowDescService;
     
 	/**
 	 * 下单时的账户变动：目前仅红包置为已使用 
@@ -129,7 +135,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @param status
 	 * @return
 	 */
-	public List<UserBonusDTO> queryBonusListByStatus(String status) {
+	public PageInfo<UserBonusDTO> queryBonusListByStatus(String status) {
 		Integer userId = SessionUtil.getUserId();
 		UserBonus userBonus = new UserBonus();
 		userBonus.setUserId(userId);
@@ -139,14 +145,24 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}
 		
 		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
+		PageInfo<UserBonus> pageInfo = new PageInfo<UserBonus>(userBonusList);
 		
-//		userBonusList.forEach(userBonus->{
-//			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(shopBonusDTO, userBonus)
-//			
-//			
-//		});
+		List<UserBonusDTO> userBonusDTOList = new ArrayList<UserBonusDTO>();
+		userBonusList.forEach(s->{
+			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(s);
+			userBonusDTOList.add(userBonusDTO);
+		});
 		
-		return null;
+		PageInfo<UserBonusDTO> result = new PageInfo<UserBonusDTO>();
+		try {
+			BeanUtils.copyProperties(pageInfo, result);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		} 
+		
+		result.setList(userBonusDTOList);
+		
+		return result;
 	}
 	
 	/**
@@ -155,17 +171,21 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @param userBonusList
 	 * @return
 	 */
-//	public UserBonusDTO createReturnUserBonusDTO(UserBonus userBonus){
-//		UserBonusDTO userBonusDTO = new UserBonusDTO();
-//		BeanUtils.copyProperties(shopBonusDTO, userBonus);
-//		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
-//		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
-//		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
-//		userBonusDTO.setLimitTime(userBonusShowDescService.getLimitTimeDesc(userBonus.getStartTime(),userBonus.getEndTime()));
-//		userBonusDTO.setMinGoodsAmount(userBonusShowDescService.getLimitOrderAmountDesc(userBonus.getMin_goods_amount()));
-//
-//		return userBonusDTO;
-//	}
+	public UserBonusDTO createReturnUserBonusDTO(UserBonus userBonus){
+		UserBonusDTO userBonusDTO = new UserBonusDTO();
+		try {
+			BeanUtils.copyProperties(userBonusDTO, userBonus);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
+		
+		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
+		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
+		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
+		userBonusDTO.setLimitTime(userBonusShowDescService.getLimitTimeDesc(userBonus.getStartTime(),userBonus.getEndTime()));
+		userBonusDTO.setMinGoodsAmount(userBonusShowDescService.getLimitOrderAmountDesc(userBonus.getMinGoodsAmount(),userBonus.getBonusPrice()));
+		return userBonusDTO;
+	}
 	
 	/**
 	 * 查询单个红包的数据

@@ -3,6 +3,8 @@ package com.dl.member.model;
 import java.math.BigDecimal;
 import javax.persistence.*;
 
+import io.swagger.annotations.ApiModelProperty;
+
 @Table(name = "dl_user_bonus")
 public class UserBonus {
     /**
@@ -80,8 +82,37 @@ public class UserBonus {
      */
     @Column(name = "is_delete")
     private Integer isDelete;
-
+    
     /**
+     * 使用范围
+     */
+    @Column(name = "use_range")
+    private Integer useRange;
+    
+    /**
+     * 最小订单金额
+     */
+    @Column(name = "min_goods_amount")
+    private BigDecimal minGoodsAmount;
+    
+
+    public Integer getUseRange() {
+		return useRange;
+	}
+
+	public void setUseRange(Integer useRange) {
+		this.useRange = useRange;
+	}
+
+	public BigDecimal getMinGoodsAmount() {
+		return minGoodsAmount;
+	}
+
+	public void setMinGoodsAmount(BigDecimal minGoodsAmount) {
+		this.minGoodsAmount = minGoodsAmount;
+	}
+
+	/**
      * 获取用户红包编号
      *
      * @return user_bonus_id - 用户红包编号

@@ -6,6 +6,7 @@ import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.RollackSurplusPayParam;
 import com.dl.member.param.UserBonusIdParam;
+import com.dl.member.param.UserBonusStatusParam;
 import com.dl.member.service.UserBonusService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -37,5 +38,11 @@ public class UserBonusController {
     	return ResultGenerator.genSuccessResult("根据userBonusId查询单个红包成功",userBonusDTO);
     }
     
+    @ApiOperation(value="根据状态查询有效的红包集合", notes="根据状态查询有效的红包集合",hidden=false)
+    @PostMapping("/queryBonusListByStatus")
+    public BaseResult<PageInfo<UserBonusDTO>> queryBonusListByStatus(@RequestBody UserBonusStatusParam userBonusStatusParam) {
+    	PageInfo<UserBonusDTO> userBonusDTOList =  userBonusService.queryBonusListByStatus(userBonusStatusParam.getStatus());
+    	return ResultGenerator.genSuccessResult("根据状态查询有效的红包集合成功",userBonusDTOList);
+    }
 
 }

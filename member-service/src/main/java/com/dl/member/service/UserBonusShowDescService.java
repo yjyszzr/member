@@ -1,6 +1,12 @@
 package com.dl.member.service;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 import org.springframework.stereotype.Service;
+
+import com.dl.base.util.DateUtil;
+import com.dl.member.core.ProjectConstant;
 
 
 
@@ -13,43 +19,42 @@ public class UserBonusShowDescService {
 	 * @param endTimeInteger
 	 * @return
 	 */
-//	public String getLimitTimeDesc(Integer startTimeInteger,Integer endTimeInteger) {
-//		String startTime = DateUtil.getCurrentTimeString(Long.valueOf(startTimeInteger), DateUtil.date_sdf);
-//		String endTime = DateUtil.getCurrentTimeString(Long.valueOf(endTimeInteger), DateUtil.date_sdf);
-//		return startTime+"~"+endTime;
-//	}
-//	
-//	/**
-//	 *  获取限制的最小订单金额描述
-//	 * @param minGoodsAmountParam
-//	 * @param bonusDataDTO
-//	 * @return
-//	 */
-//	public String getLimitOrderAmountDesc(BigDecimal minGoodsAmountParam) {
-//		if(minGoodsAmountParam.compareTo(BigDecimal.ZERO) == 0) {
-//			return "无使用门槛";
-//		}else {
-//			return "订单满"+minGoodsAmountParam+"元可用";
-//		}
-//	}
-//	
-//	public String getUseRange(Integer useRange) {
-//		if(ProjectConstant.BONUS_USE_RANGE_ALLGOODS.equals(useRange)) {
-//			return "全部商品";
-//		}else if(ProjectConstant.BONUS_USE_RANGE_SOMEGOODS.equals(useRange)) {
-//			return "指定商品";
-//		}
-//		return "";
-//	}
-//
-//	public String getUseRange(Integer useRange,BonusDataDTO bonusDataDTO) {
-//		StringBuilder bonusRangeDesc = new StringBuilder();
-//		if(ProjectConstant.BONUS_USE_RANGE_ALLGOODS.equals(useRange)) {
-//			bonusRangeDesc.append("全部商品");
-//		}else if(ProjectConstant.BONUS_USE_RANGE_SOMEGOODS.equals(useRange)) {
-//			bonusRangeDesc.append("指定商品");
-//		}
-//		return bonusRangeDesc.toString();
-//	}
+	public String getLimitTimeDesc(Integer startTimeInteger,Integer endTimeInteger) {
+		String startTime = DateUtil.getCurrentTimeString(Long.valueOf(startTimeInteger), DateUtil.date_sdf);
+		String endTime = DateUtil.getCurrentTimeString(Long.valueOf(endTimeInteger), DateUtil.date_sdf);
+		Date endDate = new Date(endTimeInteger);
+		if(DateUtil.isLatestWeek(endDate, new Date())) {
+			return "剩余时间少于等于7天";
+		}else {
+			return startTime+"~"+endTime;
+		}
+	}
+	
+	/**
+	 * 获取限制的最小订单金额描述
+	 * @param minGoodsAmountParam
+	 * @param bonusDataDTO
+	 * @return
+	 */
+	public String getLimitOrderAmountDesc(BigDecimal minGoodsAmountParam,BigDecimal bonusPrice) {
+		if(minGoodsAmountParam.compareTo(BigDecimal.ZERO) == 0) {
+			return "无使用门槛";
+		}else {
+			return "购彩满"+minGoodsAmountParam+"元减"+bonusPrice;
+		}
+	}
+	
+	/**
+	 * 获取使用范围
+	 * @param useRange
+	 * @return
+	 */
+	public String getUseRange(Integer useRange) {
+		if(ProjectConstant.ALL_LOTERRY_TYPE.equals(useRange)) {
+			return "不限票种";
+		}else {
+			return "指定票种";
+		}
+	}
 
 }

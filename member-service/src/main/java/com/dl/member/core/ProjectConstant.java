@@ -58,4 +58,6 @@ public class ProjectConstant {
     
     public static final String NOT_FINISH = "0";// 用户未完成
     public static final String FINISH = "1";//用户已完成
+    
+    public static final Integer ALL_LOTERRY_TYPE = 0;
 }

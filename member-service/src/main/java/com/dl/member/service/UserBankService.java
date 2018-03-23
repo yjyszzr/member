@@ -116,17 +116,18 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg());
 		}
 		
+		//把已经添加的默认银行卡 设为非默认
+		BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
+		if(userBankDTORst.getCode() != 0) {
+			return ResultGenerator.genFailResult(userBankDTORst.getMsg());
+		}
+		
 		//保存到数据库
 		userBankDTO.setRealName(realName);
 		userBankDTO.setCardNo(bankCardNo);
 		userBankDTO.setStatus(ProjectConstant.USER_BANK_DEFAULT);
 		this.saveUserBank(userBankDTO);
 		
-		//把已经添加的默认银行卡 设为非默认
-		BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
-		if(userBankDTORst.getCode() != 0) {
-			return ResultGenerator.genFailResult(userBankDTORst.getMsg());
-		}
 		
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
@@ -416,8 +417,19 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * @param userBankId
 	 * @return
 	 */
+	@Transactional
 	public BaseResult<UserBankDTO> deleteUserBank(DeleteBankCardParam deleteBankCardParam){
 		Integer userId = SessionUtil.getUserId();
+		
+		UserBankDTO userBankDTO = new UserBankDTO();
+		if(ProjectConstant.USER_BANK_NO_DEFAULT.equals(deleteBankCardParam.getStatus())) {//删除的是非默认
+			
+		}else {//删除的是默认
+			BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_NO_DEFAULT);
+			userBankDTO = userBankDTORst.getData();
+			return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTORst.getData());
+		}
+		
 		UserBank userBank = new UserBank();
 		userBank.setId(Integer.valueOf(deleteBankCardParam.getId()));
 		userBank.setUserId(userId);
@@ -428,20 +440,14 @@ public class UserBankService extends AbstractService<UserBank> {
 		if(1 != rst) {
 			log.error("删除银行卡失败");
 		}
-		
-		UserBankDTO userBankDTO = new UserBankDTO();
-		if(ProjectConstant.USER_BANK_NO_DEFAULT.equals(deleteBankCardParam.getStatus())) {//删除的是非默认
-			return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTO);
-		}else {//删除的是默认
-			BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_NO_DEFAULT);
-			return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTORst.getData());
-		}
+		return ResultGenerator.genSuccessResult("删除银行卡成功",userBankDTO);
 	}
 	
 	/**
 	 * 更改银行卡状态为默认
 	 * @return
 	 */
+	@Transactional
 	public BaseResult<String> updateUserBankDefault(Integer userBankId){
  		Integer userId = SessionUtil.getUserId();
 		//当前一张银行卡不允许更改状态
