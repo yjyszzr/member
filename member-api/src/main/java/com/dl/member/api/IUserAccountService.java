@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserRechargeDTO;
+import com.dl.member.dto.UserWithdrawDTO;
 import com.dl.member.param.AmountParam;
 import com.dl.member.param.RollackSurplusPayParam;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
@@ -83,7 +84,7 @@ public interface IUserAccountService {
 	 * @return
 	 */	
 	@RequestMapping(path="/user/account/createUserWithdraw", method=RequestMethod.POST)
-	public BaseResult<UserRechargeDTO> createUserWithdraw(@RequestBody UserWithdrawParam userWithdrawParam);
+	public BaseResult<UserWithdrawDTO> createUserWithdraw(@RequestBody UserWithdrawParam userWithdrawParam);
 	
 	
 	/**

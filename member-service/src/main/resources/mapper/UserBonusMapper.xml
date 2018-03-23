@@ -39,7 +39,7 @@
 	  	SELECT * FROM dl_user_bonus
 		<where>
 		  	<if test="userId != null">
-		        AND user_id = #{userId}
+		        user_id = #{userId}
 		    </if>
 		    <if test="isDelete != null">
 		        AND is_delete = #{isDelete}

@@ -1,4 +1,5 @@
 package com.dl.member.service;
+import com.dl.member.model.Header;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.param.UpdateUserRechargeParam;
@@ -31,8 +32,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import javax.annotation.Resource;
 
@@ -252,18 +255,21 @@ public class UserAccountService extends AbstractService<UserAccount> {
         }
 
         PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
-        
-        userAccountList.forEach(s -> {
+        Map acocutMap = new HashMap();
+        for(int i = 0;i < userAccountList.size();i++) {
+        	UserAccount ua = userAccountList.get(i);
+        	Header header = new Header();
             UserAccountDTO userAccountDTO = new UserAccountDTO();
-            userAccountDTO.setId(s.getId());
-            userAccountDTO.setAccountSn(s.getAccountSn());
-            userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(s.getAddTime()), DateUtil.datetimeFormat));
-            userAccountDTO.setProcessTypeName(s.getNote());
-            String changeAmount = s.getAmount().compareTo(BigDecimal.ZERO) == 1?"+" + s.getAmount():String.valueOf(s.getAmount());
+            Integer addTime = ua.getAddTime();
+            
+            userAccountDTO.setId(ua.getId());
+            userAccountDTO.setAccountSn(ua.getAccountSn());
+            userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.datetimeFormat));
+            userAccountDTO.setProcessTypeName(ua.getNote());
+            String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1?"+" + ua.getAmount():String.valueOf(ua.getAmount());
             userAccountDTO.setChangeAmount(changeAmount);
             userAccountListDTO.add(userAccountDTO);
-        });
-
+        }
         PageInfo<UserAccountDTO> result = new PageInfo<UserAccountDTO>();
         try {
 			BeanUtils.copyProperties(pageInfo, result);

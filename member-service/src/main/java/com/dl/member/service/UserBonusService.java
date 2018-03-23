@@ -18,8 +18,7 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
-
-import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -175,7 +174,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	public UserBonusDTO createReturnUserBonusDTO(UserBonus userBonus){
 		UserBonusDTO userBonusDTO = new UserBonusDTO();
 		try {
-			BeanUtils.copyProperties(userBonusDTO, userBonus);
+			BeanUtils.copyProperties(userBonus,userBonusDTO);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}

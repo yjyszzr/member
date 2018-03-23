@@ -3,6 +3,7 @@ import com.dl.member.model.UserRecharge;
 import com.dl.member.model.UserWithdraw;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserWithdrawParam;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,21 +34,22 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
      * @param amount
      * @return
      */
-    public int saveWithdraw(UserWithdraw userWithdraw){
+    public String saveWithdraw(UserWithdrawParam  userWithdrawParam){
     	Integer userId = SessionUtil.getUserId();
     	String withdrawalSn = this.createSn("4");
+    	UserWithdraw userWithdraw = new UserWithdraw();
     	userWithdraw.setWithdrawalSn(withdrawalSn);
-    	userWithdraw.setAmount(userWithdraw.getAmount());
+    	userWithdraw.setAmount(userWithdrawParam.getAmount());
     	userWithdraw.setAddTime(DateUtil.getCurrentTimeLong());
-    	userWithdraw.setRealName(userWithdraw.getRealName());
-    	userWithdraw.setCardNo(userWithdraw.getCardNo());
+    	userWithdraw.setRealName(userWithdrawParam.getRealName());
+    	userWithdraw.setCardNo(userWithdrawParam.getCardNo());
     	userWithdraw.setUserId(userId);
     	userWithdraw.setStatus(Integer.valueOf(ProjectConstant.NOT_FINISH));
     	int rst = userWithdrawMapper.insert(userWithdraw);
     	if(1 != rst) {
     		log.error("");
     	}
-		return 0;
+		return withdrawalSn;
     }
     
     
@@ -56,7 +58,7 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
      * @param amount
      * @return
      */
-    public int updateWithdraw(UpdateUserWithdrawParam updateUserWithdrawParam){
+    public String updateWithdraw(UpdateUserWithdrawParam updateUserWithdrawParam){
     	UserWithdraw userWithdraw = new UserWithdraw();
     	userWithdraw.setPaymentId(updateUserWithdrawParam.getPaymentId());
     	userWithdraw.setPayTime(updateUserWithdrawParam.getPayTime());
@@ -65,7 +67,7 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
     	if(1 != rst) {
     		log.error("更新数据库提现单失败");
     	}
-		return rst;
+		return "success";
     }
     
     /**

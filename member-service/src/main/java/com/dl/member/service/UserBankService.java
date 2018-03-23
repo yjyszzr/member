@@ -182,11 +182,13 @@ public class UserBankService extends AbstractService<UserBank> {
 		try {
 			BeanUtils.copyProperties(userBankDTO, noDefaultUserBank);
 			userBankDTO.setUserBankId(String.valueOf(noDefaultUserBank.getId()));
+			String cardNO = noDefaultUserBank.getCardNo();
+			userBankDTO.setLastCardNo4(cardNO.substring(cardNO.length()-4));
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		} 
 		
-		return ResultGenerator.genSuccessResult("查询银行卡种类成功", userBankDTO) ;
+		return ResultGenerator.genSuccessResult("查询默认银行卡成功", userBankDTO) ;
 	}
     
     

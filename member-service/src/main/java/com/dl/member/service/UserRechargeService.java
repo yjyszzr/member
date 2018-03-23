@@ -32,7 +32,7 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
      * @param amount
      * @return
      */
-    public int saveReCharege(BigDecimal amount){
+    public String saveReCharege(BigDecimal amount){
     	Integer userId = SessionUtil.getUserId();
     	UserRecharge userRecharge = new UserRecharge();
     	String rechargeSn = this.createSn("3");
@@ -45,7 +45,8 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
     	if(1 != rst) {
     		log.error("");
     	}
-		return 0;
+    	
+		return rechargeSn;
     }
     
     
@@ -54,7 +55,7 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
      * @param amount
      * @return
      */
-    public int updateReCharege(UpdateUserRechargeParam updateUserRechargeParam){
+    public String updateReCharege(UpdateUserRechargeParam updateUserRechargeParam){
     	Integer userId = SessionUtil.getUserId();
     	UserRecharge userRecharge = new UserRecharge();
     	userRecharge.setPaymentCode(updateUserRechargeParam.getPaymentCode());
@@ -66,7 +67,7 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
     	if(1 != rst) {
     		log.error("更新数据库充值单失败");
     	}
-		return rst;
+		return "success";
     }
     
     /**

@@ -3,13 +3,21 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserAccountDTO;
+import com.dl.member.dto.UserRechargeDTO;
+import com.dl.member.dto.UserWithdrawDTO;
+import com.dl.member.param.AmountParam;
 import com.dl.member.param.PageParam;
 import com.dl.member.param.RollackSurplusPayParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
+import com.dl.member.param.UpdateUserRechargeParam;
+import com.dl.member.param.UpdateUserWithdrawParam;
 import com.dl.member.param.UserBonusParam;
+import com.dl.member.param.UserWithdrawParam;
 import com.dl.member.service.UserAccountService;
 import com.dl.member.service.UserBonusService;
+import com.dl.member.service.UserRechargeService;
+import com.dl.member.service.UserWithdrawService;
 import com.github.pagehelper.PageInfo;
 
 import io.swagger.annotations.ApiOperation;
@@ -31,7 +39,13 @@ public class UserAccountController {
     
     @Resource
     private UserBonusService userBonusService;
-
+    
+    @Resource
+    private UserRechargeService userRechargeService;
+    
+    @Resource
+    private UserWithdrawService userWithdrawService;
+    
 	/**
 	 * 余额支付引起的账户余额变动
 	 * @param SurplusPayParam
@@ -89,6 +103,39 @@ public class UserAccountController {
     	PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(null,pageParam.getPageNum(), pageParam.getPageSize()); 
     	return ResultGenerator.genSuccessResult("查询用户账户明细列表",rst);
 	}
+    
+    @ApiOperation(value="用户生成充值单", notes="用户生成充值单",hidden=false)
+	@RequestMapping(path="/createReCharege", method=RequestMethod.POST)
+    public BaseResult<UserRechargeDTO> createReCharege(@RequestBody AmountParam amountParam){
+    	String rechargeSn = userRechargeService.saveReCharege(amountParam.getAmount());
+    	UserRechargeDTO userRechargeDTO = new UserRechargeDTO();
+    	userRechargeDTO.setRechargeSn(rechargeSn);
+    	return ResultGenerator.genSuccessResult("用户生成充值单成功",userRechargeDTO);
+    }
+    
+    @ApiOperation(value="更新用户充值单", notes="更新用户充值单",hidden=false)
+	@RequestMapping(path="/updateReCharege", method=RequestMethod.POST)
+    public BaseResult<String> updateReCharege(@RequestBody UpdateUserRechargeParam updateUserRechargeParam){
+    	return ResultGenerator.genSuccessResult("更新用户充值单成功",userRechargeService.updateReCharege(updateUserRechargeParam));
+    }
+    
+    @ApiOperation(value="用户生成提现单", notes="用户生成提现单",hidden=false)
+	@RequestMapping(path="/createUserWithdraw", method=RequestMethod.POST)
+    public BaseResult<UserWithdrawDTO> createUserWithdraw(@RequestBody UserWithdrawParam userWithdrawParam){
+    	String withDrawSn = userWithdrawService.saveWithdraw(userWithdrawParam);
+    	UserWithdrawDTO userWithdrawDTO = new UserWithdrawDTO();
+    	userWithdrawDTO.setWithdrawalSn(withDrawSn);
+    	return ResultGenerator.genSuccessResult("用户生成提现单成功",userWithdrawDTO);
+    	
+    }
+    
+    @ApiOperation(value="更新用户提现单", notes="更新用户提现单",hidden=false)
+	@RequestMapping(path="/updateUserWithdraw", method=RequestMethod.POST)
+    public BaseResult<String> updateUserWithdraw(@RequestBody UpdateUserWithdrawParam updateUserWithdrawParam){
+    	return ResultGenerator.genSuccessResult("更新用户提现单成功",userWithdrawService.updateWithdraw(updateUserWithdrawParam));
+    	
+    }
+    
     
     
 }

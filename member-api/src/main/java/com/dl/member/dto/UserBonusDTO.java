@@ -29,6 +29,10 @@ public class UserBonusDTO {
     @ApiModelProperty(value = "红包使用状态：0-未使用 1-已使用 2-已过期")
     private String bonusStatus;
     
+    @ApiModelProperty(value = "使用说明")
+    private String useHelp;
+    
+    
     
 
     
