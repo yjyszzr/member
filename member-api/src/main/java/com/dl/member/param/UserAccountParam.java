@@ -35,4 +35,14 @@ public class UserAccountParam {
     @ApiModelProperty(value = "日志")
     private String note;
     
+    @ApiModelProperty(value = "第三方名称")
+    private String thirdPartName;
+    
+    @ApiModelProperty(value = "第三方支付金额")
+    private BigDecimal thirdPartPaid;
+    
+    
+    
+    
+    
 }

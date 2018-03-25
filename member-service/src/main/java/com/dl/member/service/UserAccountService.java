@@ -25,21 +25,14 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.dto.OrderDTO;
-
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
 
 @Service
@@ -124,29 +117,29 @@ public class UserAccountService extends AbstractService<UserAccount> {
         return ResultGenerator.genSuccessResult("余额支付后余额扣减成功",surplusPaymentCallbackDTO);
     }
     
-    /**
-     * 创建流水
-     */
-    public int saveUserAccount(UserAccountParam userAccountParam) {
-    	Integer userId = SessionUtil.getUserId();
-        UserAccount uap = new UserAccount();
-        String note = "";
-        uap.setNote(note);
-        uap.setUserId(userId);
-        uap.setAdminUser(userAccountParam.getUserName());
-        uap.setAddTime(DateUtil.getCurrentTimeLong());
-        String accountSn = this.createAccountSn(String.valueOf(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND));
-        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND);
-        uap.setAccountSn(accountSn);
-        uap.setAmount(userAccountParam.getAmount());
-        uap.setCurBalance(userAccountParam.getCurBalance());
-        uap.setPaymentCode(userAccountParam.getPaymentCode());
-        uap.setPaymentName(userAccountParam.getPaymentName());
-        uap.setOrderSn(userAccountParam.getOrderSn());
-        uap.setParentSn("");
-        this.save(uap);
-		return userId;
-    }
+//    /**
+//     * 创建账户流水
+//     */
+//    public int saveUserAccount(UserAccountParam userAccountParam) {
+//    	Integer userId = SessionUtil.getUserId();
+//        UserAccount uap = new UserAccount();
+//        String note = "";
+//        uap.setNote(note);
+//        uap.setUserId(userId);
+//        uap.setAdminUser(userAccountParam.getUserName());
+//        uap.setAddTime(DateUtil.getCurrentTimeLong());
+//        String accountSn = this.createAccountSn(String.valueOf(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND));
+//        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND);
+//        uap.setAccountSn(accountSn);
+//        uap.setAmount(userAccountParam.getAmount());
+//        uap.setCurBalance(userAccountParam.getCurBalance());
+//        uap.setPaymentCode(userAccountParam.getPaymentCode());
+//        uap.setPaymentName(userAccountParam.getPaymentName());
+//        uap.setOrderSn(userAccountParam.getOrderSn());
+//        uap.setParentSn("");
+//        this.save(uap);
+//		return userId;
+//    }
     
     /**
      * @see 余额支付时候扣减余额和订单支出，优先使用可提现余额
@@ -299,20 +292,21 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param processType
      * @return
      */
-    public String saveAccount(BigDecimal amount,String orderSn,String paymentCode,String paymentName,Integer processType) {
+    public String saveAccount(UserAccountParam userAccountParam) {
     	User user = userService.findById(SessionUtil.getUserId());
-    	BigDecimal curBalance = user.getUserMoney().add(user.getUserMoneyLimit()).add(user.getFrozenMoney()).subtract(amount);
+    	BigDecimal curBalance = user.getUserMoney().add(user.getUserMoneyLimit()).add(user.getFrozenMoney()).subtract(userAccountParam.getAmount());
     	UserAccount userAccount = new UserAccount();
     	String accountSn = snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
     	userAccount.setAccountSn(accountSn);
     	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
-    	userAccount.setAmount(amount);
+    	userAccount.setAmount(userAccountParam.getAmount());
     	userAccount.setCurBalance(curBalance);
-    	userAccount.setOrderSn(orderSn);
-    	userAccount.setPaymentCode(paymentCode);
-    	userAccount.setPaymentName(paymentName);
-    	userAccount.setProcessType(processType);
+    	userAccount.setOrderSn(userAccountParam.getOrderSn());
+    	userAccount.setPaymentName(userAccountParam.getPaymentName());
+    	userAccount.setProcessType(userAccountParam.getAccountType());
     	userAccount.setUserId(user.getUserId());
+    	
+    	userAccount.setNote("");
     	int rst = userAccountMapper.insertUserAccount(userAccount);
     	if(rst != 1) {
     		log.error("生成流水账户失败");
@@ -321,6 +315,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	return accountSn;
     }
+    
+    public String createNote(Integer processType) {
+    	return "";
+    }
+    
+    
     /**
      * 构造提现状态
      * @param processType

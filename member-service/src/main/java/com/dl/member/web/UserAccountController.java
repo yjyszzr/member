@@ -116,7 +116,7 @@ public class UserAccountController {
     @ApiOperation(value="更新用户充值单", notes="更新用户充值单",hidden=false)
 	@RequestMapping(path="/updateReCharege", method=RequestMethod.POST)
     public BaseResult<String> updateReCharege(@RequestBody UpdateUserRechargeParam updateUserRechargeParam){
-    	return ResultGenerator.genSuccessResult("更新用户充值单成功",userRechargeService.updateReCharege(updateUserRechargeParam));
+    	return userRechargeService.updateReCharege(updateUserRechargeParam);
     }
     
     @ApiOperation(value="用户生成提现单", notes="用户生成提现单",hidden=false)
@@ -126,13 +126,12 @@ public class UserAccountController {
     	UserWithdrawDTO userWithdrawDTO = new UserWithdrawDTO();
     	userWithdrawDTO.setWithdrawalSn(withDrawSn);
     	return ResultGenerator.genSuccessResult("用户生成提现单成功",userWithdrawDTO);
-    	
     }
     
     @ApiOperation(value="更新用户提现单", notes="更新用户提现单",hidden=false)
 	@RequestMapping(path="/updateUserWithdraw", method=RequestMethod.POST)
     public BaseResult<String> updateUserWithdraw(@RequestBody UpdateUserWithdrawParam updateUserWithdrawParam){
-    	return ResultGenerator.genSuccessResult("更新用户提现单成功",userWithdrawService.updateWithdraw(updateUserWithdrawParam));
+    	return userWithdrawService.updateWithdraw(updateUserWithdrawParam);
     	
     }
     

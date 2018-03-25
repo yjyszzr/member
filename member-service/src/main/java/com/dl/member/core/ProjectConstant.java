@@ -59,11 +59,11 @@ public class ProjectConstant {
     public static final String NOT_FINISH = "0";// 用户未完成
     public static final String FINISH = "1";//用户已完成
     
-    public static final Integer REWARD = 1;
-    public static final Integer RECHARGE = 2;
-    public static final Integer BUY = 3;
-    public static final Integer WITHDRAW = 4;
-    public static final Integer BONUS =5;
+    public static final Integer REWARD = 1;//奖金
+    public static final Integer RECHARGE = 2;//充值
+    public static final Integer BUY = 3;//购彩
+    public static final Integer WITHDRAW = 4;//提现
+    public static final Integer BONUS =5;//红包
     
     public static final Integer ALL_LOTERRY_TYPE = 0;
 }

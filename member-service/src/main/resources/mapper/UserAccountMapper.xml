@@ -14,10 +14,14 @@
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="last_time" jdbcType="INTEGER" property="lastTime" />
     <result column="process_type" jdbcType="INTEGER" property="processType" />
-    <result column="payment_code" jdbcType="VARCHAR" property="paymentCode" />
-    <result column="payment_name" jdbcType="VARCHAR" property="paymentName" />
     <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
     <result column="parent_sn" jdbcType="VARCHAR" property="parentSn" />
+    <result column="pay_id" jdbcType="VARCHAR" property="payId" />
+    <result column="payment_name" jdbcType="VARCHAR" property="paymentName" />
+    <result column="third_party_name" jdbcType="VARCHAR" property="thirdPartyName" />
+    <result column="user_surplus" jdbcType="VARCHAR" property="userSurplus" />
+    <result column="user_surplus_limit" jdbcType="VARCHAR" property="userSurplusLimit" />
+    <result column="third_part_paid" jdbcType="VARCHAR" property="thirdPartPaid" />
     <result column="note" jdbcType="LONGVARCHAR" property="note" />
   </resultMap>
   
@@ -41,10 +45,15 @@
   </select>
   
   <insert id="insertUserAccount">
-  	INSERT INTO dl_user_account(account_sn,user_id,admin_user,amount,
-  	cur_balance,add_time,last_time,process_type,payment_code,payment_name,
-  	order_sn,parent_sn,note) 
+  	INSERT INTO 
+  	dl_user_account(account_sn,user_id,admin_user,amount,
+  	cur_balance,add_time,last_time,process_type,payment_code,
+  	payment_name,order_sn,parent_sn,note,pay_id,third_party_name,
+  	user_surplus,user_surplus_limit,third_part_paid) 
   	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},
-  	#{curBalance},#{addTime},#{lastTime},#{processType},#{paymentCode},#{paymentName},#{orderSn},#{parentSn},#{note});
+  	#{curBalance},#{addTime},#{lastTime},#{processType},
+  	#{paymentCode},#{paymentName},#{orderSn},#{parentSn},
+  	#{note},#{payId},#{third_party_name},#{user_surplus},
+  	#{user_surplus_limit},#{third_part_paid});
   </insert>
 </mapper>

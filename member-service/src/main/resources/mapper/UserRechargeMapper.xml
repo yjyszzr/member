@@ -37,4 +37,27 @@
 		 </trim>
 	 WHERE recharge_sn = #{rechargeSn}  
   </update>
+  
+  <select id="queryUserChargeBySelective" parameterType="com.dl.member.model.UserRecharge" resultMap="BaseResultMap">
+  	 select * from dl_user_recharge 
+  	 <where>
+	  	<if test="userId != null">
+	        AND user_id = #{userId}
+	    </if>
+	    <if test="rechargeSn != null">
+	        AND recharge_sn = #{rechargeSn}
+	    </if>
+
+	    <if test="status != null">
+	        AND status = #{status}
+	    </if>
+	    <if test="id != null">
+	        AND id = #{id}
+	    </if>
+	     <if test="paymentCode!=null">
+	        AND payment_code = #{paymentCode}
+	    </if>
+    </where>
+    order by add_time
+  </select>
 </mapper>

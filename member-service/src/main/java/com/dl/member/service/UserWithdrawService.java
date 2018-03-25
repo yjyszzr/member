@@ -1,17 +1,29 @@
 package com.dl.member.service;
+import com.dl.member.model.UserRecharge;
 import com.dl.member.model.UserWithdraw;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserWithdrawParam;
 import lombok.extern.slf4j.Slf4j;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserWithdrawMapper;
+import com.dl.member.enums.MemberEnums;
 import com.dl.base.enums.SNBusinessCodeEnum;
+import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 @Service
@@ -20,6 +32,9 @@ import javax.annotation.Resource;
 public class UserWithdrawService extends AbstractService<UserWithdraw> {
     @Resource
     private UserWithdrawMapper userWithdrawMapper;
+    
+    @Resource
+    private UserAccountService userAccountService;
     
     public static SNGenerator snGenerator = new SNGenerator();
     
@@ -45,6 +60,19 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
     	}
 		return withdrawalSn;
     }
+ 
+    /**
+     * 根据提现单号查询提现单
+     */
+    public BaseResult<UserWithdraw> queryUserWithdraw(String withDrawSn){
+    	UserWithdraw userWithdraw = new UserWithdraw();
+    	userWithdraw.setWithdrawalSn(withDrawSn);
+    	List<UserWithdraw> userWithdrawList = userWithdrawMapper.queryUserWithdrawBySelective(userWithdraw);
+    	if(CollectionUtils.isEmpty(userWithdrawList)) {
+    		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "提现单不存在");
+    	}
+    	return ResultGenerator.genSuccessResult("查询提现单成功", userWithdrawList.get(0));
+    }
     
     
     /**
@@ -52,7 +80,13 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
      * @param amount
      * @return
      */
-    public String updateWithdraw(UpdateUserWithdrawParam updateUserWithdrawParam){
+    public BaseResult<String> updateWithdraw(UpdateUserWithdrawParam updateUserWithdrawParam){
+    	BaseResult<UserWithdraw> userWithdrawRst = this.queryUserWithdraw(updateUserWithdrawParam.getWithdrawalSn());
+    	if(userWithdrawRst.getCode() != 0) {
+    		return ResultGenerator.genResult(userWithdrawRst.getCode(), userWithdrawRst.getMsg());
+    	}
+    	BigDecimal amount = userWithdrawRst.getData().getAmount();
+    	
     	UserWithdraw userWithdraw = new UserWithdraw();
     	userWithdraw.setPaymentId(updateUserWithdrawParam.getPaymentId());
     	userWithdraw.setPayTime(updateUserWithdrawParam.getPayTime());
@@ -61,8 +95,16 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
     	int rst = userWithdrawMapper.updateUserWithdrawBySelective(userWithdraw);
     	if(1 != rst) {
     		log.error("更新数据库提现单失败");
+    		return ResultGenerator.genFailResult("更新数据库提现单失败");
     	}
-		return "success";
+    	
+    	UserAccountParam userAccountParam= new UserAccountParam();
+    	//生成账户流水
+    	String withdrawSn = userAccountService.saveAccount(userAccountParam);
+		if(StringUtils.isEmpty(withdrawSn)) {
+			return ResultGenerator.genFailResult("更新数据库提现单失败");
+		}
+		return ResultGenerator.genSuccessResult("更新数据库提现单成功", withdrawSn);
     }
     
 }
