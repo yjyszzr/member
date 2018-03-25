@@ -37,7 +37,7 @@
 		        AND account_sn = #{accountSn}
 		    </if>
 	    </where>
-  		ORDER BY add_time DESC
+  		ORDER BY add_time
   </select>
   
   <insert id="insertUserAccount">

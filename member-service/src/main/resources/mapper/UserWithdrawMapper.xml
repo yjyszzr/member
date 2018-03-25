@@ -20,16 +20,17 @@
   
   <insert id="insertUserWithdraw"  parameterType="com.dl.member.model.UserWithdraw">
      INSERT INTO dl_user_withdraw(withdrawal_sn,user_id,amount,add_time,status,real_name,card_no)
-     VALUES((#{recharge_sn},#{user_id},#{amount},#{add_time},#{status},#{realName},#{cardNo});
+     VALUES(#{withdrawalSn},#{userId},#{amount},#{addTime},#{status},#{realName},#{cardNo});
   </insert>
   
   <update id="updateUserWithdrawBySelective" parameterType="com.dl.member.model.UserWithdraw">
    	 UPDATE dl_user_withdraw
 		 <trim prefix="set" suffixOverrides=",">
+		  <if test="status!=null">status=#{status},</if>
 		  <if test="payTime!=null">pay_time=#{payTime},</if>
 		  <if test="paymentId!=null">payment_id=#{paymentId},</if>
 		 </trim>
-	 WHERE id = #{id}  
+	 WHERE withdrawal_sn = #{withdrawalSn}  
   </update>
   
 </mapper>

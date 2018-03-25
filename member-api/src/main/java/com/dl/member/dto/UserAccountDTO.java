@@ -20,17 +20,20 @@ public class UserAccountDTO {
 	@ApiModelProperty("流水号")
     private String accountSn;
 
-	@ApiModelProperty("用户id")
-    private Integer userId;
-
 	@ApiModelProperty("变化的金额")
     private String changeAmount;
 
     @ApiModelProperty("添加时间")
     private String addTime;
     
+    @ApiModelProperty("时分秒")
+    private String shotTime;
+    
     @ApiModelProperty("操作类型名称")
     private String processTypeName;
+    
+    @ApiModelProperty("状态")
+    private String status;
 
     @ApiModelProperty("操作备注")
     private String note;
