@@ -111,6 +111,7 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
         userAccountParam.setUserName("");
         userAccountParam.setNote("");
+        userAccountParam.setStatus(Integer.valueOf(updateUserWithdrawParam.getStatus()));
         userAccountParam.setPayId(updateUserWithdrawParam.getPaymentId());
     	String withdrawSn = userAccountService.saveAccount(userAccountParam);
 		if(StringUtils.isEmpty(withdrawSn)) {

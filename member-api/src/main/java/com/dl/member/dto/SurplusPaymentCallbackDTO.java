@@ -25,4 +25,11 @@ public class SurplusPaymentCallbackDTO {
 	 * 当前变动后的总余额
 	 */
 	private BigDecimal curBalance;
+	
+	/**
+	 * 当前流水号
+	 */
+	private String accountSn;
+	
+	
 }

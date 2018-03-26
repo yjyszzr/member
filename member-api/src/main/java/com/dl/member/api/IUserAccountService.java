@@ -14,12 +14,15 @@ import com.dl.member.param.RollackSurplusPayParam;
 //import com.pgt.shop.member.param.CancelChangeParam;
 //import com.pgt.shop.member.param.ConfirmOrderParam;
 import com.dl.member.param.SurplusPayParam;
+import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
 import com.dl.member.param.UserWithdrawParam;
 //import com.pgt.shop.member.param.UserCapitalParam;
 //import com.pgt.shop.member.param.UserRefundParam;
+
+import io.swagger.annotations.ApiOperation;
 
 /**
  * 用户账户接口
@@ -94,6 +97,14 @@ public interface IUserAccountService {
 	 */	
 	@RequestMapping(path="/user/account/updateUserWithdraw", method=RequestMethod.POST)
 	public BaseResult<String> updateUserWithdraw(@RequestBody UpdateUserWithdrawParam updateUserWithdrawParam);
+	
+	/**
+	 * 更新用户账户
+	 * @param updateUserAccountParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/account/updateUserAccount", method=RequestMethod.POST)
+    public BaseResult<String> updateUserAccount(@RequestBody UpdateUserAccountParam updateUserAccountParam);
 	
 //	
 //	/**

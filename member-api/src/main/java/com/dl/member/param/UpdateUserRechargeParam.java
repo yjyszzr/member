@@ -15,7 +15,7 @@ public class UpdateUserRechargeParam {
 	@NotBlank(message="充值单单号不能为空")
     private String rechargeSn;
 	
-	@ApiModelProperty("充值单状态：0-未完成充值 1-已完成充值")
+	@ApiModelProperty("充值单状态：0-未完成充值 1-已完成充值  2-失败")
 	@NotBlank(message="充值单状态不能为空")
     private String status;
 	

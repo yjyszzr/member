@@ -20,7 +20,7 @@ public class UpdateUserWithdrawParam {
 	@NotBlank(message="提现单号不能为空")
     private String withdrawalSn;
 
-	@ApiModelProperty("提现单状态：0-未完成提现 1-已完成提现")
+	@ApiModelProperty("提现单状态：0-未完成提现 1-已完成提现 2-失败")
 	@NotBlank(message="提现单状态不能为空")
     private String status;
 

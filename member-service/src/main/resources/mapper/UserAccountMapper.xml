@@ -44,6 +44,27 @@
   		ORDER BY add_time
   </select>
   
+    <select id="countUserAccountByType" parameterType="com.dl.member.model.UserAccount"  resultMap="BaseResultMap">
+  		SELECT *  FROM dl_user_account 
+	  	<where>
+		  	<if test="userId != null">
+		        AND user_id = #{userId}
+		    </if>
+		    <if test="processType != null">
+		        AND process_type = #{processType}
+		    </if>
+		    <if test="id != null">
+		        AND id = #{id}
+		    </if>
+		    <if test="accountSn != null">
+		        AND account_sn = #{accountSn}
+		    </if>
+		    <if test="addTime != null">
+		        AND add_time >= DATE_SUB(NOW(),INTERVAL 1 MONTH)
+		    </if>
+	    </where>
+  </select>
+  
   <insert id="insertUserAccount">
   	INSERT INTO 
   	dl_user_account(account_sn,user_id,admin_user,amount,
@@ -56,4 +77,14 @@
   	#{note},#{payId},#{third_party_name},#{user_surplus},
   	#{user_surplus_limit},#{third_part_paid});
   </insert>
+  
+  <update id="updateUserAccountBySelective" parameterType="com.dl.member.model.UserAccount">
+  	UPDATE dl_user_account 
+		 <trim prefix="set" suffixOverrides=",">
+		  <if test="payId!=null">pay_id=#{payId},</if>
+		  <if test="status!=null">status=#{status},</if>
+		 </trim>
+    WHERE account_sn = #{accountSn} and user_id=#{userId}
+  </update>
+  
 </mapper>

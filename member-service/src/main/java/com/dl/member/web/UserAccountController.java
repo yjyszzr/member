@@ -10,8 +10,10 @@ import com.dl.member.param.PageParam;
 import com.dl.member.param.RollackSurplusPayParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
+import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserWithdrawParam;
 import com.dl.member.service.UserAccountService;
@@ -134,6 +136,14 @@ public class UserAccountController {
     	return userWithdrawService.updateWithdraw(updateUserWithdrawParam);
     	
     }
+    
+    @ApiOperation(value="更新用户账户", notes="更新用户账户",hidden=false)
+	@RequestMapping(path="/updateUserAccount", method=RequestMethod.POST)
+    public BaseResult<String> updateUserAccount(@RequestBody UpdateUserAccountParam updateUserAccountParam){
+    	return userAccountService.updateUserAccount(updateUserAccountParam.getPayId(),updateUserAccountParam.getStatus(),updateUserAccountParam.getAccountSn());
+    	
+    }
+    
     
     
     

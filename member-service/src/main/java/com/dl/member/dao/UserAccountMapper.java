@@ -13,4 +13,6 @@ public interface UserAccountMapper extends Mapper<UserAccount> {
 	
 	int insertUserAccount(UserAccount userAccount); 
 	
+	int updateUserAccountBySelective(UserAccount userAccount); 
+	
 }

@@ -90,9 +90,18 @@ public class UserAccount {
     @Column(name = "pay_id")
     private String payId;
     
+    @Column(name = "status")
+    private Integer status;
     
+    public Integer getStatus() {
+		return status;
+	}
 
-    public String getThirdPartyName() {
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public String getThirdPartyName() {
 		return thirdPartyName;
 	}
 

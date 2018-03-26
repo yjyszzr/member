@@ -53,6 +53,9 @@ public class UserAccountParam {
     @ApiModelProperty(value = "第三方支付金额")
     private BigDecimal thirdPartPaid;
     
+    @ApiModelProperty(value = "状态：0-未完成 1-已完成 2-失败")
+    private Integer status;
+    
     
     
     

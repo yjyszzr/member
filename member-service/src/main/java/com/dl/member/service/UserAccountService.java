@@ -86,7 +86,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
             throw new ServiceException(MemberEnums.USERACCOUNTS_ALREADY_REDUCE.getcode(), MemberEnums.USERACCOUNTS_ALREADY_REDUCE.getMsg());
         }
 
-        SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = this.countReduceMoney(surplus, user);
+        SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = this.commonCalculateMoney(surplusPayParam.getSurplus(), ProjectConstant.BUY);
         
         UserAccountParam userAccountParam = new UserAccountParam();
         String accountSn = snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
@@ -101,11 +101,33 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
         userAccountParam.setUserName(user.getUserName());
+        if(ProjectConstant.yuePay.equals(surplusPayParam.getPayType())) {
+        	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
+        }else {
+        	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.NOT_FINISH));
+        }
         userAccountParam.setNote("");
         userAccountParam.setPayId("");
-        this.saveAccount(userAccountParam);
+        String accountSnRst = this.saveAccount(userAccountParam);
+        if(StringUtils.isEmpty(accountSnRst)) {
+        	surplusPaymentCallbackDTO.setAccountSn("");
+        }else {
+        	surplusPaymentCallbackDTO.setAccountSn(accountSnRst);
+        }
         
         return ResultGenerator.genSuccessResult("余额支付后余额扣减成功",surplusPaymentCallbackDTO);
+    }
+    
+    public BaseResult<String> updateUserAccount(String payId,Integer status,String accountSn){
+    	UserAccount userAccount = new UserAccount();
+    	userAccount.setPayId(payId);
+    	userAccount.setStatus(status);
+    	userAccount.setAccountSn(accountSn);
+    	int rst = userAccountMapper.updateUserAccountBySelective(userAccount);
+    	if(1 != rst) {
+    		return ResultGenerator.genFailResult("余额支付后余额扣减失败");
+    	}
+    	return ResultGenerator.genSuccessResult("余额支付后余额扣减成功","success");
     }
     
 //    /**
@@ -120,7 +142,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 //        uap.setAdminUser(userAccountParam.getUserName());
 //        uap.setAddTime(DateUtil.getCurrentTimeLong());
 //        String accountSn = this.createAccountSn(String.valueOf(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND));
-//        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND);
+//        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND);update
 //        uap.setAccountSn(accountSn);
 //        uap.setAmount(userAccountParam.getAmount());
 //        uap.setCurBalance(userAccountParam.getCurBalance());
@@ -305,12 +327,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
         }
 
         PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
-        for(int i = 0;i < userAccountList.size();i++) {
+        for(int i = 0,len = userAccountList.size();i < len;i++) {
         	UserAccount ua = userAccountList.get(i);
             UserAccountDTO userAccountDTO = new UserAccountDTO();
             userAccountDTO.setId(ua.getId());
-            userAccountDTO.setAccountSn(ua.getAccountSn());
             userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.date_sdf));
+            userAccountDTO.setAccountSn(ua.getAccountSn());
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
             userAccountDTO.setStatus(showStatus(ua.getProcessType(),ua.getId()));
             userAccountDTO.setProcessTypeName(createProcessTypeString(ua.getProcessType()));
@@ -362,6 +384,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	userAccount.setThirdPartPaid(userAccountParam.getThirdPartPaid() == null ? BigDecimal.ZERO:userAccountParam.getThirdPartPaid());
     	userAccount.setProcessType(userAccountParam.getAccountType());
     	userAccount.setUserId(user.getUserId());
+    	userAccount.setStatus(userAccountParam.getStatus());
     	userAccount.setNote("");
     	userAccount.setParentSn("");
     	
@@ -372,10 +395,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	}
     	
     	return accountSn;
-    }
-    
-    public String createNote(Integer processType) {
-    	return "";
     }
     
     /**

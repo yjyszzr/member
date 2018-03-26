@@ -118,6 +118,7 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
         userAccountParam.setUserName("");
         userAccountParam.setNote("");
         userAccountParam.setPayId(updateUserRechargeParam.getPaymentId());
+        userAccountParam.setStatus(Integer.valueOf(updateUserRechargeParam.getStatus()));
     	String rechargeSn = userAccountService.saveAccount(userAccountParam);
 		if(StringUtils.isEmpty(rechargeSn)) {
 			return ResultGenerator.genFailResult("更新数据库充值单失败");

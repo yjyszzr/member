@@ -22,8 +22,11 @@ public class UserAccountDTO {
 
 	@ApiModelProperty("变化的金额")
     private String changeAmount;
+	
+    @ApiModelProperty("是否显示时间")
+    private String isShow;
 
-    @ApiModelProperty("添加时间")
+    @ApiModelProperty("添加时间:年月日")
     private String addTime;
     
     @ApiModelProperty("时分秒")
