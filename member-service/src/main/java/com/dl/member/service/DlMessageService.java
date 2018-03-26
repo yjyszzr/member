@@ -1,4 +1,9 @@
 package com.dl.member.service;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,11 +38,14 @@ public class DlMessageService extends AbstractService<DlMessage> {
     		messageDTO.setObjectType(msg.getObjectType());
     		messageDTO.setReceiver(msg.getReceiver());
     		messageDTO.setReceiverMobile(msg.getReceiverMobile());
-    		messageDTO.setSendTime(msg.getSendTime());
+    		Integer sendTime = msg.getSendTime();
+    		LocalDateTime ofEpochSecond = LocalDateTime.ofEpochSecond(sendTime, 0, ZoneOffset.UTC);
+    		messageDTO.setSendTime(ofEpochSecond.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     		messageDTO.setTitle(msg.getTitle());
     		messageDTO.setContentDesc(msg.getContentDesc());
     		messageDTO.setMsgUrl(msg.getMsgUrl());
     		return messageDTO;
     	}).collect(Collectors.toList());
     }
+    
 }

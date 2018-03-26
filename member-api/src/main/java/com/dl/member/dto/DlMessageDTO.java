@@ -14,7 +14,7 @@ public class DlMessageDTO {
 
     private Integer msgId;
 
-    private Integer sendTime;
+    private String sendTime;
 
     private String title;
 
