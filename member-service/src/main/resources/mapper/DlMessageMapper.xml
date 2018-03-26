@@ -16,7 +16,9 @@
     <result column="is_push_success" jdbcType="BIT" property="isPushSuccess" />
     <result column="is_read" jdbcType="BIT" property="isRead" />
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <result column="content_desc" jdbcType="LONGVARCHAR" property="contentDesc" />
     <result column="msg_desc" jdbcType="LONGVARCHAR" property="msgDesc" />
+    <result column="msg_url" jdbcType="LONGVARCHAR" property="msgUrl" />
   </resultMap>
   
   <sql id="fields">
@@ -29,6 +31,6 @@
   	from 
   		dl_message
   	where 
-  		receiver=#{receiver} and msg_type=#{msgType}
+  		msg_type=#{msgType} and (receiver=#{receiver} or receiver =-1)
   </select>
 </mapper>

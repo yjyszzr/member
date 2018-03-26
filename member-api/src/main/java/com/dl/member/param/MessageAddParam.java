@@ -11,9 +11,9 @@ import lombok.Data;
 @Data
 public class MessageAddParam {
 
-    @ApiModelProperty(value = "页码")
     private String title;
     private String content;
+    private String contentDesc;
     private String msgDesc;
     private Integer msgType;
     private Integer receiver;
@@ -21,4 +21,5 @@ public class MessageAddParam {
     private String objectType;
     private Integer sendTime;
     private Integer sender;
+    private String msgUrl;
 }

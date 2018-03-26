@@ -35,6 +35,8 @@ public class DlMessageService extends AbstractService<DlMessage> {
     		messageDTO.setReceiverMobile(msg.getReceiverMobile());
     		messageDTO.setSendTime(msg.getSendTime());
     		messageDTO.setTitle(msg.getTitle());
+    		messageDTO.setContentDesc(msg.getContentDesc());
+    		messageDTO.setMsgUrl(msg.getMsgUrl());
     		return messageDTO;
     	}).collect(Collectors.toList());
     }

@@ -31,4 +31,8 @@ public class DlMessageDTO {
     private String content;
 
     private String msgDesc;
+    
+    private String msgUrl;
+    
+    private String contentDesc;
 }

@@ -84,12 +84,18 @@ public class DlMessage {
      * 内容
      */
     private String content;
+    
+    @Column(name = "content_desc")
+    private String contentDesc;
 
     /**
      * 消息附加信息
      */
     @Column(name = "msg_desc")
     private String msgDesc;
+    
+    @Column(name="msg_url")
+    private String msgUrl;
 
     /**
      * 获取消息ID
@@ -360,4 +366,22 @@ public class DlMessage {
     public void setMsgDesc(String msgDesc) {
         this.msgDesc = msgDesc;
     }
+
+	public String getContentDesc() {
+		return contentDesc;
+	}
+
+	public void setContentDesc(String contentDesc) {
+		this.contentDesc = contentDesc;
+	}
+
+	public String getMsgUrl() {
+		return msgUrl;
+	}
+
+	public void setMsgUrl(String msgUrl) {
+		this.msgUrl = msgUrl;
+	}
+    
+    
 }

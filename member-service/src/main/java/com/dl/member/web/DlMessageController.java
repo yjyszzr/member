@@ -52,6 +52,7 @@ public class DlMessageController {
     public BaseResult add(@RequestBody MessageAddParam param) {
     	DlMessage dlMessage = new DlMessage();
     	dlMessage.setContent(param.getContent());
+    	dlMessage.setContentDesc(param.getContentDesc());
     	dlMessage.setMsgDesc(param.getMsgDesc());
     	dlMessage.setMsgType(param.getMsgType());
     	dlMessage.setReceiver(param.getReceiver());
@@ -60,6 +61,7 @@ public class DlMessageController {
     	dlMessage.setSendTime(param.getSendTime());
     	dlMessage.setSender(param.getSender());
     	dlMessage.setTitle(param.getTitle());
+    	dlMessage.setMsgUrl(param.getMsgUrl());
         dlMessageService.save(dlMessage);
         return ResultGenerator.genSuccessResult();
     }
