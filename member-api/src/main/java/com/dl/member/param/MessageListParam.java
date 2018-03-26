@@ -12,9 +12,9 @@ import lombok.Data;
 public class MessageListParam {
 
     @ApiModelProperty(value = "页码")
-    private Integer page;
+    private Integer pageNum;
     @ApiModelProperty(value = "页面显示数量")
-    private Integer size;
+    private Integer pageSize;
     @ApiModelProperty(value = "消息类型：0通知，1消息")
     private Integer msgType;
 }
