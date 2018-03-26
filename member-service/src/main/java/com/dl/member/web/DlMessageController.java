@@ -35,8 +35,8 @@ public class DlMessageController {
     @ApiOperation(value = "用户消息列表", notes = "用户消息列表")
     @PostMapping("/list")
     public BaseResult list(@RequestBody MessageListParam param) {
-    	int page = param.getPage() == null?1:param.getPage();
-    	int size = param.getSize() == null?10:param.getSize();
+    	int page = param.getPageNum() == null?1:param.getPageNum();
+    	int size = param.getPageSize() == null?10:param.getPageSize();
     	int msgType = param.getMsgType() == null?0:param.getMsgType();
     	Integer userId = SessionUtil.getUserId();
         PageHelper.startPage(page, size);
