@@ -57,11 +57,6 @@ public class UserAccount {
     @Column(name = "process_type")
     private Integer processType;
 
-    /**
-     * 支付代码
-     */
-    @Column(name = "payment_code")
-    private String paymentCode;
 
     /**
      * 支付方式名称
@@ -79,8 +74,65 @@ public class UserAccount {
      * 操作备注
      */
     private String note;
+    
+    @Column(name = "third_party_name")
+    private String thirdPartyName;
+    
+    @Column(name = "user_surplus")
+    private BigDecimal userSurplus;
+    
+    @Column(name = "user_surplus_limit")
+    private BigDecimal userSurplusLimit;
+    
+    @Column(name = "third_part_paid")
+    private BigDecimal thirdPartPaid;
+    
+    @Column(name = "pay_id")
+    private String payId;
+    
+    
 
-    /**
+    public String getThirdPartyName() {
+		return thirdPartyName;
+	}
+
+	public void setThirdPartyName(String thirdPartyName) {
+		this.thirdPartyName = thirdPartyName;
+	}
+
+	public BigDecimal getUserSurplus() {
+		return userSurplus;
+	}
+
+	public void setUserSurplus(BigDecimal userSurplus) {
+		this.userSurplus = userSurplus;
+	}
+
+	public BigDecimal getUserSurplusLimit() {
+		return userSurplusLimit;
+	}
+
+	public void setUserSurplusLimit(BigDecimal userSurplusLimit) {
+		this.userSurplusLimit = userSurplusLimit;
+	}
+
+	public BigDecimal getThirdPartPaid() {
+		return thirdPartPaid;
+	}
+
+	public void setThirdPartPaid(BigDecimal thirdPartPaid) {
+		this.thirdPartPaid = thirdPartPaid;
+	}
+
+	public String getPayId() {
+		return payId;
+	}
+
+	public void setPayId(String payId) {
+		this.payId = payId;
+	}
+
+	/**
      * @return id
      */
     public Integer getId() {
@@ -236,24 +288,6 @@ public class UserAccount {
      */
     public void setProcessType(Integer processType) {
         this.processType = processType;
-    }
-
-    /**
-     * 获取支付代码
-     *
-     * @return payment_code - 支付代码
-     */
-    public String getPaymentCode() {
-        return paymentCode;
-    }
-
-    /**
-     * 设置支付代码
-     *
-     * @param paymentCode 支付代码
-     */
-    public void setPaymentCode(String paymentCode) {
-        this.paymentCode = paymentCode;
     }
 
     /**

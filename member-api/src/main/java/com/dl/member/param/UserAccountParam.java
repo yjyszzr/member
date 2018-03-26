@@ -14,6 +14,9 @@ public class UserAccountParam {
     @ApiModelProperty(value = "账户名")
     private String userName;
     
+    @ApiModelProperty(value = "流水号")
+    private String accountSn;
+    
     @ApiModelProperty(value = "流水类型")
     private Integer accountType;
     
@@ -35,11 +38,21 @@ public class UserAccountParam {
     @ApiModelProperty(value = "日志")
     private String note;
     
+    @ApiModelProperty(value = "支付id")
+    private String payId;
+    
+    @ApiModelProperty(value = "使用的可提现余额")
+    private BigDecimal userSurplus;
+    
+    @ApiModelProperty(value = "使用的不可提现余额")
+    private BigDecimal userSurplusLimit;
+    
     @ApiModelProperty(value = "第三方名称")
     private String thirdPartName;
     
     @ApiModelProperty(value = "第三方支付金额")
     private BigDecimal thirdPartPaid;
+    
     
     
     

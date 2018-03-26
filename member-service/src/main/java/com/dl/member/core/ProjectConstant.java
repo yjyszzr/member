@@ -64,6 +64,8 @@ public class ProjectConstant {
     public static final Integer BUY = 3;//购彩
     public static final Integer WITHDRAW = 4;//提现
     public static final Integer BONUS =5;//红包
+    public static final Integer ACCOUNT_ROLLBACK =6;//账户回滚
+    public static final Integer REFOUND =7;
     
     public static final Integer ALL_LOTERRY_TYPE = 0;
 }

@@ -75,6 +75,11 @@ public class UserDTO {
     @Column(name = "user_money_limit")
     private String userMoneyLimit;
     
+    /**
+     * 用户总余额
+     */
+    private String totalMoney;
+    
     
     /**
      * 用户余额

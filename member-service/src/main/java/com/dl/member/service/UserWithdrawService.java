@@ -1,5 +1,4 @@
 package com.dl.member.service;
-import com.dl.member.model.UserRecharge;
 import com.dl.member.model.UserWithdraw;
 import com.dl.member.param.UpdateUserWithdrawParam;
 import com.dl.member.param.UserAccountParam;
@@ -7,6 +6,7 @@ import com.dl.member.param.UserWithdrawParam;
 import lombok.extern.slf4j.Slf4j;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserWithdrawMapper;
+import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.result.BaseResult;
@@ -15,15 +15,12 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
-
 import javax.annotation.Resource;
 
 @Service
@@ -98,8 +95,23 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
     		return ResultGenerator.genFailResult("更新数据库提现单失败");
     	}
     	
-    	UserAccountParam userAccountParam= new UserAccountParam();
-    	//生成账户流水
+    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.commonCalculateMoney(amount, ProjectConstant.WITHDRAW);
+    	
+    	UserAccountParam userAccountParam = new UserAccountParam();
+        String accountSn = snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+        userAccountParam.setAccountSn(accountSn);
+        userAccountParam.setAmount(amount);
+        userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
+        userAccountParam.setAccountType(ProjectConstant.WITHDRAW);
+        userAccountParam.setOrderSn("");
+        userAccountParam.setPaymentName(updateUserWithdrawParam.getPaymentName());
+        userAccountParam.setThirdPartName(updateUserWithdrawParam.getPaymentName());
+        userAccountParam.setThirdPartPaid(amount);
+        userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
+        userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
+        userAccountParam.setUserName("");
+        userAccountParam.setNote("");
+        userAccountParam.setPayId(updateUserWithdrawParam.getPaymentId());
     	String withdrawSn = userAccountService.saveAccount(userAccountParam);
 		if(StringUtils.isEmpty(withdrawSn)) {
 			return ResultGenerator.genFailResult("更新数据库提现单失败");

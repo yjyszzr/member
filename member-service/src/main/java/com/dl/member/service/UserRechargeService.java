@@ -6,6 +6,7 @@ import com.dl.member.param.UserAccountParam;
 import lombok.extern.slf4j.Slf4j;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserRechargeMapper;
+import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
@@ -87,6 +88,7 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
     	BigDecimal amount = userRechargeRst.getData().getAmount();
     	
     	UserRecharge userRecharge = new UserRecharge();
+    	userRecharge.setAmount(amount);
     	userRecharge.setPaymentCode(updateUserRechargeParam.getPaymentCode());
     	userRecharge.setPaymentId(updateUserRechargeParam.getPaymentId());
     	userRecharge.setPaymentName(updateUserRechargeParam.getPaymentName());
@@ -99,7 +101,23 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
     		return ResultGenerator.genFailResult("更新数据库充值单失败");
     	}
     	
-    	UserAccountParam userAccountParam= new UserAccountParam();
+    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.commonCalculateMoney(amount, ProjectConstant.RECHARGE);
+        
+    	UserAccountParam userAccountParam = new UserAccountParam();
+        String accountSn = snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+        userAccountParam.setAccountSn(accountSn);
+        userAccountParam.setAmount(amount);
+        userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
+        userAccountParam.setAccountType(ProjectConstant.BUY);
+        userAccountParam.setOrderSn("");
+        userAccountParam.setPaymentName(updateUserRechargeParam.getPaymentName());
+        userAccountParam.setThirdPartName(updateUserRechargeParam.getPaymentName());
+        userAccountParam.setThirdPartPaid(amount);
+        userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
+        userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
+        userAccountParam.setUserName("");
+        userAccountParam.setNote("");
+        userAccountParam.setPayId(updateUserRechargeParam.getPaymentId());
     	String rechargeSn = userAccountService.saveAccount(userAccountParam);
 		if(StringUtils.isEmpty(rechargeSn)) {
 			return ResultGenerator.genFailResult("更新数据库充值单失败");

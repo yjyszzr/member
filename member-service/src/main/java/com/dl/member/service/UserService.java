@@ -1,4 +1,6 @@
 package com.dl.member.service;
+import java.math.BigDecimal;
+
 import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -175,6 +177,8 @@ public class UserService extends AbstractService<User> {
 			userDTO.setMobile(mobile);
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
+			BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
+			userDTO.setTotalMoney(totalMoney.toString());
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}

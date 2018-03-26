@@ -54,7 +54,7 @@ public class UserAccountController {
     @ApiOperation(value="余额支付引起的账户余额变动", notes="余额支付引起的账户余额变动",hidden=false)
     @PostMapping("/addUserAccountByPay")
     public BaseResult<SurplusPaymentCallbackDTO> addUserAccountByPay(@RequestBody SurplusPayParam surplusPayParam) {
-    	BaseResult<SurplusPaymentCallbackDTO> rst = userAccountService.addUserAccountByPay(surplusPayParam.getOrderSn(), surplusPayParam.getSurplus());
+    	BaseResult<SurplusPaymentCallbackDTO> rst = userAccountService.addUserAccountByPay(surplusPayParam);
     	if(rst.getCode() == 0) {
     		return ResultGenerator.genFailResult(rst.getMsg());
     	}
@@ -65,7 +65,7 @@ public class UserAccountController {
     @ApiOperation(value="回滚账户的余额和订单的余额", notes="回滚账户的余额和订单的余额",hidden=false)
     @PostMapping("/rollbackUserAccountChangeByPay")
     public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(@RequestBody SurplusPayParam surplusPayParam) {
-    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.rollbackUserAccountChangeByPay(surplusPayParam.getSurplus(),surplusPayParam.getOrderSn());
+    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.rollbackUserAccountChangeByPay(surplusPayParam);
     	return ResultGenerator.genSuccessResult("回滚扣减余额成功",surplusPaymentCallbackDTO);
     }
     

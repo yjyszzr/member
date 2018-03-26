@@ -2,8 +2,8 @@ package com.dl.member.service;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.model.UserWithdraw;
+import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
-import com.dl.param.OrderSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,6 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
-import com.dl.dto.OrderDTO;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import javax.annotation.Resource;
 
 @Service
@@ -57,63 +55,56 @@ public class UserAccountService extends AbstractService<UserAccount> {
     
     
     /**
-     * @param String orderSn,String surplus
+     * @param SurplusPayParam surplusPayParam
      * @return
      * @see:余额支付引起账户变化 
      */
     @Transactional
-    public BaseResult<SurplusPaymentCallbackDTO> addUserAccountByPay(String orderSn, BigDecimal surplus) {
+    public BaseResult<SurplusPaymentCallbackDTO> addUserAccountByPay(SurplusPayParam surplusPayParam) {
     	Integer userId = SessionUtil.getUserId();
         User user = userService.findById(userId);
         
         //用户余额
         BigDecimal yue = user.getUserMoney().add(user.getUserMoneyLimit());
+        BigDecimal surplus = surplusPayParam.getSurplus();
         if (yue.compareTo(surplus) == -1) {
             return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
         }
 
-        if (surplus.compareTo(BigDecimal.ZERO) == -1) {
-            return ResultGenerator.genBadRequestResult("扣减余额不能为负数");
+        if (surplus.compareTo(BigDecimal.ZERO) == -1 || surplus.compareTo(BigDecimal.ZERO) == 0) {
+            return ResultGenerator.genBadRequestResult("扣减余额不能为负数和0");
         }
-        
-        OrderSnParam orderSnParam = new OrderSnParam();
-        orderSnParam.setOrderSn(orderSn);
-        BaseResult<OrderDTO> orderRst = orderService.getOrderInfoByOrderSn(orderSnParam);
-        if(orderRst.getCode() != 0) {
-        	return ResultGenerator.genResult(orderRst.getCode(), orderRst.getMsg());
-        }
-        OrderDTO orderDTO = orderRst.getData();
         
         Condition c = new Condition(UserAccount.class);
         Criteria criteria = c.createCriteria();
-        criteria.andCondition("order_sn =", orderSn);
+        criteria.andCondition("order_sn =", surplusPayParam.getOrderSn());
         criteria.andCondition("user_id =", SessionUtil.getUserId());
         criteria.andCondition("amount =", "-".concat(surplus.toString()));
-        criteria.andCondition("process_type =", ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND);
+        criteria.andCondition("process_type =", ProjectConstant.BUY);
         List<UserAccount> userAccountsList = this.findByCondition(c);
         if (userAccountsList.size() > 0) {
             throw new ServiceException(MemberEnums.USERACCOUNTS_ALREADY_REDUCE.getcode(), MemberEnums.USERACCOUNTS_ALREADY_REDUCE.getMsg());
         }
 
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = this.countReduceMoney(surplus, user);
-                
-        UserAccount uap = new UserAccount();
-        String note = "";
-        uap.setNote(note);
-        uap.setUserId(userId);
-        uap.setAdminUser(user.getUserName());
-        uap.setAddTime(DateUtil.getCurrentTimeLong());
-        String accountSn = this.createAccountSn(String.valueOf(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND));
-        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND);
-        uap.setAccountSn(accountSn);
-        uap.setAmount(new BigDecimal(0).subtract(surplus));
-        uap.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
-        uap.setPaymentCode("");
-        uap.setPaymentName("");
-        uap.setOrderSn(orderSn);
-        uap.setParentSn(orderSn);
-        this.save(uap);
-
+        
+        UserAccountParam userAccountParam = new UserAccountParam();
+        String accountSn = snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+        userAccountParam.setAccountSn(accountSn);
+        userAccountParam.setAmount(new BigDecimal(0).subtract(surplus));
+        userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
+        userAccountParam.setAccountType(ProjectConstant.BUY);
+        userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
+        userAccountParam.setPaymentName(surplusPayParam.getThirdPartName());
+        userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
+        userAccountParam.setThirdPartPaid(surplusPayParam.getThirdPartPaid() == null ?BigDecimal.ZERO:surplusPayParam.getThirdPartPaid());
+        userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
+        userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
+        userAccountParam.setUserName(user.getUserName());
+        userAccountParam.setNote("");
+        userAccountParam.setPayId("");
+        this.saveAccount(userAccountParam);
+        
         return ResultGenerator.genSuccessResult("余额支付后余额扣减成功",surplusPaymentCallbackDTO);
     }
     
@@ -187,13 +178,70 @@ public class UserAccountService extends AbstractService<UserAccount> {
     }
     
     /**
+     * 账户公共计算服务
+     * @param inOrOutMoney 非0
+     * @param type:1-下单付款  2-充值  3-提现 4-退款
+     * @return
+     */
+    public SurplusPaymentCallbackDTO commonCalculateMoney(BigDecimal inOrOutMoney,Integer type) {
+    	BigDecimal money = BigDecimal.ZERO;
+        BigDecimal user_money = BigDecimal.ZERO; //用户账户变动后的可提现余额
+        BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
+        BigDecimal usedUserMoney = null;//使用的可提现余额
+        BigDecimal usedUserMoneyLimit = null;//使用的不可提现余额
+        BigDecimal curBalance = BigDecimal.ZERO;//当前变动后的总余额
+        
+    	Integer userId = SessionUtil.getUserId();
+    	User user = userService.findById(userId);
+    	if(ProjectConstant.BUY == type) {
+            money = user.getUserMoney().subtract(inOrOutMoney);
+            if (money.compareTo(BigDecimal.ZERO) >= 0) {//可提现余额 够	
+                user_money = money;
+                user_money_limit = user.getUserMoneyLimit();
+            	usedUserMoney = inOrOutMoney;
+            	usedUserMoneyLimit = BigDecimal.ZERO;
+            } else {//可提现余额 不够
+                user_money = BigDecimal.ZERO;
+                user_money_limit = user.getUserMoneyLimit().add(money);
+            	usedUserMoney = user.getUserMoney();
+            	usedUserMoneyLimit = inOrOutMoney.subtract(usedUserMoney);
+            }
+            curBalance = user_money_limit.add(user_money);
+    	}else if(ProjectConstant.RECHARGE == type) {
+    		
+    		user_money = user.getUserMoney();
+    		user_money_limit = user.getUserMoneyLimit().add(inOrOutMoney);
+    		curBalance = user_money_limit.add(user_money);
+    		
+    	}else if(ProjectConstant.WITHDRAW == type) {
+    		
+    		user_money = user.getUserMoney().subtract(inOrOutMoney);
+    		user_money_limit = user.getUserMoneyLimit();
+    		curBalance = user_money_limit.add(user_money);
+    		
+    	}else if(4 == type) {
+    		
+    	}
+    	
+        SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
+        surplusPaymentCallbackDTO.setSurplus(inOrOutMoney);
+        surplusPaymentCallbackDTO.setUserSurplus(usedUserMoney);
+        surplusPaymentCallbackDTO.setUserSurplusLimit(usedUserMoneyLimit);
+        surplusPaymentCallbackDTO.setCurBalance(curBalance);
+    	
+    	return surplusPaymentCallbackDTO;
+    	
+    }
+    
+    /**
      * 回滚余额支付的付款所用的钱
      * @param String orderSn,String surplus
      */
     @Transactional
-    public SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(BigDecimal surplus,String orderSn) {
+    public SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam) {
     	Integer userId= SessionUtil.getUserId();
     	User user = userService.findById(userId);
+    	BigDecimal surplus = surplusPayParam.getSurplus();
         BigDecimal money = BigDecimal.ZERO;
         BigDecimal user_money = new BigDecimal(0); //用户账户剩下的可提现余额
         BigDecimal user_money_limit = new BigDecimal(0);// 用户账户剩下的不可提现余额
@@ -212,22 +260,22 @@ public class UserAccountService extends AbstractService<UserAccount> {
         	log.error("回滚更新用户账户资金异常");
         }
         
-        UserAccount uap = new UserAccount();
-        String note = "";
-        uap.setNote(note);
-        uap.setUserId(user.getUserId());
-        uap.setAdminUser(user.getUserName());
-        uap.setAddTime(DateUtil.getCurrentTimeLong());
-        String accountSn = this.createAccountSn(String.valueOf(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND_ROLLBACK));
-        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND_ROLLBACK);
-        uap.setAccountSn(accountSn);
-        uap.setAmount(surplus);
-        uap.setCurBalance(curBalance);
-        uap.setPaymentCode("");
-        uap.setPaymentName("");
-        uap.setOrderSn(orderSn);
-        uap.setParentSn("");
-        this.save(uap);
+        UserAccountParam userAccountParam = new UserAccountParam();
+        String accountSn = snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+        userAccountParam.setAccountSn(accountSn);
+        userAccountParam.setAmount(surplus);
+        userAccountParam.setCurBalance(curBalance);
+        userAccountParam.setAccountType(ProjectConstant.ACCOUNT_ROLLBACK);
+        userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
+        userAccountParam.setPaymentName(surplusPayParam.getThirdPartName());
+        userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
+        userAccountParam.setThirdPartPaid(BigDecimal.ZERO);
+        userAccountParam.setUserSurplus(BigDecimal.ZERO);
+        userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
+        userAccountParam.setUserName(user.getUserName());
+        userAccountParam.setNote("");
+        userAccountParam.setPayId("");
+        this.saveAccount(userAccountParam);
         
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
         surplusPaymentCallbackDTO.setSurplus(BigDecimal.ZERO);
@@ -292,6 +340,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param processType
      * @return
      */
+    @Transactional
     public String saveAccount(UserAccountParam userAccountParam) {
     	User user = userService.findById(SessionUtil.getUserId());
     	BigDecimal curBalance = user.getUserMoney().add(user.getUserMoneyLimit()).add(user.getFrozenMoney()).subtract(userAccountParam.getAmount());
@@ -301,12 +350,21 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
     	userAccount.setAmount(userAccountParam.getAmount());
     	userAccount.setCurBalance(curBalance);
-    	userAccount.setOrderSn(userAccountParam.getOrderSn());
+    	if(StringUtils.isNotEmpty(userAccountParam.getOrderSn())) {
+    		userAccount.setOrderSn(userAccountParam.getOrderSn());
+    	}
+    	
+    	userAccount.setPayId(userAccountParam.getPayId() == null?"":userAccountParam.getPayId());
     	userAccount.setPaymentName(userAccountParam.getPaymentName());
+    	userAccount.setThirdPartyName(StringUtils.isEmpty(userAccountParam.getThirdPartName())?"":userAccountParam.getThirdPartName());
+    	userAccount.setUserSurplus(userAccountParam.getUserSurplus() == null ?BigDecimal.ZERO:userAccountParam.getUserSurplus());
+    	userAccount.setUserSurplusLimit(userAccountParam.getUserSurplusLimit() == null ?BigDecimal.ZERO:userAccountParam.getUserSurplusLimit());
+    	userAccount.setThirdPartPaid(userAccountParam.getThirdPartPaid() == null ? BigDecimal.ZERO:userAccountParam.getThirdPartPaid());
     	userAccount.setProcessType(userAccountParam.getAccountType());
     	userAccount.setUserId(user.getUserId());
-    	
     	userAccount.setNote("");
+    	userAccount.setParentSn("");
+    	
     	int rst = userAccountMapper.insertUserAccount(userAccount);
     	if(rst != 1) {
     		log.error("生成流水账户失败");
@@ -319,7 +377,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
     public String createNote(Integer processType) {
     	return "";
     }
-    
     
     /**
      * 构造提现状态
@@ -352,16 +409,4 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	}
 		return str;
     }
-    
-    
-    /**
-     * 生成流水号
-     */
-    public static String createAccountSn(String account_type) {
-        String s1 = DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong() + Long.valueOf(8 * 3600), DateUtil.yyyyMMdd);
-        String s2 = StringUtils.rightPad(account_type, 2, "0");
-        int s3 = new Random().nextInt(900000) + 100000;
-        return s1 + s2 + String.valueOf(s3);
-    }
-
 }
