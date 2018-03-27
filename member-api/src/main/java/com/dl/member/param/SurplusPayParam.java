@@ -35,4 +35,8 @@ public class SurplusPayParam {
     @ApiModelProperty("第三方支付的钱数")
     private BigDecimal thirdPartPaid;
     
+    @ApiModelProperty("红包支付的钱")
+    private BigDecimal bonusMoney;
+
+    
 }

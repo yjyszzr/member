@@ -7,12 +7,14 @@ import com.dl.member.param.UserAccountParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.DoubleValue;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserAccountMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.api.IOrderService;
@@ -31,6 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import javax.annotation.Resource;
 
 @Service
@@ -106,7 +114,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
         }else {
         	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.NOT_FINISH));
         }
-        userAccountParam.setNote("");
+        
+        userAccountParam.setNote(this.createNote(surplusPayParam));
         userAccountParam.setPayId("");
         String accountSnRst = this.saveAccount(userAccountParam);
         if(StringUtils.isEmpty(accountSnRst)) {
@@ -117,7 +126,35 @@ public class UserAccountService extends AbstractService<UserAccount> {
         
         return ResultGenerator.genSuccessResult("余额支付后余额扣减成功",surplusPaymentCallbackDTO);
     }
-    
+  
+    /**
+     * 记录详情
+     * @param surplusPayParam
+     * @return
+     */
+    public String createNote(SurplusPayParam surplusPayParam) {
+    	String noteStr = "";
+    	Integer payType = surplusPayParam.getPayType();
+    	if(payType.equals(ProjectConstant.yuePay)) {
+    		noteStr = "余额支付"+surplusPayParam.getSurplus()+"元";
+    	}else if(payType.equals(ProjectConstant.aliPay) || payType.equals(ProjectConstant.weixinPay)) {
+    		noteStr = surplusPayParam.getThirdPartName()+"支付"+surplusPayParam.getThirdPartPaid()+"元";
+    	}else if(payType.equals(ProjectConstant.mixPay)) {
+        	noteStr = surplusPayParam.getThirdPartName()+"支付"+surplusPayParam.getThirdPartPaid()+"元/n"
+    		        +"余额支付"+surplusPayParam.getSurplus()+"元";
+    	}
+    	if(null != surplusPayParam.getBonusMoney()) {
+    		noteStr = noteStr + "/n红包支付"+surplusPayParam.getBonusMoney()+"元";
+    	}
+		return noteStr;
+    }
+    /**
+     * 更新用户账户信息
+     * @param payId
+     * @param status
+     * @param accountSn
+     * @return
+     */
     public BaseResult<String> updateUserAccount(String payId,Integer status,String accountSn){
     	UserAccount userAccount = new UserAccount();
     	userAccount.setPayId(payId);
@@ -130,29 +167,44 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	return ResultGenerator.genSuccessResult("余额支付后余额扣减成功","success");
     }
     
-//    /**
-//     * 创建账户流水
-//     */
-//    public int saveUserAccount(UserAccountParam userAccountParam) {
-//    	Integer userId = SessionUtil.getUserId();
-//        UserAccount uap = new UserAccount();
-//        String note = "";
-//        uap.setNote(note);
-//        uap.setUserId(userId);
-//        uap.setAdminUser(userAccountParam.getUserName());
-//        uap.setAddTime(DateUtil.getCurrentTimeLong());
-//        String accountSn = this.createAccountSn(String.valueOf(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND));
-//        uap.setProcessType(ProjectConstant.ACCOUNT_TYPE_TRADE_SURPLUS_SEND);update
-//        uap.setAccountSn(accountSn);
-//        uap.setAmount(userAccountParam.getAmount());
-//        uap.setCurBalance(userAccountParam.getCurBalance());
-//        uap.setPaymentCode(userAccountParam.getPaymentCode());
-//        uap.setPaymentName(userAccountParam.getPaymentName());
-//        uap.setOrderSn(userAccountParam.getOrderSn());
-//        uap.setParentSn("");
-//        this.save(uap);
-//		return userId;
-//    }
+    /**
+     * 统计当月的各个用途的资金和
+     * @return
+     */
+    public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth() {
+    	Integer userId = SessionUtil.getUserId();
+    	UserAccountCurMonthDTO userAccountCurMonthDTO = new UserAccountCurMonthDTO();
+
+    	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountCurMonth(userId);
+    	List<UserAccount> buyList = new ArrayList<>();
+    	List<UserAccount> rechargeList = new ArrayList<>();
+    	List<UserAccount> withdrawList = new ArrayList<>();
+    	List<UserAccount> rewardList = new ArrayList<>();
+ 
+    	for(UserAccount u:userAccountList) {
+    		if(ProjectConstant.BUY.equals(u.getProcessType())) {
+    			buyList.add(u);
+    		}else if(ProjectConstant.RECHARGE.equals(u.getProcessType())) {
+    			rechargeList.add(u);
+    		}else if(ProjectConstant.WITHDRAW.equals(u.getProcessType())) {
+    			withdrawList.add(u);
+    		}else if(ProjectConstant.REWARD.equals(u.getProcessType())) {
+    			rewardList.add(u);
+    		}
+    	}
+    	
+    	Double buyMoney = buyList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
+    	Double rechargeMoney = rechargeList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
+    	Double withdrawMoney = withdrawList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
+    	Double rewardMoney = rewardList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
+    	
+    	userAccountCurMonthDTO.setBuyMoney(String.valueOf(buyMoney));
+    	userAccountCurMonthDTO.setRechargeMoney(String.valueOf(rechargeMoney));
+    	userAccountCurMonthDTO.setWithDrawMoney(String.valueOf(withdrawMoney));
+    	userAccountCurMonthDTO.setRewardMoney(String.valueOf(rewardMoney));
+    	
+    	return ResultGenerator.genSuccessResult("统计当月的各个用途的资金和成功",userAccountCurMonthDTO);
+    }
     
     /**
      * @see 余额支付时候扣减余额和订单支出，优先使用可提现余额
@@ -335,9 +387,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setAccountSn(ua.getAccountSn());
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
             userAccountDTO.setStatus(showStatus(ua.getProcessType(),ua.getId()));
+            userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeName(createProcessTypeString(ua.getProcessType()));
             userAccountDTO.setNote(ua.getNote());
-            String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1?"+" + ua.getAmount():String.valueOf(ua.getAmount());
+            String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1?"+" + " ¥ " +ua.getAmount():String.valueOf(ua.getAmount());
             userAccountDTO.setChangeAmount(changeAmount);
             userAccountListDTO.add(userAccountDTO);
         }

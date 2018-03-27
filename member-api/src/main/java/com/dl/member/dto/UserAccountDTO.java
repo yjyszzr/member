@@ -35,6 +35,9 @@ public class UserAccountDTO {
     @ApiModelProperty("操作类型名称")
     private String processTypeName;
     
+    @ApiModelProperty("操作类型:0-全部 1-奖金 2-充值 3-购彩 4-提现 5-红包")
+    private String processType;
+    
     @ApiModelProperty("状态")
     private String status;
 

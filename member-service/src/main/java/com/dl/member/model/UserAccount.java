@@ -75,8 +75,8 @@ public class UserAccount {
      */
     private String note;
     
-    @Column(name = "third_party_name")
-    private String thirdPartyName;
+    @Column(name = "third_part_name")
+    private String thirdPartName;
     
     @Column(name = "user_surplus")
     private BigDecimal userSurplus;
@@ -101,12 +101,12 @@ public class UserAccount {
 		this.status = status;
 	}
 
-	public String getThirdPartyName() {
-		return thirdPartyName;
+	public String getThirdPartName() {
+		return thirdPartName;
 	}
 
-	public void setThirdPartyName(String thirdPartyName) {
-		this.thirdPartyName = thirdPartyName;
+	public void setThirdPartyName(String thirdPartName) {
+		this.thirdPartName = thirdPartName;
 	}
 
 	public BigDecimal getUserSurplus() {

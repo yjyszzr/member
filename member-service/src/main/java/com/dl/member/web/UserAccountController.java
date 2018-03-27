@@ -2,10 +2,12 @@ package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserRechargeDTO;
 import com.dl.member.dto.UserWithdrawDTO;
 import com.dl.member.param.AmountParam;
+import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.PageParam;
 import com.dl.member.param.RollackSurplusPayParam;
 import com.dl.member.param.StrParam;
@@ -101,8 +103,8 @@ public class UserAccountController {
 	 */
     @ApiOperation(value="查询用户账户明细列表", notes="查询用户账户明细列表",hidden=false)
 	@RequestMapping(path="/getUserAccountList", method=RequestMethod.POST)
-	public BaseResult<PageInfo<UserAccountDTO>> getUserAccountList(@RequestBody PageParam pageParam) {
-    	PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(null,pageParam.getPageNum(), pageParam.getPageSize()); 
+	public BaseResult<PageInfo<UserAccountDTO>> getUserAccountList(@RequestBody AmountTypeParam amountTypeParam) {
+    	PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(amountTypeParam.getAmountType(),amountTypeParam.getPageNum(), amountTypeParam.getPageSize()); 
     	return ResultGenerator.genSuccessResult("查询用户账户明细列表",rst);
 	}
     
@@ -144,7 +146,10 @@ public class UserAccountController {
     	
     }
     
-    
-    
+    @ApiOperation(value="统计当月的各个用途的资金和", notes="统计当月的各个用途的资金和",hidden=false)
+	@RequestMapping(path="/countMoneyCurrentMonth", method=RequestMethod.POST)
+    public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody StrParam strParam){
+    	return userAccountService.countMoneyCurrentMonth();
+    }
     
 }

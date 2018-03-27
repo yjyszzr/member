@@ -18,7 +18,7 @@
     <result column="parent_sn" jdbcType="VARCHAR" property="parentSn" />
     <result column="pay_id" jdbcType="VARCHAR" property="payId" />
     <result column="payment_name" jdbcType="VARCHAR" property="paymentName" />
-    <result column="third_party_name" jdbcType="VARCHAR" property="thirdPartyName" />
+    <result column="third_part_name" jdbcType="VARCHAR" property="thirdPartName" />
     <result column="user_surplus" jdbcType="VARCHAR" property="userSurplus" />
     <result column="user_surplus_limit" jdbcType="VARCHAR" property="userSurplusLimit" />
     <result column="third_part_paid" jdbcType="VARCHAR" property="thirdPartPaid" />
@@ -44,37 +44,22 @@
   		ORDER BY add_time
   </select>
   
-    <select id="countUserAccountByType" parameterType="com.dl.member.model.UserAccount"  resultMap="BaseResultMap">
-  		SELECT *  FROM dl_user_account 
-	  	<where>
-		  	<if test="userId != null">
-		        AND user_id = #{userId}
-		    </if>
-		    <if test="processType != null">
-		        AND process_type = #{processType}
-		    </if>
-		    <if test="id != null">
-		        AND id = #{id}
-		    </if>
-		    <if test="accountSn != null">
-		        AND account_sn = #{accountSn}
-		    </if>
-		    <if test="addTime != null">
-		        AND add_time >= DATE_SUB(NOW(),INTERVAL 1 MONTH)
-		    </if>
-	    </where>
+  <select id="queryUserAccountCurMonth" parameterType="java.lang.Integer"  resultMap="BaseResultMap">
+  		select *  from dl_user_account 
+  		where DATE_FORMAT(FROM_UNIXTIME(add_time), '%Y-%m') = date_format(now(),'%Y-%m') 
+  		and user_id = #{userId};
   </select>
   
   <insert id="insertUserAccount">
   	INSERT INTO 
   	dl_user_account(account_sn,user_id,admin_user,amount,
   	cur_balance,add_time,last_time,process_type,payment_code,
-  	payment_name,order_sn,parent_sn,note,pay_id,third_party_name,
+  	payment_name,order_sn,parent_sn,note,pay_id,third_part_name,
   	user_surplus,user_surplus_limit,third_part_paid) 
   	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},
   	#{curBalance},#{addTime},#{lastTime},#{processType},
   	#{paymentCode},#{paymentName},#{orderSn},#{parentSn},
-  	#{note},#{payId},#{third_party_name},#{user_surplus},
+  	#{note},#{payId},#{third_part_name},#{user_surplus},
   	#{user_surplus_limit},#{third_part_paid});
   </insert>
   
