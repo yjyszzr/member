@@ -34,7 +34,7 @@ public class DlMessageController {
 
     @ApiOperation(value = "用户消息列表", notes = "用户消息列表")
     @PostMapping("/list")
-    public BaseResult list(@RequestBody MessageListParam param) {
+    public BaseResult<PageInfo<DlMessageDTO>> list(@RequestBody MessageListParam param) {
     	int page = param.getPageNum() == null?1:param.getPageNum();
     	int size = param.getPageSize() == null?10:param.getPageSize();
     	int msgType = param.getMsgType() == null?0:param.getMsgType();
@@ -44,7 +44,7 @@ public class DlMessageController {
         userMessageListParam.setMsgType(msgType);
         userMessageListParam.setReceiver(userId);
         List<DlMessageDTO> list = dlMessageService.userMessageList(userMessageListParam);
-        PageInfo pageInfo = new PageInfo(list);
+        PageInfo<DlMessageDTO> pageInfo = new PageInfo<DlMessageDTO>(list);
         return ResultGenerator.genSuccessResult(null,pageInfo);
     }
     
