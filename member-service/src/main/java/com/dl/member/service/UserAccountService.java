@@ -198,7 +198,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	Double withdrawMoney = withdrawList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
     	Double rewardMoney = rewardList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
     	
-    	userAccountCurMonthDTO.setBuyMoney(String.valueOf(buyMoney));
+    	userAccountCurMonthDTO.setBuyMoney(String.valueOf(0 - buyMoney));
     	userAccountCurMonthDTO.setRechargeMoney(String.valueOf(rechargeMoney));
     	userAccountCurMonthDTO.setWithDrawMoney(String.valueOf(withdrawMoney));
     	userAccountCurMonthDTO.setRewardMoney(String.valueOf(rewardMoney));
@@ -371,7 +371,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
         
         UserAccount userAccount = new UserAccount();
         userAccount.setUserId(userId);
-        userAccount.setProcessType(processType);
+        if(0 != processType) {
+        	userAccount.setProcessType(processType);
+        }
         PageHelper.startPage(pageNum, pageSize);
         List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
         if (userAccountList.size() == 0) {
@@ -388,9 +390,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
             userAccountDTO.setStatus(showStatus(ua.getProcessType(),ua.getId()));
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
-            userAccountDTO.setProcessTypeName(createProcessTypeString(ua.getProcessType()));
-            userAccountDTO.setNote(ua.getNote());
-            String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1?"+" + " ¥ " +ua.getAmount():String.valueOf(ua.getAmount());
+            userAccountDTO.setProcessTypeChar(createProcessTypeString(ua.getProcessType()));
+            String noteStr = ua.getNote();
+            String firstNote =noteStr.substring(0,noteStr.indexOf("/n"));
+            String lastNote = noteStr.substring(noteStr.indexOf("/n")+2);
+            userAccountDTO.setProcessTypeName(firstNote);
+            userAccountDTO.setNote(lastNote);
+            String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1? "¥ " + "+" +ua.getAmount():"¥ " +String.valueOf(ua.getAmount());
             userAccountDTO.setChangeAmount(changeAmount);
             userAccountListDTO.add(userAccountDTO);
         }

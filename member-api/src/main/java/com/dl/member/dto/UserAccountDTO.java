@@ -22,15 +22,15 @@ public class UserAccountDTO {
 
 	@ApiModelProperty("变化的金额")
     private String changeAmount;
-	
-    @ApiModelProperty("是否显示时间")
-    private String isShow;
 
     @ApiModelProperty("添加时间:年月日")
     private String addTime;
     
     @ApiModelProperty("时分秒")
     private String shotTime;
+    
+    @ApiModelProperty("操作类型名称汉字")
+    private String processTypeChar;
     
     @ApiModelProperty("操作类型名称")
     private String processTypeName;
