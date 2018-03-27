@@ -105,7 +105,7 @@ public class UserAccount {
 		return thirdPartName;
 	}
 
-	public void setThirdPartyName(String thirdPartName) {
+	public void setThirdPartName(String thirdPartName) {
 		this.thirdPartName = thirdPartName;
 	}
 

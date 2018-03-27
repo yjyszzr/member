@@ -74,7 +74,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         
         //用户余额
         BigDecimal yue = user.getUserMoney().add(user.getUserMoneyLimit());
-        BigDecimal surplus = surplusPayParam.getSurplus();
+        BigDecimal surplus = surplusPayParam.getMoneyPaid();
         if (yue.compareTo(surplus) == -1) {
             return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
         }
@@ -99,7 +99,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
         UserAccountParam userAccountParam = new UserAccountParam();
         String accountSn = snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
         userAccountParam.setAccountSn(accountSn);
-        userAccountParam.setAmount(new BigDecimal(0).subtract(surplus));
+        Integer payType = surplusPayParam.getPayType();
+        if(ProjectConstant.yuePay.equals(payType)) {
+        	userAccountParam.setAmount(new BigDecimal(0).subtract(surplus));
+        }else if(ProjectConstant.weixinPay.equals(payType) || ProjectConstant.aliPay.equals(payType)) {
+        	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getThirdPartPaid()));
+        }else if(ProjectConstant.mixPay.equals(payType)) {
+        	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
+        }
+        
         userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
         userAccountParam.setAccountType(ProjectConstant.BUY);
         userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
@@ -140,11 +148,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	}else if(payType.equals(ProjectConstant.aliPay) || payType.equals(ProjectConstant.weixinPay)) {
     		noteStr = surplusPayParam.getThirdPartName()+"支付"+surplusPayParam.getThirdPartPaid()+"元";
     	}else if(payType.equals(ProjectConstant.mixPay)) {
-        	noteStr = surplusPayParam.getThirdPartName()+"支付"+surplusPayParam.getThirdPartPaid()+"元/n"
+        	noteStr = surplusPayParam.getThirdPartName()+"支付"+surplusPayParam.getThirdPartPaid()+"元\n"
     		        +"余额支付"+surplusPayParam.getSurplus()+"元";
     	}
     	if(null != surplusPayParam.getBonusMoney()) {
-    		noteStr = noteStr + "/n红包支付"+surplusPayParam.getBonusMoney()+"元";
+    		noteStr = noteStr + "\n红包支付"+surplusPayParam.getBonusMoney()+"元";
     	}
 		return noteStr;
     }
@@ -392,8 +400,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeChar(createProcessTypeString(ua.getProcessType()));
             String noteStr = ua.getNote();
-            String firstNote =noteStr.substring(0,noteStr.indexOf("/n"));
-            String lastNote = noteStr.substring(noteStr.indexOf("/n")+2);
+            String firstNote =noteStr.substring(0,noteStr.indexOf("\n"));
+            String lastNote = noteStr.substring(noteStr.indexOf("\n")+1);
             userAccountDTO.setProcessTypeName(firstNote);
             userAccountDTO.setNote(lastNote);
             String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1? "¥ " + "+" +ua.getAmount():"¥ " +String.valueOf(ua.getAmount());
@@ -424,7 +432,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     @Transactional
     public String saveAccount(UserAccountParam userAccountParam) {
     	User user = userService.findById(SessionUtil.getUserId());
-    	BigDecimal curBalance = user.getUserMoney().add(user.getUserMoneyLimit()).add(user.getFrozenMoney()).subtract(userAccountParam.getAmount());
+    	BigDecimal curBalance = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(userAccountParam.getAmount());
     	UserAccount userAccount = new UserAccount();
     	String accountSn = snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
     	userAccount.setAccountSn(accountSn);
@@ -437,14 +445,14 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	userAccount.setPayId(userAccountParam.getPayId() == null?"":userAccountParam.getPayId());
     	userAccount.setPaymentName(userAccountParam.getPaymentName());
-    	userAccount.setThirdPartyName(StringUtils.isEmpty(userAccountParam.getThirdPartName())?"":userAccountParam.getThirdPartName());
+    	userAccount.setThirdPartName(StringUtils.isEmpty(userAccountParam.getThirdPartName())?"":userAccountParam.getThirdPartName());
     	userAccount.setUserSurplus(userAccountParam.getUserSurplus() == null ?BigDecimal.ZERO:userAccountParam.getUserSurplus());
     	userAccount.setUserSurplusLimit(userAccountParam.getUserSurplusLimit() == null ?BigDecimal.ZERO:userAccountParam.getUserSurplusLimit());
     	userAccount.setThirdPartPaid(userAccountParam.getThirdPartPaid() == null ? BigDecimal.ZERO:userAccountParam.getThirdPartPaid());
     	userAccount.setProcessType(userAccountParam.getAccountType());
     	userAccount.setUserId(user.getUserId());
     	userAccount.setStatus(userAccountParam.getStatus());
-    	userAccount.setNote("");
+    	userAccount.setNote(userAccountParam.getNote());
     	userAccount.setParentSn("");
     	
     	int rst = userAccountMapper.insertUserAccount(userAccount);

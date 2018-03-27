@@ -53,14 +53,14 @@
   <insert id="insertUserAccount">
   	INSERT INTO 
   	dl_user_account(account_sn,user_id,admin_user,amount,
-  	cur_balance,add_time,last_time,process_type,payment_code,
+  	cur_balance,add_time,last_time,process_type,
   	payment_name,order_sn,parent_sn,note,pay_id,third_part_name,
   	user_surplus,user_surplus_limit,third_part_paid) 
   	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},
   	#{curBalance},#{addTime},#{lastTime},#{processType},
-  	#{paymentCode},#{paymentName},#{orderSn},#{parentSn},
-  	#{note},#{payId},#{third_part_name},#{user_surplus},
-  	#{user_surplus_limit},#{third_part_paid});
+  	#{paymentName},#{orderSn},#{parentSn},
+  	#{note},#{payId},#{thirdPartName},#{userSurplus},
+  	#{userSurplusLimit},#{thirdPartPaid});
   </insert>
   
   <update id="updateUserAccountBySelective" parameterType="com.dl.member.model.UserAccount">

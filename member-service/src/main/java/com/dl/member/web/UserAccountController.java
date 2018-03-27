@@ -59,7 +59,7 @@ public class UserAccountController {
     @PostMapping("/addUserAccountByPay")
     public BaseResult<SurplusPaymentCallbackDTO> addUserAccountByPay(@RequestBody SurplusPayParam surplusPayParam) {
     	BaseResult<SurplusPaymentCallbackDTO> rst = userAccountService.addUserAccountByPay(surplusPayParam);
-    	if(rst.getCode() == 0) {
+    	if(rst.getCode() != 0) {
     		return ResultGenerator.genFailResult(rst.getMsg());
     	}
     	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = rst.getData();
