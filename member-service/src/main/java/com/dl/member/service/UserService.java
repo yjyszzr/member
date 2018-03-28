@@ -106,7 +106,7 @@ public class UserService extends AbstractService<User> {
 		user.setPassword(Encryption.encryption(userParam.getPassWord(), loginsalt));
 		user.setRankPoint(0);
 		user.setPassWrongCount(0);
-		user.setIsReal(ProjectConstant.USER_IS_REAL);
+		user.setIsReal(ProjectConstant.USER_IS_NOT_REAL);
 		int rst = userMapper.insertWithReturnId(user);
 		if(1 != rst) {
 			return 0;
