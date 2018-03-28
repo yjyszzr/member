@@ -44,7 +44,7 @@ public class UserRecharge {
      * 类型0-提现 1-充值
      */
     @Column(name = "process_type")
-    private Boolean processType;
+    private Integer processType;
 
     /**
      * 支付代码
@@ -75,8 +75,9 @@ public class UserRecharge {
      */
     @Column(name = "donation_id")
     private String donationId;
+    
 
-    /**
+	/**
      * @return id
      */
     public Integer getId() {
@@ -199,7 +200,7 @@ public class UserRecharge {
      *
      * @return process_type - 类型0-提现 1-充值
      */
-    public Boolean getProcessType() {
+    public Integer getProcessType() {
         return processType;
     }
 
@@ -208,7 +209,7 @@ public class UserRecharge {
      *
      * @param processType 类型0-提现 1-充值
      */
-    public void setProcessType(Boolean processType) {
+    public void setProcessType(Integer processType) {
         this.processType = processType;
     }
 

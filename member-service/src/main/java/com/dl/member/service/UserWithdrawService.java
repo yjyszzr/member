@@ -114,7 +114,7 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
         userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
         userAccountParam.setUserName("");
-        userAccountParam.setNote("");
+        userAccountParam.setNote("提现"+amount+"元\n");
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setStatus(Integer.valueOf(updateUserWithdrawParam.getStatus()));
         userAccountParam.setPayId(updateUserWithdrawParam.getPaymentId());

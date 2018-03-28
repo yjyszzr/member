@@ -112,7 +112,7 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
         userAccountParam.setAccountSn(accountSn);
         userAccountParam.setAmount(amount);
         userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
-        userAccountParam.setAccountType(ProjectConstant.BUY);
+        userAccountParam.setAccountType(ProjectConstant.RECHARGE);
         userAccountParam.setOrderSn("");
         userAccountParam.setPaymentName(updateUserRechargeParam.getPaymentName());
         userAccountParam.setThirdPartName(updateUserRechargeParam.getPaymentName());
@@ -120,7 +120,7 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
         userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
         userAccountParam.setUserName("");
-        userAccountParam.setNote("");
+        userAccountParam.setNote("微信充值"+amount+"元\n");
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setPayId(updateUserRechargeParam.getPaymentId());
         userAccountParam.setStatus(Integer.valueOf(updateUserRechargeParam.getStatus()));

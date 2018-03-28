@@ -52,6 +52,76 @@
   		and user_id = #{userId};
   </select>
   
+  <!--  <sql id="key">
+      <trim suffixOverrides=",">
+        <if test="accountSn!=null">
+            account_sn,
+        </if>
+        <if test="userId!=null">
+            user_id,
+        </if>
+        <if test="adminUser!=null">
+            admin_user,
+        </if>
+        <if test="amount!=null">
+            amount,
+        </if>
+        <if test="curBalance!=null">
+            cur_balance,
+        </if>
+        <if test="addTime!=null">
+            add_time,
+        </if>
+        <if test="lastTime!=null">
+            last_time,
+        </if>
+        <if test="processType!=null">
+            process_type,
+        </if>
+        <if test="paymentName">
+            payment_name,
+        </if>
+        <if test="orderSn!=null">
+            order_sn,
+        </if>
+        <if test="parentSn!=null">
+            parent_sn,
+        </if>
+        <if test="lastTime!=null">
+            last_time,
+        </if>
+        <if test="lastTime!=null">
+            last_time,
+        </if>
+        <if test="lastTime!=null">
+            last_time,
+        </if>
+        <if test="lastTime!=null">
+            last_time,
+        </if>                                
+      </trim>
+    </sql>
+
+
+    <sql id="value">
+      <trim suffixOverrides=",">
+        <if test="id!=null">
+            #{id},
+        </if>
+
+        <if test="name!=null">
+            #{name},
+        </if>
+
+        <if test="sal!=null">
+            #{sal},
+        </if>
+      </trim>
+    </sql>
+  <insert id="insertUserAccount">
+  	INSERT INTO dl_user_account(<include refid="key"/>) values(<include refid="value"/>);
+  </insert>-->
+  
   <insert id="insertUserAccount">
   	INSERT INTO 
   	dl_user_account(account_sn,user_id,admin_user,amount,
@@ -63,7 +133,7 @@
   	#{paymentName},#{orderSn},#{parentSn},
   	#{note},#{payId},#{thirdPartName},#{userSurplus},
   	#{userSurplusLimit},#{thirdPartPaid},#{status});
-  </insert>
+  </insert> 
   
   <update id="updateUserAccountBySelective" parameterType="com.dl.member.model.UserAccount">
   	UPDATE dl_user_account 
