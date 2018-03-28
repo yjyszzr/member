@@ -27,6 +27,7 @@ import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserRealMapper;
 import com.dl.member.dto.UserRealDTO;
+import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.model.UserReal;
 
@@ -78,6 +79,11 @@ public class UserRealService extends AbstractService<UserReal> {
     	Integer userId = SessionUtil.getUserId();
     	User user = userService.findById(userId);
     	
+    	UserReal userReal = this.findBy("idCode", iDCode);
+    	if(userReal != null) {
+    		return ResultGenerator.genResult(MemberEnums.USERREAL_ALREADY_AUTH.getcode(), MemberEnums.USERREAL_ALREADY_AUTH.getMsg());
+    	}
+    	
     	//TODO 身份证二元素校验接口
     	try {
 			realName = URLDecoder.decode(realName, "UTF-8");
@@ -92,6 +98,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	
     	this.saveUserReal(realName,iDCode);
     	User updateUser = new User();
+    	updateUser.setUserId(userId);
     	updateUser.setIsReal(ProjectConstant.USER_IS_REAL);
     	userService.update(updateUser);
     	return ResultGenerator.genSuccessResult("实名认证成功");

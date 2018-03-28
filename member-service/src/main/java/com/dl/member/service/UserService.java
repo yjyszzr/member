@@ -68,6 +68,7 @@ public class UserService extends AbstractService<User> {
 			String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
 			userDTO.setMobile(mobileStr);
 			userDTO.setRealName(realName);
+			userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit())));
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}
@@ -178,7 +179,7 @@ public class UserService extends AbstractService<User> {
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
 			BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
-			userDTO.setTotalMoney(totalMoney.toString());
+			userDTO.setTotalMoney(String.valueOf(totalMoney));
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}
