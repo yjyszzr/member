@@ -154,7 +154,7 @@ public class UserService extends AbstractService<User> {
     	
     	User updateUser = new User();
     	updateUser.setUserId(user.getUserId());
-    	updateUser.setPassword(userLoginPass);
+    	updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
     	this.update(updateUser);
     	
     	return ResultGenerator.genSuccessResult("更新用户登录密码成功");
