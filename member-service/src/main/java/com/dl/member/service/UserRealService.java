@@ -148,7 +148,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	Integer userId = SessionUtil.getUserId();
     	UserReal userReal = this.findBy("userId", userId);
     	UserRealDTO userRealDTO = new UserRealDTO();
-    	if(null == userRealDTO) {
+    	if(null == userReal) {
     		return null;
     	}
     	
