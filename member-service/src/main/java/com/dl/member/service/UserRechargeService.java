@@ -8,6 +8,7 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserRechargeMapper;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.enums.MemberEnums;
+import com.alibaba.fastjson.JSON;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
@@ -81,6 +82,9 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
      */
     @Transactional
     public BaseResult<String> updateReCharege(UpdateUserRechargeParam updateUserRechargeParam){
+    	String inPrams = JSON.toJSONString(updateUserRechargeParam);
+    	log.info(DateUtil.getCurrentDateTime()+"更新充值单参数:"+inPrams);
+    	
     	BaseResult<UserRecharge> userRechargeRst =  this.queryUserRecharge(updateUserRechargeParam.getRechargeSn());
     	if(userRechargeRst.getCode() != 0) {
     		throw new ServiceException(userRechargeRst.getCode(), userRechargeRst.getMsg());
@@ -117,13 +121,14 @@ public class UserRechargeService extends AbstractService<UserRecharge> {
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
         userAccountParam.setUserName("");
         userAccountParam.setNote("");
+        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setPayId(updateUserRechargeParam.getPaymentId());
         userAccountParam.setStatus(Integer.valueOf(updateUserRechargeParam.getStatus()));
     	String rechargeSn = userAccountService.saveAccount(userAccountParam);
 		if(StringUtils.isEmpty(rechargeSn)) {
 			return ResultGenerator.genFailResult("更新数据库充值单失败");
 		}
-    	return ResultGenerator.genSuccessResult("更新数据库充值单失败");
+    	return ResultGenerator.genSuccessResult("更新数据库充值单成功");
     }
 
 }

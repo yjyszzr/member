@@ -8,6 +8,7 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserWithdrawMapper;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.enums.MemberEnums;
+import com.alibaba.fastjson.JSON;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -78,6 +79,9 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
      * @return
      */
     public BaseResult<String> updateWithdraw(UpdateUserWithdrawParam updateUserWithdrawParam){
+    	String inPrams = JSON.toJSONString(updateUserWithdrawParam);
+    	log.info(DateUtil.getCurrentDateTime()+"更新提现单参数:"+inPrams);
+    	
     	BaseResult<UserWithdraw> userWithdrawRst = this.queryUserWithdraw(updateUserWithdrawParam.getWithdrawalSn());
     	if(userWithdrawRst.getCode() != 0) {
     		return ResultGenerator.genResult(userWithdrawRst.getCode(), userWithdrawRst.getMsg());
@@ -111,6 +115,7 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
         userAccountParam.setUserName("");
         userAccountParam.setNote("");
+        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setStatus(Integer.valueOf(updateUserWithdrawParam.getStatus()));
         userAccountParam.setPayId(updateUserWithdrawParam.getPaymentId());
     	String withdrawSn = userAccountService.saveAccount(userAccountParam);

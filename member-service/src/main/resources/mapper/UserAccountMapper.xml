@@ -23,6 +23,8 @@
     <result column="user_surplus_limit" jdbcType="VARCHAR" property="userSurplusLimit" />
     <result column="third_part_paid" jdbcType="VARCHAR" property="thirdPartPaid" />
     <result column="note" jdbcType="LONGVARCHAR" property="note" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    
   </resultMap>
   
   <select id="queryUserAccountBySelective" parameterType="com.dl.member.model.UserAccount"  resultMap="BaseResultMap">
@@ -55,12 +57,12 @@
   	dl_user_account(account_sn,user_id,admin_user,amount,
   	cur_balance,add_time,last_time,process_type,
   	payment_name,order_sn,parent_sn,note,pay_id,third_part_name,
-  	user_surplus,user_surplus_limit,third_part_paid) 
+  	user_surplus,user_surplus_limit,third_part_paid,status)
   	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},
   	#{curBalance},#{addTime},#{lastTime},#{processType},
   	#{paymentName},#{orderSn},#{parentSn},
   	#{note},#{payId},#{thirdPartName},#{userSurplus},
-  	#{userSurplusLimit},#{thirdPartPaid});
+  	#{userSurplusLimit},#{thirdPartPaid},#{status});
   </insert>
   
   <update id="updateUserAccountBySelective" parameterType="com.dl.member.model.UserAccount">

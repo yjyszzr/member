@@ -20,7 +20,8 @@ public enum MemberEnums {
 	NOT_REAL_AUTH(301026,"未进行实名认证"),
 	CURRENT_ONE_CARD(301027,"当前仅一张银行卡不能切换默认状态"),
 	NO_BANKCARDS(301029,"当前用户下没有银行卡"),
-	DBDATA_IS_NULL(301030,"数据库无该数据");
+	DBDATA_IS_NULL(301030,"数据库无该数据"),
+	ORDER_PARAM_NOT_MATCH(301031,"与订单金额不符合");
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	
 //	NO_SHOP_MEM(301014,"用户不是店铺会员"),

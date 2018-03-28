@@ -56,6 +56,11 @@ public class UserAccountParam {
     @ApiModelProperty(value = "状态：0-未完成 1-已完成 2-失败")
     private Integer status;
     
+    @ApiModelProperty(value = "最后更新时间")
+    private Integer lastTime;
+    
+    
+    
     
     
     

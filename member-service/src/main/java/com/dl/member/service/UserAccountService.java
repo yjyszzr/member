@@ -4,6 +4,7 @@ import com.dl.member.model.UserAccount;
 import com.dl.member.model.UserWithdraw;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
+import com.dl.param.OrderSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.enums.MemberEnums;
+import com.alibaba.fastjson.JSON;
 import com.dl.api.IOrderService;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
@@ -26,6 +28,8 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
+import com.dl.dto.OrderDTO;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -69,6 +73,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
      */
     @Transactional
     public BaseResult<SurplusPaymentCallbackDTO> addUserAccountByPay(SurplusPayParam surplusPayParam) {
+    	String inPrams = JSON.toJSONString(surplusPayParam);
+    	log.info(DateUtil.getCurrentDateTime()+"使用到了部分或全部余额时候支付传递的参数:"+inPrams);
+    	
     	Integer userId = SessionUtil.getUserId();
         User user = userService.findById(userId);
         
@@ -83,16 +90,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
             return ResultGenerator.genBadRequestResult("扣减余额不能为负数和0");
         }
         
-        Condition c = new Condition(UserAccount.class);
-        Criteria criteria = c.createCriteria();
-        criteria.andCondition("order_sn =", surplusPayParam.getOrderSn());
-        criteria.andCondition("user_id =", SessionUtil.getUserId());
-        criteria.andCondition("amount =", "-".concat(surplus.toString()));
-        criteria.andCondition("process_type =", ProjectConstant.BUY);
-        List<UserAccount> userAccountsList = this.findByCondition(c);
-        if (userAccountsList.size() > 0) {
-            throw new ServiceException(MemberEnums.USERACCOUNTS_ALREADY_REDUCE.getcode(), MemberEnums.USERACCOUNTS_ALREADY_REDUCE.getMsg());
-        }
+        //校验
+       // this.validMoneyMatchOrder(surplusPayParam);
 
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = this.commonCalculateMoney(surplusPayParam.getSurplus(), ProjectConstant.BUY);
         
@@ -107,7 +106,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
         }else if(ProjectConstant.mixPay.equals(payType)) {
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
         }
-        
         userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
         userAccountParam.setAccountType(ProjectConstant.BUY);
         userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
@@ -117,7 +115,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
         userAccountParam.setUserName(user.getUserName());
-        if(ProjectConstant.yuePay.equals(surplusPayParam.getPayType())) {
+        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
+        if(ProjectConstant.yuePay.equals(payType)) {
         	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
         }else {
         	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.NOT_FINISH));
@@ -135,6 +134,52 @@ public class UserAccountService extends AbstractService<UserAccount> {
         return ResultGenerator.genSuccessResult("余额支付后余额扣减成功",surplusPaymentCallbackDTO);
     }
   
+    /**
+     * 校验 1.钱是否与订单金额是否符合  2.是否重复扣款
+     * @param surplusPayParam
+     * @return
+     */
+    public BaseResult<SurplusPaymentCallbackDTO> validMoneyMatchOrder(SurplusPayParam surplusPayParam){
+    	Integer payType = surplusPayParam.getPayType();
+    	
+        OrderSnParam orderSnParam = new OrderSnParam();
+        orderSnParam.setOrderSn(surplusPayParam.getOrderSn());
+        BaseResult<OrderDTO> orderDTORst = orderService.getOrderInfoByOrderSn(orderSnParam);
+        if(orderDTORst.getCode() != 0) {
+        	return ResultGenerator.genResult(orderDTORst.getCode(), orderDTORst.getMsg());
+        }
+        OrderDTO orderDTO = orderDTORst.getData();
+        if(ProjectConstant.yuePay.equals(payType)) {
+        	if(!surplusPayParam.getSurplus().equals(orderDTO.getSurplus())) {
+        		throw new ServiceException(MemberEnums.ORDER_PARAM_NOT_MATCH.getcode(), MemberEnums.ORDER_PARAM_NOT_MATCH.getMsg());
+        	}
+        	
+        }else if(ProjectConstant.weixinPay.equals(payType) || ProjectConstant.aliPay.equals(payType)) {
+        	if(!surplusPayParam.getThirdPartPaid().equals(orderDTO.getThirdPartyPaid())) {
+        		throw new ServiceException(MemberEnums.ORDER_PARAM_NOT_MATCH.getcode(), MemberEnums.ORDER_PARAM_NOT_MATCH.getMsg());
+        	}
+        }else if(ProjectConstant.mixPay.equals(payType)) {
+        	if(!surplusPayParam.getSurplus().equals(orderDTO.getSurplus())) {
+        		throw new ServiceException(MemberEnums.ORDER_PARAM_NOT_MATCH.getcode(), MemberEnums.ORDER_PARAM_NOT_MATCH.getMsg());
+        	}
+        	if(!surplusPayParam.getThirdPartPaid().equals(orderDTO.getThirdPartyPaid())) {
+        		throw new ServiceException(MemberEnums.ORDER_PARAM_NOT_MATCH.getcode(), MemberEnums.ORDER_PARAM_NOT_MATCH.getMsg());
+        	}
+        }
+        
+        Condition c = new Condition(UserAccount.class);
+        Criteria criteria = c.createCriteria();
+        criteria.andCondition("order_sn =", surplusPayParam.getOrderSn());
+        criteria.andCondition("user_id =", SessionUtil.getUserId());
+        criteria.andCondition("amount =", "-".concat(surplusPayParam.getMoneyPaid().toString()));
+        criteria.andCondition("process_type =", ProjectConstant.BUY);
+        List<UserAccount> userAccountsList = this.findByCondition(c);
+        if (userAccountsList.size() > 0) {
+            throw new ServiceException(MemberEnums.USERACCOUNTS_ALREADY_REDUCE.getcode(), MemberEnums.USERACCOUNTS_ALREADY_REDUCE.getMsg());
+        }
+        
+		return null;
+    }
     /**
      * 记录详情
      * @param surplusPayParam
@@ -321,6 +366,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
      */
     @Transactional
     public SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam) {
+    	String inPrams = JSON.toJSONString(surplusPayParam);
+    	log.info(DateUtil.getCurrentDateTime()+"使用到了部分或全部余额时候回滚支付传递的参数:"+inPrams);
+    	
     	Integer userId= SessionUtil.getUserId();
     	User user = userService.findById(userId);
     	BigDecimal surplus = surplusPayParam.getSurplus();
@@ -355,6 +403,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setUserSurplus(BigDecimal.ZERO);
         userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
         userAccountParam.setUserName(user.getUserName());
+        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setNote("");
         userAccountParam.setPayId("");
         this.saveAccount(userAccountParam);
@@ -437,6 +486,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	String accountSn = snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
     	userAccount.setAccountSn(accountSn);
     	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
+    	userAccount.setLastTime(userAccountParam.getLastTime());
     	userAccount.setAmount(userAccountParam.getAmount());
     	userAccount.setCurBalance(curBalance);
     	if(StringUtils.isNotEmpty(userAccountParam.getOrderSn())) {
