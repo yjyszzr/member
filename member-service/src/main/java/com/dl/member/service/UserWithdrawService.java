@@ -1,4 +1,5 @@
 package com.dl.member.service;
+import com.dl.member.model.UserBank;
 import com.dl.member.model.UserWithdraw;
 import com.dl.member.param.UpdateUserWithdrawParam;
 import com.dl.member.param.UserAccountParam;
@@ -7,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserWithdrawMapper;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.UserWithdrawDTO;
+import com.dl.member.dto.WithdrawalSnDTO;
 import com.dl.member.enums.MemberEnums;
 import com.alibaba.fastjson.JSON;
 import com.dl.base.enums.SNBusinessCodeEnum;
@@ -18,6 +21,7 @@ import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -34,6 +38,9 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
     @Resource
     private UserAccountService userAccountService;
     
+    @Resource
+    private UserBankService userBankService;
+    
     public static SNGenerator snGenerator = new SNGenerator();
     
     /**
@@ -41,7 +48,7 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
      * @param amount
      * @return
      */
-    public String saveWithdraw(UserWithdrawParam  userWithdrawParam){
+    public BaseResult<WithdrawalSnDTO> saveWithdraw(UserWithdrawParam  userWithdrawParam){
     	Integer userId = SessionUtil.getUserId();
     	String withdrawalSn = snGenerator.nextSN(SNBusinessCodeEnum.WITHDRAW_SN.getCode());
     	UserWithdraw userWithdraw = new UserWithdraw();
@@ -51,14 +58,27 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
     	userWithdraw.setAddTime(DateUtil.getCurrentTimeLong());
     	userWithdraw.setRealName(userWithdrawParam.getRealName());
     	userWithdraw.setCardNo(userWithdrawParam.getCardNo());
+    	String cardNo = userWithdrawParam.getCardNo();
+    	UserBank userBank = userBankService.findBy("cardNo", userWithdrawParam.getCardNo());
+    	if(userBank == null) {
+    		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), MemberEnums.DBDATA_IS_NULL.getMsg());
+    	}
+    	userWithdraw.setBankName(userBank.getBankName());
     	userWithdraw.setStatus(ProjectConstant.NOT_FINISH);
     	int rst = userWithdrawMapper.insertUserWithdraw(userWithdraw);
     	if(1 != rst) {
     		log.error("保存数据库提现单失败");
+    		return ResultGenerator.genFailResult("保存数据库提现单失败");
+    		
     	}
-		return withdrawalSn;
+    	
+    	WithdrawalSnDTO withdrawalSnDTO = new WithdrawalSnDTO();
+    	withdrawalSnDTO.setWithdrawalSn(withdrawalSn);
+		return  ResultGenerator.genSuccessResult("保存数据库提现单成功", withdrawalSnDTO) ;
     }
  
+    
+    
     /**
      * 根据提现单号查询提现单
      */
@@ -72,6 +92,22 @@ public class UserWithdrawService extends AbstractService<UserWithdraw> {
     	return ResultGenerator.genSuccessResult("查询提现单成功", userWithdrawList.get(0));
     }
     
+    /**
+     * 根据accountId 查询提现单
+     * @param accountId
+     * @return
+     */
+    public BaseResult<UserWithdrawDTO> queryUserWithDrawByAccountId(Integer accountId){
+    	UserWithdraw userWithdrawQuery =new UserWithdraw();
+    	userWithdrawQuery.setAccountId(accountId);
+    	List<UserWithdraw> userWithDrawList =  userWithdrawMapper.queryUserWithdrawBySelective(userWithdrawQuery);
+    	if(CollectionUtils.isEmpty(userWithDrawList)) {
+    		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), MemberEnums.DBDATA_IS_NULL.getMsg());
+    	}
+    	UserWithdrawDTO userWithDrawDTO = new UserWithdrawDTO();
+    	BeanUtils.copyProperties(userWithDrawList.get(0), userWithDrawDTO);
+		return ResultGenerator.genSuccessResult("查询提现单成功",userWithDrawDTO);
+    }
     
     /**
      * 更新提现单

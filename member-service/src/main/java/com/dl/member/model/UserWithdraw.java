@@ -63,8 +63,23 @@ public class UserWithdraw {
      */
     @Column(name = "payment_id")
     private String paymentId;
-
+    
     /**
+     * 银行卡名称
+     */
+    @Column(name = "bank_name")
+    private String bankName;
+    
+
+    public String getBankName() {
+		return bankName;
+	}
+
+	public void setBankName(String bankName) {
+		this.bankName = bankName;
+	}
+
+	/**
      * @return id
      */
     public Integer getId() {

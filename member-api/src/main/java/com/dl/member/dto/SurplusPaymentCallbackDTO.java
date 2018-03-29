@@ -22,9 +22,16 @@ public class SurplusPaymentCallbackDTO {
 	private BigDecimal userSurplusLimit;
 	
 	/**
+	 * 当前被冻结的余额
+	 */
+	private BigDecimal frozenMoney;
+	
+	/**
 	 * 当前变动后的总余额
 	 */
 	private BigDecimal curBalance;
+	
+
 	
 	/**
 	 * 当前流水号

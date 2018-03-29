@@ -6,6 +6,7 @@ import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserRechargeDTO;
 import com.dl.member.dto.UserWithdrawDTO;
+import com.dl.member.dto.WithdrawalSnDTO;
 import com.dl.member.param.AmountParam;
 import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.PageParam;
@@ -125,25 +126,20 @@ public class UserAccountController {
     
     @ApiOperation(value="用户生成提现单", notes="用户生成提现单",hidden=false)
 	@RequestMapping(path="/createUserWithdraw", method=RequestMethod.POST)
-    public BaseResult<UserWithdrawDTO> createUserWithdraw(@RequestBody UserWithdrawParam userWithdrawParam){
-    	String withDrawSn = userWithdrawService.saveWithdraw(userWithdrawParam);
-    	UserWithdrawDTO userWithdrawDTO = new UserWithdrawDTO();
-    	userWithdrawDTO.setWithdrawalSn(withDrawSn);
-    	return ResultGenerator.genSuccessResult("用户生成提现单成功",userWithdrawDTO);
+    public BaseResult<WithdrawalSnDTO> createUserWithdraw(@RequestBody UserWithdrawParam userWithdrawParam){
+    	return userWithdrawService.saveWithdraw(userWithdrawParam);
     }
     
     @ApiOperation(value="更新用户提现单", notes="更新用户提现单",hidden=false)
 	@RequestMapping(path="/updateUserWithdraw", method=RequestMethod.POST)
     public BaseResult<String> updateUserWithdraw(@RequestBody UpdateUserWithdrawParam updateUserWithdrawParam){
     	return userWithdrawService.updateWithdraw(updateUserWithdrawParam);
-    	
     }
     
     @ApiOperation(value="更新用户账户", notes="更新用户账户",hidden=false)
 	@RequestMapping(path="/updateUserAccount", method=RequestMethod.POST)
     public BaseResult<String> updateUserAccount(@RequestBody UpdateUserAccountParam updateUserAccountParam){
     	return userAccountService.updateUserAccount(updateUserAccountParam.getPayId(),updateUserAccountParam.getStatus(),updateUserAccountParam.getAccountSn());
-    	
     }
     
     @ApiOperation(value="统计当月的各个用途的资金和", notes="统计当月的各个用途的资金和",hidden=false)

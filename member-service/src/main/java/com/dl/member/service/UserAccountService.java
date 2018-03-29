@@ -320,6 +320,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         
     	Integer userId = SessionUtil.getUserId();
     	User user = userService.findById(userId);
+    	BigDecimal frozenMoney = user.getFrozenMoney();//冻结的资金
     	if(ProjectConstant.BUY == type) {
             money = user.getUserMoney().subtract(inOrOutMoney);
             if (money.compareTo(BigDecimal.ZERO) >= 0) {//可提现余额 够	
@@ -345,6 +346,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		user_money = user.getUserMoney().subtract(inOrOutMoney);
     		user_money_limit = user.getUserMoneyLimit();
     		curBalance = user_money_limit.add(user_money);
+    		frozenMoney = BigDecimal.ZERO.subtract(inOrOutMoney);
     		
     	}else if(4 == type) {
     		
@@ -355,7 +357,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
         surplusPaymentCallbackDTO.setUserSurplus(usedUserMoney);
         surplusPaymentCallbackDTO.setUserSurplusLimit(usedUserMoneyLimit);
         surplusPaymentCallbackDTO.setCurBalance(curBalance);
-    	
+        surplusPaymentCallbackDTO.setFrozenMoney(frozenMoney);
+        
     	return surplusPaymentCallbackDTO;
     	
     }

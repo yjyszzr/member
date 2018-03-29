@@ -1,11 +1,14 @@
 package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.member.dto.UserWithdrawDTO;
 import com.dl.member.model.UserWithdraw;
+import com.dl.member.param.AccountIdParam;
 import com.dl.member.service.UserWithdrawService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,4 +56,10 @@ public class UserWithdrawController {
         PageInfo pageInfo = new PageInfo(list);
         return ResultGenerator.genSuccessResult(null,pageInfo);
     }
+
+    @PostMapping("/queryUserWithDrawByAccountId")
+    public BaseResult<UserWithdrawDTO> queryUserWithDrawByAccountId(@RequestBody AccountIdParam accountIdParam) {
+        return userWithdrawService.queryUserWithDrawByAccountId(accountIdParam.getAccountId());
+    }
+    
 }

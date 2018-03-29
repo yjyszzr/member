@@ -16,11 +16,14 @@
     <result column="card_no" jdbcType="VARCHAR" property="cardNo" />
     <result column="pay_time" jdbcType="INTEGER" property="payTime" />
     <result column="payment_id" jdbcType="VARCHAR" property="paymentId" />
+    <result column="bank_name" jdbcType="VARCHAR" property="bankName" />
+    
+    
   </resultMap>
   
   <insert id="insertUserWithdraw"  parameterType="com.dl.member.model.UserWithdraw">
      INSERT INTO dl_user_withdraw(withdrawal_sn,user_id,amount,add_time,status,real_name,card_no)
-     VALUES(#{withdrawalSn},#{userId},#{amount},#{addTime},#{status},#{realName},#{cardNo});
+     VALUES(#{withdrawalSn},#{userId},#{amount},#{addTime},#{status},#{realName},#{cardNo},#{bankName});
   </insert>
   
   <update id="updateUserWithdrawBySelective" parameterType="com.dl.member.model.UserWithdraw">
@@ -45,6 +48,9 @@
 
 	    <if test="status != null">
 	        AND status = #{status}
+	    </if>
+	    <if test="accountId != null">
+	        AND account_id = #{accountId}
 	    </if>
 	    <if test="id != null">
 	        AND id = #{id}
