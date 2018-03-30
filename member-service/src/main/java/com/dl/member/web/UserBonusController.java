@@ -44,5 +44,12 @@ public class UserBonusController {
     	PageInfo<UserBonusDTO> userBonusDTOList =  userBonusService.queryBonusListByStatus(userBonusStatusParam.getStatus(),userBonusStatusParam.getPageNum(),userBonusStatusParam.getPageSize());
     	return ResultGenerator.genSuccessResult("根据状态查询有效的红包集合成功",userBonusDTOList);
     }
-
+    
+    @ApiOperation(value="查询用户有效的红包列表", notes="查询用户有效的红包列表",hidden=false)
+    @PostMapping("/queryValidBonusList")
+    public BaseResult<List<UserBonusDTO>> queryValidBonusList(@RequestBody UserBonusStatusParam userBonusStatusParam) {
+    	List<UserBonusDTO> userBonusDTOList =  userBonusService.queryValidBonusList();
+    	return ResultGenerator.genSuccessResult("查询用户有效的红包列表成功",userBonusDTOList);
+    }
+    
 }

@@ -19,6 +19,7 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 import org.springframework.beans.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,6 +132,33 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	}
 
 	/**
+	 * 查询用户可用的红包列表
+	 * @return
+	 */
+	public List<UserBonusDTO> queryValidBonusList(){
+		Integer userId = SessionUtil.getUserId();
+		UserBonus userBonus = new UserBonus();
+		userBonus.setUserId(userId);
+		userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+		userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
+		userBonus.setStartTime(DateUtil.getCurrentTimeLong());
+		userBonus.setEndTime(DateUtil.getCurrentTimeLong());
+		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
+		List<UserBonusDTO> userBonusDTOList = new ArrayList<UserBonusDTO>();
+		if(CollectionUtils.isEmpty(userBonusList)) {
+			return userBonusDTOList;
+		}
+		
+		userBonusList.forEach(s->{
+			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(s);
+			userBonusDTOList.add(userBonusDTO);
+		});
+		return userBonusDTOList;		
+		
+	}
+	
+	
+	/**
 	 * 根据状态查询有效的红包集合 ""-全部   0-未使用 1-已使用 2-已过期
 	 * @param status
 	 * @return
@@ -161,7 +189,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		} 
 		
 		result.setList(userBonusDTOList);
-		
 		return result;
 	}
 	
