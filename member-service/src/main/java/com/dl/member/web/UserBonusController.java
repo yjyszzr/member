@@ -5,6 +5,7 @@ import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.RollackSurplusPayParam;
+import com.dl.member.param.StrParam;
 import com.dl.member.param.UserBonusIdParam;
 import com.dl.member.param.UserBonusStatusParam;
 import com.dl.member.service.UserBonusService;
@@ -47,7 +48,7 @@ public class UserBonusController {
     
     @ApiOperation(value="查询用户有效的红包列表", notes="查询用户有效的红包列表",hidden=false)
     @PostMapping("/queryValidBonusList")
-    public BaseResult<List<UserBonusDTO>> queryValidBonusList(@RequestBody UserBonusStatusParam userBonusStatusParam) {
+    public BaseResult<List<UserBonusDTO>> queryValidBonusList(@RequestBody StrParam strParam) {
     	List<UserBonusDTO> userBonusDTOList =  userBonusService.queryValidBonusList();
     	return ResultGenerator.genSuccessResult("查询用户有效的红包列表成功",userBonusDTOList);
     }
