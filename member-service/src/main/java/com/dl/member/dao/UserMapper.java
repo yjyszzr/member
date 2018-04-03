@@ -15,10 +15,8 @@ public interface UserMapper extends Mapper<User> {
 	
 	/**
 	 * 更新用户账户资金
-	 * @param userId
-	 * @param userMoney
-	 * @param userMoneyLimit
+	 * @param user
 	 * @return
 	 */
-	int updateUserMoneyAndUserMoneyLimit(@Param("userId") Integer userId,@Param("userMoney") BigDecimal userMoney,@Param("userMoneyLimit") BigDecimal userMoneyLimit);
+	int updateUserMoneyAndUserMoneyLimit(User user);
 }

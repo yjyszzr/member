@@ -68,8 +68,14 @@
 		 WHERE user_id=#{userId}  
   </update>
   
-  <update id="updateUserMoneyAndUserMoneyLimit">
-  	UPDATE dl_user SET user_money = #{userMoney} ,user_money_limit = #{userMoneyLimit} WHERE user_id = #{userId}
+  <update id="updateUserMoneyAndUserMoneyLimit" parameterType="com.dl.member.model.User">
+  	UPDATE dl_user SET user_money = #{userMoney} ,user_money_limit = #{userMoneyLimit} 
+  		 <trim prefix="set" suffixOverrides=",">
+		  <if test="userMoney!=null">is_delete=#{userMoney},</if>
+		  <if test="userMoneyLimit!=null">user_money_limit=#{userMoneyLimit},</if>
+		  <if test="frozenMoney!=null">frozen_money=#{frozenMoney},</if>
+		 </trim>
+  	WHERE user_id = #{userId}
   </update>
   
   <select id="queryUserExceptPass" resultMap="BaseResultMap">

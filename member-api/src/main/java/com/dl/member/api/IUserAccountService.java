@@ -1,5 +1,7 @@
 package com.dl.member.api;
 
+import javax.validation.Valid;
+
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserAccountByTypeParam;
 import com.dl.member.param.UserWithdrawParam;
 //import com.pgt.shop.member.param.UserCapitalParam;
 //import com.pgt.shop.member.param.UserRefundParam;
@@ -105,6 +108,14 @@ public interface IUserAccountService {
 	 */
 	@RequestMapping(path="/user/account/updateUserAccount", method=RequestMethod.POST)
     public BaseResult<String> updateUserAccount(@RequestBody UpdateUserAccountParam updateUserAccountParam);
+	
+	/**
+	 * 内部使用的用户资金变动服务
+	 * @param updateUserAccountParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/account/changeUserAccountByType", method=RequestMethod.POST)
+    public BaseResult<String> changeUserAccountByType(@Valid @RequestBody UserAccountByTypeParam userAccountByTypeParam);
 	
 //	
 //	/**
