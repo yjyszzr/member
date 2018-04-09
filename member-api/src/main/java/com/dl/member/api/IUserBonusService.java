@@ -43,7 +43,7 @@ public interface IUserBonusService {
 	  *
 	  * @return
 	  */
-	 @PostMapping("/bonus/queryUserBonus")    
+	 @PostMapping("/user/bonus/queryUserBonus")    
 	 BaseResult<UserBonusDTO> queryUserBonus(@RequestBody UserBonusIdParam userBonusIdParam);
 	 
 	 /**
@@ -51,7 +51,7 @@ public interface IUserBonusService {
 	  * @param userBonusStatusParam
 	  * @return
 	  */
-     @PostMapping("/bonus/queryValidBonusList")
+     @PostMapping("/user/bonus/queryValidBonusList")
      BaseResult<List<UserBonusDTO>> queryValidBonusList(@RequestBody StrParam strParam);	 
 
 //	 /**

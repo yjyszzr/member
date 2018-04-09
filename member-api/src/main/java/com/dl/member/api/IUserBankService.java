@@ -34,7 +34,7 @@ public interface IUserBankService {
 	  *
 	  * @return
 	  */
-	 @PostMapping("/bank/queryUserBank")    
+	 @PostMapping("/user/bank/queryUserBank")    
 	 BaseResult<UserBankDTO> queryUserBank(@RequestBody IDParam idParam);
     
 }
