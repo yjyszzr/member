@@ -25,8 +25,8 @@ public class DlMessageDTO {
     private Integer receiver;
 	@ApiModelProperty("消息接收者的手机号，可以为空")
     private String receiverMobile;
-	@ApiModelProperty("消息业务类型：")
-    private String objectType;
+	@ApiModelProperty("消息业务类型：1:订单，2：提现")
+    private Integer objectType;
 	@ApiModelProperty("是否已阅读")
     private Integer isRead;
 	@ApiModelProperty("消息主题内容")

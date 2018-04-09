@@ -11,7 +11,7 @@
     <result column="push_value" jdbcType="VARCHAR" property="pushValue" />
     <result column="receiver" jdbcType="BIT" property="receiver" />
     <result column="receiver_mobile" jdbcType="VARCHAR" property="receiverMobile" />
-    <result column="object_type" jdbcType="VARCHAR" property="objectType" />
+    <result column="object_type" jdbcType="INTEGER" property="objectType" />
     <result column="is_mobile_success" jdbcType="BIT" property="isMobileSuccess" />
     <result column="is_push_success" jdbcType="BIT" property="isPushSuccess" />
     <result column="is_read" jdbcType="BIT" property="isRead" />

@@ -20,7 +20,7 @@ CREATE TABLE `dl_message` (
   `push_value` varchar(255) DEFAULT NULL COMMENT '推送值',
   `receiver` int(11) DEFAULT '-1' COMMENT '接收者',
   `receiver_mobile` varchar(11) DEFAULT NULL COMMENT '接受者手机号',
-  `object_type` varchar(60) DEFAULT NULL COMMENT '业务类型',
+  `object_type` int(4) DEFAULT '0' COMMENT '业务类型',
   `is_mobile_success` tinyint(1) DEFAULT '0' COMMENT '短信是否发送成功',
   `is_push_success` tinyint(1) DEFAULT '0' COMMENT '推送是否发送成功',
   `is_read` tinyint(1) DEFAULT '0' COMMENT '是否读取',

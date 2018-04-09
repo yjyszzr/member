@@ -60,7 +60,7 @@ public class DlMessage {
      * 业务类型
      */
     @Column(name = "object_type")
-    private String objectType;
+    private Integer objectType;
 
     /**
      * 短信是否发送成功
@@ -264,7 +264,7 @@ public class DlMessage {
      *
      * @return object_type - 业务类型
      */
-    public String getObjectType() {
+    public Integer getObjectType() {
         return objectType;
     }
 
@@ -273,7 +273,7 @@ public class DlMessage {
      *
      * @param objectType 业务类型
      */
-    public void setObjectType(String objectType) {
+    public void setObjectType(Integer objectType) {
         this.objectType = objectType;
     }
 
