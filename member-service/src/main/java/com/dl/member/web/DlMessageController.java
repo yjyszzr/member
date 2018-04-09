@@ -66,7 +66,7 @@ public class DlMessageController {
         return ResultGenerator.genSuccessResult();
     }
 
-    @PostMapping("/update")
+   /* @PostMapping("/update")
     public BaseResult update(DlMessage dlMessage) {
         dlMessageService.update(dlMessage);
         return ResultGenerator.genSuccessResult();
@@ -76,6 +76,6 @@ public class DlMessageController {
     public BaseResult detail(@RequestParam Integer id) {
         DlMessage dlMessage = dlMessageService.findById(id);
         return ResultGenerator.genSuccessResult(null,dlMessage);
-    }
+    }*/
 
 }
