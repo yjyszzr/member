@@ -55,7 +55,7 @@ public class UserService extends AbstractService<User> {
 			BeanUtils.copyProperties(userDTO, user);
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setIsReal(user.getIsReal().equals("1")?"1":"0");
-			userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit())));
+			userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 			
 			String realName = "";
 			UserRealDTO userRealDTO = userRealService.queryUserReal();
@@ -187,7 +187,6 @@ public class UserService extends AbstractService<User> {
 	}
 	
 	
-	
 	/**
 	 * 生成昵称：
 	 *
@@ -201,7 +200,6 @@ public class UserService extends AbstractService<User> {
 		String userName = String.format("%s彩主", mobile.substring(mobile.length()-4, mobile.length()));
 		return userName.toString();
 	}
-	
 	
 	/**
 	 * 生成账号：

@@ -16,6 +16,7 @@ import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserAccountByTypeParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserWithdrawParam;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
 * Created by zhangzirong on 2018/03/15.
@@ -146,6 +148,18 @@ public class UserAccountController {
 	@RequestMapping(path="/countMoneyCurrentMonth", method=RequestMethod.POST)
     public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody StrParam strParam){
     	return userAccountService.countMoneyCurrentMonth();
+    }
+    
+	/**
+	 * 内部使用的用户资金变动服务
+	 * @param userAccountByTypeParam
+	 * @return
+	 */
+    @ApiOperation(value="内部使用的用户资金变动服务", notes="内部使用的用户资金变动服务",hidden=true)
+	@RequestMapping(path="/user/account/changeUserAccountByType", method=RequestMethod.POST)
+    public BaseResult<SurplusPaymentCallbackDTO> changeUserAccountByType(@Valid @RequestBody UserAccountByTypeParam userAccountByTypeParam){
+    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.commonCalculateMoney(userAccountByTypeParam.getInOrOutMoney(), userAccountByTypeParam.getType());
+    	return ResultGenerator.genSuccessResult("变动用户账户金额成功",surplusPaymentCallbackDTO);
     }
     
 }

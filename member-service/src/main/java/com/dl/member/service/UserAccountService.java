@@ -1,25 +1,16 @@
 package com.dl.member.service;
-import com.dl.member.model.User;
-import com.dl.member.model.UserAccount;
-import com.dl.member.model.UserWithdraw;
-import com.dl.member.param.SurplusPayParam;
-import com.dl.member.param.UserAccountParam;
-import com.dl.param.OrderSnParam;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.DoubleValue;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
-import com.dl.member.core.ProjectConstant;
-import com.dl.member.dao.UserAccountMapper;
-import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.SurplusPaymentCallbackDTO;
-import com.dl.member.dto.UserAccountCurMonthDTO;
-import com.dl.member.dto.UserAccountDTO;
-import com.dl.member.enums.MemberEnums;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSON;
-import com.dl.api.IOrderService;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
@@ -28,22 +19,27 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
-import com.dl.dto.OrderDTO;
+import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.UserAccountMapper;
+import com.dl.member.dao.UserMapper;
+import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.UserAccountCurMonthDTO;
+import com.dl.member.dto.UserAccountDTO;
+import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.User;
+import com.dl.member.model.UserAccount;
+import com.dl.member.model.UserWithdraw;
+import com.dl.member.param.SurplusPayParam;
+import com.dl.member.param.UserAccountParam;
+import com.dl.order.api.IOrderService;
+import com.dl.order.dto.OrderDTO;
+import com.dl.order.param.OrderSnParam;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 @Slf4j
@@ -80,7 +76,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         User user = userService.findById(userId);
         
         //用户余额
-        BigDecimal yue = user.getUserMoney().add(user.getUserMoneyLimit());
+        BigDecimal yue = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney());
         BigDecimal surplus = surplusPayParam.getMoneyPaid();
         if (yue.compareTo(surplus) == -1) {
             return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
@@ -91,7 +87,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         }
         
         //校验
-       // this.validMoneyMatchOrder(surplusPayParam);
+        // this.validMoneyMatchOrder(surplusPayParam);
 
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = this.commonCalculateMoney(surplusPayParam.getSurplus(), ProjectConstant.BUY);
         
@@ -281,7 +277,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
         }
         curBalance = user_money_limit.add(user_money).add(user.getFrozenMoney());
 
-        int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(SessionUtil.getUserId(), user_money, user_money_limit);
+        User updateUser = new User();
+        updateUser.setUserId(SessionUtil.getUserId());
+        updateUser.setUserMoney(user_money);
+        updateUser.setUserMoneyLimit(user_money_limit);
+    	
+        int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
         if(moneyRst != 1) {
         	log.error("更新用户账户资金异常");
         }
@@ -311,6 +312,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @return
      */
     public SurplusPaymentCallbackDTO commonCalculateMoney(BigDecimal inOrOutMoney,Integer type) {
+		if(inOrOutMoney.compareTo(BigDecimal.ZERO) == -1) {
+			throw new ServiceException(MemberEnums.PARAM_WRONG.getcode(), MemberEnums.PARAM_WRONG.getMsg());
+		}
+    	
     	BigDecimal money = BigDecimal.ZERO;
         BigDecimal user_money = BigDecimal.ZERO; //用户账户变动后的可提现余额
         BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
@@ -321,6 +326,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	Integer userId = SessionUtil.getUserId();
     	User user = userService.findById(userId);
     	BigDecimal frozenMoney = user.getFrozenMoney();//冻结的资金
+    	
+    	User updateUser = new User();
+    	updateUser.setUserId(SessionUtil.getUserId());
+    	
     	if(ProjectConstant.BUY == type) {
             money = user.getUserMoney().subtract(inOrOutMoney);
             if (money.compareTo(BigDecimal.ZERO) >= 0) {//可提现余额 够	
@@ -335,22 +344,43 @@ public class UserAccountService extends AbstractService<UserAccount> {
             	usedUserMoneyLimit = inOrOutMoney.subtract(usedUserMoney);
             }
             curBalance = user_money_limit.add(user_money);
+            
+            updateUser.setUserMoney(user_money);
+            updateUser.setUserMoneyLimit(user_money_limit);
+            
     	}else if(ProjectConstant.RECHARGE == type) {
     		
     		user_money = user.getUserMoney();
     		user_money_limit = user.getUserMoneyLimit().add(inOrOutMoney);
     		curBalance = user_money_limit.add(user_money);
     		
+    		updateUser.setUserMoneyLimit(user_money_limit);
+    		
     	}else if(ProjectConstant.WITHDRAW == type) {
+    		BigDecimal curMoney = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney());
+    		if(inOrOutMoney.compareTo(curMoney) == 1) {
+    			throw new ServiceException(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), "当前提现的余额大于账户余额");
+    		}
     		
     		user_money = user.getUserMoney().subtract(inOrOutMoney);
     		user_money_limit = user.getUserMoneyLimit();
     		curBalance = user_money_limit.add(user_money);
     		frozenMoney = BigDecimal.ZERO.subtract(inOrOutMoney);
     		
-    	}else if(4 == type) {
+    		updateUser.setUserMoney(user_money);
+    		updateUser.setFrozenMoney(frozenMoney);
     		
+    	}else if(ProjectConstant.REWARD == type) {
+
+    		user_money = user.getUserMoney().add(inOrOutMoney);
+    		user_money_limit = user.getUserMoneyLimit();
+    		curBalance = user_money_limit.add(user_money);
+    		
+    		updateUser.setUserMoney(user_money);
     	}
+    	
+    	
+    	int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
     	
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
         surplusPaymentCallbackDTO.setSurplus(inOrOutMoney);
@@ -388,7 +418,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
         }
 
         BigDecimal curBalance = user_money.add(user_money_limit);
-        int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(SessionUtil.getUserId(), user_money, user_money_limit);
+        
+        User updateUser = new User();
+        updateUser.setUserId(SessionUtil.getUserId());
+        updateUser.setUserMoney(user_money);
+        updateUser.setUserMoneyLimit(user_money_limit);
+        
+        int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
         if(moneyRst != 1) {
         	log.error("回滚更新用户账户资金异常");
         }

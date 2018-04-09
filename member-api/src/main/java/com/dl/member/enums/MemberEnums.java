@@ -22,7 +22,9 @@ public enum MemberEnums {
 	NO_BANKCARDS(301029,"当前用户下没有银行卡"),
 	DBDATA_IS_NULL(301030,"数据库无该数据"),
 	ORDER_PARAM_NOT_MATCH(301031,"与订单金额不符合"),
-	USERREAL_ALREADY_AUTH(301032,"用户已经认证过");
+	USERREAL_ALREADY_AUTH(301032,"用户已经认证过"),
+	PARAM_WRONG(301033,"参数错误");
+
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	
 //	NO_SHOP_MEM(301014,"用户不是店铺会员"),
