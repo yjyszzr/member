@@ -103,15 +103,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
             return ResultGenerator.genBadRequestResult("扣减余额不能为负数和0");
         }
         
-        OrderSnParam osm = new OrderSnParam();
-        osm.setOrderSn("123");
-        BaseResult<OrderDTO> ss = orderService.getOrderInfoByOrderSn(osm);
-        
-        LotteryPrintMoneyParam lotteryPrintMoneyParam = new LotteryPrintMoneyParam();
-        List<OrderDataParam> dtos = new LinkedList<OrderDataParam>();
-        lotteryPrintMoneyParam.setOrderDataDTOs(dtos);
-		orderService.updateOrderInfoByExchangeReward(lotteryPrintMoneyParam);
-        
         //校验
         // this.validMoneyMatchOrder(surplusPayParam);
 
