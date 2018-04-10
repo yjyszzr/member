@@ -1,23 +1,20 @@
 package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.member.dto.BatchResultDTO;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserRechargeDTO;
-import com.dl.member.dto.UserWithdrawDTO;
 import com.dl.member.dto.WithdrawalSnDTO;
 import com.dl.member.param.AmountParam;
 import com.dl.member.param.AmountTypeParam;
-import com.dl.member.param.PageParam;
-import com.dl.member.param.RollackSurplusPayParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
-import com.dl.member.param.UserAccountByTypeParam;
-import com.dl.member.param.UserAccountParam;
+import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserWithdrawParam;
 import com.dl.member.service.UserAccountService;
@@ -25,7 +22,6 @@ import com.dl.member.service.UserBonusService;
 import com.dl.member.service.UserRechargeService;
 import com.dl.member.service.UserWithdrawService;
 import com.github.pagehelper.PageInfo;
-
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -151,15 +147,23 @@ public class UserAccountController {
     }
     
 	/**
-	 * 内部使用的用户资金变动服务
+	 * 批量更新用户账户,给派奖使用
 	 * @param userAccountByTypeParam
 	 * @return
 	 */
-    @ApiOperation(value="内部使用的用户资金变动服务", notes="内部使用的用户资金变动服务",hidden=true)
-	@RequestMapping(path="/user/account/changeUserAccountByType", method=RequestMethod.POST)
-    public BaseResult<SurplusPaymentCallbackDTO> changeUserAccountByType(@Valid @RequestBody UserAccountByTypeParam userAccountByTypeParam){
-    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.commonCalculateMoney(userAccountByTypeParam.getInOrOutMoney(), userAccountByTypeParam.getType());
-    	return ResultGenerator.genSuccessResult("变动用户账户金额成功",surplusPaymentCallbackDTO);
+    @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=true)
+	@RequestMapping(path="/user/account/batchUpdateUserAccount", method=RequestMethod.POST)
+    public BaseResult<BatchResultDTO> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
+    	int rst = userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());
+    	BatchResultDTO batchResultDTO = new BatchResultDTO();
+    	batchResultDTO.setRst(rst);
+    	if(rst == 1) {
+    		return ResultGenerator.genSuccessResult("批量更新用户账户执行成功",batchResultDTO);
+    	}else {
+    		return ResultGenerator.genFailResult("批量更新用户账户执行失败",batchResultDTO);
+    	}
+
+    	
     }
     
 }

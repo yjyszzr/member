@@ -20,7 +20,7 @@ import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
-import com.dl.member.param.UserAccountByTypeParam;
+import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.UserWithdrawParam;
 //import com.pgt.shop.member.param.UserCapitalParam;
 //import com.pgt.shop.member.param.UserRefundParam;
@@ -115,7 +115,7 @@ public interface IUserAccountService {
 	 * @return
 	 */
 	@RequestMapping(path="/user/account/changeUserAccountByType", method=RequestMethod.POST)
-    public BaseResult<String> changeUserAccountByType(@Valid @RequestBody UserAccountByTypeParam userAccountByTypeParam);
+    public BaseResult<String> changeUserAccountByType(@Valid @RequestBody UserIdAndRewardListParam userAccountByTypeParam);
 	
 //	
 //	/**

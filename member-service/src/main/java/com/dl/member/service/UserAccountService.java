@@ -1,15 +1,15 @@
 package com.dl.member.service;
 import java.math.BigDecimal;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.Resource;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
@@ -25,6 +25,7 @@ import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
+import com.dl.member.dto.UserIdAndRewardDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
@@ -36,6 +37,8 @@ import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
 
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
@@ -60,6 +63,18 @@ public class UserAccountService extends AbstractService<UserAccount> {
     private UserWithdrawService userWithdrawService;
     
     public static SNGenerator snGenerator = new SNGenerator();
+    
+	@Value("${spring.datasource.druid.url}")
+	private String dbUrl;
+	
+	@Value("${spring.datasource.druid.username}")
+	private String dbUserName;
+	
+	@Value("${spring.datasource.druid.password}")
+	private String dbPass;
+	
+	@Value("${spring.datasource.druid.driver-class-name}")
+	private String dbDriver;
     
     
     /**
@@ -394,6 +409,28 @@ public class UserAccountService extends AbstractService<UserAccount> {
     }
     
     /**
+     * 中奖后批量更新用户账户
+     * @param userIdAndRewardList
+     */
+    public int batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList) {
+    	List<UserAccountParam> userAccountParamList = new ArrayList<>();
+    	
+    	userIdAndRewardList.stream().forEach(s->{
+    		UserAccountParam userAccountParam = new UserAccountParam();
+    		userAccountParam.setUserId(s.getUserId());
+    		userAccountParam.setAccountSn(snGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode()));
+    		userAccountParam.setAmount(s.getReward());
+    		userAccountParamList.add(userAccountParam);
+    	});
+    	
+    	int updateRst = this.updateBatchUserMoney(userIdAndRewardList);
+    	int insertRst = this.batchInsertUserAccount(userAccountParamList);
+    	
+    	return updateRst;
+    }
+    
+    
+    /**
      * 回滚余额支付的付款所用的钱
      * @param String orderSn,String surplus
      */
@@ -584,4 +621,96 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	}
 		return str;
     }
+    
+    
+	/**
+	 * 高速批量更新User 中的userMoney 10万条数据 18s
+	 * @param list
+	 */
+	public int updateBatchUserMoney(List<UserIdAndRewardDTO> list) {
+		Connection conn = null;
+		try {
+			Class.forName(dbDriver);
+			conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
+			conn.setAutoCommit(false);
+			String sql = "UPDATE dl_user SET user_money = user_money + ? WHERE user_id = ?";
+			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY,
+					ResultSet.CONCUR_READ_ONLY);
+			for (int x = 0, size = list.size(); x < size; x++) {
+				prest.setBigDecimal(1, list.get(x).getReward());
+				prest.setInt(2, list.get(x).getUserId());
+				prest.addBatch();
+			}
+			prest.executeBatch();
+			conn.commit();
+			conn.close();
+			return 1;
+		}catch (Exception ex) {
+			try {
+				conn.rollback();
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.error(DateUtil.getCurrentDateTime() + "执行updateBatchUserMoney异常，且回滚异常:" + ex.getMessage());
+				return -1;
+			}
+			log.error(DateUtil.getCurrentDateTime() + "执行updateBatchUserMoney异常，回滚成功:" + ex.getMessage());
+			return 0;
+		}
+	}
+	
+	/**
+	 * 高速批量插入UserAccount 10万条数据 18s
+	 * @param list
+	 * @return 0：执行批量操作异常，但是回滚成功  -1 执行批量操作异常，且回滚失败  1批量更新成功
+	 */
+	public int batchInsertUserAccount(List<UserAccountParam> list) {
+		int rowsTmp = 0;
+		int commitNum = 1000;
+		
+		Connection conn = null;
+		try {
+			Class.forName(dbDriver);
+			conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
+			conn.setAutoCommit(false);
+			String sql = "INSERT INTO dl_user_account(account_sn,user_id,amount,add_time,process_type) VALUES(?,?,?,?,?)";
+			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY,
+					ResultSet.CONCUR_READ_ONLY);
+			Integer addTime = DateUtil.getCurrentTimeLong();
+			for (int x = 0, size = list.size(); x < size; x++) {
+				prest.setString(1, list.get(x).getAccountSn());
+				prest.setInt(2, list.get(x).getUserId());
+				prest.setBigDecimal(3, list.get(x).getAmount());
+				prest.setInt(4, addTime);
+				prest.setInt(5, ProjectConstant.REWARD);
+				prest.addBatch();
+				
+                if(rowsTmp%commitNum == 0){//每1000条记录一提交  
+                	prest.executeBatch();  
+                    conn.commit();  
+                    if (null==conn) { //如果连接关闭了 就在创建一个 为什么要这样 原因是 conn.commit()后可能conn被关闭  
+                        conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
+                        conn.setAutoCommit(false);  
+                    }  
+                }  
+                rowsTmp++; 
+			}
+			
+			prest.executeBatch();
+			conn.commit();
+			
+			conn.setAutoCommit(true); 
+			conn.close();
+			return 1;
+		} catch (Exception ex) {
+			try {
+				conn.rollback();
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.error(DateUtil.getCurrentDateTime() + "执行batchInsertUserAccount异常，且回滚异常:" + ex.getMessage());
+				return -1;
+			}
+			log.error(DateUtil.getCurrentDateTime() + "执行batchInsertUserAccount异常，回滚成功:" + ex.getMessage());
+			return 0;
+		}
+	}
 }

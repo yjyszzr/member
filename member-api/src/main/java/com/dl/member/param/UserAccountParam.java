@@ -14,6 +14,9 @@ public class UserAccountParam {
     @ApiModelProperty(value = "账户名")
     private String userName;
     
+    @ApiModelProperty(value = "用户id")
+    private Integer userId;
+    
     @ApiModelProperty(value = "流水号")
     private String accountSn;
     
