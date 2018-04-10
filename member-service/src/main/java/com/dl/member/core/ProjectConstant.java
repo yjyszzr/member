@@ -68,10 +68,10 @@ public class ProjectConstant {
     public static final Integer ACCOUNT_ROLLBACK =6;//账户回滚
     public static final Integer REFOUND =7;
     
-    public static final Integer aliPay =0;
-    public static final Integer weixinPay =1;
-    public static final Integer yuePay =2;
-    public static final Integer mixPay =3;
+    public static final Integer aliPay = 0;
+    public static final Integer weixinPay = 1;
+    public static final Integer yuePay = 2;
+    public static final Integer mixPay = 3;
     
     
     public static final Integer ALL_LOTERRY_TYPE = 0;
