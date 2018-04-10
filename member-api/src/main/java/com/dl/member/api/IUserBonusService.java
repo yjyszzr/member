@@ -38,7 +38,7 @@ import io.swagger.annotations.ApiOperation;
 public interface IUserBonusService {
 	
 	
-	  /**
+	 /**
 	  * 根userBonusId查询红包
 	  *
 	  * @return

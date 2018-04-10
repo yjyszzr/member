@@ -39,7 +39,7 @@
 	  	SELECT * FROM dl_user_bonus
 		<where>
 		  	<if test="userId != null">
-		        user_id = #{userId}
+		        AND user_id = #{userId}
 		    </if>
 		    <if test="isDelete != null">
 		        AND is_delete = #{isDelete}
@@ -57,7 +57,7 @@
 		        AND start_time &lt;= #{startTime}
 		    </if>
 		    <if test="endTime != null">
-		        AND end_time &gt;= {endTime}
+		        AND end_time &gt;= #{endTime}
 		    </if>
 	    </where>
 	    order by add_time
