@@ -3,6 +3,7 @@ import java.math.BigDecimal;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
@@ -35,6 +36,8 @@ import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
+import com.dl.order.param.LotteryPrintMoneyParam;
+import com.dl.order.param.OrderDataParam;
 import com.dl.order.param.OrderSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -99,6 +102,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
         if (surplus.compareTo(BigDecimal.ZERO) == -1 || surplus.compareTo(BigDecimal.ZERO) == 0) {
             return ResultGenerator.genBadRequestResult("扣减余额不能为负数和0");
         }
+        
+        OrderSnParam osm = new OrderSnParam();
+        osm.setOrderSn("123");
+        BaseResult<OrderDTO> ss = orderService.getOrderInfoByOrderSn(osm);
+        
+        LotteryPrintMoneyParam lotteryPrintMoneyParam = new LotteryPrintMoneyParam();
+        List<OrderDataParam> dtos = new LinkedList<OrderDataParam>();
+        lotteryPrintMoneyParam.setOrderDataDTOs(dtos);
+		orderService.updateOrderInfoByExchangeReward(lotteryPrintMoneyParam);
         
         //校验
         // this.validMoneyMatchOrder(surplusPayParam);
