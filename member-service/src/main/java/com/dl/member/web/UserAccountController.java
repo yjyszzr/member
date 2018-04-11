@@ -55,7 +55,7 @@ public class UserAccountController {
 	 * @return
 	 */	
     @ApiOperation(value="余额支付引起的账户余额变动", notes="余额支付引起的账户余额变动",hidden=false)
-    @PostMapping("/addUserAccountByPay")
+    @PostMapping("/changeUserAccountByPay")
     public BaseResult<SurplusPaymentCallbackDTO> addUserAccountByPay(@RequestBody SurplusPayParam surplusPayParam) {
     	BaseResult<SurplusPaymentCallbackDTO> rst = userAccountService.addUserAccountByPay(surplusPayParam);
     	if(rst.getCode() != 0) {
@@ -152,7 +152,7 @@ public class UserAccountController {
 	 * @return
 	 */
     @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=true)
-	@RequestMapping(path="/user/account/batchUpdateUserAccount", method=RequestMethod.POST)
+	@RequestMapping(path="/batchUpdateUserAccount", method=RequestMethod.POST)
     public BaseResult<BatchResultDTO> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
     	int rst = userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());
     	BatchResultDTO batchResultDTO = new BatchResultDTO();
@@ -162,8 +162,6 @@ public class UserAccountController {
     	}else {
     		return ResultGenerator.genFailResult("批量更新用户账户执行失败",batchResultDTO);
     	}
-
-    	
     }
     
 }
