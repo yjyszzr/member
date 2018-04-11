@@ -110,11 +110,11 @@ public interface IUserAccountService {
     public BaseResult<String> updateUserAccount(@RequestBody UpdateUserAccountParam updateUserAccountParam);
 	
 	/**
-	 * 内部使用的用户资金变动服务
+	 * 内部使用的用户资金变动服务：目前仅提供给派奖使用
 	 * @param updateUserAccountParam
 	 * @return
 	 */
-	@RequestMapping(path="/user/account/changeUserAccountByType", method=RequestMethod.POST)
+	@RequestMapping(path="/user/account/batchUpdateUserAccount", method=RequestMethod.POST)
     public BaseResult<String> changeUserAccountByType(@Valid @RequestBody UserIdAndRewardListParam userAccountByTypeParam);
 	
 //	
