@@ -355,17 +355,17 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	updateUser.setUserId(SessionUtil.getUserId());
     	
     	if(ProjectConstant.BUY == type) {
-            money = user.getUserMoney().subtract(inOrOutMoney);
-            if (money.compareTo(BigDecimal.ZERO) >= 0) {//可提现余额 够	
-                user_money = money;
-                user_money_limit = user.getUserMoneyLimit();
-            	usedUserMoney = inOrOutMoney;
-            	usedUserMoneyLimit = BigDecimal.ZERO;
-            } else {//可提现余额 不够
-                user_money = BigDecimal.ZERO;
-                user_money_limit = user.getUserMoneyLimit().add(money);
-            	usedUserMoney = user.getUserMoney();
-            	usedUserMoneyLimit = inOrOutMoney.subtract(usedUserMoney);
+            money = user.getUserMoneyLimit().subtract(inOrOutMoney);
+            if (money.compareTo(BigDecimal.ZERO) >= 0) {//不可提现余额 够	
+                user_money = user.getUserMoney();
+                user_money_limit = money;
+            	usedUserMoney = BigDecimal.ZERO;
+            	usedUserMoneyLimit = inOrOutMoney;
+            } else {//不可提现余额 不够
+                user_money = user.getUserMoney().add(money);
+                user_money_limit = BigDecimal.ZERO;
+                usedUserMoneyLimit = user.getUserMoneyLimit();
+            	usedUserMoney = inOrOutMoney.subtract(usedUserMoneyLimit);
             }
             curBalance = user_money_limit.add(user_money);
             
