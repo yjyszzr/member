@@ -153,15 +153,8 @@ public class UserAccountController {
 	 */
     @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=false)
 	@RequestMapping(path="/batchUpdateUserAccount", method=RequestMethod.POST)
-    public BaseResult<BatchResultDTO> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
-    	int rst = userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());
-    	BatchResultDTO batchResultDTO = new BatchResultDTO();
-    	batchResultDTO.setRst(rst);
-    	if(rst == 1) {
-    		return ResultGenerator.genSuccessResult("批量更新用户账户执行成功",batchResultDTO);
-    	}else {
-    		return ResultGenerator.genFailResult("批量更新用户账户执行失败",batchResultDTO);
-    	}
+    public BaseResult<String> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
+    	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());
     }
     
 }

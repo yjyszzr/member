@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -420,18 +421,32 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * 中奖后批量更新用户账户的可提现余额
      * @param userIdAndRewardList
      */
-    public int batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList) {
+    public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList) {
+    	//查询该是否已经派发奖金
+    	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
+    	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
+    	if(!CollectionUtils.isEmpty(userAccountList)) {
+    		return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "含有已经派过奖金的订单，不进行批量更新用户账户");
+    	}
+    	
     	List<UserAccountParam> userAccountParamList = new ArrayList<>();
-    	List<Integer> userIdList = userAccountParamList.stream().map(s->s.getUserId()).collect(Collectors.toList());
+    	List<Integer> userIdList = userIdAndRewardList.stream().map(s->s.getUserId()).collect(Collectors.toList());
     	
     	List<User> userList = userMapper.queryUserByUserIds(userIdList);
     	Map<Integer,BigDecimal> userMoneyMap = userList.stream().collect(Collectors.toMap(User::getUserId, User::getUserMoney));
     	
     	//组装好每个用户的可提现余额是多少
-    	for(UserIdAndRewardDTO uo:userIdAndRewardList) {
-    		BigDecimal userMoney = userMoneyMap.get(uo.getUserId());
-    		if(null != userMoney) {
-    			uo.setUserMoney(userMoney);
+    	Map<Integer,List<UserIdAndRewardDTO>> userIdMap = userIdAndRewardList.stream().collect(Collectors.groupingBy(UserIdAndRewardDTO::getUserId));
+    	List<UserIdAndRewardDTO> updateList = new ArrayList<>();
+    	for(Map.Entry<Integer, List<UserIdAndRewardDTO>> entry : userIdMap.entrySet()){
+    		BigDecimal curUserMoney = userMoneyMap.get(entry.getKey());
+    		if(null != curUserMoney) {
+    			UserIdAndRewardDTO uo = new UserIdAndRewardDTO();
+    			List<UserIdAndRewardDTO> tempList =  entry.getValue();
+    			BigDecimal sameUserIdTotalMoney = tempList.stream().map(s->s.getReward()).reduce(BigDecimal.ZERO, BigDecimal::add);
+    			uo.setUserId(entry.getKey());
+    			uo.setUserMoney(curUserMoney.add(sameUserIdTotalMoney));
+    			updateList.add(uo);
     		}
     	}
     	
@@ -440,14 +455,21 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		userAccountParam.setUserId(s.getUserId());
     		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
     		userAccountParam.setAccountSn(accountSn);
+    		userAccountParam.setOrderSn(s.getOrderSn());
     		userAccountParam.setAmount(s.getReward());
+    		userAccountParam.setNote("中奖"+s.getReward()+"元");
+    		userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
     		userAccountParamList.add(userAccountParam);
     	});
     	
-    	int updateRst = this.updateBatchUserMoney(userIdAndRewardList);
+    	int updateRst = this.updateBatchUserMoney(updateList);
     	int insertRst = this.batchInsertUserAccount(userAccountParamList);
     	
-    	return updateRst;
+    	if(updateRst == 1 && insertRst == 1) {
+    		return ResultGenerator.genSuccessResult("批量更新用户账户成功");
+    	}else {
+    		return ResultGenerator.genFailResult("批量更新用户账户失败，请查看日志");
+    	}
     }
     
     
@@ -658,7 +680,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
 			for (int x = 0, size = list.size(); x < size; x++) {
-				prest.setBigDecimal(1, list.get(x).getReward());
+				prest.setBigDecimal(1, list.get(x).getUserMoney());
 				prest.setInt(2, list.get(x).getUserId());
 				prest.addBatch();
 			}
@@ -693,7 +715,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			Class.forName(dbDriver);
 			conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
 			conn.setAutoCommit(false);
-			String sql = "INSERT INTO dl_user_account(account_sn,user_id,amount,add_time,process_type) VALUES(?,?,?,?,?)";
+			String sql = "INSERT INTO dl_user_account(account_sn,user_id,amount,add_time,process_type,order_sn,note,status) VALUES(?,?,?,?,?,?,?,?)";
 			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			Integer addTime = DateUtil.getCurrentTimeLong();
@@ -703,6 +725,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 				prest.setBigDecimal(3, list.get(x).getAmount());
 				prest.setInt(4, addTime);
 				prest.setInt(5, ProjectConstant.REWARD);
+				prest.setString(6, list.get(x).getOrderSn());
+				prest.setString(7, list.get(x).getNote());
+				prest.setInt(8, list.get(x).getStatus());
 				prest.addBatch();
 				
                 if(rowsTmp%commitNum == 0){//每1000条记录一提交  
