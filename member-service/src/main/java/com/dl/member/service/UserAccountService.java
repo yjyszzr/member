@@ -3,8 +3,10 @@ import java.math.BigDecimal;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,8 +38,6 @@ import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
-import com.dl.order.param.LotteryPrintMoneyParam;
-import com.dl.order.param.OrderDataParam;
 import com.dl.order.param.OrderSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -417,11 +417,23 @@ public class UserAccountService extends AbstractService<UserAccount> {
     }
     
     /**
-     * 中奖后批量更新用户账户
+     * 中奖后批量更新用户账户的可提现余额
      * @param userIdAndRewardList
      */
     public int batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList) {
     	List<UserAccountParam> userAccountParamList = new ArrayList<>();
+    	List<Integer> userIdList = userAccountParamList.stream().map(s->s.getUserId()).collect(Collectors.toList());
+    	
+    	List<User> userList = userMapper.queryUserByUserIds(userIdList);
+    	Map<Integer,BigDecimal> userMoneyMap = userList.stream().collect(Collectors.toMap(User::getUserId, User::getUserMoney));
+    	
+    	//组装好每个用户的可提现余额是多少
+    	for(UserIdAndRewardDTO uo:userIdAndRewardList) {
+    		BigDecimal userMoney = userMoneyMap.get(uo.getUserId());
+    		if(null != userMoney) {
+    			uo.setUserMoney(userMoney);
+    		}
+    	}
     	
     	userIdAndRewardList.stream().forEach(s->{
     		UserAccountParam userAccountParam = new UserAccountParam();
@@ -642,8 +654,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			Class.forName(dbDriver);
 			conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
 			conn.setAutoCommit(false);
-			String sql = "UPDATE dl_user SET user_money = user_money + ? WHERE user_id = ?";
-			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY,
+			String sql = "UPDATE dl_user SET user_money =  ? WHERE user_id = ?";
+			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
 			for (int x = 0, size = list.size(); x < size; x++) {
 				prest.setBigDecimal(1, list.get(x).getReward());

@@ -151,7 +151,7 @@ public class UserAccountController {
 	 * @param userAccountByTypeParam
 	 * @return
 	 */
-    @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=true)
+    @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=false)
 	@RequestMapping(path="/batchUpdateUserAccount", method=RequestMethod.POST)
     public BaseResult<BatchResultDTO> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
     	int rst = userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());

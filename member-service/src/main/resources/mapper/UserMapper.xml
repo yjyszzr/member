@@ -38,6 +38,7 @@
     <result column="user_remark" jdbcType="LONGVARCHAR" property="userRemark" />
   </resultMap>
   
+  
   <insert id="insertWithReturnId"  parameterType="com.dl.member.model.User">
 	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="userId">    
       SELECT LAST_INSERT_ID() AS USERID     
@@ -86,5 +87,13 @@
 		reg_from,user_status,
 		pass_wrong_count,user_type,is_real,user_remark 
   	 	FROM dl_user WHERE user_id = #{userId}
+  </select>
+  
+  
+  <select id="queryUserByUserIds" resultMap="BaseResultMap">
+  	 	SELECT * FROM dl_user WHERE user_id IN
+	  	<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+	         #{item}  
+	    </foreach>
   </select>
 </mapper>

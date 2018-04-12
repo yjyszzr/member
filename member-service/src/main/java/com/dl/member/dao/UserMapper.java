@@ -1,6 +1,7 @@
 package com.dl.member.dao;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -19,4 +20,9 @@ public interface UserMapper extends Mapper<User> {
 	 * @return
 	 */
 	int updateUserMoneyAndUserMoneyLimit(User user);
+	
+	/**
+	 * 查询多个用户的当前余额
+	 */
+	List<User> queryUserByUserIds(@Param("list") List list);
 }
