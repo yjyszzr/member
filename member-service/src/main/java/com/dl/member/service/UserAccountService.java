@@ -482,50 +482,72 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	String inPrams = JSON.toJSONString(surplusPayParam);
     	log.info(DateUtil.getCurrentDateTime()+"使用到了部分或全部余额时候回滚支付传递的参数:"+inPrams);
     	
-    	Integer userId= SessionUtil.getUserId();
-    	User user = userService.findById(userId);
-    	BigDecimal surplus = surplusPayParam.getSurplus();
-        BigDecimal money = BigDecimal.ZERO;
-        BigDecimal user_money = new BigDecimal(0); //用户账户剩下的可提现余额
-        BigDecimal user_money_limit = new BigDecimal(0);// 用户账户剩下的不可提现余额
-        money = surplus.subtract(user.getUserMoney());
-        if (money.compareTo(BigDecimal.ZERO) <= 0) {//扣减的钱依然比当前账户的可用余额要小
-        	user_money = user.getUserMoney().add(surplus);
-        	user_money_limit = user.getUserMoneyLimit();
-        } else {//当前账户的可用余额  不够 扣减的钱
-        	user_money =  BigDecimal.ZERO;
-        	user_money_limit = user.getUserMoneyLimit().add(money);
-        }
-
-        BigDecimal curBalance = user_money.add(user_money_limit);
-        
-        User updateUser = new User();
-        updateUser.setUserId(SessionUtil.getUserId());
+    	Integer userId = SessionUtil.getUserId();
+        User user = userService.findById(userId);
+    	
+    	UserAccount userAccount = new UserAccount();
+    	userAccount.setUserId(SessionUtil.getUserId());
+    	userAccount.setOrderSn(surplusPayParam.getOrderSn());
+    	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
+    	if(CollectionUtils.isEmpty(userAccountList)) {
+    		return null;
+    	}
+    	
+    	User updateUser = new User();
+    	UserAccount  rollBackUserAccount = userAccountList.get(0);
+        BigDecimal user_money = user.getUserMoney().add(rollBackUserAccount.getUserSurplus());
+        BigDecimal user_money_limit = user.getUserMoneyLimit().add(rollBackUserAccount.getUserSurplusLimit());
+        updateUser.setUserId(user.getUserId());
         updateUser.setUserMoney(user_money);
         updateUser.setUserMoneyLimit(user_money_limit);
-        
         int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
-        if(moneyRst != 1) {
-        	log.error("回滚更新用户账户资金异常");
-        }
         
-        UserAccountParam userAccountParam = new UserAccountParam();
-        String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
-        userAccountParam.setAccountSn(accountSn);
-        userAccountParam.setAmount(surplus);
-        userAccountParam.setCurBalance(curBalance);
-        userAccountParam.setAccountType(ProjectConstant.ACCOUNT_ROLLBACK);
-        userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
-        userAccountParam.setPaymentName(surplusPayParam.getThirdPartName());
-        userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
-        userAccountParam.setThirdPartPaid(BigDecimal.ZERO);
-        userAccountParam.setUserSurplus(BigDecimal.ZERO);
-        userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
-        userAccountParam.setUserName(user.getUserName());
-        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-        userAccountParam.setNote("");
-        userAccountParam.setPayId("");
-        this.saveAccount(userAccountParam);
+    	this.deleteById(userAccountList.get(0).getId());
+    	
+//    	Integer userId= SessionUtil.getUserId();
+//    	User user = userService.findById(userId);
+//    	BigDecimal surplus = surplusPayParam.getSurplus();
+//        BigDecimal money = BigDecimal.ZERO;
+//        BigDecimal user_money = new BigDecimal(0); //用户账户剩下的可提现余额
+//        BigDecimal user_money_limit = new BigDecimal(0);// 用户账户剩下的不可提现余额
+//        money = surplus.subtract(user.getUserMoneyLimit());
+//        if (money.compareTo(BigDecimal.ZERO) <= 0) {//扣减的钱依然比当前账户的不可提现余额要小
+//        	user_money = user.getUserMoney();
+//        	user_money_limit = user.getUserMoneyLimit().add(surplus);
+//        } else {//当前账户的不可提现余额  不够 扣减的钱
+//        	user_money =  BigDecimal.ZERO;
+//        	user_money_limit = user.getUserMoneyLimit().add(money);
+//        }
+//
+//        BigDecimal curBalance = user_money.add(user_money_limit);
+//        
+//        User updateUser = new User();
+//        updateUser.setUserId(SessionUtil.getUserId());
+//        updateUser.setUserMoney(user_money);
+//        updateUser.setUserMoneyLimit(user_money_limit);
+//        
+//        int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+//        if(moneyRst != 1) {
+//        	log.error("回滚更新用户账户资金异常");
+//        }
+//        
+//        UserAccountParam userAccountParam = new UserAccountParam();
+//        String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+//        userAccountParam.setAccountSn(accountSn);
+//        userAccountParam.setAmount(surplus);
+//        userAccountParam.setCurBalance(curBalance);
+//        userAccountParam.setAccountType(ProjectConstant.ACCOUNT_ROLLBACK);
+//        userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
+//        userAccountParam.setPaymentName(surplusPayParam.getThirdPartName());
+//        userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
+//        userAccountParam.setThirdPartPaid(BigDecimal.ZERO);
+//        userAccountParam.setUserSurplus(BigDecimal.ZERO);
+//        userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
+//        userAccountParam.setUserName(user.getUserName());
+//        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
+//        userAccountParam.setNote("");
+//        userAccountParam.setPayId("");
+//        this.saveAccount(userAccountParam);
         
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
         surplusPaymentCallbackDTO.setSurplus(BigDecimal.ZERO);

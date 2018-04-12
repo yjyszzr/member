@@ -42,6 +42,9 @@
 		    <if test="accountSn != null">
 		        AND account_sn = #{accountSn}
 		    </if>
+		    <if test="orderSn != null">
+		        AND order_sn = #{orderSn}
+		    </if>
 	    </where>
   		ORDER BY add_time
   </select>
