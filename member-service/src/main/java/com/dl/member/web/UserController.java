@@ -2,10 +2,14 @@ package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.UserDTO;
+import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.User;
 import com.dl.member.param.MobileNumberParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UserLoginPassParam;
 import com.dl.member.service.UserService;
+import com.dl.member.util.TokenUtil;
+
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,6 +60,23 @@ public class UserController {
     public BaseResult<UserDTO> queryUserInfo(@RequestBody StrParam strParam){
     	UserDTO userDTO = userService.queryUserByUserIdExceptPass();
     	return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
+    }
+    
+    /**
+     * 根据手机号获取token
+     * @param mobileNumberParam
+     * @return
+     */
+    @ApiOperation(value = "根据手机号获取token(不提供调用)", notes = "根据手机号获取token(不提供调用)")
+    @PostMapping("/getTokenByMobile")
+    public BaseResult<String> getTokenByMobile(@RequestBody MobileNumberParam mobileNumberParam) {
+    	User user = userService.findBy("mobile", mobileNumberParam.getMobileNumber());
+    	if(null == user) {
+    		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "没有该用户，无法生成token");
+    	}
+    	
+    	String token = TokenUtil.genToken(user.getUserId(), 1);
+    	return ResultGenerator.genSuccessResult("获取token成功", token);
     }
     	  
 }
