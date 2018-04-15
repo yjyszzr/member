@@ -12,7 +12,5 @@ import javax.annotation.Resource;
 public class UserCollectService extends AbstractService<UserCollect> {
     @Resource
     private UserCollectMapper userCollectMapper;
-    
-    
 
 }

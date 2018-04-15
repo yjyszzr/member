@@ -14,6 +14,9 @@ public class UserCollect {
     @Column(name = "article_id")
     private String articleId;
 
+    @Column(name = "article_title")
+    private String articleTitle;
+
     /**
      * 添加时间
      */
@@ -25,23 +28,14 @@ public class UserCollect {
      */
     @Column(name = "collect_from")
     private String collectFrom;
-    
-    /**
-     * 用户id
-     */
+
+    @Column(name = "dl_user_collectcol")
+    private String dlUserCollectcol;
+
     @Column(name = "user_id")
     private Integer userId;
-    
 
-    public Integer getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
-
-	/**
+    /**
      * @return id
      */
     public Integer getId() {
@@ -71,6 +65,20 @@ public class UserCollect {
      */
     public void setArticleId(String articleId) {
         this.articleId = articleId;
+    }
+
+    /**
+     * @return article_title
+     */
+    public String getArticleTitle() {
+        return articleTitle;
+    }
+
+    /**
+     * @param articleTitle
+     */
+    public void setArticleTitle(String articleTitle) {
+        this.articleTitle = articleTitle;
     }
 
     /**
@@ -107,5 +115,33 @@ public class UserCollect {
      */
     public void setCollectFrom(String collectFrom) {
         this.collectFrom = collectFrom;
+    }
+
+    /**
+     * @return dl_user_collectcol
+     */
+    public String getDlUserCollectcol() {
+        return dlUserCollectcol;
+    }
+
+    /**
+     * @param dlUserCollectcol
+     */
+    public void setDlUserCollectcol(String dlUserCollectcol) {
+        this.dlUserCollectcol = dlUserCollectcol;
+    }
+
+    /**
+     * @return user_id
+     */
+    public Integer getUserId() {
+        return userId;
+    }
+
+    /**
+     * @param userId
+     */
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 }
