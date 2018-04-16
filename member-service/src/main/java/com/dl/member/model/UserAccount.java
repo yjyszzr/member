@@ -93,7 +93,18 @@ public class UserAccount {
     @Column(name = "status")
     private Integer status;
     
-    public Integer getStatus() {
+    @Column(name = "bonus_price")
+    private BigDecimal bonusPrice;
+    
+    public BigDecimal getBonusPrice() {
+		return bonusPrice;
+	}
+
+	public void setBonusPrice(BigDecimal bonusPrice) {
+		this.bonusPrice = bonusPrice;
+	}
+
+	public Integer getStatus() {
 		return status;
 	}
 

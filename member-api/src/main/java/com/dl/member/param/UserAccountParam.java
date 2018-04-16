@@ -62,6 +62,9 @@ public class UserAccountParam {
     @ApiModelProperty(value = "最后更新时间")
     private Integer lastTime;
     
+    @ApiModelProperty(value = "使用的红包的金额")
+    private BigDecimal bonusPrice;
+    
     
     
     

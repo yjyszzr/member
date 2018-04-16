@@ -114,16 +114,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setAccountSn(accountSn);
         Integer payType = surplusPayParam.getPayType();
         if(PayEnum.YUEPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(PayEnum.YUEPAY.getMsg());
+        	userAccountParam.setPaymentName(String.valueOf(PayEnum.YUEPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplus));
         }else if(PayEnum.WEIXINPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(PayEnum.WEIXINPAY.getMsg());
+        	userAccountParam.setPaymentName(String.valueOf(PayEnum.WEIXINPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getThirdPartPaid()));
         }else if(PayEnum.ALIPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(PayEnum.ALIPAY.getMsg());
+        	userAccountParam.setPaymentName(String.valueOf(PayEnum.ALIPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getThirdPartPaid()));
         } if(PayEnum.MIXPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(PayEnum.MIXPAY.getMsg());
+        	userAccountParam.setPaymentName(String.valueOf(PayEnum.MIXPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
         }
         
@@ -134,6 +134,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setThirdPartPaid(surplusPayParam.getThirdPartPaid() == null ?BigDecimal.ZERO:surplusPayParam.getThirdPartPaid());
         userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
+        userAccountParam.setBonusPrice(surplusPayParam.getBonusMoney());
         userAccountParam.setUserName(user.getUserName());
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
         if(PayEnum.YUEPAY.getCode().equals(payType)) {
@@ -208,17 +209,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
     public String createNote(SurplusPayParam surplusPayParam) {
     	String noteStr = "";
     	Integer payType = surplusPayParam.getPayType();
-    	if(payType.equals(ProjectConstant.yuePay)) {
-    		noteStr = "余额支付"+surplusPayParam.getSurplus()+"元";
-    	}else if(payType.equals(ProjectConstant.aliPay) || payType.equals(ProjectConstant.weixinPay)) {
-    		noteStr = surplusPayParam.getThirdPartName()+"支付"+surplusPayParam.getThirdPartPaid()+"元";
-    	}else if(payType.equals(ProjectConstant.mixPay)) {
+    	if(null != surplusPayParam.getBonusMoney() && surplusPayParam.getBonusMoney().compareTo(BigDecimal.ZERO) == 1) {
+    		noteStr = noteStr + "红包支付"+surplusPayParam.getBonusMoney()+"元";
+    	}
+    	
+    	if(payType.equals(ProjectConstant.mixPay)) {
         	noteStr = surplusPayParam.getThirdPartName()+"支付"+surplusPayParam.getThirdPartPaid()+"元\n"
     		        +"余额支付"+surplusPayParam.getSurplus()+"元";
     	}
-    	if(null != surplusPayParam.getBonusMoney()) {
-    		noteStr = noteStr + "\n红包支付"+surplusPayParam.getBonusMoney()+"元";
-    	}
+
 		return noteStr;
     }
     /**
@@ -589,11 +588,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setStatus(showStatus(ua.getProcessType(),ua.getId()));
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeChar(createProcessTypeString(ua.getProcessType()));
-            String noteStr = ua.getNote();
-            String firstNote =noteStr.substring(0,noteStr.indexOf("\n"));
-            String lastNote = noteStr.substring(noteStr.indexOf("\n")+1);
-            userAccountDTO.setProcessTypeName(firstNote);
-            userAccountDTO.setNote(lastNote);
+            userAccountDTO.setProcessTypeName(PayEnum.getName(Integer.valueOf(ua.getPaymentName())));
+            userAccountDTO.setNote(ua.getNote());
             String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1? "¥ " + "+" +ua.getAmount():"¥ " +String.valueOf(ua.getAmount());
             userAccountDTO.setChangeAmount(changeAmount);
             userAccountListDTO.add(userAccountDTO);
@@ -645,6 +641,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	userAccount.setStatus(userAccountParam.getStatus());
     	userAccount.setNote(userAccountParam.getNote());
     	userAccount.setParentSn("");
+    	userAccount.setBonusPrice(userAccountParam.getBonusPrice() != null?userAccountParam.getBonusPrice():BigDecimal.ZERO);
     	
     	int rst = userAccountMapper.insertUserAccount(userAccount);
     	if(rst != 1) {
