@@ -21,7 +21,7 @@ public class UserCollect {
      * 添加时间
      */
     @Column(name = "add_time")
-    private String addTime;
+    private Integer addTime;
 
     /**
      * 收藏来源
@@ -29,8 +29,6 @@ public class UserCollect {
     @Column(name = "collect_from")
     private String collectFrom;
 
-    @Column(name = "dl_user_collectcol")
-    private String dlUserCollectcol;
 
     @Column(name = "user_id")
     private Integer userId;
@@ -86,7 +84,7 @@ public class UserCollect {
      *
      * @return add_time - 添加时间
      */
-    public String getAddTime() {
+    public Integer getAddTime() {
         return addTime;
     }
 
@@ -95,7 +93,7 @@ public class UserCollect {
      *
      * @param addTime 添加时间
      */
-    public void setAddTime(String addTime) {
+    public void setAddTime(Integer addTime) {
         this.addTime = addTime;
     }
 
@@ -117,19 +115,6 @@ public class UserCollect {
         this.collectFrom = collectFrom;
     }
 
-    /**
-     * @return dl_user_collectcol
-     */
-    public String getDlUserCollectcol() {
-        return dlUserCollectcol;
-    }
-
-    /**
-     * @param dlUserCollectcol
-     */
-    public void setDlUserCollectcol(String dlUserCollectcol) {
-        this.dlUserCollectcol = dlUserCollectcol;
-    }
 
     /**
      * @return user_id
