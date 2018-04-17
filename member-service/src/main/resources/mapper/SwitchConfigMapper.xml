@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.SwitchConfigMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.SwitchConfig">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="turn_on" jdbcType="INTEGER" property="turnOn" />
+    <id column="business_type" jdbcType="INTEGER" property="businessType" />
+    <id column="platform" jdbcType="INTEGER" property="platform" />
+    <id column="version" jdbcType="VARCHAR" property="version" />
+  </resultMap>
+  
+  <select id="querySwitchConfigTurnOff" parameterType="java.lang.String" resultMap="BaseResultMap">
+  	   select *  from dl_switch_config where  platform = #{platform} and business_type = #{businessType}
+  </select>
+</mapper>
