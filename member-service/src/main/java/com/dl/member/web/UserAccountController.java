@@ -65,7 +65,7 @@ public class UserAccountController {
     	return ResultGenerator.genSuccessResult("扣减余额成功",surplusPaymentCallbackDTO);
     }
     
-    @ApiOperation(value="回滚账户的余额和订单的余额", notes="回滚账户的余额和订单的余额",hidden=false)
+    @ApiOperation(value="余额支付或混合支付失败回滚账户的余额", notes="余额支付或混合支付失败回滚账户的余额",hidden=false)
     @PostMapping("/rollbackUserAccountChangeByPay")
     public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(@RequestBody SurplusPayParam surplusPayParam) {
     	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.rollbackUserAccountChangeByPay(surplusPayParam);
@@ -151,17 +151,10 @@ public class UserAccountController {
 	 * @param userAccountByTypeParam
 	 * @return
 	 */
-    @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=true)
+    @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=false)
 	@RequestMapping(path="/batchUpdateUserAccount", method=RequestMethod.POST)
-    public BaseResult<BatchResultDTO> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
-    	int rst = userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());
-    	BatchResultDTO batchResultDTO = new BatchResultDTO();
-    	batchResultDTO.setRst(rst);
-    	if(rst == 1) {
-    		return ResultGenerator.genSuccessResult("批量更新用户账户执行成功",batchResultDTO);
-    	}else {
-    		return ResultGenerator.genFailResult("批量更新用户账户执行失败",batchResultDTO);
-    	}
+    public BaseResult<String> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
+    	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());
     }
     
 }

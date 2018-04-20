@@ -42,6 +42,9 @@
 		    <if test="accountSn != null">
 		        AND account_sn = #{accountSn}
 		    </if>
+		    <if test="orderSn != null">
+		        AND order_sn = #{orderSn}
+		    </if>
 	    </where>
   		ORDER BY add_time
   </select>
@@ -52,6 +55,13 @@
   		and user_id = #{userId};
   </select>
   
+  <select id="queryUserAccountRewardByOrdersn" parameterType="java.lang.Integer"  resultMap="BaseResultMap">
+  		select *  from dl_user_account 
+  		where process_type = 1 and  order_sn in
+  		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+	         #{item}  
+	    </foreach>
+  </select>
   <!--  <sql id="key">
       <trim suffixOverrides=",">
         <if test="accountSn!=null">

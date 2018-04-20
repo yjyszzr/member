@@ -15,4 +15,6 @@ public interface UserAccountMapper extends Mapper<UserAccount> {
 	
 	List<UserAccount> queryUserAccountCurMonth(@Param("userId") Integer userId);
 	
+	List<UserAccount> queryUserAccountRewardByOrdersn(@Param("list") List<String> list);
+	
 }
