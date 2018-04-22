@@ -4,6 +4,9 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.base.util.UUIDGenerator;
+import com.dl.lottery.api.ILotteryArticleService;
+import com.dl.lottery.dto.DLArticleDTO;
+import com.dl.lottery.param.ArticleIdsParam;
 import com.dl.member.dto.UserCollectDTO;
 import com.dl.member.model.UserCollect;
 import com.dl.member.param.IDParam;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
 * Created by zhangzirong on 2018/04/13.
@@ -33,6 +37,9 @@ import java.util.List;
 public class UserCollectController {
     @Resource
     private UserCollectService userCollectService;
+    
+    @Resource
+    private ILotteryArticleService lotteryArticleService;
 
     @ApiOperation(value = "添加收藏", notes = "添加收藏")
     @PostMapping("/add")
@@ -40,7 +47,6 @@ public class UserCollectController {
     	Integer userId = SessionUtil.getUserId();
     	UserCollect userCollect = new UserCollect();
     	userCollect.setArticleId(userCollectParam.getArticleId());
-    	userCollect.setArticleTitle(userCollectParam.getArticleTitle());
     	userCollect.setCollectFrom(userCollectParam.getCollectFrom());
     	userCollect.setAddTime(DateUtil.getCurrentTimeLong());
     	userCollect.setUserId(userId);
@@ -57,29 +63,22 @@ public class UserCollectController {
 
     @ApiOperation(value = "用户收藏列表", notes = "用户收藏列表")
     @PostMapping("/list")
-    public BaseResult<PageInfo<UserCollectDTO>> list(@RequestBody PageParam pageParam) {
+    public BaseResult<PageInfo<DLArticleDTO>> list(@RequestBody PageParam pageParam) {
         List<UserCollectDTO> userCollectDTOList = new ArrayList<>();
         PageHelper.startPage(pageParam.getPageNum(), pageParam.getPageSize());
-        Integer userId = SessionUtil.getUserId();
-        Condition c = new Condition(UserCollect.class);
-        Criteria criteria = c.createCriteria();
-        criteria.andCondition("user_id =", userId);
-        List<UserCollect> userCollectList = userCollectService.findByCondition(c);
+        List<UserCollect> userCollectList = userCollectService.queryMyCollectList();
         if(CollectionUtils.isEmpty(userCollectList)) {
-        	 return ResultGenerator.genSuccessResult("success",new PageInfo<UserCollectDTO>());
+        	return ResultGenerator.genSuccessResult("success",new PageInfo<DLArticleDTO>());
         }
         
-        PageInfo<UserCollect> pageInfo = new PageInfo<UserCollect>(userCollectList);
-        UserCollectDTO userCollectDTO = new UserCollectDTO();
-        userCollectList.forEach(s->{
-        	BeanUtils.copyProperties(s, userCollectDTO);
-        	userCollectDTOList.add(userCollectDTO);
-        });
-        
-		PageInfo<UserCollectDTO> result = new PageInfo<UserCollectDTO>();
-		BeanUtils.copyProperties(pageInfo, result);
-		result.setList(userCollectDTOList);
+        List<Integer> myArticleIds = userCollectList.stream().map(s->Integer.valueOf(s.getArticleId())).collect(Collectors.toList());
+        ArticleIdsParam articleIdsParam = new ArticleIdsParam();
+        articleIdsParam.setArticleIds(myArticleIds);
+        BaseResult<PageInfo<com.dl.lottery.dto.DLArticleDTO>> myCollectArticlesRst = lotteryArticleService.queryArticlesByIds(articleIdsParam);
+        if(myCollectArticlesRst.getCode() != 0) {
+        	return ResultGenerator.genSuccessResult("success",new PageInfo<DLArticleDTO>());
+        }
 		
-		return ResultGenerator.genSuccessResult("success", result);
+		return ResultGenerator.genSuccessResult("success", myCollectArticlesRst.getData());
     }
 }

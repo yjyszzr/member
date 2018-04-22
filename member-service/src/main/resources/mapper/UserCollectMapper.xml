@@ -7,10 +7,19 @@
     -->
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="article_id" jdbcType="VARCHAR" property="articleId" />
-    <result column="article_title" jdbcType="VARCHAR" property="articleTitle" />
     <result column="add_time" jdbcType="VARCHAR" property="addTime" />
     <result column="collect_from" jdbcType="VARCHAR" property="collectFrom" />
     <result column="dl_user_collectcol" jdbcType="VARCHAR" property="dlUserCollectcol" />
     <result column="user_id" jdbcType="INTEGER" property="userId" />
   </resultMap>
+  
+  <select id="queryUserCollectListBySelective"  resultMap="BaseResultMap">
+	  	SELECT * FROM dl_user_collect
+		<where>
+		  	<if test="userId != null">
+		        AND user_id = #{userId}
+		    </if>
+	    </where>
+	    order by add_time
+  </select>
 </mapper>

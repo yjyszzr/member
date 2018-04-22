@@ -46,7 +46,7 @@
 		        AND order_sn = #{orderSn}
 		    </if>
 	    </where>
-  		ORDER BY add_time
+  		ORDER BY add_time DESC
   </select>
   
   <select id="queryUserAccountCurMonth" parameterType="java.lang.Integer"  resultMap="BaseResultMap">

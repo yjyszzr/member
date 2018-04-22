@@ -14,8 +14,6 @@ public class UserCollect {
     @Column(name = "article_id")
     private String articleId;
 
-    @Column(name = "article_title")
-    private String articleTitle;
 
     /**
      * 添加时间
@@ -65,19 +63,6 @@ public class UserCollect {
         this.articleId = articleId;
     }
 
-    /**
-     * @return article_title
-     */
-    public String getArticleTitle() {
-        return articleTitle;
-    }
-
-    /**
-     * @param articleTitle
-     */
-    public void setArticleTitle(String articleTitle) {
-        this.articleTitle = articleTitle;
-    }
 
     /**
      * 获取添加时间
