@@ -128,7 +128,7 @@ public class UserCollectController {
 	 * @return 0-已收藏 1-取消收藏
 	 */
     @ApiOperation(value = "用户收藏列表", notes = "用户收藏列表")
-	@RequestMapping(path="/user/isCollect", method=RequestMethod.POST)
+	@RequestMapping(path="/isCollect", method=RequestMethod.POST)
 	public BaseResult<Integer> isCollect(@RequestBody ArticleIdParam articleIdParam){
     	Integer userId = SessionUtil.getUserId();
     	UserCollect userCollect = new UserCollect();
