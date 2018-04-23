@@ -11,15 +11,30 @@
     <result column="collect_from" jdbcType="VARCHAR" property="collectFrom" />
     <result column="dl_user_collectcol" jdbcType="VARCHAR" property="dlUserCollectcol" />
     <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    
   </resultMap>
   
-  <select id="queryUserCollectListBySelective"  resultMap="BaseResultMap">
+  <select id="queryUserCollectListBySelective" parameterType="com.dl.member.model.UserCollect"  resultMap="BaseResultMap">
 	  	SELECT * FROM dl_user_collect
 		<where>
+			<if test="id != null">
+		        AND id = #{id}
+		    </if>
 		  	<if test="userId != null">
 		        AND user_id = #{userId}
+		    </if>
+		    <if test="articleId != null">
+		        AND article_id = #{articleId}
+		    </if>
+		    <if test="isDelete != null">
+		        AND is_delete = #{isDelete}
 		    </if>
 	    </where>
 	    order by add_time
   </select>
+  
+  <update id="updateUserCollect"  parameterType="java.lang.Integer">
+        UPDATE dl_user_collect SET is_delete= #{isDelete}  where user_id = #{userId} and article_id = #{articleId}
+  </update>
 </mapper>

@@ -12,7 +12,7 @@ public class UserCollect {
      * 文章id
      */
     @Column(name = "article_id")
-    private String articleId;
+    private Integer articleId;
 
 
     /**
@@ -30,8 +30,19 @@ public class UserCollect {
 
     @Column(name = "user_id")
     private Integer userId;
+    
+    @Column(name = "is_delete")
+    private Integer isDelete;
 
-    /**
+    public Integer getIsDelete() {
+		return isDelete;
+	}
+
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
+	}
+
+	/**
      * @return id
      */
     public Integer getId() {
@@ -50,7 +61,7 @@ public class UserCollect {
      *
      * @return article_id - 文章id
      */
-    public String getArticleId() {
+    public Integer getArticleId() {
         return articleId;
     }
 
@@ -59,7 +70,7 @@ public class UserCollect {
      *
      * @param articleId 文章id
      */
-    public void setArticleId(String articleId) {
+    public void setArticleId(Integer articleId) {
         this.articleId = articleId;
     }
 

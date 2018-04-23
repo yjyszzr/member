@@ -9,5 +9,7 @@ import com.dl.member.model.UserCollect;
 
 public interface UserCollectMapper extends Mapper<UserCollect> {
 	
-	List<UserCollect> queryUserCollectListBySelective(@Param("userId") Integer userId);
+	List<UserCollect> queryUserCollectListBySelective(UserCollect userCollect);
+	
+	int updateUserCollect(@Param("isDelete") Integer isDelete,@Param("userId") Integer userId,@Param("articleId") Integer articleId);
 }
