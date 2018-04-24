@@ -483,7 +483,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	Integer userId = SessionUtil.getUserId();
         User user = userService.findById(userId);
-    	
+    	if(null == user) {
+    		log.info("用户获取 为空：userId="+userId);
+    		return null;
+    	}
     	UserAccount userAccount = new UserAccount();
     	userAccount.setUserId(SessionUtil.getUserId());
     	userAccount.setOrderSn(surplusPayParam.getOrderSn());
@@ -498,6 +501,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	BigDecimal userSurplusLimit = rollBackUserAccount.getUserSurplusLimit();
     	boolean isModify = false;
     	if(userSurplus != null && userSurplus.doubleValue() > 0) {
+    		log.info("user money: "+ user.getUserMoney());
     		BigDecimal user_money = user.getUserMoney().add(userSurplus);
     		updateUser.setUserMoney(user_money);
     		isModify = true;
