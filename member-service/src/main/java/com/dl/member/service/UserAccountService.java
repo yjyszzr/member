@@ -494,12 +494,23 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	User updateUser = new User();
     	UserAccount  rollBackUserAccount = userAccountList.get(0);
-        BigDecimal user_money = user.getUserMoney().add(rollBackUserAccount.getUserSurplus());
-        BigDecimal user_money_limit = user.getUserMoneyLimit().add(rollBackUserAccount.getUserSurplusLimit());
-        updateUser.setUserId(user.getUserId());
-        updateUser.setUserMoney(user_money);
-        updateUser.setUserMoneyLimit(user_money_limit);
-        int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+    	BigDecimal userSurplus = rollBackUserAccount.getUserSurplus();
+    	BigDecimal userSurplusLimit = rollBackUserAccount.getUserSurplusLimit();
+    	boolean isModify = false;
+    	if(userSurplus != null && userSurplus.doubleValue() > 0) {
+    		BigDecimal user_money = user.getUserMoney().add(userSurplus);
+    		updateUser.setUserMoney(user_money);
+    		isModify = true;
+    	}
+    	if(userSurplusLimit != null && userSurplusLimit.doubleValue() > 0) {
+    		BigDecimal user_money_limit = user.getUserMoneyLimit().add(userSurplusLimit);
+    		updateUser.setUserMoneyLimit(user_money_limit);
+    		isModify = true;
+    	}
+    	if(isModify) {
+    		updateUser.setUserId(user.getUserId());
+    		int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+    	}
         
     	this.deleteById(userAccountList.get(0).getId());
     	
