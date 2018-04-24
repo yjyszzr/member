@@ -481,12 +481,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	String inPrams = JSON.toJSONString(surplusPayParam);
     	log.info(DateUtil.getCurrentDateTime()+"使用到了部分或全部余额时候回滚支付传递的参数:"+inPrams);
     	
-    	Integer userId = SessionUtil.getUserId();
-        User user = userService.findById(userId);
-    	if(null == user) {
-    		log.info("用户获取 为空：userId="+userId);
-    		return null;
-    	}
     	UserAccount userAccount = new UserAccount();
     	userAccount.setUserId(SessionUtil.getUserId());
     	userAccount.setOrderSn(surplusPayParam.getOrderSn());
@@ -494,9 +488,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	if(CollectionUtils.isEmpty(userAccountList)) {
     		return null;
     	}
-    	
-    	User updateUser = new User();
     	UserAccount  rollBackUserAccount = userAccountList.get(0);
+    	Integer userId = SessionUtil.getUserId();
+        User user = userService.findById(userId);
+    	if(null == user) {
+    		user = userService.findById(rollBackUserAccount.getUserId());
+    	}
+    	User updateUser = new User();
     	BigDecimal userSurplus = rollBackUserAccount.getUserSurplus();
     	BigDecimal userSurplusLimit = rollBackUserAccount.getUserSurplusLimit();
     	boolean isModify = false;
