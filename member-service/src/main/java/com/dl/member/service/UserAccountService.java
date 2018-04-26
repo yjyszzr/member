@@ -48,6 +48,7 @@ import com.mysql.jdbc.PreparedStatement;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
+import tk.mybatis.mapper.util.StringUtil;
 
 @Service
 @Slf4j
@@ -514,52 +515,26 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
     	}
         
-    	this.deleteById(userAccountList.get(0).getId());
+//    	this.deleteById(userAccountList.get(0).getId());
     	
-//    	Integer userId= SessionUtil.getUserId();
-//    	User user = userService.findById(userId);
-//    	BigDecimal surplus = surplusPayParam.getSurplus();
-//        BigDecimal money = BigDecimal.ZERO;
-//        BigDecimal user_money = new BigDecimal(0); //用户账户剩下的可提现余额
-//        BigDecimal user_money_limit = new BigDecimal(0);// 用户账户剩下的不可提现余额
-//        money = surplus.subtract(user.getUserMoneyLimit());
-//        if (money.compareTo(BigDecimal.ZERO) <= 0) {//扣减的钱依然比当前账户的不可提现余额要小
-//        	user_money = user.getUserMoney();
-//        	user_money_limit = user.getUserMoneyLimit().add(surplus);
-//        } else {//当前账户的不可提现余额  不够 扣减的钱
-//        	user_money =  BigDecimal.ZERO;
-//        	user_money_limit = user.getUserMoneyLimit().add(money);
-//        }
-//
-//        BigDecimal curBalance = user_money.add(user_money_limit);
-//        
-//        User updateUser = new User();
-//        updateUser.setUserId(SessionUtil.getUserId());
-//        updateUser.setUserMoney(user_money);
-//        updateUser.setUserMoneyLimit(user_money_limit);
-//        
-//        int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
-//        if(moneyRst != 1) {
-//        	log.error("回滚更新用户账户资金异常");
-//        }
-//        
-//        UserAccountParam userAccountParam = new UserAccountParam();
-//        String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
-//        userAccountParam.setAccountSn(accountSn);
-//        userAccountParam.setAmount(surplus);
-//        userAccountParam.setCurBalance(curBalance);
-//        userAccountParam.setAccountType(ProjectConstant.ACCOUNT_ROLLBACK);
-//        userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
-//        userAccountParam.setPaymentName(surplusPayParam.getThirdPartName());
-//        userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
-//        userAccountParam.setThirdPartPaid(BigDecimal.ZERO);
-//        userAccountParam.setUserSurplus(BigDecimal.ZERO);
-//        userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
-//        userAccountParam.setUserName(user.getUserName());
-//        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-//        userAccountParam.setNote("");
-//        userAccountParam.setPayId("");
-//        this.saveAccount(userAccountParam);
+        
+        UserAccountParam userAccountParam = new UserAccountParam();
+        String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+        userAccountParam.setAccountSn(accountSn);
+        userAccountParam.setAmount(BigDecimal.ZERO.subtract(rollBackUserAccount.getAmount()));
+        userAccountParam.setCurBalance(rollBackUserAccount.getCurBalance().add(BigDecimal.ZERO.subtract(rollBackUserAccount.getAmount())));
+        userAccountParam.setAccountType(ProjectConstant.ACCOUNT_ROLLBACK);
+        userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
+        userAccountParam.setPaymentName(surplusPayParam.getThirdPartName());
+        userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
+        userAccountParam.setThirdPartPaid(BigDecimal.ZERO);
+        userAccountParam.setUserSurplus(BigDecimal.ZERO);
+        userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
+        userAccountParam.setUserName(user.getUserName());
+        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
+        userAccountParam.setNote("回滚账户:"+BigDecimal.ZERO.subtract(rollBackUserAccount.getAmount())+"元");
+        userAccountParam.setPayId("");
+        this.saveAccount(userAccountParam);
         
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
         surplusPaymentCallbackDTO.setSurplus(BigDecimal.ZERO);
@@ -601,7 +576,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setStatus(showStatus(ua.getProcessType(),ua.getId()));
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeChar(createProcessTypeString(ua.getProcessType()));
-            userAccountDTO.setProcessTypeName(PayEnum.getName(Integer.valueOf(ua.getPaymentName())));
+            if(StringUtil.isEmpty(ua.getPaymentName())) {
+            	userAccountDTO.setProcessTypeName("");
+            }else {
+            	userAccountDTO.setProcessTypeName(PayEnum.getName(Integer.valueOf(ua.getPaymentName())));
+            }
             userAccountDTO.setNote(ua.getNote());
             String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1? "¥ " + "+" +ua.getAmount():"¥ " +String.valueOf(ua.getAmount());
             userAccountDTO.setChangeAmount(changeAmount);
