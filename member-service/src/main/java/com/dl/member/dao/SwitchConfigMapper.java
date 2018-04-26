@@ -9,5 +9,5 @@ import com.dl.member.model.SwitchConfig;
 
 public interface SwitchConfigMapper extends Mapper<SwitchConfig> {
 	
-	List<SwitchConfig> querySwitchConfigTurnOff(@Param("platform") String platform,@Param("businessType") String businessType);
+	List<SwitchConfig> querySwitchConfigTurnOff(@Param("platform") String platform,@Param("version") String businessType);
 }
