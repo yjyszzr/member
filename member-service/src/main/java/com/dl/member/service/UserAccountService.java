@@ -428,6 +428,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
     	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
     	if(!CollectionUtils.isEmpty(userAccountList)) {
+    		log.info("含有已经派过奖金的订单，不进行批量更新用户账户");
     		return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "含有已经派过奖金的订单，不进行批量更新用户账户");
     	}
     	
@@ -452,6 +453,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		}
     	}
     	
+
     	userIdAndRewardList.stream().forEach(s->{
     		UserAccountParam userAccountParam = new UserAccountParam();
     		userAccountParam.setUserId(s.getUserId());
@@ -464,9 +466,14 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		userAccountParamList.add(userAccountParam);
     	});
     	
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新账户参数:"+JSON.toJSONString(updateList));
     	int updateRst = this.updateBatchUserMoney(updateList);
-    	int insertRst = this.batchInsertUserAccount(userAccountParamList);
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新账户结果:"+updateRst);
     	
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新账户流水参数:"+JSON.toJSONString(updateList));
+    	int insertRst = this.batchInsertUserAccount(userAccountParamList);
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新账户流水结果:"+insertRst);
+
     	if(updateRst == 1 && insertRst == 1) {
     		log.info("————————————————————批量更新用户中奖账户流水");
     		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
