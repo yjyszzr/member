@@ -441,7 +441,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	log.info("批量更新用户奖金");
     	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
     	
-    	
     	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
 //    	if(!CollectionUtils.isEmpty(userAccountList)) {
 //    		log.info("含有已经派过奖金的订单，不进行批量更新用户账户");
@@ -463,9 +462,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
     			UserIdAndRewardDTO uo = new UserIdAndRewardDTO();
     			List<UserIdAndRewardDTO> tempList =  entry.getValue();
     			BigDecimal sameUserIdTotalMoney = tempList.stream().map(s->s.getReward()).reduce(BigDecimal.ZERO, BigDecimal::add);
-    			if(sameUserIdTotalMoney.compareTo(limitValue) >= 0) {//大于等于限制金额,不自动派发奖金
-    				continue;
-    			}
     			uo.setUserId(entry.getKey());
     			uo.setUserMoney(curUserMoney.add(sameUserIdTotalMoney));
     			updateList.add(uo);
@@ -494,15 +490,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新账户流水结果:"+insertRst);
 
     	if(updateRst == 1 && insertRst == 1) {
-    		log.info("————————————————————批量更新用户中奖账户流水");
+    		log.info("----------------------------------批量更新用户中奖账户流水开始");
     		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
     		OrderSnListParam orderSnListParam = new OrderSnListParam();
     		orderSnListParam.setOrderSnlist(orderSnRewaredList);
     		BaseResult<Integer> orderRst = orderService.updateOrderStatusRewarded(orderSnListParam);
     		if(0 != orderRst.getCode() ) {
-    			log.error("批量更新用户订单为已派奖状态失败");
+    			log.error("批量更新用户订单为已中奖失败");
     		}
-    		log.info("————————————————————批量更新用户中奖账户流水成功");
+    		log.info("----------------------------------批量更新用户订单为已中奖成功");
+    		log.info("----------------------------------批量更新用户中奖账户流水结束");
     		return ResultGenerator.genSuccessResult("批量更新用户账户成功");
     	}else {
     		return ResultGenerator.genFailResult("批量更新用户账户失败，请查看日志");
