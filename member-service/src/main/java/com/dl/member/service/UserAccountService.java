@@ -423,8 +423,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param userIdAndRewardList
      */
     public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList) {
-    	log.info("批量更新用户奖金");
     	//查询该是否已经派发奖金
+    	log.info("批量更新用户奖金");
     	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
     	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
     	if(!CollectionUtils.isEmpty(userAccountList)) {
