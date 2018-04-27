@@ -39,6 +39,7 @@ import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
+import com.dl.order.param.OrderSnListParam;
 import com.dl.order.param.OrderSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -422,6 +423,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param userIdAndRewardList
      */
     public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList) {
+    	log.info("批量更新用户奖金");
     	//查询该是否已经派发奖金
     	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
     	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
@@ -466,6 +468,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	int insertRst = this.batchInsertUserAccount(userAccountParamList);
     	
     	if(updateRst == 1 && insertRst == 1) {
+    		log.info("————————————————————批量更新用户中奖账户流水");
+    		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
+    		OrderSnListParam orderSnListParam = new OrderSnListParam();
+    		orderSnListParam.setOrderSnlist(orderSnRewaredList);
+    		BaseResult<Integer> orderRst = orderService.updateOrderStatusRewarded(orderSnListParam);
+    		if(0 != orderRst.getCode() ) {
+    			log.error("批量更新用户订单为已派奖状态失败");
+    		}
+    		log.info("————————————————————批量更新用户中奖账户流水成功");
     		return ResultGenerator.genSuccessResult("批量更新用户账户成功");
     	}else {
     		return ResultGenerator.genFailResult("批量更新用户账户失败，请查看日志");

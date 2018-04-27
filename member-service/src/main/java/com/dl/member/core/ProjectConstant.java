@@ -75,4 +75,5 @@ public class ProjectConstant {
     
     
     public static final Integer ALL_LOTERRY_TYPE = 0;
+    
 }
