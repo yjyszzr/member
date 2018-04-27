@@ -517,7 +517,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	public BigDecimal queryBusinessLimit(Integer businessId) {
 		//检查是否设置了派奖阈值
 		SysConfigDTO sysDTO = sysConfigService.querySysConfig(businessId);
-		if(sysDTO != null) {
+		if(sysDTO == null) {
 			log.warn("派奖前，请前往后台管理设置派奖的奖金阈值");
 			return BigDecimal.ZERO;
 		}
