@@ -426,11 +426,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	//查询该是否已经派发奖金
     	log.info("批量更新用户奖金");
     	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
+    	
+    	
     	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
-    	if(!CollectionUtils.isEmpty(userAccountList)) {
-    		log.info("含有已经派过奖金的订单，不进行批量更新用户账户");
-    		return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "含有已经派过奖金的订单，不进行批量更新用户账户");
-    	}
+//    	if(!CollectionUtils.isEmpty(userAccountList)) {
+//    		log.info("含有已经派过奖金的订单，不进行批量更新用户账户");
+//    		return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "含有已经派过奖金的订单，不进行批量更新用户账户");
+//    	}
     	
     	List<UserAccountParam> userAccountParamList = new ArrayList<>();
     	List<Integer> userIdList = userIdAndRewardList.stream().map(s->s.getUserId()).collect(Collectors.toList());
@@ -543,7 +545,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setCurBalance(rollBackUserAccount.getCurBalance().add(BigDecimal.ZERO.subtract(rollBackUserAccount.getAmount())));
         userAccountParam.setAccountType(ProjectConstant.ACCOUNT_ROLLBACK);
         userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
-        userAccountParam.setPaymentName(surplusPayParam.getThirdPartName());
+        userAccountParam.setPaymentName("");
         userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
         userAccountParam.setThirdPartPaid(BigDecimal.ZERO);
         userAccountParam.setUserSurplus(BigDecimal.ZERO);
