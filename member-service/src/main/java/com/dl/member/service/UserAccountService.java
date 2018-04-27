@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
+import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.PayEnum;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
@@ -24,10 +25,12 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
+import com.dl.member.api.ISysConfigService;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserAccountMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserIdAndRewardDTO;
@@ -36,6 +39,7 @@ import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.model.UserWithdraw;
 import com.dl.member.param.SurplusPayParam;
+import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
@@ -80,6 +84,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	
 	@Value("${spring.datasource.druid.driver-class-name}")
 	private String dbDriver;
+	
+	@Resource
+	private ISysConfigService sysConfigService;
     
     
     /**
@@ -423,6 +430,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param userIdAndRewardList
      */
     public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList) {
+		BigDecimal limitValue = this.queryBusinessLimit(CommonConstants.BUSINESS_ID_REWARD);
+		if(limitValue.compareTo(BigDecimal.ZERO) <= 0) {
+			log.error("-----------------------------请前往后台管理系统设置派奖金额阈值,不予派奖");
+			return ResultGenerator.genFailResult("请前往后台管理系统设置派奖金额阈值");
+		}
+    	
+    	
     	//查询该是否已经派发奖金
     	log.info("批量更新用户奖金");
     	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
@@ -449,6 +463,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
     			UserIdAndRewardDTO uo = new UserIdAndRewardDTO();
     			List<UserIdAndRewardDTO> tempList =  entry.getValue();
     			BigDecimal sameUserIdTotalMoney = tempList.stream().map(s->s.getReward()).reduce(BigDecimal.ZERO, BigDecimal::add);
+    			if(sameUserIdTotalMoney.compareTo(limitValue) >= 0) {//大于等于限制金额,不自动派发奖金
+    				continue;
+    			}
     			uo.setUserId(entry.getKey());
     			uo.setUserMoney(curUserMoney.add(sameUserIdTotalMoney));
     			updateList.add(uo);
@@ -492,6 +509,23 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	}
     }
     
+    
+	/**
+	 * 查询业务值得限制：CommonConstants 中9-派奖限制 8-提现限制
+	 * @return
+	 */
+	public BigDecimal queryBusinessLimit(Integer businessId) {
+		//检查是否设置了派奖阈值
+		SysConfigParam sysConfigParam = new SysConfigParam();
+		sysConfigParam.setBusinessId(businessId);
+		BaseResult<SysConfigDTO> sysRst = sysConfigService.querySysConfig(sysConfigParam);
+		if(sysRst.getCode() != 0) {
+			log.warn("派奖前，请前往后台管理设置派奖的奖金阈值");
+			return BigDecimal.ZERO;
+		}
+		BigDecimal limitValue = sysRst.getData().getValue();
+		return limitValue;
+	}
     
     /**
      * 回滚余额支付的付款所用的钱
