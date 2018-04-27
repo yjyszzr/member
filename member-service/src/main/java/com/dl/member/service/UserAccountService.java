@@ -86,7 +86,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	private String dbDriver;
 	
 	@Resource
-	private ISysConfigService sysConfigService;
+	private SysConfigService sysConfigService;
     
     
     /**
@@ -516,14 +516,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 */
 	public BigDecimal queryBusinessLimit(Integer businessId) {
 		//检查是否设置了派奖阈值
-		SysConfigParam sysConfigParam = new SysConfigParam();
-		sysConfigParam.setBusinessId(businessId);
-		BaseResult<SysConfigDTO> sysRst = sysConfigService.querySysConfig(sysConfigParam);
-		if(sysRst.getCode() != 0) {
+		SysConfigDTO sysDTO = sysConfigService.querySysConfig(businessId);
+		if(sysDTO != null) {
 			log.warn("派奖前，请前往后台管理设置派奖的奖金阈值");
 			return BigDecimal.ZERO;
 		}
-		BigDecimal limitValue = sysRst.getData().getValue();
+		BigDecimal limitValue = sysDTO.getValue();
 		return limitValue;
 	}
     
