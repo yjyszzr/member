@@ -17,7 +17,7 @@ public enum MemberEnums {
 	USERACCOUNTS_ALREADY_REDUCE(301023,"用户账户已扣款"),
 	BANKCARD_ALREADY_AUTH(301024,"该银行卡号已经认证过"),
 	NOT_DEBIT_CARD(301025,"不支持添加非储蓄卡"),
-	NOT_REAL_AUTH(301026,"未进行实名认证"),
+	NOT_REAL_AUTH(301026,"身份认证失败，请重试"),
 	CURRENT_ONE_CARD(301027,"当前仅一张银行卡不能切换默认状态"),
 	NO_BANKCARDS(301029,"当前用户下没有银行卡"),
 	DBDATA_IS_NULL(301030,"数据库无该数据"),

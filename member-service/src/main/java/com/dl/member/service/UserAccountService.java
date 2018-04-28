@@ -2,6 +2,7 @@ package com.dl.member.service;
 import java.math.BigDecimal;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -274,15 +275,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		}
     	}
     	
+    	DecimalFormat df = new DecimalFormat("0.00");//保留两位小数
     	Double buyMoney = buyList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
     	Double rechargeMoney = rechargeList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
     	Double withdrawMoney = withdrawList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
     	Double rewardMoney = rewardList.stream().map(s->s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
     	
-    	userAccountCurMonthDTO.setBuyMoney(String.valueOf(0 - buyMoney));
-    	userAccountCurMonthDTO.setRechargeMoney(String.valueOf(rechargeMoney));
-    	userAccountCurMonthDTO.setWithDrawMoney(String.valueOf(withdrawMoney));
-    	userAccountCurMonthDTO.setRewardMoney(String.valueOf(rewardMoney));
+    	userAccountCurMonthDTO.setBuyMoney(String.valueOf(df.format(0 - buyMoney)));
+    	userAccountCurMonthDTO.setRechargeMoney(String.valueOf(df.format(rechargeMoney)));
+    	userAccountCurMonthDTO.setWithDrawMoney(String.valueOf(df.format(withdrawMoney)));
+    	userAccountCurMonthDTO.setRewardMoney(String.valueOf(df.format(rewardMoney)));
     	
     	return ResultGenerator.genSuccessResult("统计当月的各个用途的资金和成功",userAccountCurMonthDTO);
     }
