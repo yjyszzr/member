@@ -32,7 +32,7 @@ public class SwitchConfigController {
 
     @ApiOperation(value = "根据平台和业务版本查询当前版本是否开启", notes = "根据平台和业务版本查询当前版本是否开启")
     @PostMapping("/query")
-    public BaseResult<List<SwitchConfig>> add(@RequestBody StrParam strparam) {
+    public BaseResult<SwitchConfig> add(@RequestBody StrParam strparam) {
     	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
     	String inPrams = JSON.toJSONString(userDevice);
     	log.info(DateUtil.getCurrentDateTime()+"====================================版本参数:"+inPrams);
