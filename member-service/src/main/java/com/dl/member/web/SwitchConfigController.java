@@ -1,11 +1,18 @@
 package com.dl.member.web;
+import com.alibaba.fastjson.JSON;
+import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
+import com.dl.base.util.DateUtil;
+import com.dl.base.util.SessionUtil;
 import com.dl.member.model.SwitchConfig;
 import com.dl.member.param.DeviceKeyParam;
 import com.dl.member.param.DeviceParam;
+import com.dl.member.param.StrParam;
 import com.dl.member.param.SwitchConfigParam;
 import com.dl.member.service.SwitchConfigService;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,15 +25,18 @@ import java.util.List;
 */
 @RestController
 @RequestMapping("/switch/config")
+@Slf4j
 public class SwitchConfigController {
     @Resource
     private SwitchConfigService switchConfigService;
 
     @ApiOperation(value = "根据平台和业务版本查询当前版本是否开启", notes = "根据平台和业务版本查询当前版本是否开启")
     @PostMapping("/query")
-    public BaseResult<List<SwitchConfig>> add(@RequestBody DeviceKeyParam deviceKeyParam) {
-    	DeviceParam deviceParam= deviceKeyParam.getDeviceParam();
-    	return switchConfigService.querySwitchConfig(deviceParam.getPlat(), deviceParam.getAppv());
+    public BaseResult<List<SwitchConfig>> add(@RequestBody StrParam strparam) {
+    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+    	String inPrams = JSON.toJSONString(userDevice);
+    	log.info(DateUtil.getCurrentDateTime()+"====================================版本参数:"+inPrams);
+    	return switchConfigService.querySwitchConfig(userDevice.getPlat(), userDevice.getAppv());
     }
 
 }
