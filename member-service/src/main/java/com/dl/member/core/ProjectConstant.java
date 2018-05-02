@@ -20,6 +20,7 @@ public class ProjectConstant {
     public static final String REGISTER_TPLID = "66686";
     public static final String LOGIN_TPLID = "66839";
     public static final String RESETPASS_TPLID = "66838";
+    public static final String SERVICE_TPLID = "75003";
     
 	/**
 	 * 缓存存放验证码的有效时长
@@ -76,4 +77,10 @@ public class ProjectConstant {
     
     public static final Integer ALL_LOTERRY_TYPE = 0;
     
+    
+    //验证码
+    public static final String VERIFY_TYPE_LOGIN = "0";
+    public static final String VERIFY_TYPE_REG = "1";
+    public static final String VERIFY_TYPE_FORGET = "2";
+    public static final String VERIFY_TYPE_SERVICE = "3";
 }

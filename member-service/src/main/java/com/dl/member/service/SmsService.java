@@ -48,20 +48,18 @@ public class SmsService {
 		HttpHeaders headers = new HttpHeaders();
 		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
 		headers.setContentType(type);
-
 		try {
 			tplValue = URLEncoder.encode(tplValue, "UTF-8");
 		} catch (Exception e1) {
 			log.error(e1.getMessage());
 		}
-		
 		StringBuffer url = new StringBuffer(memberConfig.getJuheSmsApiUrl());
 		url.append("?mobile=" + mobile);
 		url.append("&tpl_id=" + tplId);
 		url.append("&tpl_value=" + tplValue);
 		url.append("&key=" + memberConfig.getJuheSmsKey());
 		String rst = rest.getForObject(url.toString(), String.class);
-
+		
 		JSONObject json = null;
 		try {
 			json = JSON.parseObject(rst);
