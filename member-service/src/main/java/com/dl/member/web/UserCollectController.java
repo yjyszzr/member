@@ -80,6 +80,7 @@ public class UserCollectController {
     	UserCollect userCollect = new UserCollect();
     	userCollect.setArticleId(Integer.valueOf(userCollectParam.getArticleId()));
     	userCollect.setUserId(userId);
+    	userCollect.setIsDelete(ProjectConstant.NOT_DELETE);
     	List<UserCollect> userCollectList = userCollectMapper.queryUserCollectListBySelective(userCollect);
     	if(!CollectionUtils.isEmpty(userCollectList)) {
     		return ResultGenerator.genSuccessResult("用户已添加收藏");

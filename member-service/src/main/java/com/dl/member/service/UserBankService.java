@@ -116,6 +116,11 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg());
 		}
 		
+		//用户不匹配
+		if(atuhRst.getData().equals(ProjectConstant.BANKCARD_NOT_MATCH)) {
+			return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(),MemberEnums.BANKCARD_NOT_MATCH.getMsg());
+		}
+		
 		//把已经添加的默认银行卡 设为非默认
 		BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
 		if(userBankDTORst.getCode() != 0) {
@@ -223,8 +228,9 @@ public class UserBankService extends AbstractService<UserBank> {
 		JSONObject result = (JSONObject) json.get("result");
 		String reason = result.getString("reason");
 		Integer errorCode = json.getInteger("error_code");
+		String res = result.getString("res");
 		if(0 == errorCode) {
-			return ResultGenerator.genSuccessResult("银行卡校验成功",reason);
+			return ResultGenerator.genSuccessResult("银行卡校验成功",res);
 		}else {
 			return ResultGenerator.genFailResult(reason);
 		}

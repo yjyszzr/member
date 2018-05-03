@@ -121,18 +121,22 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
   	            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
   	        }
         	
-        	UserRegisterParam userRegisterParam = new UserRegisterParam();
-        	userRegisterParam.setMobile(userLoginMobileParam.getMobile());
-        	userRegisterParam.setPassWord("");
-        	userRegisterParam.setLoginSource(userLoginMobileParam.getLoginSource());
-        	userRegisterParam.setDevice(userLoginMobileParam.getDevice());
-        	BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
-        	if(regRst.getCode() != 0) {
-        		return ResultGenerator.genFailResult(regRst.getMsg());
-        	}
-        	
-        	UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
-			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
+//        	UserRegisterParam userRegisterParam = new UserRegisterParam();
+//        	userRegisterParam.setMobile(userLoginMobileParam.getMobile());
+//        	userRegisterParam.setPassWord("");
+//        	userRegisterParam.setLoginSource(userLoginMobileParam.getLoginSource());
+//        	userRegisterParam.setDevice(userLoginMobileParam.getDevice());
+//        	BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
+//        	if(regRst.getCode() != 0) {
+//        		return ResultGenerator.genFailResult(regRst.getMsg());
+//        	}
+//        	
+//        	UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
+//			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
+//  	    User user = userService.findBy("mobile", userRegisterParam.getMobile());
+  	    	if(null == user) {
+  	    		return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+  	    	}
         }else {
             Integer userStatus = user.getUserStatus();
         	if(userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {//账号正常

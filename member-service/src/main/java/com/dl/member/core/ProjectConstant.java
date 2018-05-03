@@ -83,4 +83,8 @@ public class ProjectConstant {
     public static final String VERIFY_TYPE_REG = "1";
     public static final String VERIFY_TYPE_FORGET = "2";
     public static final String VERIFY_TYPE_SERVICE = "3";
+    
+    public static final String BANKCARD_MATCH = "1";
+    public static final String BANKCARD_NOT_MATCH = "2";
+    
 }
