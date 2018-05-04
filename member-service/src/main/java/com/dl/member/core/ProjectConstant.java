@@ -44,6 +44,7 @@ public class ProjectConstant {
     
     public static final int BONUS_STATUS_UNUSED = 0;//红包未使用
     public static final int BONUS_STATUS_USED = 1;//红包已使用
+    public static final int BONUS_STATUS_EXPIRE = 2;//红包已过期
     
     public static final int DELETE = 1;////1代表已删除
     public static final int NOT_DELETE = 0;// 0代表未删除
@@ -86,5 +87,20 @@ public class ProjectConstant {
     
     public static final String BANKCARD_MATCH = "1";
     public static final String BANKCARD_NOT_MATCH = "2";
+    
+    //业务类型
+    public static final Integer REGISTER = 1;
+    
+    //------红包使用范围------//
+    //全场通用
+    public static final Integer BONUS_USE_RANGE_ALL = 0;
+    
+    //一天的秒数
+    public static final Integer OneDaySecond = 86400;
+    
+    //红包快过期标识
+    public static final String BONUS_SOONEXPIREBZ_NOTHIDE = "1";
+    public static final String BONUS_SOONEXPIREBZ_HIDE = "0";
+    
     
 }

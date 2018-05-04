@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.ActivityBonusMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.ActivityBonus">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="bonus_id" jdbcType="INTEGER" property="bonusId" />
+    <result column="bonus_type" jdbcType="INTEGER" property="bonusType" />
+    <result column="bonus_name" jdbcType="VARCHAR" property="bonusName" />
+    <result column="bonus_desc" jdbcType="VARCHAR" property="bonusDesc" />
+    <result column="bonus_image" jdbcType="VARCHAR" property="bonusImage" />
+    <result column="bonus_amount" jdbcType="DECIMAL" property="bonusAmount" />
+    <result column="receive_count" jdbcType="INTEGER" property="receiveCount" />
+    <result column="bonus_number" jdbcType="INTEGER" property="bonusNumber" />
+    <result column="use_range" jdbcType="INTEGER" property="useRange" />
+    <result column="min_goods_amount" jdbcType="DECIMAL" property="minGoodsAmount" />
+    <result column="start_time" jdbcType="INTEGER" property="startTime" />
+    <result column="end_time" jdbcType="INTEGER" property="endTime" />
+    <result column="is_enable" jdbcType="INTEGER" property="isEnable" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="exchange_points" jdbcType="INTEGER" property="exchangePoints" />
+    <result column="exchange_goods_number" jdbcType="INTEGER" property="exchangeGoodsNumber" />
+  </resultMap>
+  
+  <select id ="queryActivityBonusListBySelective" parameterType="com.dl.member.model.ActivityBonus" resultMap="BaseResultMap">
+  	select * from dl_activity_bonus 
+  	<where>
+	  	<if test="bonusType != null">
+	        AND bonus_type = #{bonusType}
+	    </if>
+	    <if test="isDelete != null">
+	        AND is_delete = #{isDelete}
+	    </if>
+	    <if test="isEnable != null">
+	        AND is_enable = #{isEnable}
+	    </if>
+	    <if test="useRange != null">
+	        AND use_range = #{useRange}
+	    </if>
+	    <if test="bonusId != null">
+	        AND bonus_id = #{bonusId}
+	    </if>
+     </where>
+     order by add_time
+  </select>
+  
+  
+</mapper>

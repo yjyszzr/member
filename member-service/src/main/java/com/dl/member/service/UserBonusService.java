@@ -1,4 +1,5 @@
 package com.dl.member.service;
+import com.dl.member.model.ActivityBonus;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.UserBonusParam;
 import com.github.pagehelper.PageHelper;
@@ -12,11 +13,13 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
+import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import org.springframework.beans.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -39,6 +43,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
     
     @Resource
     private UserBonusShowDescService userBonusShowDescService;
+    
+    @Resource
+    private ActivityBonusService activityBonusService;
     
 	/**
 	 * 下单时的账户变动：目前仅红包置为已使用 
@@ -206,6 +213,12 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			log.error(e.getMessage());
 		}
 		
+		Integer currentTime = DateUtil.getCurrentTimeLong();
+		if(userBonus.getEndTime() - currentTime <= ProjectConstant.OneDaySecond) {
+			userBonusDTO.setSoonExprireBz(ProjectConstant.BONUS_SOONEXPIREBZ_NOTHIDE);
+		}else {
+			userBonusDTO.setSoonExprireBz(ProjectConstant.BONUS_SOONEXPIREBZ_HIDE);
+		}
 		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
 		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
 		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
@@ -236,5 +249,53 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
 		return userBonusDTO;
 	}
+	
+	/**
+	 * 领取红包
+	 * @return
+	 */
+	@Transactional
+	public Boolean receiveUserBonus(Integer type,Integer userId) {
+		if(null == userId) {
+			return false;
+		}
+		List<ActivityBonus> activityBonusList = new ArrayList<ActivityBonus>();
+		if(ProjectConstant.REGISTER.equals(type)) {
+			activityBonusList = activityBonusService.queryActivityBonusList(type);
+		}
+		if(activityBonusList.size() == 0) {
+			return false;
+		}
+		
+		Integer now = DateUtil.getCurrentTimeLong();
+		Date currentTime = new Date();
+		List<UserBonus> userBonusLisgt  = new ArrayList<UserBonus>();
+		activityBonusList.stream().forEach(s->{
+			UserBonus userBonus = new UserBonus();
+			userBonus.setBonusId(s.getBonusId());
+			userBonus.setUserId(userId);
+			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+			userBonus.setBonusPrice(s.getBonusAmount());
+			userBonus.setReceiveTime(DateUtil.getCurrentTimeLong());
+			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, s.getStartTime()));
+			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime,s.getEndTime()));
+			userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
+			userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+			userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
+			userBonus.setMinGoodsAmount(s.getMinGoodsAmount());
+			userBonusLisgt.add(userBonus);
+		});
+		
+		try {
+			int rst = userBonusMapper.insertBatchUserBonus(userBonusLisgt);
+			if(rst != userBonusLisgt.size()) {
+				throw new Exception("用户"+userId+"领取红包异常,已回滚");
+			}
+		} catch (Exception e) {
+			log.error("用户"+userId+"领取红包异常,已回滚");
+		}
+		return true;
+	}
+	
 
 }

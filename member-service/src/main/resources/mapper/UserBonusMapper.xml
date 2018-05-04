@@ -62,4 +62,46 @@
 	    </where>
 	    order by add_time
   </select>
+  
+  <insert id ="insertBatchUserBonus" parameterType="java.util.List" >
+      insert into dl_user_bonus(user_bonus_id,user_id,bonus_id,bonus_sn,bonus_price,receive_time,start_time,end_time,bonus_status,is_delete,use_range,min_goods_amount)
+            values
+            <foreach collection ="list" item="item" index= "index" separator =",">
+                (
+                #{item.userBonusId},
+                #{item.userId},
+                #{item.bonusId},
+                #{item.bonusSn},
+                #{item.bonusPrice},
+                #{item.receiveTime},
+                #{item.startTime},
+                #{item.endTime},
+                #{item.bonusStatus},
+                #{item.isDelete},
+                #{item.useRange},
+                #{item.minGoodsAmount}
+                )
+            </foreach >
+   </insert >
+    
+<!--     <update id ="updateBatchUserBonus" parameterType="java.util.List" >
+      update  dl_user_bonus set bonus_status where user_bonus_id in 
+            <foreach collection ="list" item="item" index= "index" separator =",">
+                (
+                #{item.userBonusId},
+                #{item.userId},
+                #{item.bonusId},
+                #{item.bonusSn},
+                #{item.bonusPrice},
+                #{item.receiveTime},
+                #{item.startTime},
+                #{item.endTime},
+                #{item.bonusStatus},
+                #{item.isDelete},
+                #{item.useRange},
+                #{item.minGoodsAmount}
+                )
+            </foreach >
+    </update > -->
+  
 </mapper>

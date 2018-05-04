@@ -25,7 +25,8 @@ public enum MemberEnums {
 	USERREAL_ALREADY_AUTH(301032,"用户已经认证过"),
 	PARAM_WRONG(301033,"参数错误"),
 	DATA_ALREADY_EXIT_IN_DB(301034,"数据已存在数据库中"),
-	BANKCARD_NOT_MATCH(301035,"用户信息与银行卡不匹配");
+	BANKCARD_NOT_MATCH(301035,"用户信息与银行卡不匹配"),
+	ARTICLE_NOT_COLLECT(301036,"用户没有收藏该文章");
 
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	

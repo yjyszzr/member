@@ -7,6 +7,7 @@ import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.param.UserRegisterParam;
+import com.dl.member.service.UserBonusService;
 import com.dl.member.service.UserLoginService;
 import com.dl.member.service.UserRegisterService;
 import com.dl.member.service.UserService;
@@ -44,6 +45,9 @@ public class UserRegisterController {
     
     @Resource
     private UserLoginService userLoginService;
+    
+    @Resource
+    private UserBonusService userBonusService;
 
     /**
      * 新用户注册:
@@ -63,6 +67,8 @@ public class UserRegisterController {
     	if(regRst.getCode() != 0) {
     		return ResultGenerator.genFailResult(regRst.getMsg());
     	}
+    	
+    	userBonusService.receiveUserBonus(ProjectConstant.REGISTER,regRst.getData());
     	
     	Integer userId = regRst.getData();
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));

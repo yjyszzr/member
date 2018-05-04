@@ -32,7 +32,8 @@ public class UserBonusDTO {
     @ApiModelProperty(value = "使用说明")
     private String useHelp;
     
-    
+    @ApiModelProperty(value = "快过期标志：1-显示  0-隐藏")
+    private String soonExprireBz;
     
 
     

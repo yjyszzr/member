@@ -7,6 +7,8 @@ import com.dl.member.model.UserBonus;
 
 public interface UserBonusMapper extends Mapper<UserBonus> {
 	
+	 int insertBatchUserBonus(List<UserBonus> list);
+	
 	 List<UserBonus> queryUserBonusList(@Param("userBonusIds") Integer[] userBonusIds,@Param("userId")Integer userId,@Param("curTime") Integer curTime);
 
 	 List<UserBonus> queryUserBonusBySelective(UserBonus userBonus);
