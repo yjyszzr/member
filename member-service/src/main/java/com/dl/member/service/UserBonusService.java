@@ -47,6 +47,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
     @Resource
     private ActivityBonusService activityBonusService;
     
+    
 	/**
 	 * 下单时的账户变动：目前仅红包置为已使用 
 	 * @param userBonusParam
@@ -297,5 +298,14 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		return true;
 	}
 	
+	 /**
+	  * 更新红包为已过期
+	  * @param userBonusIdList
+	  */
+	 @Transactional
+	 public int updateBonusExpire(List<Integer> userBonusIdList) {
+		 int rst = userBonusMapper.updateBatchUserBonusExpire(userBonusIdList);
+		 return rst;
+	 }
 
 }

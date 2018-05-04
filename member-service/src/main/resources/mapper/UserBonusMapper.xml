@@ -63,6 +63,10 @@
 	    order by add_time
   </select>
   
+  <select id="queryUserBonusIdsExpire" parameterType="java.lang.String" resultType="java.lang.Integer">
+	  SELECT user_bonus_id FROM dl_user_bonus WHERE  bonus_status = '1' AND end_time &lt;= #{now}
+  </select>
+  
   <insert id ="insertBatchUserBonus" parameterType="java.util.List" >
       insert into dl_user_bonus(user_bonus_id,user_id,bonus_id,bonus_sn,bonus_price,receive_time,start_time,end_time,bonus_status,is_delete,use_range,min_goods_amount)
             values
@@ -84,24 +88,11 @@
             </foreach >
    </insert >
     
-<!--     <update id ="updateBatchUserBonus" parameterType="java.util.List" >
-      update  dl_user_bonus set bonus_status where user_bonus_id in 
-            <foreach collection ="list" item="item" index= "index" separator =",">
-                (
-                #{item.userBonusId},
-                #{item.userId},
-                #{item.bonusId},
-                #{item.bonusSn},
-                #{item.bonusPrice},
-                #{item.receiveTime},
-                #{item.startTime},
-                #{item.endTime},
-                #{item.bonusStatus},
-                #{item.isDelete},
-                #{item.useRange},
-                #{item.minGoodsAmount}
-                )
-            </foreach >
-    </update > -->
+   <update id ="updateBatchUserBonusExpire" parameterType="java.util.List" >
+      update  dl_user_bonus set bonus_status = '3' where user_bonus_id in 
+          <foreach collection ="list" item="item" index= "index" separator =",">
+			#{item}  
+          </foreach >
+   </update > 
   
 </mapper>

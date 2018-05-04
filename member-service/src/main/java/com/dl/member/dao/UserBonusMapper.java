@@ -12,4 +12,8 @@ public interface UserBonusMapper extends Mapper<UserBonus> {
 	 List<UserBonus> queryUserBonusList(@Param("userBonusIds") Integer[] userBonusIds,@Param("userId")Integer userId,@Param("curTime") Integer curTime);
 
 	 List<UserBonus> queryUserBonusBySelective(UserBonus userBonus);
+	 
+	 List<Integer> queryUserBonusIdsExpire(@Param("now") Integer now);
+	 
+	 int updateBatchUserBonusExpire(List<Integer> userBonusIdList);
 }
