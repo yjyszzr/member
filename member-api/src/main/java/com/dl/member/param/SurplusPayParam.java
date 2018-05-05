@@ -29,7 +29,7 @@ public class SurplusPayParam {
     @NotBlank(message = "实际扣减余额不能为空")
     private BigDecimal moneyPaid;
     
-    @ApiModelProperty("支付方式:0-支付宝 1-微信 2-余额支付 3-混合支付")
+    @ApiModelProperty("支付方式:0-支付宝 1-微信 2-余额支付 3-混合支付 4-融宝支付")
     @NotBlank(message = "支付方式不能为空")
     private Integer payType;
     

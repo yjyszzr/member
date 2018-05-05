@@ -135,6 +135,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
         } if(PayEnum.MIXPAY.getCode().equals(payType)) {
         	userAccountParam.setPaymentName(String.valueOf(PayEnum.MIXPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
+        }else if(PayEnum.RONGBAOPAY.getCode().equals(payType)) {
+        	userAccountParam.setPaymentName(String.valueOf(PayEnum.RONGBAOPAY.getCode()));
+        	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
         }
         
         userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
@@ -649,6 +652,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         return result;
     }    
     
+    
     /**
      * 保存账户流水
      * @param amount
@@ -672,7 +676,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	if(StringUtils.isNotEmpty(userAccountParam.getOrderSn())) {
     		userAccount.setOrderSn(userAccountParam.getOrderSn());
     	}
-    	
     	userAccount.setPayId(userAccountParam.getPayId() == null?"":userAccountParam.getPayId());
     	userAccount.setPaymentName(userAccountParam.getPaymentName());
     	userAccount.setThirdPartName(StringUtils.isEmpty(userAccountParam.getThirdPartName())?"":userAccountParam.getThirdPartName());
@@ -723,6 +726,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	    	case 3:str = "购彩";break;
 	    	case 4:str = "提现";break;
 	    	case 5:str = "红包";break;
+	    	case 6:str = "购彩";break;
     	}
 		return str;
     }
@@ -821,4 +825,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return 0;
 		}
 	}
+	
+	
+	
+	
 }

@@ -1,6 +1,9 @@
 package com.dl.member.web;
+import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.SNGenerator;
+import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.BatchResultDTO;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
@@ -14,6 +17,8 @@ import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserAccountParam;
+import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserWithdrawParam;
@@ -155,6 +160,29 @@ public class UserAccountController {
 	@RequestMapping(path="/batchUpdateUserAccount", method=RequestMethod.POST)
     public BaseResult<String> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
     	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());
+    }
+    
+    
+	/**
+	 * 给第三方支付提供的记录账户流水
+	 * @param userAccountByTypeParam
+	 * @return
+	 */
+    @ApiOperation(value="给第三方支付提供的记录账户流水", notes="给第三方支付提供的记录账户流水",hidden=false)
+	@RequestMapping(path="/insertUserAccount", method=RequestMethod.POST)
+    public BaseResult<String> insertUserAccount(@Valid @RequestBody UserAccountParamByType userAccountParamByType){
+    	UserAccountParam userAccountParam = new UserAccountParam();
+    	userAccountParam.setAccountType(userAccountParamByType.getAccountType());
+    	userAccountParam.setAmount(userAccountParamByType.getAmount());
+    	userAccountParam.setOrderSn(userAccountParamByType.getOrderSn());
+    	userAccountParam.setPaymentCode(userAccountParamByType.getPaymentCode());
+    	userAccountParam.setPaymentName(userAccountParamByType.getPaymentName());
+    	userAccountParam.setNote("");
+    	userAccountParam.setThirdPartName(userAccountParamByType.getThirdPartName());
+    	userAccountParam.setThirdPartPaid(userAccountParamByType.getThirdPartPaid());
+    	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
+    	
+    	return ResultGenerator.genSuccessResult("生成账户流水成功",userAccountService.saveAccount(userAccountParam));
     }
     
 }
