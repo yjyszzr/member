@@ -32,7 +32,8 @@ public enum MemberEnums {
 	MOBILE_VALID_ERROR(301039,"请输入合法的手机号"),
 	VERIFY_IDCARD_EROOR(301040,"校验身份证失败"),
 	MONEY_PAID_NOTLESS_ZERO(301041,"扣减余额不能为负数和0"),
-	SEND_SMS_ERROR(301042,"发送短信验证码失败");
+	SEND_SMS_ERROR(301042,"发送短信验证码失败"),
+	COMPLAIN_CONTENT_NULL(301043,"投诉内容不能为空");
 
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	

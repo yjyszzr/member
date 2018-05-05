@@ -26,3 +26,16 @@ CREATE TABLE `dl_message` (
   `is_read` tinyint(1) DEFAULT '0' COMMENT '是否读取',
   PRIMARY KEY (`msg_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1443248 DEFAULT CHARSET=utf8 COMMENT='用户消息信息表';
+
+-- ----------------------------
+-- Table structure for dl_message
+-- ----------------------------
+DROP TABLE IF EXISTS `dl_complain`;
+CREATE TABLE `dl_complain` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '投诉ID',
+  `complainer` int(11) NOT NULL COMMENT '投诉者',
+  `complain_time` int(11) NOT NULL COMMENT '投诉时间',
+  `complain_content` text NOT NULL COMMENT '投诉内容',
+  `is_read` tinyint(1) DEFAULT '0' COMMENT '是否读取',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8 COMMENT='用户投诉信息表';
