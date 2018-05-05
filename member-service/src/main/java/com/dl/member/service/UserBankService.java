@@ -87,9 +87,10 @@ public class UserBankService extends AbstractService<UserBank> {
     @Transactional
 	public BaseResult<UserBankDTO> addBankCard(String bankCardNo){
 		//未实名认证
+    	UserBankDTO userBankDTO = new UserBankDTO();
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		if(null == userRealDTO) {
-			return ResultGenerator.genResult(MemberEnums.NOT_REAL_AUTH.getcode(), MemberEnums.NOT_REAL_AUTH.NOT_REAL_AUTH.getMsg());
+			return ResultGenerator.genResult(MemberEnums.NOT_REAL_AUTH.getcode(), MemberEnums.NOT_REAL_AUTH.NOT_REAL_AUTH.getMsg(),userBankDTO);
 		}
 		
 		//查询银行卡具体信息，并过滤信用卡
@@ -99,7 +100,6 @@ public class UserBankService extends AbstractService<UserBank> {
 //		}
 		
 		//三元素校验
-		UserBankDTO userBankDTO = new UserBankDTO();
 		String idCard = userRealDTO.getIdCode();
 		String realName = userRealDTO.getRealName();
 		JSONObject json = this.bankCardAuth3(realName, bankCardNo,idCard);
@@ -109,10 +109,10 @@ public class UserBankService extends AbstractService<UserBank> {
 			JSONObject result = (JSONObject) json.get("result");
 			String res = result.getString("res");
 			if("2" == res) {
-				return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(), MemberEnums.BANKCARD_NOT_MATCH.getMsg());
+				return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(), MemberEnums.BANKCARD_NOT_MATCH.getMsg(),userBankDTO);
 			}
 		}else {
-			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), reason);
+			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), reason,userBankDTO);
 		}
 		
 		//已经添加过该银行卡
@@ -121,7 +121,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBankAlready.setIsDelete(ProjectConstant.NOT_DELETE);
 		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankAlready);
 		if(!CollectionUtils.isEmpty(userBankList)) {
-			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg());
+			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg(),userBankDTO);
 		}
 		
 		
