@@ -25,7 +25,7 @@ public class DlMessageDTO {
     private Integer receiver;
 	@ApiModelProperty("消息接收者的手机号，可以为空")
     private String receiverMobile;
-	@ApiModelProperty("消息业务类型：1:订单，2：提现")
+	@ApiModelProperty("消息业务类型：1中奖通知2提现成功通知3出票成功通知4优惠券到帐通知")
     private Integer objectType;
 	@ApiModelProperty("是否已阅读")
     private Integer isRead;
@@ -37,4 +37,6 @@ public class DlMessageDTO {
     private String msgUrl;
 	@ApiModelProperty("消息主题附加")
     private String contentDesc;
+	@ApiModelProperty("消息内容图片地址")
+	private String contentUrl;
 }

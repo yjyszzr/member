@@ -62,6 +62,7 @@ public class DlMessageController {
     	dlMessage.setSender(param.getSender());
     	dlMessage.setTitle(param.getTitle());
     	dlMessage.setMsgUrl(param.getMsgUrl());
+    	dlMessage.setContentUrl(param.getContentUrl());
         dlMessageService.save(dlMessage);
         return ResultGenerator.genSuccessResult();
     }

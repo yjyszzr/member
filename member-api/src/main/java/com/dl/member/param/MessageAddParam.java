@@ -33,4 +33,6 @@ public class MessageAddParam {
     private Integer sender;
 	@ApiModelProperty(value="消息详情地址")
     private String msgUrl;
+	@ApiModelProperty(value="消息内容图片地焉")
+	private String contentUrl;
 }

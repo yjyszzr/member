@@ -44,6 +44,7 @@ public class DlMessageService extends AbstractService<DlMessage> {
     		messageDTO.setTitle(msg.getTitle());
     		messageDTO.setContentDesc(msg.getContentDesc());
     		messageDTO.setMsgUrl(msg.getMsgUrl());
+    		messageDTO.setContentUrl(msg.getContentUrl());
     		return messageDTO;
     	}).collect(Collectors.toList());
     }

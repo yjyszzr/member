@@ -16,6 +16,7 @@
     <result column="is_push_success" jdbcType="BIT" property="isPushSuccess" />
     <result column="is_read" jdbcType="BIT" property="isRead" />
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <result column="content_url" jdbcType="LONGVARCHAR" property="contentUrl" />
     <result column="content_desc" jdbcType="LONGVARCHAR" property="contentDesc" />
     <result column="msg_desc" jdbcType="LONGVARCHAR" property="msgDesc" />
     <result column="msg_url" jdbcType="LONGVARCHAR" property="msgUrl" />
@@ -23,7 +24,7 @@
   
   <sql id="fields">
   	msg_id,sender,send_time,title,msg_type,push_type,push_value,receiver,receiver_mobile,object_type,
-  	is_mobile_success,is_push_success,is_read,content,msg_desc
+  	is_mobile_success,is_push_success,is_read,content,msg_desc,content_url
   </sql>
   <select id="findUserMessageList" resultMap="BaseResultMap">
   	select 

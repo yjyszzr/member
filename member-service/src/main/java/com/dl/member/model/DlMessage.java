@@ -87,6 +87,9 @@ public class DlMessage {
     
     @Column(name = "content_desc")
     private String contentDesc;
+    
+    @Column(name = "content_url")
+    private String contentUrl;
 
     /**
      * 消息附加信息
@@ -381,6 +384,14 @@ public class DlMessage {
 
 	public void setMsgUrl(String msgUrl) {
 		this.msgUrl = msgUrl;
+	}
+
+	public String getContentUrl() {
+		return contentUrl;
+	}
+
+	public void setContentUrl(String contentUrl) {
+		this.contentUrl = contentUrl;
 	}
     
     
