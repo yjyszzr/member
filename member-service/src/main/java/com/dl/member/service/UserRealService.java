@@ -1,10 +1,7 @@
 package com.dl.member.service;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-
 import javax.annotation.Resource;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,7 +9,6 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.configurer.RestTemplateConfig;
@@ -30,7 +26,6 @@ import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.model.UserReal;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -75,6 +70,7 @@ public class UserRealService extends AbstractService<UserReal> {
      * @return
      * @throws UnsupportedEncodingException 
      */
+    @Transactional
     public BaseResult<UserRealDTO> realNameAuth(String realName,String iDCode) {
     	Integer userId = SessionUtil.getUserId();
     	User user = userService.findById(userId);
@@ -84,19 +80,27 @@ public class UserRealService extends AbstractService<UserReal> {
     		return ResultGenerator.genResult(MemberEnums.USERREAL_ALREADY_AUTH.getcode(), MemberEnums.USERREAL_ALREADY_AUTH.getMsg());
     	}
     	
-    	//TODO 身份证二元素校验接口
     	try {
 			realName = URLDecoder.decode(realName, "UTF-8");
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
     	
-    	BaseResult<String> realNameRst = this.realNameAuth2(realName, iDCode);
-    	if(realNameRst.getCode() != 0) {
-    		return ResultGenerator.genResult(realNameRst.getCode(), realNameRst.getMsg());
-    	}
+    	JSONObject json = this.realNameAuth2(realName, iDCode);
+		JSONObject result = (JSONObject) json.get("result");
+		String res = result.getString("res");
+		String reason = json.getString("reason");
+		Integer errorCode =  (Integer) json.get("error_code");
+		if(0 == errorCode) {
+			if("2".equals(res)) {
+				return ResultGenerator.genResult(MemberEnums.VERIFY_IDCARD_EROOR.getcode(),reason);
+			}
+		}else {
+			return ResultGenerator.genResult(MemberEnums.VERIFY_IDCARD_EROOR.getcode(),reason);
+		}
     	
     	this.saveUserReal(realName,iDCode);
+    	
     	User updateUser = new User();
     	updateUser.setUserId(userId);
     	updateUser.setIsReal(ProjectConstant.USER_IS_REAL);
@@ -111,7 +115,7 @@ public class UserRealService extends AbstractService<UserReal> {
 	 * @return
 	 * @throws UnsupportedEncodingException 
 	 */
-	public BaseResult<String> realNameAuth2(String realName,String idcard) {
+	public JSONObject realNameAuth2(String realName,String idcard) {
 		ClientHttpRequestFactory clientFactory = restTemplateConfig.simpleClientHttpRequestFactory();
 		RestTemplate rest = restTemplateConfig.restTemplate(clientFactory);
 		HttpHeaders headers = new HttpHeaders();
@@ -131,19 +135,7 @@ public class UserRealService extends AbstractService<UserReal> {
 			log.error(e.getMessage());
 		}
 
-		JSONObject json_tmp = (JSONObject) json.get("result");
-		Integer errorCode =  (Integer) json.get("error_code");
-		if(0 == errorCode) {
-			String res = json_tmp.getString("res");
-			String reason = json_tmp.getString("reason");
-			if("1".equals(res)) {
-				return ResultGenerator.genSuccessResult(reason);
-			}else {
-				return ResultGenerator.genFailResult(reason);
-			}
-		}else {
-			return ResultGenerator.genFailResult("调用第三方实名认证失败");
-		}
+		return json;
 		
 	}    
     

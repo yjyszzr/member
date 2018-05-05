@@ -27,7 +27,10 @@ public enum MemberEnums {
 	DATA_ALREADY_EXIT_IN_DB(301034,"数据已存在数据库中"),
 	BANKCARD_NOT_MATCH(301035,"用户信息与银行卡不匹配"),
 	ARTICLE_NOT_COLLECT(301036,"用户没有收藏该文章"),
-	BANKCARD_FORMAT_ERROR(301037,"银行卡号格式不正确");
+	BANKCARD_FORMAT_ERROR(301037,"银行卡号格式不正确"),
+	PASS_FORMAT_ERROR(301038,"请输入6-20数字和字母组合的密码"),
+	MOBILE_VALID_ERROR(301039,"请输入合法的手机号"),
+	VERIFY_IDCARD_EROOR(301040,"校验身份证失败");
 
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	

@@ -123,7 +123,7 @@ public class UserService extends AbstractService<User> {
 	 */
 	public BaseResult<String> validateUserMobile(String mobileNumber) {
     	if(!RegexUtil.checkMobile(mobileNumber)) {
-    		return ResultGenerator.genFailResult("请输入合法的手机号");
+    		return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
     	}
     	
     	User user = this.findBy("mobile", mobileNumber);
@@ -139,8 +139,8 @@ public class UserService extends AbstractService<User> {
 	 * @param mobileNumberParam
 	 */
 	public BaseResult<String> updateUserLoginPass(String userLoginPass,String mobileNumber,String smsCode){
-    	if(!userLoginPass.matches("^[0-9A-Za-z]{6,20}$")) {
-    		return ResultGenerator.genFailResult("请输入6-20数字和字母的组合的密码");
+    	if(!userLoginPass.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
+    		return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
     	}
 		
     	User user = this.findBy("mobile", mobileNumber);

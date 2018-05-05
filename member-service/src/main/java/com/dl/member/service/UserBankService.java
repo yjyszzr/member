@@ -113,7 +113,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		String realName = userRealDTO.getRealName();
 		JSONObject json = this.bankCardAuth3(realName, bankCardNo,idCard);
 		JSONObject result = (JSONObject) json.get("result");
-		String reason = result.getString("reason");
+		String reason = json.getString("reason");
 		Integer errorCode = json.getInteger("error_code");
 		String res = result.getString("res");
 		if(0 == errorCode) {
