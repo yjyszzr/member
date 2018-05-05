@@ -30,7 +30,7 @@ public class DlComplainController {
 
     @ApiOperation(value = "用户投诉接口", notes = "用户投诉接口")
     @PostMapping("/add")
-    public BaseResult add(@RequestBody DlComplainAddParam param) {
+    public BaseResult<String> add(@RequestBody DlComplainAddParam param) {
     	String complainContent = param.getComplainContent();
     	if(StringUtils.isBlank(complainContent)) {
     		return ResultGenerator.genResult(MemberEnums.COMPLAIN_CONTENT_NULL.getcode(), MemberEnums.COMPLAIN_CONTENT_NULL.getMsg());
