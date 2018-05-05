@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
-import com.dl.base.enums.PayEnum;
+import com.dl.base.enums.AccountEnum;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
@@ -123,20 +123,20 @@ public class UserAccountService extends AbstractService<UserAccount> {
         String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
         userAccountParam.setAccountSn(accountSn);
         Integer payType = surplusPayParam.getPayType();
-        if(PayEnum.YUEPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(PayEnum.YUEPAY.getCode()));
+        if(AccountEnum.YUEPAY.getCode().equals(payType)) {
+        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.YUEPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplus));
-        }else if(PayEnum.WEIXINPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(PayEnum.WEIXINPAY.getCode()));
+        }else if(AccountEnum.WEIXINPAY.getCode().equals(payType)) {
+        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.WEIXINPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getThirdPartPaid()));
-        }else if(PayEnum.ALIPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(PayEnum.ALIPAY.getCode()));
+        }else if(AccountEnum.ALIPAY.getCode().equals(payType)) {
+        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.ALIPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getThirdPartPaid()));
-        } if(PayEnum.MIXPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(PayEnum.MIXPAY.getCode()));
+        } if(AccountEnum.MIXPAY.getCode().equals(payType)) {
+        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.MIXPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
-        }else if(PayEnum.RONGBAOPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(PayEnum.RONGBAOPAY.getCode()));
+        }else if(AccountEnum.RONGBAOPAY.getCode().equals(payType)) {
+        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.RONGBAOPAY.getCode()));
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
         }
         
@@ -150,7 +150,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setBonusPrice(surplusPayParam.getBonusMoney());
         userAccountParam.setUserName(user.getUserName());
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-        if(PayEnum.YUEPAY.getCode().equals(payType)) {
+        if(AccountEnum.YUEPAY.getCode().equals(payType)) {
         	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
         }else {
         	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.NOT_FINISH));
@@ -633,7 +633,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
             if(StringUtil.isEmpty(ua.getPaymentName())) {
             	userAccountDTO.setProcessTypeName("");
             }else {
-            	userAccountDTO.setProcessTypeName(PayEnum.getName(Integer.valueOf(ua.getPaymentName())));
+            	userAccountDTO.setProcessTypeName(AccountEnum.getName(Integer.valueOf(ua.getPaymentName())));
             }
             userAccountDTO.setNote(ua.getNote());
             String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1? "¥ " + "+" +ua.getAmount():"¥ " +String.valueOf(ua.getAmount());
