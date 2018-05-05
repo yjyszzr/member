@@ -60,7 +60,7 @@
 		        AND end_time &gt;= #{endTime}
 		    </if>
 	    </where>
-	    order by start_time ASC,bonus_price DESC,min_goods_amount ASC
+	    order by start_time ASC,end_time ASC,bonus_price ASC,min_goods_amount ASC
   </select>
   
   <select id="queryUserBonusIdsExpire" parameterType="java.lang.String" resultType="java.lang.Integer">

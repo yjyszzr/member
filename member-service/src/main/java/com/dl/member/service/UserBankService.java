@@ -102,23 +102,26 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 		
 		//查询银行卡具体信息，并过滤信用卡
-		BaseResult<UserBankDTO> detectRst = this.detectUserBank(bankCardNo);
-		if(detectRst.getCode() != 0) {
-			return ResultGenerator.genResult(detectRst.getCode(), detectRst.getMsg());
-		}
+//		BaseResult<UserBankDTO> detectRst = this.detectUserBank(bankCardNo);
+//		if(detectRst.getCode() != 0) {
+//			return ResultGenerator.genResult(detectRst.getCode(), detectRst.getMsg());
+//		}
 		
 		//三元素校验
-		UserBankDTO userBankDTO = detectRst.getData();
+		UserBankDTO userBankDTO = null;
 		String idCard = userRealDTO.getIdCode();
 		String realName = userRealDTO.getRealName();
-		BaseResult<String> atuhRst = this.bankCardAuth3(realName, bankCardNo,idCard);
-		if(atuhRst.getCode() != 0) {
-			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg());
-		}
-		
-		//用户不匹配
-		if(atuhRst.getData().equals(ProjectConstant.BANKCARD_NOT_MATCH)) {
-			return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(),MemberEnums.BANKCARD_NOT_MATCH.getMsg());
+		JSONObject json = this.bankCardAuth3(realName, bankCardNo,idCard);
+		JSONObject result = (JSONObject) json.get("result");
+		String reason = result.getString("reason");
+		Integer errorCode = json.getInteger("error_code");
+		String res = result.getString("res");
+		if(0 == errorCode) {
+			if("2" == res) {
+				return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(), MemberEnums.BANKCARD_NOT_MATCH.getMsg());
+			}
+		}else {
+			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), reason);
 		}
 		
 		//把已经添加的默认银行卡 设为非默认
@@ -203,7 +206,7 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * @param cardNo
 	 * @return
 	 */
-	public BaseResult<String> bankCardAuth3(String realName,String cardNo,String idcard) {
+	public JSONObject bankCardAuth3(String realName,String cardNo,String idcard) {
 		ClientHttpRequestFactory clientFactory = restTemplateConfig.simpleClientHttpRequestFactory();
 		RestTemplate rest = restTemplateConfig.restTemplate(clientFactory);
 		HttpHeaders headers = new HttpHeaders();
@@ -224,17 +227,8 @@ public class UserBankService extends AbstractService<UserBank> {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
-
-		JSONObject result = (JSONObject) json.get("result");
-		String reason = result.getString("reason");
-		Integer errorCode = json.getInteger("error_code");
-		String res = result.getString("res");
-		if(0 == errorCode) {
-			return ResultGenerator.genSuccessResult("银行卡校验成功",res);
-		}else {
-			return ResultGenerator.genFailResult(reason);
-		}
-
+		
+		return json;
 	}
 
 	/**
