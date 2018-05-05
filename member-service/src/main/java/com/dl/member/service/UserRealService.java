@@ -75,11 +75,6 @@ public class UserRealService extends AbstractService<UserReal> {
     	Integer userId = SessionUtil.getUserId();
     	User user = userService.findById(userId);
     	
-    	UserReal userReal = this.findBy("idCode", iDCode);
-    	if(userReal != null) {
-    		return ResultGenerator.genResult(MemberEnums.USERREAL_ALREADY_AUTH.getcode(), MemberEnums.USERREAL_ALREADY_AUTH.getMsg());
-    	}
-    	
     	try {
 			realName = URLDecoder.decode(realName, "UTF-8");
 		} catch (Exception e) {
@@ -99,6 +94,11 @@ public class UserRealService extends AbstractService<UserReal> {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_IDCARD_EROOR.getcode(),reason);
 		}
     	
+    	UserReal userReal = this.findBy("idCode", iDCode);
+    	if(userReal != null) {
+    		return ResultGenerator.genResult(MemberEnums.USERREAL_ALREADY_AUTH.getcode(), MemberEnums.USERREAL_ALREADY_AUTH.getMsg());
+    	}
+		
     	this.saveUserReal(realName,iDCode);
     	
     	User updateUser = new User();

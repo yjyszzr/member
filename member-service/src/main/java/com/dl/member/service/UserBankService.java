@@ -92,15 +92,6 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genResult(MemberEnums.NOT_REAL_AUTH.getcode(), MemberEnums.NOT_REAL_AUTH.NOT_REAL_AUTH.getMsg());
 		}
 		
-		//已经添加过该银行卡
-		UserBank userBankAlready = new UserBank();
-		userBankAlready.setCardNo(bankCardNo);
-		userBankAlready.setIsDelete(ProjectConstant.NOT_DELETE);
-		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankAlready);
-		if(!CollectionUtils.isEmpty(userBankList)) {
-			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg());
-		}
-		
 		//查询银行卡具体信息，并过滤信用卡
 //		BaseResult<UserBankDTO> detectRst = this.detectUserBank(bankCardNo);
 //		if(detectRst.getCode() != 0) {
@@ -123,6 +114,16 @@ public class UserBankService extends AbstractService<UserBank> {
 		}else {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), reason);
 		}
+		
+		//已经添加过该银行卡
+		UserBank userBankAlready = new UserBank();
+		userBankAlready.setCardNo(bankCardNo);
+		userBankAlready.setIsDelete(ProjectConstant.NOT_DELETE);
+		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankAlready);
+		if(!CollectionUtils.isEmpty(userBankList)) {
+			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg());
+		}
+		
 		
 		//把已经添加的默认银行卡 设为非默认
 		BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
