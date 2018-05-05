@@ -71,7 +71,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
     	if(userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {//账号正常
     		BaseResult<UserLoginDTO> userLoginRst = this.verifyUserPass(password, user, userLoginMobileParam);
     		if(userLoginRst.getCode() != 0) {
-    			return ResultGenerator.genFailResult(userLoginRst.getMsg());
+    			return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
     		}
     		userLoginDTO = userLoginRst.getData();
     		return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
@@ -82,7 +82,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
         	if(beyond1h) {
         		BaseResult<UserLoginDTO> userLoginRst = this.verifyUserPass(password, user, userLoginMobileParam);
         		if(userLoginRst.getCode() != 0) {
-        			return ResultGenerator.genFailResult(userLoginRst.getMsg());
+        			return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
         		}
         		userLoginDTO = userLoginRst.getData();
         		

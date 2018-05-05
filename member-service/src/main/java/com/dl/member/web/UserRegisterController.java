@@ -65,7 +65,7 @@ public class UserRegisterController {
     	
     	BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
     	if(regRst.getCode() != 0) {
-    		return ResultGenerator.genFailResult(regRst.getMsg());
+    		return ResultGenerator.genResult(regRst.getCode(),regRst.getMsg());
     	}
     	
     	userBonusService.receiveUserBonus(ProjectConstant.REGISTER,regRst.getData());

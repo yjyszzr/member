@@ -87,11 +87,11 @@ public class UserRealService extends AbstractService<UserReal> {
 		}
     	
     	JSONObject json = this.realNameAuth2(realName, iDCode);
-		JSONObject result = (JSONObject) json.get("result");
-		String res = result.getString("res");
-		String reason = json.getString("reason");
+    	String reason = json.getString("reason");
 		Integer errorCode =  (Integer) json.get("error_code");
 		if(0 == errorCode) {
+			JSONObject result = (JSONObject) json.get("result");
+			String res = result.getString("res");
 			if("2".equals(res)) {
 				return ResultGenerator.genResult(MemberEnums.VERIFY_IDCARD_EROOR.getcode(),reason);
 			}

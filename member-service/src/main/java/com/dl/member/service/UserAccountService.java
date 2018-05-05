@@ -111,7 +111,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         }
 
         if (surplus.compareTo(BigDecimal.ZERO) == -1 || surplus.compareTo(BigDecimal.ZERO) == 0) {
-            return ResultGenerator.genBadRequestResult("扣减余额不能为负数和0");
+            return ResultGenerator.genResult(MemberEnums.MONEY_PAID_NOTLESS_ZERO.getcode(), MemberEnums.MONEY_PAID_NOTLESS_ZERO.getMsg());
         }
         
         //校验

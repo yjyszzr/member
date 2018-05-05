@@ -30,7 +30,9 @@ public enum MemberEnums {
 	BANKCARD_FORMAT_ERROR(301037,"银行卡号格式不正确"),
 	PASS_FORMAT_ERROR(301038,"请输入6-20数字和字母组合的密码"),
 	MOBILE_VALID_ERROR(301039,"请输入合法的手机号"),
-	VERIFY_IDCARD_EROOR(301040,"校验身份证失败");
+	VERIFY_IDCARD_EROOR(301040,"校验身份证失败"),
+	MONEY_PAID_NOTLESS_ZERO(301041,"扣减余额不能为负数和0"),
+	SEND_SMS_ERROR(301042,"发送短信验证码失败");
 
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	

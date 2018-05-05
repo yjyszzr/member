@@ -112,11 +112,11 @@ public class UserBankService extends AbstractService<UserBank> {
 		String idCard = userRealDTO.getIdCode();
 		String realName = userRealDTO.getRealName();
 		JSONObject json = this.bankCardAuth3(realName, bankCardNo,idCard);
-		JSONObject result = (JSONObject) json.get("result");
 		String reason = json.getString("reason");
 		Integer errorCode = json.getInteger("error_code");
-		String res = result.getString("res");
 		if(0 == errorCode) {
+			JSONObject result = (JSONObject) json.get("result");
+			String res = result.getString("res");
 			if("2" == res) {
 				return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(), MemberEnums.BANKCARD_NOT_MATCH.getMsg());
 			}
@@ -256,9 +256,9 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 
 		UserBankDTO userBankDTO = new UserBankDTO();
-		JSONObject result = (JSONObject) json.get("result");
 		Integer errorCode = json.getInteger("error_code");
 		if(0 == errorCode) {
+			JSONObject result = (JSONObject) json.get("result");
 			userBankDTO.setBankName(result.getString("bank"));
 			userBankDTO.setBankLogo(result.getString("logo"));
 			userBankDTO.setCardType(result.getString("cardtype"));
@@ -267,7 +267,7 @@ public class UserBankService extends AbstractService<UserBank> {
 			}
 			return ResultGenerator.genSuccessResult("查询银行卡种类成功", userBankDTO) ;
 		}else {
-			return ResultGenerator.genFailResult(result.getString("reason"), userBankDTO);
+			return ResultGenerator.genFailResult("查询银行卡种类失败", userBankDTO);
 		}
 	}
 	
