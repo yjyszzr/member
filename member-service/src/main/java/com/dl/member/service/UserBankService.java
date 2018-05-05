@@ -99,7 +99,7 @@ public class UserBankService extends AbstractService<UserBank> {
 //		}
 		
 		//三元素校验
-		UserBankDTO userBankDTO = null;
+		UserBankDTO userBankDTO = new UserBankDTO();
 		String idCard = userRealDTO.getIdCode();
 		String realName = userRealDTO.getRealName();
 		JSONObject json = this.bankCardAuth3(realName, bankCardNo,idCard);
