@@ -71,7 +71,7 @@ public class UserRealService extends AbstractService<UserReal> {
      * @throws UnsupportedEncodingException 
      */
     @Transactional
-    public BaseResult<UserRealDTO> realNameAuth(String realName,String iDCode) {
+    public BaseResult<String> realNameAuth(String realName,String iDCode) {
     	Integer userId = SessionUtil.getUserId();
     	User user = userService.findById(userId);
     	
@@ -88,7 +88,7 @@ public class UserRealService extends AbstractService<UserReal> {
 			JSONObject result = (JSONObject) json.get("result");
 			String res = result.getString("res");
 			if("2".equals(res)) {
-				return ResultGenerator.genResult(MemberEnums.VERIFY_IDCARD_EROOR.getcode(),reason);
+				return ResultGenerator.genResult(MemberEnums.NOT_REAL_AUTH.getcode(),MemberEnums.NOT_REAL_AUTH.getMsg());
 			}
 		}else {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_IDCARD_EROOR.getcode(),reason);

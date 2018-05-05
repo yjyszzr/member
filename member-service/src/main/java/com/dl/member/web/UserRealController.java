@@ -28,7 +28,7 @@ public class UserRealController {
      */
     @ApiOperation(value = "实名认证", notes = "实名认证")
     @PostMapping("/realNameAuth")
-    public BaseResult<UserRealDTO> realNameAuth(@RequestBody RealNameAuthParam realNameAuthParam){
+    public BaseResult<String> realNameAuth(@RequestBody RealNameAuthParam realNameAuthParam){
     	return userRealService.realNameAuth(realNameAuthParam.getRealName(), realNameAuthParam.getIDCode());
     }
     
