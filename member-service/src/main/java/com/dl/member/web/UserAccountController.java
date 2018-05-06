@@ -175,14 +175,15 @@ public class UserAccountController {
     	userAccountParam.setAccountType(userAccountParamByType.getAccountType());
     	userAccountParam.setAmount(userAccountParamByType.getAmount());
     	userAccountParam.setOrderSn(userAccountParamByType.getOrderSn());
-    	userAccountParam.setPaymentCode(userAccountParamByType.getPaymentCode());
     	userAccountParam.setPaymentName(userAccountParamByType.getPaymentName());
     	userAccountParam.setNote("");
+    	userAccountParam.setBonusPrice(userAccountParamByType.getBonusPrice());
     	userAccountParam.setThirdPartName(userAccountParamByType.getThirdPartName());
     	userAccountParam.setThirdPartPaid(userAccountParamByType.getThirdPartPaid());
     	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
     	
     	return ResultGenerator.genSuccessResult("生成账户流水成功",userAccountService.saveAccount(userAccountParam));
     }
+    
     
 }

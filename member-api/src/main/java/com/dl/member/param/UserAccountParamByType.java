@@ -16,20 +16,13 @@ public class UserAccountParamByType {
     private Integer accountType;
     
     @ApiModelProperty(value = "资金变化:注意正负")
-    private BigDecimal amount;
-    
-    
-    @ApiModelProperty(value = "支付代码")
-    private String paymentCode;
+    private BigDecimal amount;       
     
     @ApiModelProperty(value = "支付名称")
     private String paymentName;
     
     @ApiModelProperty(value = "订单号")
     private String orderSn;
-    
-    @ApiModelProperty(value = "日志")
-    private String note;
     
     @ApiModelProperty(value = "支付id")
     private String payId;
@@ -46,7 +39,7 @@ public class UserAccountParamByType {
     @ApiModelProperty(value = "第三方支付金额")
     private BigDecimal thirdPartPaid;
     
-    @ApiModelProperty(value = "状态：0-未完成 1-已完成 2-失败")
+    @ApiModelProperty(value = "状态：1-已完成 ")
     private Integer status;
     
     @ApiModelProperty(value = "使用的红包的金额")

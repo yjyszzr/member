@@ -92,7 +92,17 @@ public class UserBankService extends AbstractService<UserBank> {
 		if(null == userRealDTO) {
 			return ResultGenerator.genResult(MemberEnums.NOT_REAL_AUTH.getcode(), MemberEnums.NOT_REAL_AUTH.NOT_REAL_AUTH.getMsg(),userBankDTO);
 		}
-		
+
+		//已经添加过该银行卡
+		Integer userId = SessionUtil.getUserId();
+		UserBank userBankAlready = new UserBank();
+		userBankAlready.setCardNo(bankCardNo);
+		userBankAlready.setUserId(userId);
+		userBankAlready.setIsDelete(ProjectConstant.NOT_DELETE);
+		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankAlready);
+		if(!CollectionUtils.isEmpty(userBankList)) {
+			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg(),userBankDTO);
+		}
 		//查询银行卡具体信息，并过滤信用卡
 //		BaseResult<UserBankDTO> detectRst = this.detectUserBank(bankCardNo);
 //		if(detectRst.getCode() != 0) {
@@ -108,20 +118,11 @@ public class UserBankService extends AbstractService<UserBank> {
 		if(0 == errorCode) {
 			JSONObject result = (JSONObject) json.get("result");
 			String res = result.getString("res");
-			if("2" == res) {
+			if("2".equals(res)) {
 				return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(), MemberEnums.BANKCARD_NOT_MATCH.getMsg(),userBankDTO);
 			}
 		}else {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), reason,userBankDTO);
-		}
-		
-		//已经添加过该银行卡
-		UserBank userBankAlready = new UserBank();
-		userBankAlready.setCardNo(bankCardNo);
-		userBankAlready.setIsDelete(ProjectConstant.NOT_DELETE);
-		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankAlready);
-		if(!CollectionUtils.isEmpty(userBankList)) {
-			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg(),userBankDTO);
 		}
 		
 		
