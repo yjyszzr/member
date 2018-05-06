@@ -9,12 +9,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.AccountEnum;
@@ -26,7 +28,6 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
-import com.dl.member.api.ISysConfigService;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserAccountMapper;
 import com.dl.member.dao.UserMapper;
@@ -40,7 +41,6 @@ import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.model.UserWithdraw;
 import com.dl.member.param.SurplusPayParam;
-import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
@@ -54,7 +54,6 @@ import com.mysql.jdbc.PreparedStatement;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
-import tk.mybatis.mapper.util.StringUtil;
 
 @Service
 @Slf4j
@@ -93,7 +92,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     /**
      * @param SurplusPayParam surplusPayParam
      * @return
-     * @see:余额支付引起账户变化 
+     * @see:包含了余额部分的扣款
      */
     @Transactional
     public BaseResult<SurplusPaymentCallbackDTO> addUserAccountByPay(SurplusPayParam surplusPayParam) {
@@ -102,15 +101,18 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	Integer userId = SessionUtil.getUserId();
         User user = userService.findById(userId);
+        if(null == user) {
+        	return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户不存在，不能使用余额付款");
+        }
         
         //用户余额
         BigDecimal yue = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney());
-        BigDecimal surplus = surplusPayParam.getMoneyPaid();
+        BigDecimal surplus = surplusPayParam.getSurplus();
         if (yue.compareTo(surplus) == -1) {
             return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
         }
 
-        if (surplus.compareTo(BigDecimal.ZERO) == -1 || surplus.compareTo(BigDecimal.ZERO) == 0) {
+        if (surplus.compareTo(BigDecimal.ZERO) <= 0) {
             return ResultGenerator.genResult(MemberEnums.MONEY_PAID_NOTLESS_ZERO.getcode(), MemberEnums.MONEY_PAID_NOTLESS_ZERO.getMsg());
         }
         
@@ -122,24 +124,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         UserAccountParam userAccountParam = new UserAccountParam();
         String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
         userAccountParam.setAccountSn(accountSn);
-        Integer payType = surplusPayParam.getPayType();
-        if(0 == payType) {
-        	userAccountParam.setPaymentName("0");
-        	userAccountParam.setAmount(new BigDecimal(0).subtract(surplus));
-        }else if(1 == payType) {
-        	userAccountParam.setPaymentName("1");
-        	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getThirdPartPaid()));
-        }else if(2 == payType) {
-        	userAccountParam.setPaymentName("2");
-        	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getThirdPartPaid()));
-        } if(3 == payType) {
-        	userAccountParam.setPaymentName("3");
-        	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
-        }else if(4 == payType) {
-        	userAccountParam.setPaymentName("4");
-        	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
-        }
-        
+    	userAccountParam.setAmount(BigDecimal.ZERO.subtract(surplusPayParam.getMoneyPaid()));
         userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
         userAccountParam.setAccountType(ProjectConstant.BUY);
         userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
@@ -150,12 +135,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setBonusPrice(surplusPayParam.getBonusMoney());
         userAccountParam.setUserName(user.getUserName());
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-        if(0 ==payType) {
-        	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
-        }else {
-        	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.NOT_FINISH));
-        }
-        
+        userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
         userAccountParam.setNote(this.createNote(surplusPayParam));
         userAccountParam.setPayId("");
         String accountSnRst = this.saveAccount(userAccountParam);
@@ -226,7 +206,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		noteStr = noteStr + "红包支付"+surplusPayParam.getBonusMoney()+"元";
     	}
     	
-    	if(payType.equals(ProjectConstant.mixPay)) {
+    	if(surplusPayParam.getThirdPartPaid().compareTo(BigDecimal.ZERO) > 0) {
         	noteStr = surplusPayParam.getThirdPartName()+"支付"+surplusPayParam.getThirdPartPaid()+"元\n"
     		        +"余额支付"+surplusPayParam.getSurplus()+"元";
     	}
@@ -631,8 +611,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
             userAccountDTO.setProcessTypeName(AccountEnum.getName(ua.getProcessType()));
-            userAccountDTO.setNote(ua.getNote());
-            String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1? "¥ " + "+" +ua.getAmount():"¥ " +String.valueOf(ua.getAmount());
+            userAccountDTO.setNote(ua.getNote());//这个字段可以用数据库中的其他字段来拼，目前采用直接取的方式
+            String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1? "+"+ua.getAmount()+"元":String.valueOf(ua.getAmount()+"元");
             userAccountDTO.setChangeAmount(changeAmount);
             userAccountListDTO.add(userAccountDTO);
         }
@@ -647,6 +627,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         result.setList(userAccountListDTO);
         return result;
     }    
+    
     
     
     /**
