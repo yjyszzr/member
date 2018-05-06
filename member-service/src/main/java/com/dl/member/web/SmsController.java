@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.RandomUtil;
+import com.dl.base.util.RegexUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
@@ -47,17 +48,22 @@ public class SmsController {
     @ApiOperation(value = "发送短信验证码", notes = "发送短信验证码")
     @PostMapping("/sendSmsCode")
     public BaseResult<String> sendSms(@RequestBody SmsParam smsParam){
+    	if(!RegexUtil.checkMobile(smsParam.getMobile())) {
+    		return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
+    	}
     	String smsType = smsParam.getSmsType();
     	String tplId = "";
     	String tplValue = "";
     	String strRandom4 = RandomUtil.getRandNum(4);
+    	User user = userService.findBy("mobile", smsParam.getMobile());
     	if(ProjectConstant.VERIFY_TYPE_LOGIN.equals(smsType)) {//登录
-    		
+        	if(null == user) {
+       		 	return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+        	}
     		tplId = ProjectConstant.LOGIN_TPLID;
     		strRandom4 = RandomUtil.getRandNum(4);
     		tplValue = "#code#="+strRandom4;
     	}else if(ProjectConstant.VERIFY_TYPE_REG.equals(smsType)) {//注册
-        	User user = userService.findBy("mobile", smsParam.getMobile());
         	if(null != user) {
        		 	return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
         	}
@@ -66,7 +72,6 @@ public class SmsController {
     		strRandom4 = RandomUtil.getRandNum(4);
     		tplValue = "#code#="+strRandom4;
     	}else if(ProjectConstant.VERIFY_TYPE_FORGET.equals(smsType)) {//忘记密码
-        	User user = userService.findBy("mobile", smsParam.getMobile());
         	if(null == user) {
        		 	return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
         	}
