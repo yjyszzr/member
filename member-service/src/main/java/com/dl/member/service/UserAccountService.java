@@ -123,20 +123,20 @@ public class UserAccountService extends AbstractService<UserAccount> {
         String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
         userAccountParam.setAccountSn(accountSn);
         Integer payType = surplusPayParam.getPayType();
-        if(AccountEnum.YUEPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.YUEPAY.getCode()));
+        if(0 == payType) {
+        	userAccountParam.setPaymentName("0");
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplus));
-        }else if(AccountEnum.WEIXINPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.WEIXINPAY.getCode()));
+        }else if(1 == payType) {
+        	userAccountParam.setPaymentName("1");
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getThirdPartPaid()));
-        }else if(AccountEnum.ALIPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.ALIPAY.getCode()));
+        }else if(2 == payType) {
+        	userAccountParam.setPaymentName("2");
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getThirdPartPaid()));
-        } if(AccountEnum.MIXPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.MIXPAY.getCode()));
+        } if(3 == payType) {
+        	userAccountParam.setPaymentName("3");
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
-        }else if(AccountEnum.RONGBAOPAY.getCode().equals(payType)) {
-        	userAccountParam.setPaymentName(String.valueOf(AccountEnum.RONGBAOPAY.getCode()));
+        }else if(4 == payType) {
+        	userAccountParam.setPaymentName("4");
         	userAccountParam.setAmount(new BigDecimal(0).subtract(surplusPayParam.getMoneyPaid()));
         }
         
@@ -150,7 +150,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setBonusPrice(surplusPayParam.getBonusMoney());
         userAccountParam.setUserName(user.getUserName());
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-        if(AccountEnum.YUEPAY.getCode().equals(payType)) {
+        if(0 ==payType) {
         	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
         }else {
         	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.NOT_FINISH));
@@ -629,12 +629,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
             userAccountDTO.setStatus(showStatus(ua.getProcessType(),ua.getId()));
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
-            userAccountDTO.setProcessTypeChar(createProcessTypeString(ua.getProcessType()));
-            if(StringUtil.isEmpty(ua.getPaymentName())) {
-            	userAccountDTO.setProcessTypeName("");
-            }else {
-            	userAccountDTO.setProcessTypeName(AccountEnum.getName(Integer.valueOf(ua.getPaymentName())));
-            }
+            userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
+            userAccountDTO.setProcessTypeName(AccountEnum.getName(ua.getProcessType()));
             userAccountDTO.setNote(ua.getNote());
             String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1? "¥ " + "+" +ua.getAmount():"¥ " +String.valueOf(ua.getAmount());
             userAccountDTO.setChangeAmount(changeAmount);
@@ -715,18 +711,18 @@ public class UserAccountService extends AbstractService<UserAccount> {
     
     /**
      * 根据操作类型返回不同的文字
-     * @param processType
+     * @param processType  1-奖金 2-充值 3-购彩 4-提现 5-红包 6-账户回滚
      * @return
      */
     public String createProcessTypeString(Integer processType) {
     	String str = "";
     	switch(processType) {
 	    	case 1:str = "奖";break;
-	    	case 2:str = "充值";break;
-	    	case 3:str = "购彩";break;
-	    	case 4:str = "提现";break;
-	    	case 5:str = "红包";break;
-	    	case 6:str = "购彩";break;
+	    	case 2:str = "充";break;
+	    	case 3:str = "购";break;
+	    	case 4:str = "提";break;
+	    	case 5:str = "红";break;
+	    	case 6:str = "返";break;
     	}
 		return str;
     }
