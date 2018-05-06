@@ -24,7 +24,7 @@
   
   <sql id="fields">
   	msg_id,sender,send_time,title,msg_type,push_type,push_value,receiver,receiver_mobile,object_type,
-  	is_mobile_success,is_push_success,is_read,content,msg_desc,content_url
+  	is_mobile_success,is_push_success,is_read,content,msg_desc,content_url,msg_url
   </sql>
   <select id="findUserMessageList" resultMap="BaseResultMap">
   	select 
