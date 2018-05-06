@@ -12,4 +12,7 @@ public interface UserCollectMapper extends Mapper<UserCollect> {
 	List<UserCollect> queryUserCollectListBySelective(UserCollect userCollect);
 	
 	int updateUserCollect(@Param("isDelete") Integer isDelete,@Param("userId") Integer userId,@Param("articleId") Integer articleId);
+	
+	int deleteUserCollect(@Param("userId") Integer userId,@Param("articleId") Integer articleId);
+
 }

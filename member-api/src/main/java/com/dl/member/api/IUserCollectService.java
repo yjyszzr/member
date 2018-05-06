@@ -22,7 +22,7 @@ public interface IUserCollectService {
 	 * @return
 	 */
 	@RequestMapping(path="/user/collect/isCollect", method=RequestMethod.POST)
-	public BaseResult<Integer> isCollect(@RequestBody ArticleIdParam articleIdParam);
+	public BaseResult<String> isCollect(@RequestBody ArticleIdParam articleIdParam);
 	
 	
 }

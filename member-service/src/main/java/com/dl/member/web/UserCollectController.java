@@ -10,6 +10,7 @@ import com.dl.lottery.param.ArticleIdsParam;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserCollectMapper;
 import com.dl.member.dto.UserCollectDTO;
+import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.UserCollect;
 import com.dl.member.param.ArticleIdParam;
 import com.dl.member.param.IDParam;
@@ -72,7 +73,7 @@ public class UserCollectController {
         PageInfo<DLArticleDTO> page = rst.getData();
         List<DLArticleDTO> aList = page.getList();
         if(CollectionUtils.isEmpty(aList)) {
-        	return ResultGenerator.genFailResult("文章不存在");
+        	return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "文章不存在");
         }
          
     
@@ -80,7 +81,6 @@ public class UserCollectController {
     	UserCollect userCollect = new UserCollect();
     	userCollect.setArticleId(Integer.valueOf(userCollectParam.getArticleId()));
     	userCollect.setUserId(userId);
-    	userCollect.setIsDelete(ProjectConstant.NOT_DELETE);
     	List<UserCollect> userCollectList = userCollectMapper.queryUserCollectListBySelective(userCollect);
     	if(!CollectionUtils.isEmpty(userCollectList)) {
     		return ResultGenerator.genSuccessResult("用户已添加收藏");
@@ -130,17 +130,16 @@ public class UserCollectController {
 	 */
     @ApiOperation(value = "用户收藏列表", notes = "用户收藏列表")
 	@RequestMapping(path="/isCollect", method=RequestMethod.POST)
-	public BaseResult<Integer> isCollect(@RequestBody ArticleIdParam articleIdParam){
+	public BaseResult<String> isCollect(@RequestBody ArticleIdParam articleIdParam){
     	Integer userId = SessionUtil.getUserId();
     	UserCollect userCollect = new UserCollect();
     	userCollect.setArticleId(articleIdParam.getArticleId());
+    	userCollect.setUserId(userId);
     	List<UserCollect> userCollectList = userCollectMapper.queryUserCollectListBySelective(userCollect);
     	if(CollectionUtils.isEmpty(userCollectList)) {
-    		ResultGenerator.genSuccessResult("success", 1);
+    		return ResultGenerator.genSuccessResult("success",ProjectConstant.IS_NOT_COLLECT);
     	}
-    	return ResultGenerator.genSuccessResult("success", userCollectList.get(0).getIsDelete());
-    	
-    	
+    	return ResultGenerator.genSuccessResult("success", ProjectConstant.IS_COLLECTED);
     }
     
 }

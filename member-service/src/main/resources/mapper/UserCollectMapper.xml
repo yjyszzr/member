@@ -37,4 +37,8 @@
   <update id="updateUserCollect"  parameterType="java.lang.Integer">
         UPDATE dl_user_collect SET is_delete= #{isDelete}  where user_id = #{userId} and article_id = #{articleId}
   </update>
+  
+  <delete id="deleteUserCollect" parameterType="java.lang.Integer">
+  		DELETE FROM dl_user_collect WHERE user_id = #{userId} AND article_id = #{articleId}
+  </delete>
 </mapper>
