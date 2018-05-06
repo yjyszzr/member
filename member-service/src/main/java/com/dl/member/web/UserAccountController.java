@@ -2,6 +2,7 @@ package com.dl.member.web;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.BatchResultDTO;
@@ -33,6 +34,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigDecimal;
+
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
@@ -164,20 +168,25 @@ public class UserAccountController {
     
     
 	/**
-	 * 给第三方支付提供的记录账户流水
+	 * 给第三方支付成功后提供的记录账户流水
 	 * @param userAccountByTypeParam
 	 * @return
 	 */
-    @ApiOperation(value="给第三方支付提供的记录账户流水", notes="给第三方支付提供的记录账户流水",hidden=false)
+    @ApiOperation(value="给单纯第三方支付成功后提供的记录账户流水", notes="给第三方支付成功后提供的记录账户流水",hidden=false)
 	@RequestMapping(path="/insertUserAccount", method=RequestMethod.POST)
     public BaseResult<String> insertUserAccount(@Valid @RequestBody UserAccountParamByType userAccountParamByType){
     	UserAccountParam userAccountParam = new UserAccountParam();
     	userAccountParam.setAccountType(userAccountParamByType.getAccountType());
     	userAccountParam.setAmount(userAccountParamByType.getAmount());
     	userAccountParam.setOrderSn(userAccountParamByType.getOrderSn());
+    	userAccountParam.setPayId(userAccountParamByType.getPayId());
     	userAccountParam.setPaymentName(userAccountParamByType.getPaymentName());
     	userAccountParam.setNote("");
+    	userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
+    	userAccountParam.setUserSurplus(BigDecimal.ZERO);
+    	userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
     	userAccountParam.setBonusPrice(userAccountParamByType.getBonusPrice());
+    	userAccountParam.setAccountType(ProjectConstant.BUY);
     	userAccountParam.setThirdPartName(userAccountParamByType.getThirdPartName());
     	userAccountParam.setThirdPartPaid(userAccountParamByType.getThirdPartPaid());
     	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));

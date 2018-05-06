@@ -1,6 +1,10 @@
 package com.dl.member.param;
 
 import java.math.BigDecimal;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -12,37 +16,36 @@ import lombok.Data;
 @Data
 public class UserAccountParamByType {
     
-    @ApiModelProperty(value = "流水类型")
+    @ApiModelProperty(value = "流水类型：2-充值  4 -提现",required = true)
+    @NotNull
     private Integer accountType;
     
-    @ApiModelProperty(value = "资金变化:注意正负")
+    @ApiModelProperty(value = "资金变化值为正数",required = true)
+    @Min(value=0)
     private BigDecimal amount;       
     
-    @ApiModelProperty(value = "支付名称")
+    @ApiModelProperty(value = "融宝支付或微信支付名称不为空",required = true)
+    @NotNull
     private String paymentName;
     
-    @ApiModelProperty(value = "订单号")
+    @ApiModelProperty(value = "订单号不为空",required = true)
+    @NotNull
     private String orderSn;
     
-    @ApiModelProperty(value = "支付id")
+    @ApiModelProperty(value = "支付id不为空",required = true)
+    @NotNull
     private String payId;
     
-    @ApiModelProperty(value = "使用的可提现余额")
-    private BigDecimal userSurplus;
-    
-    @ApiModelProperty(value = "使用的不可提现余额")
-    private BigDecimal userSurplusLimit;
-    
-    @ApiModelProperty(value = "第三方名称")
+    @ApiModelProperty(value = "第三方名称不为空",required = true)
+    @NotNull
     private String thirdPartName;
     
-    @ApiModelProperty(value = "第三方支付金额")
+    @ApiModelProperty(value = "第三方支付金额",required = true)
+    @Min(value=0)
     private BigDecimal thirdPartPaid;
     
-    @ApiModelProperty(value = "状态：1-已完成 ")
-    private Integer status;
-    
-    @ApiModelProperty(value = "使用的红包的金额")
+    @ApiModelProperty(value = "红包的金额为正数",required = true)
+    @Min(value=0)
     private BigDecimal bonusPrice;
 
 }

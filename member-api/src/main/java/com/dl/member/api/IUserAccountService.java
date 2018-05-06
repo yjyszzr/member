@@ -20,6 +20,7 @@ import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.UserWithdrawParam;
 //import com.pgt.shop.member.param.UserCapitalParam;
@@ -116,6 +117,16 @@ public interface IUserAccountService {
 	 */
 	@RequestMapping(path="/user/account/batchUpdateUserAccount", method=RequestMethod.POST)
     public BaseResult<String> changeUserAccountByType(@Valid @RequestBody UserIdAndRewardListParam userAccountByTypeParam);
+	
+	
+	/**
+	 * 给第三方支付提供的记录账户流水
+	 * @param userAccountByTypeParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/account/insertUserAccount", method=RequestMethod.POST)
+    public BaseResult<String> insertUserAccount(@Valid @RequestBody UserAccountParamByType userAccountParamByType);
+	
 	
 //	
 //	/**
