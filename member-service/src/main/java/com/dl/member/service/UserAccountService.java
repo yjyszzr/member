@@ -523,12 +523,14 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	if(CollectionUtils.isEmpty(userAccountList)) {
     		return null;
     	}
+    	
     	UserAccount  rollBackUserAccount = userAccountList.get(0);
     	Integer userId = SessionUtil.getUserId();
         User user = userService.findById(userId);
     	if(null == user) {
     		user = userService.findById(rollBackUserAccount.getUserId());
     	}
+    	
     	User updateUser = new User();
     	BigDecimal userSurplus = rollBackUserAccount.getUserSurplus();
     	BigDecimal userSurplusLimit = rollBackUserAccount.getUserSurplusLimit();
@@ -544,6 +546,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		updateUser.setUserMoneyLimit(user_money_limit);
     		isModify = true;
     	}
+    	
     	if(isModify) {
     		updateUser.setUserId(user.getUserId());
     		int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
@@ -551,7 +554,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
         
 //    	this.deleteById(userAccountList.get(0).getId());
     	
-        
         UserAccountParam userAccountParam = new UserAccountParam();
         String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
         userAccountParam.setAccountSn(accountSn);
@@ -566,7 +568,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
         userAccountParam.setUserName(user.getUserName());
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-        userAccountParam.setNote("回滚账户:"+BigDecimal.ZERO.subtract(rollBackUserAccount.getAmount())+"元");
+        userAccountParam.setNote("退回:"+BigDecimal.ZERO.subtract(rollBackUserAccount.getAmount())+"元");
         userAccountParam.setPayId("");
         this.saveAccount(userAccountParam);
         

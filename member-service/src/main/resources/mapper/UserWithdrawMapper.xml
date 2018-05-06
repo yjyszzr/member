@@ -22,8 +22,8 @@
   </resultMap>
   
   <insert id="insertUserWithdraw"  parameterType="com.dl.member.model.UserWithdraw">
-     INSERT INTO dl_user_withdraw(withdrawal_sn,user_id,amount,add_time,status,real_name,card_no)
-     VALUES(#{withdrawalSn},#{userId},#{amount},#{addTime},#{status},#{realName},#{cardNo},#{bankName});
+     INSERT INTO dl_user_withdraw(withdrawal_sn,user_id,amount,add_time,status,real_name,card_no,bank_name)
+     VALUES(#{withdrawalSn},#{userId},#{amount},#{addTime},#{status},#{realName},#{cardNo},#{bankName})
   </insert>
   
   <update id="updateUserWithdrawBySelective" parameterType="com.dl.member.model.UserWithdraw">

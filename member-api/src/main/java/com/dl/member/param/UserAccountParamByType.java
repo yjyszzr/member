@@ -16,7 +16,7 @@ import lombok.Data;
 @Data
 public class UserAccountParamByType {
     
-    @ApiModelProperty(value = "流水类型：2-充值  4 -提现",required = true)
+    @ApiModelProperty(value = "流水类型：2-充值  3-购彩  4 -提现",required = true)
     @NotNull
     private Integer accountType;
     
