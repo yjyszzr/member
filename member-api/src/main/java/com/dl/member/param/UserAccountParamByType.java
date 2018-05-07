@@ -34,7 +34,7 @@ public class UserAccountParamByType {
     
     @ApiModelProperty(value = "支付id不为空",required = true)
     @NotNull
-    private String payId;
+    private Integer payId;
     
     @ApiModelProperty(value = "第三方名称不为空",required = true)
     @NotNull

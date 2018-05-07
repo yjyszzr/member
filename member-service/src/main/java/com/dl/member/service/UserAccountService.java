@@ -421,6 +421,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
      */
     @Transactional
     public BaseResult<String> rechargeUserMoneyLimit(RecharegeParam recharegeParam) {
+    	Condition condition = new Condition(UserAccount.class);
+    	Criteria cri = condition.createCriteria();
+    	cri.andCondition("user_id =",recharegeParam.getUserId());
+    	cri.andCondition("pay_id =",recharegeParam.getPayId());
+    	List<UserAccount> userAccountList = this.findByCondition(condition);
+    	if(CollectionUtils.isEmpty(userAccountList)) {
+    		return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),MemberEnums.DATA_ALREADY_EXIT_IN_DB.getMsg());
+    	}
+    	
     	BigDecimal user_money = BigDecimal.ZERO; //用户账户变动后的可提现余额
         BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
         BigDecimal curBalance = BigDecimal.ZERO;//当前变动后的总余额
@@ -826,7 +835,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	userAccount.setProcessType(ProjectConstant.BUY);
     	userAccount.setAmount(userAccountParamByType.getAmount());
     	userAccount.setOrderSn(userAccountParamByType.getOrderSn());
-    	userAccount.setPayId(userAccountParamByType.getPayId());
+    	userAccount.setPayId(String.valueOf(userAccountParamByType.getPayId()));
     	userAccount.setPaymentName(userAccountParamByType.getPaymentName());
     	userAccount.setUserId(userAccountParamByType.getUserId());
     	if(userAccountParamByType.getBonusPrice().compareTo(BigDecimal.ZERO) > 0) {

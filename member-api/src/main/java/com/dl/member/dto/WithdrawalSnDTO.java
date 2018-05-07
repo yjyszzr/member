@@ -20,4 +20,7 @@ public class WithdrawalSnDTO {
 	@ApiModelProperty("提现单号")
     private String withdrawalSn;
 	
+	@ApiModelProperty("提现单生成时间")
+    private Integer addTime;
+	
 }
