@@ -17,6 +17,8 @@ import com.dl.member.dto.UserBankDTO;
 //import com.pgt.shop.member.param.UserBonusIdsParam;
 //import com.pgt.shop.member.param.ValidUserBonusParam;
 import com.dl.member.param.IDParam;
+import com.dl.member.param.UserBankParam;
+import com.dl.member.param.UserBankQueryParam;
 import com.dl.member.param.UserBonusIdParam;
 
 
@@ -36,5 +38,13 @@ public interface IUserBankService {
 	  */
 	 @PostMapping("/user/bank/queryUserBank")    
 	 BaseResult<UserBankDTO> queryUserBank(@RequestBody IDParam idParam);
+	 
+	  /**
+	  * 查询银行卡信息
+	  *
+	  * @return
+	  */
+	 @PostMapping("/user/bank/queryUserBankByCondition")    
+	 BaseResult<UserBankDTO> queryUserBankByCondition(@RequestBody UserBankQueryParam userBankQueryParam);
     
 }

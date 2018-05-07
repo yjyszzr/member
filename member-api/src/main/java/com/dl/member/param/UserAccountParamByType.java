@@ -47,5 +47,9 @@ public class UserAccountParamByType {
     @ApiModelProperty(value = "红包的金额为正数",required = true)
     @Min(value=0)
     private BigDecimal bonusPrice;
+    
+    @ApiModelProperty(value = "用户id")
+    @NotNull
+    private Integer userId;
 
 }

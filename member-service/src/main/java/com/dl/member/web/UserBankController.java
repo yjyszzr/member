@@ -6,6 +6,8 @@ import com.dl.member.param.BankCardParam;
 import com.dl.member.param.DeleteBankCardParam;
 import com.dl.member.param.IDParam;
 import com.dl.member.param.StrParam;
+import com.dl.member.param.UserBankParam;
+import com.dl.member.param.UserBankQueryParam;
 import com.dl.member.service.UserBankService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +50,17 @@ public class UserBankController {
     }
     
     
+	  /**
+	  * 根据userID和银行卡号查询银行卡信息
+	  *
+	  * @return
+	  */
+     @ApiOperation(value = "根据userID和银行卡号查询银行卡信息", notes = "根据userID和银行卡号查询银行卡信息")
+	 @PostMapping("/queryUserBankByCondition")    
+	 public BaseResult<UserBankDTO> queryUserBankByCondition(@RequestBody UserBankQueryParam userBankQueryParam){
+		 return userBankService.queryUserBankByCondition(userBankQueryParam);
+	 }
+    
     /**
      * 删除银行卡
      * @return
@@ -88,5 +101,17 @@ public class UserBankController {
     public BaseResult<UserBankDTO> queryUserBank(@RequestBody IDParam IDParam){
     	return userBankService.queryUserBank(IDParam.getId());
     }
+    
+    
+	  /**
+	  * 按条件查询银行卡信息
+	  *
+	  * @return
+	  */
+	 @PostMapping("/user/bank/queryUserBankByCondition")    
+	 BaseResult<UserBankDTO> queryUserBankByCondition(@RequestBody UserBankParam userBankParam){
+		 
+		 return null;
+	 }
     
 }

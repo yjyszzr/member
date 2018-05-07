@@ -11,8 +11,10 @@ import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserRechargeDTO;
 import com.dl.member.dto.WithdrawalSnDTO;
+import com.dl.member.model.UserAccount;
 import com.dl.member.param.AmountParam;
 import com.dl.member.param.AmountTypeParam;
+import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UpdateUserAccountParam;
@@ -23,6 +25,7 @@ import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserWithdrawParam;
+import com.dl.member.param.WithDrawParam;
 import com.dl.member.service.UserAccountService;
 import com.dl.member.service.UserBonusService;
 import com.dl.member.service.UserRechargeService;
@@ -167,6 +170,18 @@ public class UserAccountController {
     }
     
     
+    @ApiOperation(value="充值", notes="充值",hidden=false)
+	@RequestMapping(path="/rechargeUserMoneyLimit", method=RequestMethod.POST)
+    public BaseResult<String> rechargeUserMoneyLimit(@Valid @RequestBody RecharegeParam recharegeParam){
+    	return userAccountService.rechargeUserMoneyLimit(recharegeParam);
+    }
+    
+    @ApiOperation(value="提现", notes="提现",hidden=false)
+	@RequestMapping(path="/withdrawUserMoney", method=RequestMethod.POST)
+    public BaseResult<String> withdrawUserMoney(@Valid @RequestBody WithDrawParam withdrawParam){
+    	return userAccountService.withdrawUserMoney(withdrawParam);
+    }    
+    
 	/**
 	 * 给第三方支付成功后提供的记录账户流水
 	 * @param userAccountByTypeParam
@@ -175,23 +190,7 @@ public class UserAccountController {
     @ApiOperation(value="给单纯第三方支付成功后提供的记录账户流水", notes="给第三方支付成功后提供的记录账户流水",hidden=false)
 	@RequestMapping(path="/insertUserAccount", method=RequestMethod.POST)
     public BaseResult<String> insertUserAccount(@Valid @RequestBody UserAccountParamByType userAccountParamByType){
-    	UserAccountParam userAccountParam = new UserAccountParam();
-    	userAccountParam.setAccountType(userAccountParamByType.getAccountType());
-    	userAccountParam.setAmount(userAccountParamByType.getAmount());
-    	userAccountParam.setOrderSn(userAccountParamByType.getOrderSn());
-    	userAccountParam.setPayId(userAccountParamByType.getPayId());
-    	userAccountParam.setPaymentName(userAccountParamByType.getPaymentName());
-    	userAccountParam.setNote("");
-    	userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-    	userAccountParam.setUserSurplus(BigDecimal.ZERO);
-    	userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
-    	userAccountParam.setBonusPrice(userAccountParamByType.getBonusPrice());
-    	userAccountParam.setAccountType(ProjectConstant.BUY);
-    	userAccountParam.setThirdPartName(userAccountParamByType.getThirdPartName());
-    	userAccountParam.setThirdPartPaid(userAccountParamByType.getThirdPartPaid());
-    	userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
-    	
-    	return ResultGenerator.genSuccessResult("生成账户流水成功",userAccountService.saveAccount(userAccountParam));
+    	return ResultGenerator.genSuccessResult("生成账户流水成功",userAccountService.saveUserAccountForThirdPay(userAccountParamByType));
     }
     
     

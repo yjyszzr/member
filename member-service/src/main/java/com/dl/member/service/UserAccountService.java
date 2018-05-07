@@ -23,6 +23,7 @@ import com.dl.base.enums.AccountEnum;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
+import com.dl.base.result.Result;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
@@ -40,8 +41,11 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.model.UserWithdraw;
+import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
+import com.dl.member.param.UserAccountParamByType;
+import com.dl.member.param.WithDrawParam;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnListParam;
@@ -411,6 +415,137 @@ public class UserAccountService extends AbstractService<UserAccount> {
     }
     
     /**
+     * 充值并记录账户流水
+     * @param rechargeMoney 
+     * @return
+     */
+    @Transactional
+    public BaseResult<String> rechargeUserMoneyLimit(RecharegeParam recharegeParam) {
+    	BigDecimal user_money = BigDecimal.ZERO; //用户账户变动后的可提现余额
+        BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
+        BigDecimal curBalance = BigDecimal.ZERO;//当前变动后的总余额
+        
+    	Integer userId = recharegeParam.getUserId();
+    	User user = userService.findById(userId);
+    	if(null == user) {
+    		throw new ServiceException(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在");
+    	}
+    	
+    	BigDecimal frozenMoney = user.getFrozenMoney();//冻结的资金
+    	User updateUser = new User();
+    	user_money = user.getUserMoney();
+		user_money_limit = user.getUserMoneyLimit().add(recharegeParam.getAmount());
+		curBalance = user_money_limit.add(user_money);
+    	updateUser.setUserMoneyLimit(user_money_limit);
+    	updateUser.setUserId(userId);
+    		
+    	int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+    	if(1 != moneyRst) {
+    		log.error("充值失败");
+    		throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "充值失败");
+    	}   
+    	
+    	UserAccount userAccount = new UserAccount();
+    	userAccount.setUserId(recharegeParam.getUserId());
+    	String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+    	userAccount.setAccountSn(accountSn);
+    	userAccount.setAmount(recharegeParam.getAmount());
+    	userAccount.setProcessType(ProjectConstant.RECHARGE);
+    	userAccount.setThirdPartName(recharegeParam.getThirdPartName());
+    	userAccount.setThirdPartPaid(recharegeParam.getThirdPartPaid());
+    	userAccount.setPayId(recharegeParam.getPayId()); 
+    	
+    	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
+    	userAccount.setLastTime(DateUtil.getCurrentTimeLong());
+    	userAccount.setAdminUser(user.getUserName());
+    	userAccount.setBonusPrice(BigDecimal.ZERO);
+    	userAccount.setCurBalance(curBalance);
+    	userAccount.setOrderSn("0");
+    	userAccount.setParentSn("");
+    	userAccount.setStatus(1);
+    	userAccount.setNote("");
+    	userAccount.setUserSurplus(BigDecimal.ZERO);
+    	userAccount.setUserSurplusLimit(BigDecimal.ZERO);
+    	
+    	int rst = userAccountMapper.insertUserAccount(userAccount);
+    	if(rst != 1) {
+    		log.error("生成充值流水失败");
+    		throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "生成充值流水失败");
+    	}
+    	
+    	return ResultGenerator.genSuccessResult("充值成功", accountSn);
+    }
+ 
+    
+    /**
+     * 提现并记录账户流水
+     * @param rechargeMoney 
+     * @return
+     */
+    @Transactional
+    public BaseResult<String> withdrawUserMoney(WithDrawParam withDrawParam) {
+    	BigDecimal user_money = BigDecimal.ZERO; //用户账户变动后的可提现余额
+        BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
+        BigDecimal curBalance = BigDecimal.ZERO;//当前变动后的总余额
+        
+    	Integer userId = withDrawParam.getUserId();
+    	User user = userService.findById(userId);
+    	if(null == user) {
+    		throw new ServiceException(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在");
+    	}
+    	
+    	if(user.getUserMoney().compareTo(withDrawParam.getAmount()) < 0) {
+    		return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(),MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
+    	}
+    	
+    	BigDecimal frozenMoney = user.getFrozenMoney();//冻结的资金
+    	User updateUser = new User();
+    	user_money_limit = user.getUserMoneyLimit();
+		user_money = user.getUserMoney().subtract(withDrawParam.getAmount());
+		curBalance = user_money_limit.add(user_money);
+		updateUser.setUserMoney(user_money);
+    	updateUser.setUserId(userId);
+    		
+    	int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+    	if(1 != moneyRst) {
+    		log.error("提现失败");
+    		throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "提现失败");
+    	}   
+    	
+    	UserAccount userAccount = new UserAccount();
+    	userAccount.setUserId(withDrawParam.getUserId());
+    	String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+    	userAccount.setAmount(withDrawParam.getAmount());
+    	userAccount.setAccountSn(accountSn);
+    	userAccount.setProcessType(ProjectConstant.WITHDRAW);
+    	userAccount.setThirdPartName(withDrawParam.getThirdPartName());
+    	userAccount.setThirdPartPaid(withDrawParam.getThirdPartPaid());
+    	userAccount.setPayId(withDrawParam.getPayId()); 
+    	
+    	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
+    	userAccount.setLastTime(DateUtil.getCurrentTimeLong());
+    	userAccount.setAdminUser(user.getUserName());
+    	userAccount.setBonusPrice(BigDecimal.ZERO);
+    	userAccount.setCurBalance(curBalance);
+    	userAccount.setOrderSn("0");
+    	userAccount.setParentSn("");
+    	userAccount.setStatus(1);
+    	userAccount.setNote("");
+    	userAccount.setUserSurplus(BigDecimal.ZERO);
+    	userAccount.setUserSurplusLimit(BigDecimal.ZERO);
+    	int rst = userAccountMapper.insertUserAccount(userAccount);
+    	if(rst != 1) {
+    		log.error("生成提现流水账户失败");
+    		throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "生成提现流水账户失败");
+    	}
+    	
+    	return ResultGenerator.genSuccessResult("提现成功", accountSn);
+    }
+    
+    
+    
+    
+    /**
      * 中奖后批量更新用户账户的可提现余额
      * @param userIdAndRewardList
      */
@@ -643,7 +778,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
      */
     @Transactional
     public String saveAccount(UserAccountParam userAccountParam) {
-    	User user = userService.findById(SessionUtil.getUserId());
+    	Integer userId = SessionUtil.getUserId();
+        
+    	User user = userService.findById(userId);
     	BigDecimal curBalance = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(userAccountParam.getAmount());
     	UserAccount userAccount = new UserAccount();
     	String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
@@ -677,6 +814,45 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	return accountSn;
     }
     
+    /**
+     * 给第三方支付提供的记录日志的方法
+     * @param userAccountParamByType
+     * @return
+     */
+    public String saveUserAccountForThirdPay(UserAccountParamByType userAccountParamByType) {
+    	UserAccount userAccount = new UserAccount();
+    	String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+    	userAccount.setAccountSn(accountSn);
+    	userAccount.setProcessType(ProjectConstant.BUY);
+    	userAccount.setAmount(userAccountParamByType.getAmount());
+    	userAccount.setOrderSn(userAccountParamByType.getOrderSn());
+    	userAccount.setPayId(userAccountParamByType.getPayId());
+    	userAccount.setPaymentName(userAccountParamByType.getPaymentName());
+    	userAccount.setUserId(userAccountParamByType.getUserId());
+    	if(userAccountParamByType.getBonusPrice().compareTo(BigDecimal.ZERO) > 0) {
+    		userAccount.setNote("红包支付"+userAccountParamByType.getBonusPrice()+"元");
+    	}else {
+    		userAccount.setNote("");
+    	}
+    	
+    	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
+    	userAccount.setLastTime(DateUtil.getCurrentTimeLong());
+    	userAccount.setUserSurplus(BigDecimal.ZERO);
+    	userAccount.setUserSurplusLimit(BigDecimal.ZERO);
+    	userAccount.setBonusPrice(userAccountParamByType.getBonusPrice());
+    	userAccount.setThirdPartName(userAccountParamByType.getThirdPartName());
+    	userAccount.setThirdPartPaid(userAccountParamByType.getThirdPartPaid());
+    	userAccount.setStatus(Integer.valueOf(ProjectConstant.FINISH));
+    	
+    	int rst = userAccountMapper.insertUserAccount(userAccount);
+    	if(rst != 1) {
+    		log.error("生成流水账户失败");
+    		return "";
+    	}
+		return accountSn;
+    	
+    	
+    }
     /**
      * 构造提现状态
      * @param processType

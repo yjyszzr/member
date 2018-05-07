@@ -10,7 +10,9 @@ import com.dl.base.result.BaseResult;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserRechargeDTO;
 import com.dl.member.dto.UserWithdrawDTO;
+import com.dl.member.param.AmountCommonParam;
 import com.dl.member.param.AmountParam;
+import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.RollackSurplusPayParam;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
 //import com.pgt.shop.member.param.CancelChangeParam;
@@ -25,6 +27,7 @@ import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.UserWithdrawParam;
 //import com.pgt.shop.member.param.UserCapitalParam;
 //import com.pgt.shop.member.param.UserRefundParam;
+import com.dl.member.param.WithDrawParam;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -128,7 +131,23 @@ public interface IUserAccountService {
     public BaseResult<String> insertUserAccount(@Valid @RequestBody UserAccountParamByType userAccountParamByType);
 	
 	
-//	
+    /**
+     * 提现
+     * @param withdrawParam
+     * @return
+     */
+	@RequestMapping(path="/user/account/withdrawUserMoney", method=RequestMethod.POST)
+    public BaseResult<String> withdrawUserMoney(@Valid @RequestBody WithDrawParam withdrawParam);
+
+	/**
+	 * 充值
+	 * @param recharegeParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/account/rechargeUserMoneyLimit", method=RequestMethod.POST)
+    public BaseResult<String> rechargeUserMoneyLimit(@Valid @RequestBody RecharegeParam recharegeParam);
+	
+	//	
 //	/**
 //	 * 未付款时取消订单引起的账户变动：包括积分和红包
 //	 * @param OrderParam

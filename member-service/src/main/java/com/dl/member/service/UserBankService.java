@@ -1,4 +1,5 @@
 package com.dl.member.service;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,8 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.model.UserBank;
 import com.dl.member.param.DeleteBankCardParam;
+import com.dl.member.param.UserBankQueryParam;
+
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
@@ -142,6 +145,33 @@ public class UserBankService extends AbstractService<UserBank> {
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
 
+    /**
+     * 根据userId和卡号查询银行卡
+     * @param userBankQueryParam
+     * @return
+     */
+    public BaseResult<UserBankDTO> queryUserBankByCondition(UserBankQueryParam userBankQueryParam) {
+    	UserBank userBankQuery = new UserBank();
+    	userBankQuery.setUserId(userBankQueryParam.getUserId());
+    	userBankQuery.setCardNo(userBankQueryParam.getBankCardCode());
+    	userBankQuery.setIsDelete(ProjectConstant.NOT_DELETE);
+    	List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankQuery);
+    	if(CollectionUtils.isEmpty(userBankList)) {
+    		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), MemberEnums.DBDATA_IS_NULL.getMsg());
+    	}
+    	
+    	UserBankDTO userBankDTO = new UserBankDTO();
+    	UserBank userBank = userBankList.get(0);
+    	try {
+			BeanUtils.copyProperties(userBankDTO, userBank);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return ResultGenerator.genFailResult("查询银行卡异常");
+		} 
+    	return ResultGenerator.genSuccessResult("查询银行卡成功", userBankDTO);
+    }
+    
+    
     /**
      * 查询有效的银行卡根据默认或非默认状态
      * @param status
