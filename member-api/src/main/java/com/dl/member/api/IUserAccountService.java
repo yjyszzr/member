@@ -10,7 +10,6 @@ import com.dl.base.result.BaseResult;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserRechargeDTO;
 import com.dl.member.dto.UserWithdrawDTO;
-import com.dl.member.param.AmountCommonParam;
 import com.dl.member.param.AmountParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.RollackSurplusPayParam;
