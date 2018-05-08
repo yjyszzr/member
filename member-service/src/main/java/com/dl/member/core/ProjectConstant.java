@@ -17,10 +17,17 @@ public class ProjectConstant {
     public static final String SMS_PREFIX = "sms_";
     public static final String REGISTER_CAPTCHA = "register_captcha";
     
-    public static final String REGISTER_TPLID = "66686";
-    public static final String LOGIN_TPLID = "66839";
-    public static final String RESETPASS_TPLID = "66838";
-    public static final String SERVICE_TPLID = "75003";
+
+    public static final String REGISTER_TPLID = "76179";
+    public static final String LOGIN_TPLID = "76180";
+    public static final String RESETPASS_TPLID = "76181";
+    public static final String SERVICE_TPLID = "76178";  
+    
+    
+//    public static final String REGISTER_TPLID = "66686";
+//    public static final String LOGIN_TPLID = "66839";
+//    public static final String RESETPASS_TPLID = "66838";
+//    public static final String SERVICE_TPLID = "75003";
     
 	/**
 	 * 缓存存放验证码的有效时长

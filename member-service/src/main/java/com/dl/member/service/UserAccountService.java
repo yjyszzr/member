@@ -3,9 +3,11 @@ import java.math.BigDecimal;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -14,6 +16,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +41,11 @@ import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserIdAndRewardDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.DlMessage;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.model.UserWithdraw;
+import com.dl.member.param.MessageAddParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
@@ -91,6 +96,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	
 	@Resource
 	private SysConfigService sysConfigService;
+	
+	@Resource
+	private DlMessageService userMessageService;
     
     
     /**
@@ -629,12 +637,49 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		}
     		log.info("----------------------------------批量更新用户订单为已中奖成功");
     		log.info("----------------------------------批量更新用户中奖账户流水结束");
+    		
+    		//saveRewardMessageAsync(userIdAndRewardList);
+    		
     		return ResultGenerator.genSuccessResult("批量更新用户账户成功");
     	}else {
     		return ResultGenerator.genFailResult("批量更新用户账户失败，请查看日志");
     	}
     }
     
+    /**
+     * 保存中奖消息
+     * @param list
+     */
+    @Async
+	public void saveRewardMessageAsync(List<UserIdAndRewardDTO> list) {
+    	List<Integer> userIdList = list.stream().map(s->s.getUserId()).collect(Collectors.toList());
+    	List<User> userList = userMapper.queryUserByUserIds(userIdList);
+    	if(CollectionUtils.isEmpty(userList)) {
+    		return;
+    	}
+    	
+    	for(UserIdAndRewardDTO u:list) {
+    		DlMessage messageAddParam = new DlMessage();
+    		messageAddParam.setTitle(CommonConstants.FORMAT_REWARD_TITLE);
+			messageAddParam.setContent(MessageFormat.format(CommonConstants.FORMAT_REWARD_DESC, "竞彩足球",u.getReward()));
+			messageAddParam.setContentDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_DESC, "竞彩足球",u.getReward()));
+			messageAddParam.setContentUrl("www.baidu.com");
+			messageAddParam.setSender(u.getUserId());
+			messageAddParam.setMsgType(10);
+			messageAddParam.setReceiver(u.getUserId());
+			for(User user:userList) {
+				if(user.getUserId().equals(u.getUserId())) {
+					messageAddParam.setReceiverMobile(user.getMobile());
+				}
+				continue;
+			}
+			messageAddParam.setObjectType(1);
+			messageAddParam.setMsgUrl("www.baidu.com");
+			messageAddParam.setSendTime(DateUtil.getCurrentTimeLong());
+			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_DESC, "竞彩足球",u.getReward()));
+			userMessageService.save(messageAddParam);
+    	}
+    }
     
 	/**
 	 * 查询业务值得限制：CommonConstants 中9-派奖限制 8-提现限制

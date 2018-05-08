@@ -29,5 +29,13 @@ public interface IUserService {
 	@RequestMapping(path="/user/userInfoExceptPass", method=RequestMethod.POST)
 	public BaseResult<UserDTO> userInfoExceptPass(@RequestBody StrParam strParam);
 	
+	/**
+	 * 批量查询查询用户
+	 * @param UserBonusParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/queryUserInfoListByUserIds", method=RequestMethod.POST)
+	public BaseResult<UserDTO> queryUserInfoListByUserIds(@RequestBody StrParam strParam);
+	
 	
 }
