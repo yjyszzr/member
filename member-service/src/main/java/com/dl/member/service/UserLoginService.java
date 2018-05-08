@@ -57,7 +57,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
         String mobile = userLoginMobileParam.getMobile();
         String password = userLoginMobileParam.getPassword();
         UserLoginDTO userLoginDTO = new UserLoginDTO();
-        UserDeviceParam device = userLoginMobileParam.getDevice();
+//        UserDeviceParam device = userLoginMobileParam.getDevice();
         int passWrongCount = 5;
         User user = userService.findBy("mobile", mobile);
         if (null == user) {
@@ -75,8 +75,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
     		
     	}else if(userStatus.equals(ProjectConstant.USER_STATUS_LOCK)){//账号处于被锁状态
     		Integer time  = DateUtil.getCurrentTimeLong() - user.getLastTime();
-        	boolean beyond1h = time > 60? true:false;
-        	if(beyond1h) {
+        	if(time > 60) {
         		BaseResult<UserLoginDTO> userLoginRst = this.verifyUserPass(password, user, userLoginMobileParam);
         		if(userLoginRst.getCode() != 0) {
         			return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
@@ -109,7 +108,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
     public BaseResult<UserLoginDTO> loginBySms(UserLoginWithSmsParam userLoginMobileParam,HttpServletRequest request) {
         String mobile = userLoginMobileParam.getMobile();
         String strRandom4 = RandomUtil.generateUpperString(4);
-        UserDeviceParam device = userLoginMobileParam.getDevice();
+//        UserDeviceParam device = userLoginMobileParam.getDevice();
         int passWrongCount = 5;
         User user = userService.findBy("mobile", mobile);
         if (null == user) {//新用户注册并登录
@@ -184,16 +183,17 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			 return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			 
 		 }else {
-        	User updatePassWrongCountUser = new User();
-        	updatePassWrongCountUser.setUserId(user.getUserId());
         	int nowWrongPassCount = user.getPassWrongCount();
-        	updatePassWrongCountUser.setPassWrongCount(++nowWrongPassCount);
-        	userService.update(updatePassWrongCountUser);
 	        if(nowWrongPassCount <= 5) {
+	        	User updatePassWrongCountUser = new User();
+	        	updatePassWrongCountUser.setUserId(user.getUserId());
+	        	updatePassWrongCountUser.setPassWrongCount(++nowWrongPassCount);
+	        	userService.update(updatePassWrongCountUser);
         		return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "您输入的密码错误，还有"+(5 - nowWrongPassCount)+"次机会");
         	}else {//输入错误密码超过5次，锁定用户
             	User lockUser = new User();
             	lockUser.setUserId(user.getUserId());
+            	lockUser.setLastTime(DateUtil.getCurrentTimeLong());
             	lockUser.setUserStatus(1);
             	userService.update(lockUser);
         		return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());

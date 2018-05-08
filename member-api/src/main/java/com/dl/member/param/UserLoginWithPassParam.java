@@ -16,8 +16,8 @@ import org.hibernate.validator.constraints.NotBlank;
 public class UserLoginWithPassParam implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "手机设备信息")
-    private UserDeviceParam device;
+//    @ApiModelProperty(value = "手机设备信息")
+//    private UserDeviceParam device;
 
     @NotBlank(message = "请填写手机号")
     @ApiModelProperty(value = "手机号", required = true)
