@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.dto.UserRechargeDTO;
 import com.dl.member.dto.UserWithdrawDTO;
 import com.dl.member.param.AmountParam;
@@ -17,6 +18,7 @@ import com.dl.member.param.RollackSurplusPayParam;
 //import com.pgt.shop.member.param.CancelChangeParam;
 //import com.pgt.shop.member.param.ConfirmOrderParam;
 import com.dl.member.param.SurplusPayParam;
+import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UpdateUserRechargeParam;
@@ -145,6 +147,14 @@ public interface IUserAccountService {
 	 */
 	@RequestMapping(path="/user/account/rechargeUserMoneyLimit", method=RequestMethod.POST)
     public BaseResult<String> rechargeUserMoneyLimit(@Valid @RequestBody RecharegeParam recharegeParam);
+	
+	/**
+	 * 查询业务阈值
+	 * @param recharegeParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/account/queryBusinessLimit", method=RequestMethod.POST)
+	public BaseResult<SysConfigDTO> queryBusinessLimit(@Valid @RequestBody SysConfigParam sysConfigParam);
 	
 	//	
 //	/**

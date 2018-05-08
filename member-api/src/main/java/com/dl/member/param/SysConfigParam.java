@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class SysConfigParam {
 
-	@ApiModelProperty("业务id")
+	@ApiModelProperty("业务id:9-奖金派发  8-提现")
 	@NotNull
     private Integer businessId;
 	
