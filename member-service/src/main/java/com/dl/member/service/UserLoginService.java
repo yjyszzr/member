@@ -12,10 +12,8 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
-import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
@@ -23,7 +21,6 @@ import com.dl.member.model.UserLoginLog;
 import com.dl.member.param.UserDeviceParam;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
-import com.dl.member.param.UserRegisterParam;
 import com.dl.member.util.Encryption;
 import lombok.extern.slf4j.Slf4j;
 
@@ -192,7 +189,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
         	int nowWrongPassCount = user.getPassWrongCount();
         	updatePassWrongCountUser.setPassWrongCount(++nowWrongPassCount);
         	userService.update(updatePassWrongCountUser);
-	        if(nowWrongPassCount < 5) {
+	        if(nowWrongPassCount <= 5) {
         		return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "您输入的密码错误，还有"+(5 - nowWrongPassCount)+"次机会");
         	}else {//输入错误密码超过5次，锁定用户
             	User lockUser = new User();

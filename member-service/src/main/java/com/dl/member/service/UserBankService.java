@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.configurer.RestTemplateConfig;
 import com.dl.base.enums.RespStatusEnum;
+import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -26,10 +27,12 @@ import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBankMapper;
+import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.UserRealDTO;
 import com.dl.member.dto.WithDrawShowDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
 import com.dl.member.model.UserBank;
 import com.dl.member.param.DeleteBankCardParam;
@@ -59,6 +62,9 @@ public class UserBankService extends AbstractService<UserBank> {
 	
 	@Resource
 	private UserService userService;
+	
+	@Resource
+	private UserMapper userMapper;
     
     @Transactional
     public void saveUserBank(UserBankDTO userBankDTO) {
@@ -280,6 +286,9 @@ public class UserBankService extends AbstractService<UserBank> {
 		url.append("&bankcard=" + cardNo);
 		String rst = rest.getForObject(url.toString(), String.class);
 
+    	MemberThirdApiLog thirdApiLog = new MemberThirdApiLog(memberConfig.getJuheSmsApiUrl(), ThirdApiEnum.JU_HE.getCode(), url.toString(), rst);
+    	userMapper.saveMemberThirdApiLog(thirdApiLog);
+    	
 		JSONObject json = null;
 		try {
 			json = JSON.parseObject(rst);

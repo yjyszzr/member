@@ -58,8 +58,7 @@ public class UserController {
     @ApiOperation(value = "查询用户信息除了登录密码和支付密码", notes = "查询用户信息除了登录密码和支付密码")
     @PostMapping("/userInfoExceptPass")
     public BaseResult<UserDTO> queryUserInfo(@RequestBody StrParam strParam){
-    	UserDTO userDTO = userService.queryUserByUserIdExceptPass();
-    	return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
+    	return userService.queryUserByUserIdExceptPass();
     }
     
     /**
@@ -67,16 +66,16 @@ public class UserController {
      * @param mobileNumberParam
      * @return
      */
-    @ApiOperation(value = "根据手机号获取token(不提供调用)", notes = "根据手机号获取token(不提供调用)")
-    @PostMapping("/getTokenByMobile")
-    public BaseResult<String> getTokenByMobile(@RequestBody MobileNumberParam mobileNumberParam) {
-    	User user = userService.findBy("mobile", mobileNumberParam.getMobileNumber());
-    	if(null == user) {
-    		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "没有该用户，无法生成token");
-    	}
-    	
-    	String token = TokenUtil.genToken(user.getUserId(), 1);
-    	return ResultGenerator.genSuccessResult("获取token成功", token);
-    }
+//    @ApiOperation(value = "根据手机号获取token(不提供调用)", notes = "根据手机号获取token(不提供调用)")
+//    @PostMapping("/getTokenByMobile")
+//    public BaseResult<String> getTokenByMobile(@RequestBody MobileNumberParam mobileNumberParam) {
+//    	User user = userService.findBy("mobile", mobileNumberParam.getMobileNumber());
+//    	if(null == user) {
+//    		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "没有该用户，无法生成token");
+//    	}
+//    	
+//    	String token = TokenUtil.genToken(user.getUserId(), 1);
+//    	return ResultGenerator.genSuccessResult("获取token成功", token);
+//    }
     	  
 }

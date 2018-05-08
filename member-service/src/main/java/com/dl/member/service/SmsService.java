@@ -18,9 +18,12 @@ import com.alibaba.fastjson.JSONObject;
 //import com.aliyuncs.profile.DefaultProfile;
 //import com.aliyuncs.profile.IClientProfile;
 import com.dl.base.configurer.RestTemplateConfig;
+import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.configurer.MemberConfig;
+import com.dl.member.dao.UserMapper;
+import com.dl.member.model.MemberThirdApiLog;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +39,9 @@ public class SmsService {
 	
 	@Resource
 	private MemberConfig memberConfig;
+	
+	@Resource
+	private UserMapper userMapper;
 	
 	/**
 	 * 发送短信:聚合
@@ -60,6 +66,9 @@ public class SmsService {
 		url.append("&key=" + memberConfig.getJuheSmsKey());
 		String rst = rest.getForObject(url.toString(), String.class);
 		
+    	MemberThirdApiLog thirdApiLog = new MemberThirdApiLog(memberConfig.getJuheSmsApiUrl(), ThirdApiEnum.JU_HE.getCode(), url.toString(), rst);
+    	userMapper.saveMemberThirdApiLog(thirdApiLog);
+		
 		JSONObject json = null;
 		try {
 			json = JSON.parseObject(rst);
@@ -74,6 +83,7 @@ public class SmsService {
 		}else {
 			return ResultGenerator.genBadRequestResult("调用第三方发送短信失败",String.valueOf(errorCode));
 		}
+		
 	}	
 	
     /**

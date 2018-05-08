@@ -66,9 +66,7 @@ public class UserRegisterService extends AbstractService<User> {
 		
     	Integer userId = userService.saveUser(userParam);
    	
-    	return ResultGenerator.genSuccessResult("登录成功", userId);
+    	return ResultGenerator.genSuccessResult("注册成功");
     }
-
-
-    
+ 
 }

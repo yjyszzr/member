@@ -89,11 +89,16 @@
   	 	FROM dl_user WHERE user_id = #{userId}
   </select>
   
-  
   <select id="queryUserByUserIds" resultMap="BaseResultMap">
   	 	SELECT * FROM dl_user WHERE user_id IN
 	  	<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
 	         #{item}  
 	    </foreach>
   </select>
+  
+  <insert id="saveMemberThirdApiLog">
+  	insert into dl_third_api_log(api_name,api_type,api_param,api_result,api_desc)
+  	values(#{apiName},#{apiType},#{apiParam},#{apiResult},#{apiDesc})
+  </insert>
+  
 </mapper>

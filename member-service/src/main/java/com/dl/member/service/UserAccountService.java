@@ -652,7 +652,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	}
     
     /**
-     * 回滚余额支付的付款所用的钱
+     * 回滚含有余额部分的付款所用的钱
      * @param String orderSn,String surplus
      */
     @Transactional
@@ -753,7 +753,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.date_sdf));
             userAccountDTO.setAccountSn(ua.getAccountSn());
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
-            userAccountDTO.setStatus(showStatus(ua.getProcessType(),ua.getId()));
+            userAccountDTO.setStatus(showStatus(ua.getProcessType(),ua.getStatus()));
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
             userAccountDTO.setProcessTypeName(AccountEnum.getName(ua.getProcessType()));
@@ -862,19 +862,26 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	
     }
+    
     /**
-     * 构造提现状态
+     * 构造每条流水的状态
      * @param processType
      * @param accountId
      * @return
      */
-    public String showStatus(Integer processType,Integer accountId) {
+    public String showStatus(Integer processType,Integer status) {
     	if(!ProjectConstant.WITHDRAW.equals(processType)) {
     		return "";
     	}
-    	UserWithdraw userWithDraw = userWithdrawService.findBy("accountId", accountId);
-    	String status = userWithDraw.getStatus();
-		return status.equals(ProjectConstant.FINISH)?"状态:提现成功":"";
+    	
+    	if(status.equals(Integer.valueOf(ProjectConstant.FINISH))) {
+    		return "状态:提现成功";
+    	}else if(status.equals(Integer.valueOf(ProjectConstant.NOT_FINISH))) {
+    		return "状态:提现中";
+    	}else if(status.equals(Integer.valueOf(ProjectConstant.FAILURE))) {
+    		return "状态:提现失败";
+    	}
+		return "";
     }
     
     /**

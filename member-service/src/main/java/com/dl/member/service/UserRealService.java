@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.configurer.RestTemplateConfig;
 import com.dl.base.enums.RespStatusEnum;
+import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -21,9 +22,11 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.UserMapper;
 import com.dl.member.dao.UserRealMapper;
 import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
 import com.dl.member.model.UserReal;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +48,9 @@ public class UserRealService extends AbstractService<UserReal> {
 	
 	@Resource
 	private MemberConfig memberConfig;
+	
+	@Resource
+	private UserMapper userMapper;
     
     @Transactional
     public void saveUserReal(String realName,String idCode) {
@@ -74,11 +80,15 @@ public class UserRealService extends AbstractService<UserReal> {
     public BaseResult<String> realNameAuth(String realName,String iDCode) {
     	Integer userId = SessionUtil.getUserId();
     	User user = userService.findById(userId);
+    	if(null == user) {
+    		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在");
+    	}
     	
     	try {
 			realName = URLDecoder.decode(realName, "UTF-8");
 		} catch (Exception e) {
 			log.error(e.getMessage());
+			return ResultGenerator.genResult(MemberEnums.COMMON_ERROR.getcode(), "实名认证的名字包含特殊符号");
 		}
     	
     	JSONObject json = this.realNameAuth2(realName, iDCode);
@@ -127,16 +137,18 @@ public class UserRealService extends AbstractService<UserReal> {
 		url.append("&realname=" + realName);
 		url.append("&idcard=" + idcard);
 		String rst = rest.getForObject(url.toString(), String.class);
-
-		JSONObject json = null;
+		
+    	MemberThirdApiLog thirdApiLog = new MemberThirdApiLog(memberConfig.getRalNameApiURL(), ThirdApiEnum.JU_HE.getCode(), url.toString(), rst);
+    	userMapper.saveMemberThirdApiLog(thirdApiLog);
+    	
+		JSONObject json = new JSONObject();
 		try {
 			json = JSON.parseObject(rst);
 		} catch (Exception e) {
 			log.error(e.getMessage());
+			return json;
 		}
-
 		return json;
-		
 	}    
     
     /**

@@ -2,30 +2,25 @@ package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.core.ProjectConstant;
-import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
-import com.dl.member.model.User;
 import com.dl.member.param.UserRegisterParam;
 import com.dl.member.service.UserBonusService;
 import com.dl.member.service.UserLoginService;
 import com.dl.member.service.UserRegisterService;
 import com.dl.member.service.UserService;
 import com.dl.member.util.TokenUtil;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
 * Created by CodeGenerator on 2018/03/08.

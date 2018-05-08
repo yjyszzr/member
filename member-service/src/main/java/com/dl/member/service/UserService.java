@@ -47,8 +47,12 @@ public class UserService extends AbstractService<User> {
      * @param userId
      * @return
      */
-    public UserDTO queryUserByUserIdExceptPass() {
+    public BaseResult<UserDTO> queryUserByUserIdExceptPass() {
     	Integer userId = SessionUtil.getUserId();
+    	if(null == userId) {
+    		return ResultGenerator.genNeedLoginResult("请登录");
+    	}
+    	
     	User user = userMapper.queryUserExceptPass(userId);
 		UserDTO userDTO = new UserDTO();
 		try {
@@ -56,23 +60,22 @@ public class UserService extends AbstractService<User> {
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setIsReal(user.getIsReal().equals("1")?"1":"0");
 			userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
-			
 			String realName = "";
 			UserRealDTO userRealDTO = userRealService.queryUserReal();
 			if(userRealDTO != null) {
 				realName = userRealDTO.getRealName();
 			}
-			
 			String mobile = user.getMobile();
 			String strStar4 = RandomUtil.generateStarString(4);
 			String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
 			userDTO.setMobile(mobileStr);
 			userDTO.setRealName(realName);
-			userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit())));
+			userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}
-		return userDTO;
+		
+		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
     }
     
 	/**
@@ -108,11 +111,8 @@ public class UserService extends AbstractService<User> {
 		user.setRankPoint(0);
 		user.setPassWrongCount(0);
 		user.setIsReal(ProjectConstant.USER_IS_NOT_REAL);
-		int rst = userMapper.insertWithReturnId(user);
-		if(1 != rst) {
-			return 0;
-		}
-		return user.getUserId();
+		Integer userId = userMapper.insertWithReturnId(user);
+		return userId;
 	}
 	
 	
