@@ -52,5 +52,17 @@ public class MemberConfig {
 	
 	@Value("${alidayu.sms.accessKeySecret}")
 	private String aliSmsAccessKeySecret;
+	
+	@Value("${juhe.sms.service.tplid}")
+	private String SERVICE_TPLID;
+	
+	@Value("${juhe.sms.register.tplid}")
+	private String REGISTER_TPLID;
+	
+	@Value("${juhe.sms.login.tplid}")
+	private String LOGIN_TPLID;
+	
+	@Value("${juhe.sms.resetpass.tplid}")
+	private String RESETPASS_TPLID;
 		
 }
