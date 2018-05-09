@@ -109,14 +109,14 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
         String mobile = userLoginMobileParam.getMobile();
         String strRandom4 = RandomUtil.generateUpperString(4);
 //      UserDeviceParam device = userLoginMobileParam.getDevice();
+        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
+        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
+            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+        }
         int passWrongCount = 5;
         User user = userService.findBy("mobile", mobile);
         if (null == user) {//新用户注册并登录
-  	        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
-  	        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
-  	            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-  	        }
-        	
+  	    	return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 //        	UserRegisterParam userRegisterParam = new UserRegisterParam();
 //        	userRegisterParam.setMobile(userLoginMobileParam.getMobile());
 //        	userRegisterParam.setPassWord("");
@@ -130,17 +130,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 //        	UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 //			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 //  	    User user = userService.findBy("mobile", userRegisterParam.getMobile());
-  	    	if(null == user) {
-  	    		return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
-  	    	}
         }else {
             Integer userStatus = user.getUserStatus();
         	if(userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {//账号正常
-	   	         String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
-	   	         if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
-	   	            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-	   	         }
-	   			 
 	   	         UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 	   			 return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
         	}else if(userStatus.equals(ProjectConstant.USER_STATUS_LOCK)){//账号处于被锁状态
@@ -150,12 +142,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
                 	normalUser.setUserId(user.getUserId());
                 	normalUser.setUserStatus(0);
                 	userService.update(normalUser);
-                	
-	   	   	        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
-	   	   	        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
-	   	   	            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-	   	   	        }
-                	
+            	
                 	UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 	    			
                 	return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
