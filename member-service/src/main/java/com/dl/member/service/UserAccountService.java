@@ -624,24 +624,24 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		userAccountParamList.add(userAccountParam);
     	});
     	
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新中奖账户参数:"+JSON.toJSONString(updateList));
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户参数:"+JSON.toJSONString(updateList));
     	int updateRst = this.updateBatchUserMoney(updateList);
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新中奖账户结果:"+updateRst);
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户结果:"+updateRst);
     	
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新中奖账户流水参数:"+JSON.toJSONString(updateList));
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户流水参数:"+JSON.toJSONString(updateList));
     	int insertRst = this.batchInsertUserAccount(userAccountParamList);
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新中奖账户流水结果:"+insertRst);
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户流水结果:"+insertRst);
 
     	if(updateRst == 1 && insertRst == 1) {
-    		log.info("----------------------------------批量更新用户中奖订单为已派奖开始");
+    		log.info("----------------------------------更新用户中奖订单为已派奖开始");
     		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
     		OrderSnListParam orderSnListParam = new OrderSnListParam();
     		orderSnListParam.setOrderSnlist(orderSnRewaredList);
     		BaseResult<Integer> orderRst = orderService.updateOrderStatusRewarded(orderSnListParam);
     		if(0 != orderRst.getCode() ) {
-    			log.error("批量更新用户订单为已派奖失败");
+    			log.error("更新用户订单为已派奖失败");
     		}
-    		log.info("----------------------------------批量更新用户中奖订单为已派奖成功");
+    		log.info("----------------------------------更新用户中奖订单为已派奖成功");
     		
     		saveRewardMessageAsync(userIdAndRewardList);
     		
