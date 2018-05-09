@@ -172,7 +172,19 @@ public class UserAccountController {
     @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=false)
 	@RequestMapping(path="/batchUpdateUserAccount", method=RequestMethod.POST)
     public BaseResult<String> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
-    	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());
+    	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList(),ProjectConstant.REWARD_AUTO);
+    }
+    
+    
+	/**
+	 * 手动更新用户账户,给后台管理派奖使用
+	 * @param userAccountByTypeParam
+	 * @return
+	 */
+    @ApiOperation(value="手动更新用户账户", notes="手动更新用户账户",hidden=false)
+	@RequestMapping(path="/manualUpdateUserAccount", method=RequestMethod.POST)
+    public BaseResult<String> manualUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
+    	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList(),ProjectConstant.REWARD_MANUAL);
     }
     
     

@@ -5,9 +5,10 @@ import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -57,6 +58,7 @@ import com.dl.order.param.OrderSnListParam;
 import com.dl.order.param.OrderSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.base.Joiner;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 
@@ -558,35 +560,40 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	return ResultGenerator.genSuccessResult("提现成功", accountSn);
     }
-    
-    
-    
+   
     
     /**
-     * 中奖后批量更新用户账户的可提现余额
+     * 中奖后批量更新用户账户的可提现余额,dealType = 1,自动；dealType = 2,手动
      * @param userIdAndRewardList
      */
-    public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList) {
-		BigDecimal limitValue = this.queryBusinessLimit(CommonConstants.BUSINESS_ID_REWARD);
-		if(limitValue.compareTo(BigDecimal.ZERO) <= 0) {
-			log.error("-----------------------------请前往后台管理系统设置派奖金额阈值,不予派奖");
-			return ResultGenerator.genFailResult("请前往后台管理系统设置派奖金额阈值");
-		}
+    @Transactional
+    public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList,Integer dealType) {
+		BigDecimal limitValue = BigDecimal.ZERO;
+    	if(1 == dealType) {
+    		limitValue = this.queryBusinessLimit(CommonConstants.BUSINESS_ID_REWARD);
+    		if(limitValue.compareTo(BigDecimal.ZERO) <= 0) {
+    			log.error("-----------------------------请前往后台管理系统设置派奖金额阈值,不予派奖");
+    			return ResultGenerator.genFailResult("请前往后台管理系统设置派奖金额阈值");
+    		}
+    		
+    		Double limitValueDouble = limitValue.doubleValue();
+    		userIdAndRewardList.removeIf(s -> s.getReward().doubleValue() >= limitValueDouble);
+    	}
     	
+    	if(userIdAndRewardList.size() == 0) {
+    		return ResultGenerator.genSuccessResult("没有要自动开奖的订单");
+    	}
     	
-    	//查询该是否已经派发奖金
-    	log.info("批量更新用户奖金");
     	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
-    	
-    	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
-//    	if(!CollectionUtils.isEmpty(userAccountList)) {
-//    		log.info("含有已经派过奖金的订单，不进行批量更新用户账户");
-//    		return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "含有已经派过奖金的订单，不进行批量更新用户账户");
-//    	}
+    	//查询是否已经派发奖金,并过滤掉
+    	List<String> rewardOrderSnList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
+    	if(rewardOrderSnList.size() > 0) {
+    		log.error("含有已派发过奖金的订单号，已被过滤,订单号包括："+Joiner.on(",").join(rewardOrderSnList));
+    		userIdAndRewardList.removeIf(s -> rewardOrderSnList.contains(s.getOrderSn()));
+    	}
     	
     	List<UserAccountParam> userAccountParamList = new ArrayList<>();
-    	List<Integer> userIdList = userIdAndRewardList.stream().map(s->s.getUserId()).collect(Collectors.toList());
-    	
+    	List<Integer> userIdList = userIdAndRewardList.stream().map(s->s.getUserId()).collect(Collectors.toList());    	
     	List<User> userList = userMapper.queryUserByUserIds(userIdList);
     	Map<Integer,BigDecimal> userMoneyMap = userList.stream().collect(Collectors.toMap(User::getUserId, User::getUserMoney));
     	
@@ -604,7 +611,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
     			updateList.add(uo);
     		}
     	}
-    	
 
     	userIdAndRewardList.stream().forEach(s->{
     		UserAccountParam userAccountParam = new UserAccountParam();
@@ -613,41 +619,52 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		userAccountParam.setAccountSn(accountSn);
     		userAccountParam.setOrderSn(s.getOrderSn());
     		userAccountParam.setAmount(s.getReward());
-    		userAccountParam.setNote("中奖"+s.getReward()+"元");
+    		userAccountParam.setNote("");
     		userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
     		userAccountParamList.add(userAccountParam);
     	});
     	
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新账户参数:"+JSON.toJSONString(updateList));
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户参数:"+JSON.toJSONString(updateList));
     	int updateRst = this.updateBatchUserMoney(updateList);
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新账户结果:"+updateRst);
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户结果:"+updateRst);
     	
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新账户流水参数:"+JSON.toJSONString(updateList));
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户流水参数:"+JSON.toJSONString(updateList));
     	int insertRst = this.batchInsertUserAccount(userAccountParamList);
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------批量更新账户流水结果:"+insertRst);
+    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户流水结果:"+insertRst);
 
     	if(updateRst == 1 && insertRst == 1) {
-    		log.info("----------------------------------批量更新用户中奖账户流水开始");
+    		log.info("----------------------------------更新用户中奖订单为已派奖开始");
     		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
     		OrderSnListParam orderSnListParam = new OrderSnListParam();
     		orderSnListParam.setOrderSnlist(orderSnRewaredList);
     		BaseResult<Integer> orderRst = orderService.updateOrderStatusRewarded(orderSnListParam);
     		if(0 != orderRst.getCode() ) {
-    			log.error("批量更新用户订单为已中奖失败");
+    			log.error("更新用户订单为已派奖失败");
     		}
-    		log.info("----------------------------------批量更新用户订单为已中奖成功");
-    		log.info("----------------------------------批量更新用户中奖账户流水结束");
+    		log.info("----------------------------------更新用户中奖订单为已派奖成功");
     		
-    		//saveRewardMessageAsync(userIdAndRewardList);
+    		saveRewardMessageAsync(userIdAndRewardList);
     		
-    		return ResultGenerator.genSuccessResult("批量更新用户账户成功");
+    		log.info(DateUtil.getCurrentTimeString(Long.valueOf(DateUtil.getCurrentTimeLong()), DateUtil.datetimeFormat));
+    		log.info("用");
+    		log.info("户");
+    		log.info("派");
+    		log.info("发");
+    		log.info("奖");
+    		log.info("金");
+    		log.info("完");
+    		log.info("成");
+    		
     	}else {
-    		return ResultGenerator.genFailResult("批量更新用户账户失败，请查看日志");
+    		throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "用户派发奖金完成完成失败，请查看日志");
     	}
+    	
+    	return ResultGenerator.genSuccessResult("用户派发奖金完成");
     }
+ 
     
     /**
-     * 保存中奖消息
+     * 异步保存中奖消息
      * @param list
      */
     @Async

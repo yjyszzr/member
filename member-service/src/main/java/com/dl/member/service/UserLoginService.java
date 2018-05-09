@@ -12,6 +12,7 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
+import com.dl.base.util.RegexUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserLoginDTO;
@@ -106,7 +107,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
      * @return
      */
     public BaseResult<UserLoginDTO> loginBySms(UserLoginWithSmsParam userLoginMobileParam,HttpServletRequest request) {
-        String mobile = userLoginMobileParam.getMobile();
+    	if(!RegexUtil.checkMobile(userLoginMobileParam.getMobile())) {
+    		return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
+    	}
+    	
+    	String mobile = userLoginMobileParam.getMobile();
         String strRandom4 = RandomUtil.generateUpperString(4);
 //      UserDeviceParam device = userLoginMobileParam.getDevice();
         String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
