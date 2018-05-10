@@ -131,18 +131,32 @@ public class UserBankService extends AbstractService<UserBank> {
 					BeanUtils.copyProperties(userBankDTO, userBank);
 				} catch (Exception e) {
 					log.error("银行卡数据转换异常");
+					return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg(),userBankDTO);
 				}
 			}
 			return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 		}
 		
-		
 		//查询银行卡具体信息，并过滤信用卡
-		BaseResult<UserBankDTO> detectRst = this.detectUserBank(bankCardNo);
-		if(detectRst.getCode() != 0) {
-			return ResultGenerator.genResult(detectRst.getCode(), detectRst.getMsg());
+		JSONObject jsonDetect = this.detectUserBank(bankCardNo);
+		Integer deErrorCode = jsonDetect.getInteger("error_code");
+		JSONObject deResult = (JSONObject) jsonDetect.get("result");
+		if(0 == deErrorCode) {
+			userBankDTO.setBankName(deResult.getString("bank"));
+			userBankDTO.setBankLogo(deResult.getString("logo"));
+			userBankDTO.setCardType(deResult.getString("cardtype"));
+			if(!"借记卡".equals(deResult.getString("cardtype"))) {
+				return ResultGenerator.genResult(MemberEnums.NOT_DEBIT_CARD.getcode(), MemberEnums.NOT_DEBIT_CARD.getMsg());
+			}
+		}else if(229902 == deErrorCode){//聚合数据 错误码 银行卡号错误
+			return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(), MemberEnums.BANKCARD_NOT_MATCH.getMsg());
+		}else {
+			log.error("判断银行卡类型异常："+deResult.toJSONString());
+			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg(),userBankDTO);
 		}
 		
+		String bankCardLogo = deResult.getString("logo");
+		String bankName =  deResult.getString("bank");
 		//三元素校验
 		String idCard = userRealDTO.getIdCode();
 		String realName = userRealDTO.getRealName();
@@ -152,7 +166,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		if(0 == errorCode) {
 			JSONObject result = (JSONObject) json.get("result");
 			String res = result.getString("res");
-			if("2".equals(res)) {
+			if("2".equals(res)) {//不匹配
 				return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(), MemberEnums.BANKCARD_NOT_MATCH.getMsg(),userBankDTO);
 			}
 		}else {
@@ -167,11 +181,12 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 		
 		//保存到数据库
+		userBankDTO.setBankName(bankName);
+		userBankDTO.setBankLogo(bankCardLogo);
 		userBankDTO.setRealName(realName);
 		userBankDTO.setCardNo(bankCardNo);
 		userBankDTO.setStatus(ProjectConstant.USER_BANK_DEFAULT);
 		this.saveUserBank(userBankDTO);
-		
 		
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
@@ -226,6 +241,7 @@ public class UserBankService extends AbstractService<UserBank> {
      * @param status
      * @return
      */
+    @Transactional
 	public BaseResult<UserBankDTO> updateAlreadyAddCardStatus(String status) {
 		Integer userId = SessionUtil.getUserId();
 		UserBankDTO userBankDTO = new UserBankDTO();
@@ -299,7 +315,7 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * @param cardNo
 	 * @return
 	 */
-	public BaseResult<UserBankDTO> detectUserBank(String cardNo) {
+	public JSONObject detectUserBank(String cardNo) {
 		ClientHttpRequestFactory clientFactory = restTemplateConfig.simpleClientHttpRequestFactory();
 		RestTemplate rest = restTemplateConfig.restTemplate(clientFactory);
 		HttpHeaders headers = new HttpHeaders();
@@ -321,20 +337,7 @@ public class UserBankService extends AbstractService<UserBank> {
 			log.error(e.getMessage());
 		}
 
-		UserBankDTO userBankDTO = new UserBankDTO();
-		Integer errorCode = json.getInteger("error_code");
-		if(0 == errorCode) {
-			JSONObject result = (JSONObject) json.get("result");
-			userBankDTO.setBankName(result.getString("bank"));
-			userBankDTO.setBankLogo(result.getString("logo"));
-			userBankDTO.setCardType(result.getString("cardtype"));
-			if(!"借记卡".equals(result.getString("cardtype"))) {
-				return ResultGenerator.genResult(MemberEnums.NOT_DEBIT_CARD.getcode(), MemberEnums.NOT_DEBIT_CARD.getMsg());
-			}
-			return ResultGenerator.genSuccessResult("查询银行卡种类成功", userBankDTO) ;
-		}else {
-			return ResultGenerator.genFailResult("查询银行卡种类失败", userBankDTO);
-		}
+		return json;
 	}
 	
 	
