@@ -17,7 +17,7 @@ import com.dl.member.core.ProjectConstant;
 @Import({RestTemplateConfig.class, Swagger1.class, WebMvcConfigurer.class, FeignConfiguration.class})
 @MapperScan(ProjectConstant.MAPPER_PACKAGE)
 @EnableEurekaClient
-@EnableFeignClients({"com.dl.order.api","com.dl.lottery.api","com.dl.shop.auth.api"})
+@EnableFeignClients({"com.dl.order.api","com.dl.lottery.api","com.dl.shop.auth.api","com.dl.shop.payment.api"})
 public class MemberServiceApplication {
 	
     public static void main(String[] args) {

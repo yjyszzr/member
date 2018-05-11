@@ -41,6 +41,13 @@
             <artifactId>auth-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+  
+         <dependency>
+	        <groupId>com.dl</groupId>
+		    <artifactId>payment-api</artifactId>
+		    <version>1.0-SNAPSHOT</version>
+        </dependency>     
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-eureka</artifactId>

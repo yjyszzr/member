@@ -1,18 +1,11 @@
 package com.dl.member.service;
 import java.math.BigDecimal;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,14 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.AccountEnum;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
-import com.dl.base.result.Result;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
@@ -45,8 +36,7 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlMessage;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
-import com.dl.member.model.UserWithdraw;
-import com.dl.member.param.MessageAddParam;
+import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
@@ -56,12 +46,12 @@ import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnListParam;
 import com.dl.order.param.OrderSnParam;
+import com.dl.shop.payment.api.IpaymentService;
+import com.dl.shop.payment.dto.UserWithdrawDetailDTO;
+import com.dl.shop.payment.param.WithDrawSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Joiner;
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
@@ -82,7 +72,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     private IOrderService orderService;
     
     @Resource
-    private UserWithdrawService userWithdrawService;
+    private IpaymentService payMentService;
     
 	@Value("${spring.datasource.druid.url}")
 	private String dbUrl;
@@ -211,7 +201,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
      */
     public String createNote(SurplusPayParam surplusPayParam) {
     	String noteStr = "";
-    	Integer payType = surplusPayParam.getPayType();
     	if(null != surplusPayParam.getBonusMoney() && surplusPayParam.getBonusMoney().compareTo(BigDecimal.ZERO) == 1) {
     		noteStr = noteStr + "红包支付"+surplusPayParam.getBonusMoney()+"元";
     	}
@@ -219,6 +208,24 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	if(surplusPayParam.getThirdPartPaid().compareTo(BigDecimal.ZERO) > 0) {
         	noteStr = surplusPayParam.getThirdPartName()+"支付"+surplusPayParam.getThirdPartPaid()+"元\n"
     		        +"余额支付"+surplusPayParam.getSurplus()+"元";
+    	}
+
+		return noteStr;
+    }
+    
+    /**
+     * 记录详情for thirdPay
+     * @param surplusPayParam
+     * @return
+     */
+    public String createNoteForThirdPay(UserAccountParamByType userAccountParamByType) {
+    	String noteStr = "";
+    	if(null != userAccountParamByType.getBonusPrice() && userAccountParamByType.getBonusPrice().compareTo(BigDecimal.ZERO) == 1) {
+    		noteStr = noteStr + "红包支付"+userAccountParamByType.getBonusPrice()+"元";
+    	}
+    	
+    	if(userAccountParamByType.getThirdPartPaid().compareTo(BigDecimal.ZERO) > 0) {
+        	noteStr = userAccountParamByType.getThirdPartName()+"支付"+userAccountParamByType.getThirdPartPaid()+"元\n";
     	}
 
 		return noteStr;
@@ -327,7 +334,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
             updateUser.setUserMoneyLimit(user_money_limit);
             
     	}
-    	
 //    	else if(ProjectConstant.RECHARGE == type) {
 //    		
 //    		user_money = user.getUserMoney();
@@ -358,7 +364,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 //    		
 //    		updateUser.setUserMoney(user_money);
 //    	}
-    	
     	int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
     	
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
@@ -423,6 +428,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	userAccount.setThirdPartPaid(recharegeParam.getThirdPartPaid());
     	userAccount.setPayId(recharegeParam.getPayId()); 
     	
+    	userAccount.setNote(recharegeParam.getThirdPartName()+"充值"+recharegeParam.getAmount()+"元");
     	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
     	userAccount.setLastTime(DateUtil.getCurrentTimeLong());
     	userAccount.setCurBalance(curBalance);
@@ -439,7 +445,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
  
     
     /**
-     * 提现并记录账户流水
+     * 预提现并记录账户流水
      * @param rechargeMoney 
      * @return
      */
@@ -486,7 +492,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	UserAccount userAccount = new UserAccount();
     	userAccount.setUserId(withDrawParam.getUserId());
     	String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
-    	userAccount.setAmount(withDrawParam.getAmount());
+    	userAccount.setAmount(BigDecimal.ZERO.subtract(withDrawParam.getAmount()));
     	userAccount.setAccountSn(accountSn);
     	userAccount.setProcessType(ProjectConstant.WITHDRAW);
     	userAccount.setThirdPartName(withDrawParam.getThirdPartName());
@@ -495,16 +501,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
     	userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-    	userAccount.setAdminUser(user.getUserName());
-    	userAccount.setBonusPrice(BigDecimal.ZERO);
     	userAccount.setCurBalance(curBalance);
-    	userAccount.setOrderSn("0");
-    	userAccount.setParentSn("");
     	userAccount.setStatus(1);
-    	userAccount.setNote("");
-    	userAccount.setUserSurplus(BigDecimal.ZERO);
-    	userAccount.setUserSurplusLimit(BigDecimal.ZERO);
-    	int rst = userAccountMapper.insertUserAccount(userAccount);
+    	userAccount.setNote(withDrawParam.getThirdPartName()+"提现"+withDrawParam.getThirdPartPaid()+"元");
+    	int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
     	if(rst != 1) {
     		log.error("生成提现流水账户失败");
     		throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "生成提现流水账户失败");
@@ -651,12 +651,20 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	String inPrams = JSON.toJSONString(surplusPayParam);
     	log.info(DateUtil.getCurrentDateTime()+"使用到了部分或全部余额时候回滚支付传递的参数:"+inPrams);	
     	
-    	Integer userId = SessionUtil.getUserId();
+    	OrderSnParam orderSnParam = new OrderSnParam();
+    	orderSnParam.setOrderSn(surplusPayParam.getOrderSn());
+    	BaseResult<OrderDTO> orderDTORst = orderService.getOrderInfoByOrderSn(orderSnParam);
+    	if(orderDTORst.getCode() != 0) {
+    		return ResultGenerator.genFailResult(orderDTORst.getMsg());
+    	}
+    	OrderDTO orderDTO = orderDTORst.getData();
+    	if(null == orderDTO) {
+    		return ResultGenerator.genFailResult("没有该笔订单"+surplusPayParam.getOrderSn()+"，无法回滚账户");
+    	}
+    	
+    	Integer userId = orderDTO.getUserId();
     	if(null == userId) {
-    		userId = surplusPayParam.getUserId();
-    		if(null == userId) {
-    			return ResultGenerator.genFailResult("账户回滚的时候userId为空");
-    		}
+    		return ResultGenerator.genFailResult("该笔订单"+surplusPayParam.getOrderSn()+"userId为空，无法回滚账户");
     	}
     	
     	User user = userService.findById(userId);
@@ -673,17 +681,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		return ResultGenerator.genFailResult("订单号为"+surplusPayParam.getOrderSn()+"没有账户记录，无法回滚");
     	}
     	
-    	OrderSnParam orderSnParam = new OrderSnParam();
-    	orderSnParam.setOrderSn(surplusPayParam.getOrderSn());
-    	BaseResult<OrderDTO> orderDTORst = orderService.getOrderInfoByOrderSn(orderSnParam);
-    	if(orderDTORst.getCode() != 0) {
-    		return ResultGenerator.genFailResult(orderDTORst.getMsg());
-    	}
-    	
-    	OrderDTO orderDTO = orderDTORst.getData();
-    	if(null == orderDTO) {
-    		return ResultGenerator.genFailResult("没有该笔订单"+surplusPayParam.getOrderSn()+"，无法回滚账户");
-    	}
     	User updateUser = new User();
     	BigDecimal userSurplus = orderDTO.getUserSurplus();
     	BigDecimal userSurplusLimit = orderDTO.getUserSurplusLimit();
@@ -714,12 +711,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
         BigDecimal curBalance = curUser.getUserMoney().add(user.getUserMoneyLimit());
         userAccountParam.setCurBalance(curBalance);
         userAccountParam.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
-        userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
-        userAccountParam.setPaymentName("");
-        userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
+        userAccountParam.setOrderSn(orderDTO.getOrderSn());
+        userAccountParam.setPaymentName(orderDTO.getPayName());
+        userAccountParam.setThirdPartName(StringUtils.isEmpty(orderDTO.getPayName())?"":orderDTO.getPayName());
         userAccountParam.setAddTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-        userAccountParam.setPayId("");
+        userAccountParam.setPayId(String.valueOf(orderDTO.getPayId()));
         int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
         
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
@@ -731,7 +728,42 @@ public class UserAccountService extends AbstractService<UserAccount> {
         return ResultGenerator.genSuccessResult("success", surplusPaymentCallbackDTO);
     }
     
- 
+    /**
+     * 提现失败回滚账户可提现余额
+     * @param String orderSn,String surplus
+     */
+    @Transactional
+    public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyWithDrawFailure(MemWithDrawSnParam memWithDrawSnParam) {
+    	String inPrams = JSON.toJSONString(memWithDrawSnParam);
+    	log.info(DateUtil.getCurrentDateTime()+"提现失败回滚账户可提现余额的参数:"+memWithDrawSnParam);	
+    	Integer userId = SessionUtil.getUserId();
+    	WithDrawSnParam paywithDrawSnParam = new WithDrawSnParam();
+    	paywithDrawSnParam.setWithDrawSn(memWithDrawSnParam.getWithDrawSn());
+    	BaseResult<com.dl.shop.payment.dto.UserWithdrawDTO> withDrawRst = payMentService.queryUserWithdrawBySnAndUserId(paywithDrawSnParam);
+        if(withDrawRst.getCode() != 0) {
+        	return ResultGenerator.genFailResult("查询提现单失败，无法对这笔提现单对应的提现预扣款进行回滚");
+        }
+        com.dl.shop.payment.dto.UserWithdrawDTO userWithdrawDTO = withDrawRst.getData();
+        if(null == userWithdrawDTO) {
+        	return ResultGenerator.genFailResult("提现单"+paywithDrawSnParam.getWithDrawSn()+"不存在，无法对这笔提现单对应的提现预扣款进行回滚");
+        }
+        if(!userWithdrawDTO.getStatus().equals(ProjectConstant.FAILURE)) {
+        	return ResultGenerator.genFailResult("提现单"+paywithDrawSnParam.getWithDrawSn()+"未提现失败，无法对这笔提现单对应的提现预扣款进行回滚");
+        }
+        
+        User user = userService.findById(userId);
+        User updateUser = new User();
+        updateUser.setUserMoney(user.getUserMoney().add(userWithdrawDTO.getAmount()));
+        userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+        
+        SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
+        surplusPaymentCallbackDTO.setCurBalance(user.getUserMoney().add(userWithdrawDTO.getAmount()));
+        
+        return ResultGenerator.genSuccessResult("success", surplusPaymentCallbackDTO);
+    }
+    
+    
+    
     /**
      * 查询用户余额明细列表
      *
@@ -760,7 +792,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.date_sdf));
             userAccountDTO.setAccountSn(ua.getAccountSn());
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
-            userAccountDTO.setStatus(showStatus(ua.getProcessType(),ua.getStatus()));
+           
+            if(ua.getProcessType().equals(ProjectConstant.WITHDRAW)) {
+            	userAccountDTO.setStatus(showStatus(ua));
+            }
+            
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
             userAccountDTO.setProcessTypeName(AccountEnum.getName(ua.getProcessType()));
@@ -848,12 +884,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	userAccount.setPayId(String.valueOf(userAccountParamByType.getPayId()));
     	userAccount.setPaymentName(userAccountParamByType.getPaymentName());
     	userAccount.setUserId(userAccountParamByType.getUserId());
-    	if(userAccountParamByType.getBonusPrice().compareTo(BigDecimal.ZERO) > 0) {
-    		userAccount.setNote("红包支付"+userAccountParamByType.getBonusPrice()+"元");
-    	}else {
-    		userAccount.setNote("");
-    	}
-    	
+    	userAccount.setNote(this.createNoteForThirdPay(userAccountParamByType));
     	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
     	userAccount.setLastTime(DateUtil.getCurrentTimeLong());
     	userAccount.setUserSurplus(BigDecimal.ZERO);
@@ -874,21 +905,29 @@ public class UserAccountService extends AbstractService<UserAccount> {
     }
     
     /**
-     * 构造每条流水的状态
+     * 查询提现的状态
      * @param processType
      * @param accountId
      * @return
      */
-    public String showStatus(Integer processType,Integer status) {
-    	if(!ProjectConstant.WITHDRAW.equals(processType)) {
+    public String showStatus(UserAccount ua) {
+    	String withDrawSn = ua.getPayId();
+    	if(StringUtils.isEmpty(withDrawSn)) {
+    		return "";
+    	}
+    	WithDrawSnParam withDrawSnParam = new WithDrawSnParam();
+    	withDrawSnParam.setWithDrawSn(withDrawSn);
+    	BaseResult<UserWithdrawDetailDTO> withDrawDTORst = payMentService.querUserWithDrawDetail(withDrawSnParam);
+    	if(withDrawDTORst.getCode() != 0) {
     		return "";
     	}
     	
-    	if(status.equals(Integer.valueOf(ProjectConstant.FINISH))) {
+    	String withDrawStatus = withDrawDTORst.getData().getStatus();
+    	if(withDrawStatus.equals(ProjectConstant.FINISH)) {
     		return "状态:提现成功";
-    	}else if(status.equals(Integer.valueOf(ProjectConstant.NOT_FINISH))) {
+    	}else if(withDrawStatus.equals(ProjectConstant.NOT_FINISH)) {
     		return "状态:提现中";
-    	}else if(status.equals(Integer.valueOf(ProjectConstant.FAILURE))) {
+    	}else if(withDrawStatus.equals(ProjectConstant.FAILURE)) {
     		return "状态:提现失败";
     	}
 		return "";

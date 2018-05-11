@@ -44,5 +44,6 @@ public class UserWithdrawDTO {
 
     @ApiModelProperty("银行卡名称")
     private String bankName;
+    
 
 }
