@@ -129,34 +129,30 @@ public class UserAccountService extends AbstractService<UserAccount> {
         if (surplus.compareTo(BigDecimal.ZERO) <= 0) {
             return ResultGenerator.genResult(MemberEnums.MONEY_PAID_NOTLESS_ZERO.getcode(), MemberEnums.MONEY_PAID_NOTLESS_ZERO.getMsg());
         }
-        
-        //校验
-        // this.validMoneyMatchOrder(surplusPayParam);
-
+  
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = this.commonCalculateMoney(surplusPayParam.getSurplus(), ProjectConstant.BUY);
         
-        UserAccountParam userAccountParam = new UserAccountParam();
+        UserAccount userAccountParam = new UserAccount();
         String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
         userAccountParam.setAccountSn(accountSn);
     	userAccountParam.setAmount(BigDecimal.ZERO.subtract(surplusPayParam.getMoneyPaid()));
         userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
-        userAccountParam.setAccountType(ProjectConstant.BUY);
+        userAccountParam.setProcessType(ProjectConstant.BUY);
         userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
         userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
         userAccountParam.setThirdPartPaid(surplusPayParam.getThirdPartPaid() == null ?BigDecimal.ZERO:surplusPayParam.getThirdPartPaid());
         userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
         userAccountParam.setBonusPrice(surplusPayParam.getBonusMoney());
-        userAccountParam.setUserName(user.getUserName());
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
         userAccountParam.setNote(this.createNote(surplusPayParam));
         userAccountParam.setPayId("");
-        String accountSnRst = this.saveAccount(userAccountParam);
-        if(StringUtils.isEmpty(accountSnRst)) {
-        	surplusPaymentCallbackDTO.setAccountSn("");
+        int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
+        if(1 == insertRst) {
+        	surplusPaymentCallbackDTO.setAccountSn(accountSn);
         }else {
-        	surplusPaymentCallbackDTO.setAccountSn(accountSnRst);
+        	surplusPaymentCallbackDTO.setAccountSn("");
         }
         
         return ResultGenerator.genSuccessResult("余额支付后余额扣减成功",surplusPaymentCallbackDTO);
@@ -227,6 +223,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 		return noteStr;
     }
+    
     /**
      * 更新用户账户信息
      * @param payId
@@ -285,57 +282,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	return ResultGenerator.genSuccessResult("统计当月的各个用途的资金和成功",userAccountCurMonthDTO);
     }
-    
-    /**
-     * @see 余额支付时候扣减余额和订单支出，优先使用可提现余额
-     *      返回 可提现余额和不可提现余额 剩余的余额 各是多少 
-     */
-    @Transactional
-    private SurplusPaymentCallbackDTO countReduceMoney(BigDecimal surplus, User user) {
-        BigDecimal money = BigDecimal.ZERO;
-        BigDecimal user_money = BigDecimal.ZERO; //用户账户扣减过后的可提现余额
-        BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户扣减过后的不可提现余额
-        BigDecimal usedUserMoney = null;//订单使用的可提现余额
-        BigDecimal usedUserMoneyLimit = null;// 订单使用的不可提现余额
-        BigDecimal curBalance = BigDecimal.ZERO;//当前变动后的总余额
-        money = user.getUserMoney().subtract(surplus);
-        if (money.compareTo(BigDecimal.ZERO) >= 0) {//可提现余额 够	
-            user_money = money;
-            user_money_limit = user.getUserMoneyLimit();
-        } else {//可提现余额 不够
-            user_money = BigDecimal.ZERO;
-            user_money_limit = user.getUserMoneyLimit().add(money);
-        }
-        curBalance = user_money_limit.add(user_money).add(user.getFrozenMoney());
-
-        User updateUser = new User();
-        updateUser.setUserId(SessionUtil.getUserId());
-        updateUser.setUserMoney(user_money);
-        updateUser.setUserMoneyLimit(user_money_limit);
-    	
-        int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
-        if(moneyRst != 1) {
-        	log.error("更新用户账户资金异常");
-        }
-        
-        //回写订单使用可提现和不可提现各自多少
-        if (money.compareTo(BigDecimal.ZERO) >= 0) {//可提现余额 够
-        	usedUserMoney = surplus;
-        	usedUserMoneyLimit = BigDecimal.ZERO;
-        } else {//可提现余额 不够
-        	usedUserMoney = user.getUserMoney();
-        	usedUserMoneyLimit = surplus.subtract(usedUserMoney);
-        } 
-        
-        SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
-        surplusPaymentCallbackDTO.setSurplus(surplus);
-        surplusPaymentCallbackDTO.setUserSurplus(usedUserMoney);
-        surplusPaymentCallbackDTO.setUserSurplusLimit(usedUserMoneyLimit);
-        surplusPaymentCallbackDTO.setCurBalance(curBalance);
-        
-        return surplusPaymentCallbackDTO;
-    }
-    
+      
     /**
      * 账户公共计算服务
      * @param inOrOutMoney 非0
@@ -379,37 +326,38 @@ public class UserAccountService extends AbstractService<UserAccount> {
             updateUser.setUserMoney(user_money);
             updateUser.setUserMoneyLimit(user_money_limit);
             
-    	}else if(ProjectConstant.RECHARGE == type) {
-    		
-    		user_money = user.getUserMoney();
-    		user_money_limit = user.getUserMoneyLimit().add(inOrOutMoney);
-    		curBalance = user_money_limit.add(user_money);
-    		
-    		updateUser.setUserMoneyLimit(user_money_limit);
-    		
-    	}else if(ProjectConstant.WITHDRAW == type) {
-    		BigDecimal curMoney = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney());
-    		if(inOrOutMoney.compareTo(curMoney) == 1) {
-    			throw new ServiceException(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), "当前提现的余额大于账户余额");
-    		}
-    		
-    		user_money = user.getUserMoney().subtract(inOrOutMoney);
-    		user_money_limit = user.getUserMoneyLimit();
-    		curBalance = user_money_limit.add(user_money);
-    		frozenMoney = BigDecimal.ZERO.subtract(inOrOutMoney);
-    		
-    		updateUser.setUserMoney(user_money);
-    		updateUser.setFrozenMoney(frozenMoney);
-    		
-    	}else if(ProjectConstant.REWARD == type) {
-
-    		user_money = user.getUserMoney().add(inOrOutMoney);
-    		user_money_limit = user.getUserMoneyLimit();
-    		curBalance = user_money_limit.add(user_money);
-    		
-    		updateUser.setUserMoney(user_money);
     	}
     	
+//    	else if(ProjectConstant.RECHARGE == type) {
+//    		
+//    		user_money = user.getUserMoney();
+//    		user_money_limit = user.getUserMoneyLimit().add(inOrOutMoney);
+//    		curBalance = user_money_limit.add(user_money);
+//    		
+//    		updateUser.setUserMoneyLimit(user_money_limit);
+//    		
+//    	}else if(ProjectConstant.WITHDRAW == type) {
+//    		BigDecimal curMoney = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney());
+//    		if(inOrOutMoney.compareTo(curMoney) == 1) {
+//    			throw new ServiceException(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), "当前提现的余额大于账户余额");
+//    		}
+//    		
+//    		user_money = user.getUserMoney().subtract(inOrOutMoney);
+//    		user_money_limit = user.getUserMoneyLimit();
+//    		curBalance = user_money_limit.add(user_money);
+//    		frozenMoney = BigDecimal.ZERO.subtract(inOrOutMoney);
+//    		
+//    		updateUser.setUserMoney(user_money);
+//    		updateUser.setFrozenMoney(frozenMoney);
+//    		
+//    	}else if(ProjectConstant.REWARD == type) {
+//
+//    		user_money = user.getUserMoney().add(inOrOutMoney);
+//    		user_money_limit = user.getUserMoneyLimit();
+//    		curBalance = user_money_limit.add(user_money);
+//    		
+//    		updateUser.setUserMoney(user_money);
+//    	}
     	
     	int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
     	
@@ -435,8 +383,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	Criteria cri = condition.createCriteria();
     	cri.andCondition("user_id =",recharegeParam.getUserId());
     	cri.andCondition("pay_id =",recharegeParam.getPayId());
+    	cri.andCondition("process_type =", ProjectConstant.RECHARGE);
     	List<UserAccount> userAccountList = this.findByCondition(condition);
-    	if(CollectionUtils.isEmpty(userAccountList)) {
+    	if(!CollectionUtils.isEmpty(userAccountList)) {
     		return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),MemberEnums.DATA_ALREADY_EXIT_IN_DB.getMsg());
     	}
     	
@@ -476,17 +425,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
     	userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-    	userAccount.setAdminUser(user.getUserName());
-    	userAccount.setBonusPrice(BigDecimal.ZERO);
     	userAccount.setCurBalance(curBalance);
-    	userAccount.setOrderSn("0");
-    	userAccount.setParentSn("");
-    	userAccount.setStatus(1);
-    	userAccount.setNote("");
-    	userAccount.setUserSurplus(BigDecimal.ZERO);
-    	userAccount.setUserSurplusLimit(BigDecimal.ZERO);
+    	userAccount.setStatus(Integer.valueOf(ProjectConstant.FINISH));
     	
-    	int rst = userAccountMapper.insertUserAccount(userAccount);
+    	int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
     	if(rst != 1) {
     		log.error("生成充值流水失败");
     		throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "生成充值流水失败");
@@ -503,6 +445,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
      */
     @Transactional
     public BaseResult<String> withdrawUserMoney(WithDrawParam withDrawParam) {
+    	Condition condition = new Condition(UserAccount.class);
+    	Criteria cri = condition.createCriteria();
+    	cri.andCondition("user_id =",withDrawParam.getUserId());
+    	cri.andCondition("pay_id =",withDrawParam.getPayId());
+    	cri.andCondition("process_type =", ProjectConstant.WITHDRAW);
+    	List<UserAccount> userAccountList = this.findByCondition(condition);
+    	if(!CollectionUtils.isEmpty(userAccountList)) {
+    		return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),MemberEnums.DATA_ALREADY_EXIT_IN_DB.getMsg());
+    	}
+    	
     	BigDecimal user_money = BigDecimal.ZERO; //用户账户变动后的可提现余额
         BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
         BigDecimal curBalance = BigDecimal.ZERO;//当前变动后的总余额
@@ -695,28 +647,46 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param String orderSn,String surplus
      */
     @Transactional
-    public SurplusPaymentCallbackDTO rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam) {
+    public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam) {
     	String inPrams = JSON.toJSONString(surplusPayParam);
-    	log.info(DateUtil.getCurrentDateTime()+"使用到了部分或全部余额时候回滚支付传递的参数:"+inPrams);
+    	log.info(DateUtil.getCurrentDateTime()+"使用到了部分或全部余额时候回滚支付传递的参数:"+inPrams);	
+    	
+    	Integer userId = SessionUtil.getUserId();
+    	if(null == userId) {
+    		userId = surplusPayParam.getUserId();
+    		if(null == userId) {
+    			return ResultGenerator.genFailResult("账户回滚的时候userId为空");
+    		}
+    	}
+    	
+    	User user = userService.findById(userId);
+    	if(null == user) {
+    		return ResultGenerator.genFailResult("没有这个用户的用户id，无法回滚账户");
+    	}
     	
     	UserAccount userAccount = new UserAccount();
-    	userAccount.setUserId(SessionUtil.getUserId());
+    	userAccount.setUserId(userId);
     	userAccount.setOrderSn(surplusPayParam.getOrderSn());
+    	userAccount.setProcessType(ProjectConstant.BUY);
     	List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
     	if(CollectionUtils.isEmpty(userAccountList)) {
-    		return null;
+    		return ResultGenerator.genFailResult("订单号为"+surplusPayParam.getOrderSn()+"没有账户记录，无法回滚");
     	}
     	
-    	UserAccount  rollBackUserAccount = userAccountList.get(0);
-    	Integer userId = SessionUtil.getUserId();
-        User user = userService.findById(userId);
-    	if(null == user) {
-    		user = userService.findById(rollBackUserAccount.getUserId());
+    	OrderSnParam orderSnParam = new OrderSnParam();
+    	orderSnParam.setOrderSn(surplusPayParam.getOrderSn());
+    	BaseResult<OrderDTO> orderDTORst = orderService.getOrderInfoByOrderSn(orderSnParam);
+    	if(orderDTORst.getCode() != 0) {
+    		return ResultGenerator.genFailResult(orderDTORst.getMsg());
     	}
     	
+    	OrderDTO orderDTO = orderDTORst.getData();
+    	if(null == orderDTO) {
+    		return ResultGenerator.genFailResult("没有该笔订单"+surplusPayParam.getOrderSn()+"，无法回滚账户");
+    	}
     	User updateUser = new User();
-    	BigDecimal userSurplus = rollBackUserAccount.getUserSurplus();
-    	BigDecimal userSurplusLimit = rollBackUserAccount.getUserSurplusLimit();
+    	BigDecimal userSurplus = orderDTO.getUserSurplus();
+    	BigDecimal userSurplusLimit = orderDTO.getUserSurplusLimit();
     	boolean isModify = false;
     	if(userSurplus != null && userSurplus.doubleValue() > 0) {
     		log.info("user money: "+ user.getUserMoney());
@@ -724,6 +694,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		updateUser.setUserMoney(user_money);
     		isModify = true;
     	}
+    	
     	if(userSurplusLimit != null && userSurplusLimit.doubleValue() > 0) {
     		BigDecimal user_money_limit = user.getUserMoneyLimit().add(userSurplusLimit);
     		updateUser.setUserMoneyLimit(user_money_limit);
@@ -733,34 +704,31 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	if(isModify) {
     		updateUser.setUserId(user.getUserId());
     		int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
-    	}
-        
-//    	this.deleteById(userAccountList.get(0).getId());
+    	}       
     	
-        UserAccountParam userAccountParam = new UserAccountParam();
+        UserAccount userAccountParam = new UserAccount();
         String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
         userAccountParam.setAccountSn(accountSn);
-        userAccountParam.setAmount(BigDecimal.ZERO.subtract(rollBackUserAccount.getAmount()));
-        userAccountParam.setCurBalance(rollBackUserAccount.getCurBalance().add(BigDecimal.ZERO.subtract(rollBackUserAccount.getAmount())));
-        userAccountParam.setAccountType(ProjectConstant.ACCOUNT_ROLLBACK);
+        userAccountParam.setAmount(orderDTO.getUserSurplus().add(orderDTO.getUserSurplusLimit()));
+        User curUser = userService.findById(userId);
+        BigDecimal curBalance = curUser.getUserMoney().add(user.getUserMoneyLimit());
+        userAccountParam.setCurBalance(curBalance);
+        userAccountParam.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
         userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
         userAccountParam.setPaymentName("");
         userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
-        userAccountParam.setThirdPartPaid(BigDecimal.ZERO);
-        userAccountParam.setUserSurplus(BigDecimal.ZERO);
-        userAccountParam.setUserSurplusLimit(BigDecimal.ZERO);
-        userAccountParam.setUserName(user.getUserName());
+        userAccountParam.setAddTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-        userAccountParam.setNote("退回:"+BigDecimal.ZERO.subtract(rollBackUserAccount.getAmount())+"元");
         userAccountParam.setPayId("");
-        this.saveAccount(userAccountParam);
+        int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
         
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
         surplusPaymentCallbackDTO.setSurplus(BigDecimal.ZERO);
         surplusPaymentCallbackDTO.setUserSurplus(BigDecimal.ZERO);
         surplusPaymentCallbackDTO.setUserSurplusLimit(BigDecimal.ZERO);
+        surplusPaymentCallbackDTO.setCurBalance(curBalance);
         
-        return surplusPaymentCallbackDTO;
+        return ResultGenerator.genSuccessResult("success", surplusPaymentCallbackDTO);
     }
     
  
@@ -785,10 +753,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
         }
 
         PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
-        for(int i = 0,len = userAccountList.size();i < len;i++) {
-        	UserAccount ua = userAccountList.get(i);
+        for(UserAccount ua:userAccountList) {
             UserAccountDTO userAccountDTO = new UserAccountDTO();
             userAccountDTO.setId(ua.getId());
+            userAccountDTO.setPayId(ua.getPayId());
             userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.date_sdf));
             userAccountDTO.setAccountSn(ua.getAccountSn());
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
@@ -945,99 +913,99 @@ public class UserAccountService extends AbstractService<UserAccount> {
     }
     
     
-	/**
-	 * 高速批量更新User 中的userMoney 10万条数据 18s
-	 * @param list
-	 */
-	public int updateBatchUserMoney(List<UserIdAndRewardDTO> list) {
-		Connection conn = null;
-		try {
-			Class.forName(dbDriver);
-			conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
-			conn.setAutoCommit(false);
-			String sql = "UPDATE dl_user SET user_money =  ? WHERE user_id = ?";
-			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-					ResultSet.CONCUR_READ_ONLY);
-			for (int x = 0, size = list.size(); x < size; x++) {
-				prest.setBigDecimal(1, list.get(x).getUserMoney());
-				prest.setInt(2, list.get(x).getUserId());
-				prest.addBatch();
-			}
-			prest.executeBatch();
-			conn.commit();
-			conn.close();
-			return 1;
-		}catch (Exception ex) {
-			try {
-				conn.rollback();
-			} catch (Exception e) {
-				e.printStackTrace();
-				log.error(DateUtil.getCurrentDateTime() + "执行updateBatchUserMoney异常，且回滚异常:" + ex.getMessage());
-				return -1;
-			}
-			log.error(DateUtil.getCurrentDateTime() + "执行updateBatchUserMoney异常，回滚成功:" + ex.getMessage());
-			return 0;
-		}
-	}
-	
-	/**
-	 * 高速批量插入UserAccount 10万条数据 18s
-	 * @param list
-	 * @return 0：执行批量操作异常，但是回滚成功  -1 执行批量操作异常，且回滚失败  1批量更新成功
-	 */
-	public int batchInsertUserAccount(List<UserAccountParam> list) {
-		int rowsTmp = 0;
-		int commitNum = 1000;
-		
-		Connection conn = null;
-		try {
-			Class.forName(dbDriver);
-			conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
-			conn.setAutoCommit(false);
-			String sql = "INSERT INTO dl_user_account(account_sn,user_id,amount,add_time,process_type,order_sn,note,status) VALUES(?,?,?,?,?,?,?,?)";
-			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY,
-					ResultSet.CONCUR_READ_ONLY);
-			Integer addTime = DateUtil.getCurrentTimeLong();
-			for (int x = 0, size = list.size(); x < size; x++) {
-				prest.setString(1, list.get(x).getAccountSn());
-				prest.setInt(2, list.get(x).getUserId());
-				prest.setBigDecimal(3, list.get(x).getAmount());
-				prest.setInt(4, addTime);
-				prest.setInt(5, ProjectConstant.REWARD);
-				prest.setString(6, list.get(x).getOrderSn());
-				prest.setString(7, list.get(x).getNote());
-				prest.setInt(8, list.get(x).getStatus());
-				prest.addBatch();
-				
-                if(rowsTmp%commitNum == 0){//每1000条记录一提交  
-                	prest.executeBatch();  
-                    conn.commit();  
-                    if (null==conn) { //如果连接关闭了 就在创建一个 为什么要这样 原因是 conn.commit()后可能conn被关闭  
-                        conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
-                        conn.setAutoCommit(false);  
-                    }  
-                }  
-                rowsTmp++; 
-			}
-			
-			prest.executeBatch();
-			conn.commit();
-			
-			conn.setAutoCommit(true); 
-			conn.close();
-			return 1;
-		} catch (Exception ex) {
-			try {
-				conn.rollback();
-			} catch (Exception e) {
-				e.printStackTrace();
-				log.error(DateUtil.getCurrentDateTime() + "执行batchInsertUserAccount异常，且回滚异常:" + ex.getMessage());
-				return -1;
-			}
-			log.error(DateUtil.getCurrentDateTime() + "执行batchInsertUserAccount异常，回滚成功:" + ex.getMessage());
-			return 0;
-		}
-	}
+//	/**
+//	 * 高速批量更新User 中的userMoney 10万条数据 18s
+//	 * @param list
+//	 */
+//	public int updateBatchUserMoney(List<UserIdAndRewardDTO> list) {
+//		Connection conn = null;
+//		try {
+//			Class.forName(dbDriver);
+//			conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
+//			conn.setAutoCommit(false);
+//			String sql = "UPDATE dl_user SET user_money =  ? WHERE user_id = ?";
+//			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+//					ResultSet.CONCUR_READ_ONLY);
+//			for (int x = 0, size = list.size(); x < size; x++) {
+//				prest.setBigDecimal(1, list.get(x).getUserMoney());
+//				prest.setInt(2, list.get(x).getUserId());
+//				prest.addBatch();
+//			}
+//			prest.executeBatch();
+//			conn.commit();
+//			conn.close();
+//			return 1;
+//		}catch (Exception ex) {
+//			try {
+//				conn.rollback();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				log.error(DateUtil.getCurrentDateTime() + "执行updateBatchUserMoney异常，且回滚异常:" + ex.getMessage());
+//				return -1;
+//			}
+//			log.error(DateUtil.getCurrentDateTime() + "执行updateBatchUserMoney异常，回滚成功:" + ex.getMessage());
+//			return 0;
+//		}
+//	}
+//	
+//	/**
+//	 * 高速批量插入UserAccount 10万条数据 18s
+//	 * @param list
+//	 * @return 0：执行批量操作异常，但是回滚成功  -1 执行批量操作异常，且回滚失败  1批量更新成功
+//	 */
+//	public int batchInsertUserAccount(List<UserAccountParam> list) {
+//		int rowsTmp = 0;
+//		int commitNum = 1000;
+//		
+//		Connection conn = null;
+//		try {
+//			Class.forName(dbDriver);
+//			conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
+//			conn.setAutoCommit(false);
+//			String sql = "INSERT INTO dl_user_account(account_sn,user_id,amount,add_time,process_type,order_sn,note,status) VALUES(?,?,?,?,?,?,?,?)";
+//			PreparedStatement prest = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY,
+//					ResultSet.CONCUR_READ_ONLY);
+//			Integer addTime = DateUtil.getCurrentTimeLong();
+//			for (int x = 0, size = list.size(); x < size; x++) {
+//				prest.setString(1, list.get(x).getAccountSn());
+//				prest.setInt(2, list.get(x).getUserId());
+//				prest.setBigDecimal(3, list.get(x).getAmount());
+//				prest.setInt(4, addTime);
+//				prest.setInt(5, ProjectConstant.REWARD);
+//				prest.setString(6, list.get(x).getOrderSn());
+//				prest.setString(7, list.get(x).getNote());
+//				prest.setInt(8, list.get(x).getStatus());
+//				prest.addBatch();
+//				
+//                if(rowsTmp%commitNum == 0){//每1000条记录一提交  
+//                	prest.executeBatch();  
+//                    conn.commit();  
+//                    if (null==conn) { //如果连接关闭了 就在创建一个 为什么要这样 原因是 conn.commit()后可能conn被关闭  
+//                        conn = (Connection) DriverManager.getConnection(dbUrl, dbUserName, dbPass);
+//                        conn.setAutoCommit(false);  
+//                    }  
+//                }  
+//                rowsTmp++; 
+//			}
+//			
+//			prest.executeBatch();
+//			conn.commit();
+//			
+//			conn.setAutoCommit(true); 
+//			conn.close();
+//			return 1;
+//		} catch (Exception ex) {
+//			try {
+//				conn.rollback();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				log.error(DateUtil.getCurrentDateTime() + "执行batchInsertUserAccount异常，且回滚异常:" + ex.getMessage());
+//				return -1;
+//			}
+//			log.error(DateUtil.getCurrentDateTime() + "执行batchInsertUserAccount异常，回滚成功:" + ex.getMessage());
+//			return 0;
+//		}
+//	}
 	
 	
 	

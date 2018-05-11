@@ -43,4 +43,7 @@ public class UserAccountDTO {
 
     @ApiModelProperty("操作备注")
     private String note;
+    
+    @ApiModelProperty("查看第三方支付详情的id:对于提现详情的withdraw_sn就是这个值")
+    private String payId;
 }
