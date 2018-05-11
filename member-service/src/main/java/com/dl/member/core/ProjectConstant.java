@@ -16,16 +16,21 @@ public class ProjectConstant {
     public static final String REGISTER_CAPTCHA_ = "register_captcha_";
     public static final String SMS_PREFIX = "sms_";
     public static final String REGISTER_CAPTCHA = "register_captcha";
-    
-    public static final String REGISTER_TPLID = "66686";
-    public static final String LOGIN_TPLID = "66839";
-    public static final String RESETPASS_TPLID = "66838";
-    public static final String SERVICE_TPLID = "75003";
+
+    public static final String REGISTER_TPLID = "76179";
+    public static final String LOGIN_TPLID = "76180";
+    public static final String RESETPASS_TPLID = "76181";
+    public static final String SERVICE_TPLID = "76178";  
+        
+//    public static final String REGISTER_TPLID = "66686";
+//    public static final String LOGIN_TPLID = "66839";
+//    public static final String RESETPASS_TPLID = "66838";
+//    public static final String SERVICE_TPLID = "75003";
     
 	/**
 	 * 缓存存放验证码的有效时长
 	 */
-	public final static int SMS_REDIS_EXPIRED = 60;
+	public final static int SMS_REDIS_EXPIRED = 300;
     public static final String USER_DEFAULT_HEADING_IMG = "http://i9-static.jjwxc.net/novelimage.php?novelid=3385656&coverid=100&ver=d8d2de8a8fb398618c161418abc58f04";
     public static final String JUHEIMAGE_URL = "http://images.juheapi.com/banklogo/";
     public static final String LOGIN_SOURCE_ANDROID = "1";
@@ -108,6 +113,13 @@ public class ProjectConstant {
     
     //用户未收藏
     public static final String IS_NOT_COLLECT = "0";
+    
+    //银行卡默认和非默认
+    public static final String BANK_DEFAULT = "1";
+    public static final String BANK_NOT_DEFAULT = "0";
+    
+    public static final Integer REWARD_AUTO = 1;
+    public static final Integer REWARD_MANUAL = 2;
     
     
 }

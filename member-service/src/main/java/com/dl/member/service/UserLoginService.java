@@ -12,10 +12,9 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
-import com.dl.base.util.SessionUtil;
+import com.dl.base.util.RegexUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
@@ -23,7 +22,6 @@ import com.dl.member.model.UserLoginLog;
 import com.dl.member.param.UserDeviceParam;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
-import com.dl.member.param.UserRegisterParam;
 import com.dl.member.util.Encryption;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,7 +58,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
         String mobile = userLoginMobileParam.getMobile();
         String password = userLoginMobileParam.getPassword();
         UserLoginDTO userLoginDTO = new UserLoginDTO();
-        UserDeviceParam device = userLoginMobileParam.getDevice();
+//        UserDeviceParam device = userLoginMobileParam.getDevice();
         int passWrongCount = 5;
         User user = userService.findBy("mobile", mobile);
         if (null == user) {
@@ -78,8 +76,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
     		
     	}else if(userStatus.equals(ProjectConstant.USER_STATUS_LOCK)){//账号处于被锁状态
     		Integer time  = DateUtil.getCurrentTimeLong() - user.getLastTime();
-        	boolean beyond1h = time > 60? true:false;
-        	if(beyond1h) {
+        	if(time > 60) {
         		BaseResult<UserLoginDTO> userLoginRst = this.verifyUserPass(password, user, userLoginMobileParam);
         		if(userLoginRst.getCode() != 0) {
         			return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
@@ -110,17 +107,21 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
      * @return
      */
     public BaseResult<UserLoginDTO> loginBySms(UserLoginWithSmsParam userLoginMobileParam,HttpServletRequest request) {
-        String mobile = userLoginMobileParam.getMobile();
+    	if(!RegexUtil.checkMobile(userLoginMobileParam.getMobile())) {
+    		return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
+    	}
+    	
+    	String mobile = userLoginMobileParam.getMobile();
         String strRandom4 = RandomUtil.generateUpperString(4);
-        UserDeviceParam device = userLoginMobileParam.getDevice();
+//      UserDeviceParam device = userLoginMobileParam.getDevice();
+        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
+        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
+            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+        }
         int passWrongCount = 5;
         User user = userService.findBy("mobile", mobile);
         if (null == user) {//新用户注册并登录
-  	        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
-  	        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
-  	            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-  	        }
-        	
+  	    	return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 //        	UserRegisterParam userRegisterParam = new UserRegisterParam();
 //        	userRegisterParam.setMobile(userLoginMobileParam.getMobile());
 //        	userRegisterParam.setPassWord("");
@@ -134,17 +135,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 //        	UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 //			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 //  	    User user = userService.findBy("mobile", userRegisterParam.getMobile());
-  	    	if(null == user) {
-  	    		return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
-  	    	}
         }else {
             Integer userStatus = user.getUserStatus();
         	if(userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {//账号正常
-	   	         String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
-	   	         if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
-	   	            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-	   	         }
-	   			 
 	   	         UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 	   			 return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
         	}else if(userStatus.equals(ProjectConstant.USER_STATUS_LOCK)){//账号处于被锁状态
@@ -154,12 +147,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
                 	normalUser.setUserId(user.getUserId());
                 	normalUser.setUserStatus(0);
                 	userService.update(normalUser);
-                	
-	   	   	        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
-	   	   	        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
-	   	   	            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-	   	   	        }
-                	
+            	
                 	UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 	    			
                 	return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
@@ -187,16 +175,17 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			 return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			 
 		 }else {
-        	User updatePassWrongCountUser = new User();
-        	updatePassWrongCountUser.setUserId(user.getUserId());
         	int nowWrongPassCount = user.getPassWrongCount();
-        	updatePassWrongCountUser.setPassWrongCount(++nowWrongPassCount);
-        	userService.update(updatePassWrongCountUser);
-	        if(nowWrongPassCount < 5) {
+	        if(nowWrongPassCount <= 5) {
+	        	User updatePassWrongCountUser = new User();
+	        	updatePassWrongCountUser.setUserId(user.getUserId());
+	        	updatePassWrongCountUser.setPassWrongCount(++nowWrongPassCount);
+	        	userService.update(updatePassWrongCountUser);
         		return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "您输入的密码错误，还有"+(5 - nowWrongPassCount)+"次机会");
         	}else {//输入错误密码超过5次，锁定用户
             	User lockUser = new User();
             	lockUser.setUserId(user.getUserId());
+            	lockUser.setLastTime(DateUtil.getCurrentTimeLong());
             	lockUser.setUserStatus(1);
             	userService.update(lockUser);
         		return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());

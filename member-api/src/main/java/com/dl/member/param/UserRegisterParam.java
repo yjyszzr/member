@@ -30,7 +30,7 @@ public class UserRegisterParam {
 	@NotBlank(message="登录来源不能为空")
     @ApiModelProperty(value = "登录来源 1= android,2= ios,3= pc,4 =h5")
     private String loginSource;
-	
-    @ApiModelProperty(value = "手机设备信息", required = false)
-    private UserDeviceParam device;	
+//	
+//    @ApiModelProperty(value = "手机设备信息", required = false)
+//    private UserDeviceParam device;	
 }

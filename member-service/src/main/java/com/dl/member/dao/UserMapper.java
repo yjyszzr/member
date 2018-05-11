@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.dl.base.mapper.Mapper;
+import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
 
 public interface UserMapper extends Mapper<User> {
@@ -25,4 +26,7 @@ public interface UserMapper extends Mapper<User> {
 	 * 查询多个用户的当前余额
 	 */
 	List<User> queryUserByUserIds(@Param("list") List list);
+	
+	
+	int saveMemberThirdApiLog(MemberThirdApiLog thirdApiLog);
 }

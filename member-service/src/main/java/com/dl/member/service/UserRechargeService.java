@@ -26,6 +26,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import javax.annotation.Resource;
 
+/**
+ * 支付模块已有这个类
+ * @author zzr
+ *
+ */
 @Service
 @Transactional
 @Slf4j

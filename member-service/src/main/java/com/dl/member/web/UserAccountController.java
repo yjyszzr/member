@@ -7,6 +7,7 @@ import com.dl.base.util.SNGenerator;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.BatchResultDTO;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserRechargeDTO;
@@ -17,6 +18,7 @@ import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
+import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
@@ -26,6 +28,7 @@ import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserWithdrawParam;
 import com.dl.member.param.WithDrawParam;
+import com.dl.member.service.SysConfigService;
 import com.dl.member.service.UserAccountService;
 import com.dl.member.service.UserBonusService;
 import com.dl.member.service.UserRechargeService;
@@ -61,6 +64,9 @@ public class UserAccountController {
     @Resource
     private UserWithdrawService userWithdrawService;
     
+    @Resource
+    private SysConfigService sysConfigService;
+    
 	/**
 	 * 余额支付引起的账户余额变动
 	 * @param SurplusPayParam
@@ -80,8 +86,7 @@ public class UserAccountController {
     @ApiOperation(value="余额支付或混合支付失败回滚账户的余额", notes="余额支付或混合支付失败回滚账户的余额",hidden=false)
     @PostMapping("/rollbackUserAccountChangeByPay")
     public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(@RequestBody SurplusPayParam surplusPayParam) {
-    	SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = userAccountService.rollbackUserAccountChangeByPay(surplusPayParam);
-    	return ResultGenerator.genSuccessResult("回滚扣减余额成功",surplusPaymentCallbackDTO);
+    	return userAccountService.rollbackUserAccountChangeByPay(surplusPayParam);
     }
     
 	/** 
@@ -166,7 +171,19 @@ public class UserAccountController {
     @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=false)
 	@RequestMapping(path="/batchUpdateUserAccount", method=RequestMethod.POST)
     public BaseResult<String> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
-    	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList());
+    	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList(),ProjectConstant.REWARD_AUTO);
+    }
+    
+    
+	/**
+	 * 手动更新用户账户,给后台管理派奖使用
+	 * @param userAccountByTypeParam
+	 * @return
+	 */
+    @ApiOperation(value="手动更新用户账户", notes="手动更新用户账户",hidden=false)
+	@RequestMapping(path="/manualUpdateUserAccount", method=RequestMethod.POST)
+    public BaseResult<String> manualUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
+    	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList(),ProjectConstant.REWARD_MANUAL);
     }
     
     
@@ -193,5 +210,15 @@ public class UserAccountController {
     	return ResultGenerator.genSuccessResult("生成账户流水成功",userAccountService.saveUserAccountForThirdPay(userAccountParamByType));
     }
     
+	/**
+	 * 查询业务值的限制：CommonConstants 中9-派奖限制 8-提现限制
+	 * @return
+	 */
+    @ApiOperation(value="查询业务值的限制", notes="查询业务值的限制",hidden=false)
+	@RequestMapping(path="/queryBusinessLimit", method=RequestMethod.POST)
+	public BaseResult<SysConfigDTO> queryBusinessLimit(@Valid @RequestBody SysConfigParam sysConfigParam) {
+		SysConfigDTO sysDTO = sysConfigService.querySysConfig(sysConfigParam.getBusinessId());
+		return  ResultGenerator.genSuccessResult("查询业务值的限制",sysDTO);
+	}
     
 }

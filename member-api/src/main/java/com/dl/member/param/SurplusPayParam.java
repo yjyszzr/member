@@ -42,4 +42,7 @@ public class SurplusPayParam {
     @ApiModelProperty("红包支付的钱")
     private BigDecimal bonusMoney;
     
+    @ApiModelProperty("用户id")
+    private Integer userId;
+    
 }
