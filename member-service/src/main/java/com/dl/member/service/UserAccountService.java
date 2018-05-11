@@ -572,92 +572,69 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	if(1 == dealType) {
     		limitValue = this.queryBusinessLimit(CommonConstants.BUSINESS_ID_REWARD);
     		if(limitValue.compareTo(BigDecimal.ZERO) <= 0) {
-    			log.error("-----------------------------请前往后台管理系统设置派奖金额阈值,不予派奖");
+    			log.error("请前往后台管理系统设置派奖金额阈值,不予派奖");
     			return ResultGenerator.genFailResult("请前往后台管理系统设置派奖金额阈值");
     		}
     		
     		Double limitValueDouble = limitValue.doubleValue();
     		userIdAndRewardList.removeIf(s -> s.getReward().doubleValue() >= limitValueDouble);
     	}
-    	
     	if(userIdAndRewardList.size() == 0) {
     		return ResultGenerator.genSuccessResult("没有要自动开奖的订单");
     	}
     	
-    	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
+    	log.info("=^_^= =^_^= =^_^= =^_^= 派奖开始,派奖数据包括:"+JSON.toJSONString(userIdAndRewardList));
+    	
     	//查询是否已经派发奖金,并过滤掉
+    	List<String> orderSnList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
     	List<String> rewardOrderSnList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
     	if(rewardOrderSnList.size() > 0) {
     		log.error("含有已派发过奖金的订单号，已被过滤,订单号包括："+Joiner.on(",").join(rewardOrderSnList));
     		userIdAndRewardList.removeIf(s -> rewardOrderSnList.contains(s.getOrderSn()));
     	}
     	
-    	List<UserAccountParam> userAccountParamList = new ArrayList<>();
     	List<Integer> userIdList = userIdAndRewardList.stream().map(s->s.getUserId()).collect(Collectors.toList());    	
     	List<User> userList = userMapper.queryUserByUserIds(userIdList);
-    	Map<Integer,BigDecimal> userMoneyMap = userList.stream().collect(Collectors.toMap(User::getUserId, User::getUserMoney));
-    	
-    	//组装好每个用户的可提现余额是多少
-    	Map<Integer,List<UserIdAndRewardDTO>> userIdMap = userIdAndRewardList.stream().collect(Collectors.groupingBy(UserIdAndRewardDTO::getUserId));
-    	List<UserIdAndRewardDTO> updateList = new ArrayList<>();
-    	for(Map.Entry<Integer, List<UserIdAndRewardDTO>> entry : userIdMap.entrySet()){
-    		BigDecimal curUserMoney = userMoneyMap.get(entry.getKey());
-    		if(null != curUserMoney) {
-    			UserIdAndRewardDTO uo = new UserIdAndRewardDTO();
-    			List<UserIdAndRewardDTO> tempList =  entry.getValue();
-    			BigDecimal sameUserIdTotalMoney = tempList.stream().map(s->s.getReward()).reduce(BigDecimal.ZERO, BigDecimal::add);
-    			uo.setUserId(entry.getKey());
-    			uo.setUserMoney(curUserMoney.add(sameUserIdTotalMoney));
-    			updateList.add(uo);
+    	for(UserIdAndRewardDTO uDTO:userIdAndRewardList) {
+    		User updateUserMoney = new User();
+    		BigDecimal userMoney = BigDecimal.ZERO;
+    		for(User user:userList) {
+    			if(uDTO.getUserId().equals(user.getUserId())) {
+    				userMoney = user.getUserMoney();
+    				continue;
+    			}
     		}
-    	}
-
-    	userIdAndRewardList.stream().forEach(s->{
-    		UserAccountParam userAccountParam = new UserAccountParam();
-    		userAccountParam.setUserId(s.getUserId());
+    		updateUserMoney.setUserMoney(userMoney.add(uDTO.getReward()));
+    		userMapper.updateUserMoneyAndUserMoneyLimit(updateUserMoney);
+    		UserAccount userAccountParam = new UserAccount();
     		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
     		userAccountParam.setAccountSn(accountSn);
-    		userAccountParam.setOrderSn(s.getOrderSn());
-    		userAccountParam.setAmount(s.getReward());
-    		userAccountParam.setNote("");
-    		userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
-    		userAccountParamList.add(userAccountParam);
-    	});
-    	
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户参数:"+JSON.toJSONString(updateList));
-    	int updateRst = this.updateBatchUserMoney(updateList);
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户结果:"+updateRst);
-    	
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户流水参数:"+JSON.toJSONString(updateList));
-    	int insertRst = this.batchInsertUserAccount(userAccountParamList);
-    	log.info(DateUtil.getCurrentDateTime()+"----------------------------------更新中奖账户流水结果:"+insertRst);
-
-    	if(updateRst == 1 && insertRst == 1) {
-    		log.info("----------------------------------更新用户中奖订单为已派奖开始");
-    		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
-    		OrderSnListParam orderSnListParam = new OrderSnListParam();
-    		orderSnListParam.setOrderSnlist(orderSnRewaredList);
-    		BaseResult<Integer> orderRst = orderService.updateOrderStatusRewarded(orderSnListParam);
-    		if(0 != orderRst.getCode() ) {
-    			log.error("更新用户订单为已派奖失败");
-    		}
-    		log.info("----------------------------------更新用户中奖订单为已派奖成功");
-    		
-    		saveRewardMessageAsync(userIdAndRewardList);
-    		
-    		log.info(DateUtil.getCurrentTimeString(Long.valueOf(DateUtil.getCurrentTimeLong()), DateUtil.datetimeFormat));
-    		log.info("用");
-    		log.info("户");
-    		log.info("派");
-    		log.info("发");
-    		log.info("奖");
-    		log.info("金");
-    		log.info("完");
-    		log.info("成");
-    		
-    	}else {
-    		throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "用户派发奖金完成完成失败，请查看日志");
+    		userAccountParam.setOrderSn(uDTO.getOrderSn());
+    		userAccountParam.setUserId(uDTO.getUserId());
+	        userAccountParam.setAmount(uDTO.getReward());
+	        userAccountParam.setProcessType(ProjectConstant.REWARD);
+	        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
+	        userAccountParam.setAddTime(DateUtil.getCurrentTimeLong());
+	        userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
+			int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
+			if(1 == insertRst) {
+				log.error("中奖订单号为"+uDTO.getOrderSn()+"生成中奖流水失败");
+			}
     	}
+
+		log.info("更新用户中奖订单为已派奖开始");
+		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
+		OrderSnListParam orderSnListParam = new OrderSnListParam();
+		orderSnListParam.setOrderSnlist(orderSnRewaredList);
+		BaseResult<Integer> orderRst = orderService.updateOrderStatusRewarded(orderSnListParam);
+		if(0 != orderRst.getCode() ) {
+			log.error("更新用户订单为已派奖失败");
+		}
+		log.info("更新用户中奖订单为已派奖成功");
+		
+		saveRewardMessageAsync(userIdAndRewardList);
+		
+		log.info("=^_^= =^_^= =^_^= =^_^= "+DateUtil.getCurrentDateTime()+"用户派发奖金完成"+"=^_^= =^_^= =^_^= =^_^= ");
     	
     	return ResultGenerator.genSuccessResult("用户派发奖金完成");
     }
@@ -852,6 +829,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	Integer userId = SessionUtil.getUserId();
         
     	User user = userService.findById(userId);
+    	if(null == user) {
+    		return "";
+    	}
     	BigDecimal curBalance = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(userAccountParam.getAmount());
     	UserAccount userAccount = new UserAccount();
     	String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());

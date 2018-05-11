@@ -62,7 +62,8 @@
 	         #{item}  
 	    </foreach>
   </select>
-  <!--  <sql id="key">
+
+ <sql id="key">
       <trim suffixOverrides=",">
         <if test="accountSn!=null">
             account_sn,
@@ -97,40 +98,87 @@
         <if test="parentSn!=null">
             parent_sn,
         </if>
-        <if test="lastTime!=null">
-            last_time,
+        <if test="note">
+            note,
         </if>
-        <if test="lastTime!=null">
-            last_time,
+        <if test="payId">
+            pay_id,
         </if>
-        <if test="lastTime!=null">
-            last_time,
+        <if test="thirdPartName">
+            third_part_name,
         </if>
-        <if test="lastTime!=null">
-            last_time,
-        </if>                                
+        <if test="userSurplus!=null">
+            user_surplus,
+        </if>   
+         <if test="userSurplusLimit!=null">
+            user_surplus_limit,
+        </if>  
+        <if test="status!=null">
+            status,
+        </if>                             
       </trim>
     </sql>
 
 
     <sql id="value">
       <trim suffixOverrides=",">
-        <if test="id!=null">
-            #{id},
+        <if test="accountSn!=null">
+            #{accountSn},
         </if>
-
-        <if test="name!=null">
-            #{name},
+        <if test="userId!=null">
+            #{userId},
         </if>
-
-        <if test="sal!=null">
-            #{sal},
+        <if test="adminUser!=null">
+            #{adminUser},
         </if>
+        <if test="amount!=null">
+            #{amount},
+        </if>
+        <if test="curBalance!=null">
+            #{curBalance},
+        </if>
+        <if test="addTime!=null">
+            #{addTime},
+        </if>
+        <if test="lastTime!=null">
+            #{lastTime},
+        </if>
+        <if test="processType!=null">
+            #{processType},
+        </if>
+        <if test="paymentName">
+            #{paymentName},
+        </if>
+        <if test="orderSn!=null">
+            #{orderSn},
+        </if>
+        <if test="parentSn!=null">
+            #{parentSn},
+        </if>
+        <if test="note">
+            #{note},
+        </if>
+        <if test="payId">
+            #{payId},
+        </if>
+        <if test="thirdPartName">
+            #{thirdPartName},
+        </if>
+        <if test="userSurplus!=null">
+             #{userSurplus},
+        </if>   
+         <if test="userSurplusLimit!=null">
+            #{userSurplusLimit},
+        </if>  
+        <if test="status!=null">
+            #{status},
+        </if>                             
       </trim>
     </sql>
-  <insert id="insertUserAccount">
+    
+  <insert id="insertUserAccountBySelective">
   	INSERT INTO dl_user_account(<include refid="key"/>) values(<include refid="value"/>);
-  </insert>-->
+  </insert>
   
   <insert id="insertUserAccount">
   	INSERT INTO 

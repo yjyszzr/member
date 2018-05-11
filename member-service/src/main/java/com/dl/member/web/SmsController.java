@@ -19,6 +19,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
+import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
@@ -40,6 +41,9 @@ public class SmsController {
 
 	@Resource
 	private UserService userService;
+	
+	@Resource
+	private MemberConfig memberConfig;
 
 	/**
 	 * 发送短信验证码
@@ -62,7 +66,7 @@ public class SmsController {
 			if (null == user) {
 				return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 			}
-			tplId = ProjectConstant.LOGIN_TPLID;
+			tplId = memberConfig.getLOGIN_TPLID();
 			strRandom4 = RandomUtil.getRandNum(4);
 			tplValue = "#code#=" + strRandom4;
 		} else if (ProjectConstant.VERIFY_TYPE_REG.equals(smsType)) {// 注册
@@ -70,14 +74,14 @@ public class SmsController {
 				return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
 			}
 
-			tplId = ProjectConstant.REGISTER_TPLID;
+			tplId = memberConfig.getREGISTER_TPLID();
 			strRandom4 = RandomUtil.getRandNum(4);
 			tplValue = "#code#=" + strRandom4;
 		} else if (ProjectConstant.VERIFY_TYPE_FORGET.equals(smsType)) {// 忘记密码
 			if (null == user) {
 				return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 			}
-			tplId = ProjectConstant.RESETPASS_TPLID;
+			tplId = memberConfig.getRESETPASS_TPLID();
 			strRandom4 = RandomUtil.getRandNum(4);
 			tplValue = "#code#=" + strRandom4;
 		}
@@ -116,7 +120,7 @@ public class SmsController {
 					return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 				}
 			}
-			tplId = ProjectConstant.SERVICE_TPLID;
+			tplId = memberConfig.getSERVICE_TPLID();
 			tplValue = "#code#=" + verifyCode;
 		}
 		if (!TextUtils.isEmpty(tplValue)) {

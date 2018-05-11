@@ -30,7 +30,7 @@ public class ProjectConstant {
 	/**
 	 * 缓存存放验证码的有效时长
 	 */
-	public final static int SMS_REDIS_EXPIRED = 60;
+	public final static int SMS_REDIS_EXPIRED = 300;
     public static final String USER_DEFAULT_HEADING_IMG = "http://i9-static.jjwxc.net/novelimage.php?novelid=3385656&coverid=100&ver=d8d2de8a8fb398618c161418abc58f04";
     public static final String JUHEIMAGE_URL = "http://images.juheapi.com/banklogo/";
     public static final String LOGIN_SOURCE_ANDROID = "1";

@@ -69,7 +69,7 @@
 		 WHERE user_id=#{userId}  
   </update>
   
-  <update id="updateUserMoneyAndUserMoneyLimit" parameterType="com.dl.member.model.User">
+  <update id="updateUserMoneyAndUserMoneyLimit" parameterType="com.dl.member.model.User" >
   	UPDATE dl_user 
   		 <trim prefix="set" suffixOverrides=",">
 		  <if test="userMoney!=null">user_money=#{userMoney},</if>
