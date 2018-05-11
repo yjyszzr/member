@@ -15,6 +15,7 @@ import com.dl.member.dto.WithdrawalSnDTO;
 import com.dl.member.model.UserAccount;
 import com.dl.member.param.AmountParam;
 import com.dl.member.param.AmountTypeParam;
+import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
@@ -35,6 +36,8 @@ import com.dl.member.service.UserRechargeService;
 import com.dl.member.service.UserWithdrawService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
+
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -220,5 +223,15 @@ public class UserAccountController {
 		SysConfigDTO sysDTO = sysConfigService.querySysConfig(sysConfigParam.getBusinessId());
 		return  ResultGenerator.genSuccessResult("查询业务值的限制",sysDTO);
 	}
+    
+    /**
+     * 提现失败回滚账户可提现余额
+     * @param MemWithDrawSnParam memWithDrawSnParam
+     */
+    @ApiOperation(value="提现失败回滚账户可提现余额", notes="提现失败回滚账户可提现余额",hidden=false)
+	@RequestMapping(path="/rollbackUserMoneyWithDrawFailure", method=RequestMethod.POST)
+    public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyWithDrawFailure(MemWithDrawSnParam memWithDrawSnParam){
+    	return userAccountService.rollbackUserMoneyWithDrawFailure(memWithDrawSnParam);
+    }
     
 }

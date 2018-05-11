@@ -12,6 +12,7 @@ import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.dto.UserRechargeDTO;
 import com.dl.member.dto.UserWithdrawDTO;
 import com.dl.member.param.AmountParam;
+import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.RollackSurplusPayParam;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
@@ -121,6 +122,9 @@ public interface IUserAccountService {
 	 */
 	@RequestMapping(path="/user/account/batchUpdateUserAccount", method=RequestMethod.POST)
     public BaseResult<String> changeUserAccountByType(@Valid @RequestBody UserIdAndRewardListParam userAccountByTypeParam);
+	
+	@RequestMapping(path="/user/account/rollbackUserMoneyWithDrawFailure", method=RequestMethod.POST)
+    public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyWithDrawFailure(@RequestBody MemWithDrawSnParam memWithDrawSnParam);
 	
 	
 	/**

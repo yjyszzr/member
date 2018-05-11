@@ -63,9 +63,10 @@ public class ProjectConstant {
     public static final String USER_IS_NOT_REAL = "0";//用户已没有进行过实名认证
     public static final String USER_IS_REAL = "1";//用户已经进行过实名认证
     
-    public static final String NOT_FINISH = "0";// 用户未完成
-    public static final String FINISH = "1";//用户已完成
-    public static final String FAILURE = "2";//失败
+    //提现状态
+    public static final String NOT_FINISH = "0";// 提现中
+    public static final String FINISH = "1";//提现成功
+    public static final String FAILURE = "2";//提现失败
     
     public static final Integer REWARD = 1;//奖金
     public static final Integer RECHARGE = 2;//充值
