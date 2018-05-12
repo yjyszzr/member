@@ -22,6 +22,11 @@ public class UserWithdrawParam {
 
 	@ApiModelProperty("银行卡号")
     private String cardNo;
-
- 
+	
+	@ApiModelProperty("银行卡号")
+    private String status;			//提现状态 2-失败,1-已完成，0-未完成
+	
+	public static final String STATUS_FAILURE = "2";
+	public static final String STATUS_SUCC = "1";
+	public static final String STATUS_UNCOMPLETE = "0";
 }
