@@ -48,6 +48,7 @@ import com.dl.order.param.OrderSnListParam;
 import com.dl.order.param.OrderSnParam;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.UserWithdrawDetailDTO;
+import com.dl.shop.payment.param.WithDrawSnAndUserIdParam;
 import com.dl.shop.payment.param.WithDrawSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -729,7 +730,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     }
     
     /**
-     * 提现失败回滚账户可提现余额
+     * 提现失败和审核拒绝回滚账户可提现余额
      * @param String orderSn,String surplus
      */
     @Transactional
@@ -737,8 +738,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	String inPrams = JSON.toJSONString(memWithDrawSnParam);
     	log.info(DateUtil.getCurrentDateTime()+"提现失败回滚账户可提现余额的参数:"+memWithDrawSnParam);	
     	Integer userId = SessionUtil.getUserId();
-    	WithDrawSnParam paywithDrawSnParam = new WithDrawSnParam();
+    	if(null == userId) {
+    		userId = memWithDrawSnParam.getUserId();
+    	}
+    	WithDrawSnAndUserIdParam paywithDrawSnParam = new WithDrawSnAndUserIdParam();
     	paywithDrawSnParam.setWithDrawSn(memWithDrawSnParam.getWithDrawSn());
+    	paywithDrawSnParam.setUserId(userId);
     	BaseResult<com.dl.shop.payment.dto.UserWithdrawDTO> withDrawRst = payMentService.queryUserWithdrawBySnAndUserId(paywithDrawSnParam);
         if(withDrawRst.getCode() != 0) {
         	return ResultGenerator.genFailResult("查询提现单失败，无法对这笔提现单对应的提现预扣款进行回滚");

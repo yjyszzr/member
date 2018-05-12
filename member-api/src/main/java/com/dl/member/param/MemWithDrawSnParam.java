@@ -10,4 +10,7 @@ public class MemWithDrawSnParam {
 	@ApiModelProperty("提现单号")
 	@NotNull
 	private String withDrawSn;
+	
+	@ApiModelProperty("用户id")
+	private Integer userId;
 }
