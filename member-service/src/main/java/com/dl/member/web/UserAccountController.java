@@ -32,11 +32,8 @@ import com.dl.member.param.WithDrawParam;
 import com.dl.member.service.SysConfigService;
 import com.dl.member.service.UserAccountService;
 import com.dl.member.service.UserBonusService;
-import com.dl.member.service.UserRechargeService;
-import com.dl.member.service.UserWithdrawService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
-
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,11 +58,6 @@ public class UserAccountController {
     @Resource
     private UserBonusService userBonusService;
     
-    @Resource
-    private UserRechargeService userRechargeService;
-    
-    @Resource
-    private UserWithdrawService userWithdrawService;
     
     @Resource
     private SysConfigService sysConfigService;
@@ -127,32 +119,32 @@ public class UserAccountController {
     	return ResultGenerator.genSuccessResult("查询用户账户明细列表",rst);
 	}
     
-    @ApiOperation(value="用户生成充值单", notes="用户生成充值单",hidden=false)
-	@RequestMapping(path="/createReCharege", method=RequestMethod.POST)
-    public BaseResult<UserRechargeDTO> createReCharege(@RequestBody AmountParam amountParam){
-    	String rechargeSn = userRechargeService.saveReCharege(amountParam.getAmount());
-    	UserRechargeDTO userRechargeDTO = new UserRechargeDTO();
-    	userRechargeDTO.setRechargeSn(rechargeSn);
-    	return ResultGenerator.genSuccessResult("用户生成充值单成功",userRechargeDTO);
-    }
-    
-    @ApiOperation(value="更新用户充值单", notes="更新用户充值单",hidden=false)
-	@RequestMapping(path="/updateReCharege", method=RequestMethod.POST)
-    public BaseResult<String> updateReCharege(@RequestBody UpdateUserRechargeParam updateUserRechargeParam){
-    	return userRechargeService.updateReCharege(updateUserRechargeParam);
-    }
-    
-    @ApiOperation(value="用户生成提现单", notes="用户生成提现单",hidden=false)
-	@RequestMapping(path="/createUserWithdraw", method=RequestMethod.POST)
-    public BaseResult<WithdrawalSnDTO> createUserWithdraw(@RequestBody UserWithdrawParam userWithdrawParam){
-    	return userWithdrawService.saveWithdraw(userWithdrawParam);
-    }
-    
-    @ApiOperation(value="更新用户提现单", notes="更新用户提现单",hidden=false)
-	@RequestMapping(path="/updateUserWithdraw", method=RequestMethod.POST)
-    public BaseResult<String> updateUserWithdraw(@RequestBody UpdateUserWithdrawParam updateUserWithdrawParam){
-    	return userWithdrawService.updateWithdraw(updateUserWithdrawParam);
-    }
+//    @ApiOperation(value="用户生成充值单", notes="用户生成充值单",hidden=false)
+//	@RequestMapping(path="/createReCharege", method=RequestMethod.POST)
+//    public BaseResult<UserRechargeDTO> createReCharege(@RequestBody AmountParam amountParam){
+//    	String rechargeSn = userRechargeService.saveReCharege(amountParam.getAmount());
+//    	UserRechargeDTO userRechargeDTO = new UserRechargeDTO();
+//    	userRechargeDTO.setRechargeSn(rechargeSn);
+//    	return ResultGenerator.genSuccessResult("用户生成充值单成功",userRechargeDTO);
+//    }
+//    
+//    @ApiOperation(value="更新用户充值单", notes="更新用户充值单",hidden=false)
+//	@RequestMapping(path="/updateReCharege", method=RequestMethod.POST)
+//    public BaseResult<String> updateReCharege(@RequestBody UpdateUserRechargeParam updateUserRechargeParam){
+//    	return userRechargeService.updateReCharege(updateUserRechargeParam);
+//    }
+//    
+//    @ApiOperation(value="用户生成提现单", notes="用户生成提现单",hidden=false)
+//	@RequestMapping(path="/createUserWithdraw", method=RequestMethod.POST)
+//    public BaseResult<WithdrawalSnDTO> createUserWithdraw(@RequestBody UserWithdrawParam userWithdrawParam){
+//    	return userWithdrawService.saveWithdraw(userWithdrawParam);
+//    }
+//    
+//    @ApiOperation(value="更新用户提现单", notes="更新用户提现单",hidden=false)
+//	@RequestMapping(path="/updateUserWithdraw", method=RequestMethod.POST)
+//    public BaseResult<String> updateUserWithdraw(@RequestBody UpdateUserWithdrawParam updateUserWithdrawParam){
+//    	return userWithdrawService.updateWithdraw(updateUserWithdrawParam);
+//    }
     
     @ApiOperation(value="更新用户账户", notes="更新用户账户",hidden=false)
 	@RequestMapping(path="/updateUserAccount", method=RequestMethod.POST)
