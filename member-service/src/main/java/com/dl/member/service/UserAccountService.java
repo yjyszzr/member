@@ -745,9 +745,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	paywithDrawSnParam.setWithDrawSn(memWithDrawSnParam.getWithDrawSn());
     	paywithDrawSnParam.setUserId(userId);
     	BaseResult<com.dl.shop.payment.dto.UserWithdrawDTO> withDrawRst = payMentService.queryUserWithdrawBySnAndUserId(paywithDrawSnParam);
-        if(withDrawRst.getCode() != 0) {
+        log.info("回滚时，查询提现单参数："+JSON.toJSONString(withDrawRst));
+    	if(withDrawRst.getCode() != 0) {
         	return ResultGenerator.genFailResult("查询提现单失败，无法对这笔提现单对应的提现预扣款进行回滚");
         }
+        
         com.dl.shop.payment.dto.UserWithdrawDTO userWithdrawDTO = withDrawRst.getData();
         if(null == userWithdrawDTO) {
         	return ResultGenerator.genFailResult("提现单"+paywithDrawSnParam.getWithDrawSn()+"不存在，无法对这笔提现单对应的提现预扣款进行回滚");
@@ -758,9 +760,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
         
         User user = userService.findById(userId);
         User updateUser = new User();
+        updateUser.setUserId(userId);
         updateUser.setUserMoney(user.getUserMoney().add(userWithdrawDTO.getAmount()));
         userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
-        
+        log.info("回滚时，更新"+userId+"账户值："+user.getUserMoney().add(userWithdrawDTO.getAmount()));
         SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
         surplusPaymentCallbackDTO.setCurBalance(user.getUserMoney().add(userWithdrawDTO.getAmount()));
         
