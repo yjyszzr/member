@@ -50,6 +50,9 @@
 		    <if test="bonusId != null">
 		        AND bonus_id = #{bonusId}
 		    </if>
+		    <if test="minGoodsAmount != null">
+		        AND min_goods_amount &gt;= #{minGoodsAmount}
+		    </if>
 		    <if test="userBonusId != null">
 		        AND user_bonus_id = #{userBonusId}
 		    </if>

@@ -22,6 +22,7 @@ import com.dl.base.result.BaseResult;
 //import com.pgt.shop.member.param.UserBonusIdsParam;
 //import com.pgt.shop.member.param.ValidUserBonusParam;
 import com.dl.member.dto.UserBonusDTO;
+import com.dl.member.param.BonusLimitConditionParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UserBonusIdParam;
 import com.dl.member.param.UserBonusStatusParam;
@@ -52,7 +53,7 @@ public interface IUserBonusService {
 	  * @return
 	  */
      @PostMapping("/user/bonus/queryValidBonusList")
-     BaseResult<List<UserBonusDTO>> queryValidBonusList(@RequestBody StrParam strParam);	 
+     BaseResult<List<UserBonusDTO>> queryValidBonusList(@RequestBody BonusLimitConditionParam bonusLimitConditionParam);	 
 
 //	 /**
 //	 * 获取结算页的店铺红包列表

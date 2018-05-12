@@ -1,6 +1,7 @@
 package com.dl.member.service;
 import com.dl.member.model.ActivityBonus;
 import com.dl.member.model.UserBonus;
+import com.dl.member.param.BonusLimitConditionParam;
 import com.dl.member.param.UserBonusParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -140,10 +142,10 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	}
 
 	/**
-	 * 查询用户可用的红包列表
+	 * 给支付提供查询用户可用的红包列表
 	 * @return
 	 */
-	public List<UserBonusDTO> queryValidBonusList(){
+	public List<UserBonusDTO> queryValidBonusListForPay(BonusLimitConditionParam bonusLimitConditionParam){
 		Integer userId = SessionUtil.getUserId();
 		UserBonus userBonus = new UserBonus();
 		userBonus.setUserId(userId);
@@ -151,6 +153,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
 		userBonus.setStartTime(DateUtil.getCurrentTimeLong());
 		userBonus.setEndTime(DateUtil.getCurrentTimeLong());
+		userBonus.setMinGoodsAmount(bonusLimitConditionParam.getOrderMoneyPaid());
 		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
 		List<UserBonusDTO> userBonusDTOList = new ArrayList<UserBonusDTO>();
 		if(CollectionUtils.isEmpty(userBonusList)) {

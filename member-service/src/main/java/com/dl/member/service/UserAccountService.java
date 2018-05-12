@@ -883,6 +883,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @return
      */
     public String saveUserAccountForThirdPay(UserAccountParamByType userAccountParamByType) {
+    	
+    	if() {}
+    	
+    	
     	UserAccount userAccount = new UserAccount();
     	String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
     	userAccount.setAccountSn(accountSn);
@@ -1053,8 +1057,5 @@ public class UserAccountService extends AbstractService<UserAccount> {
 //			return 0;
 //		}
 //	}
-	
-	
-	
 	
 }
