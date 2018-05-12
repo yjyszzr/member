@@ -126,9 +126,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
         UserAccount userAccountParam = new UserAccount();
         String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
         userAccountParam.setAccountSn(accountSn);
-    	userAccountParam.setAmount(BigDecimal.ZERO.subtract(surplusPayParam.getMoneyPaid()));
+    	userAccountParam.setAmount(BigDecimal.ZERO.subtract(surplusPayParam.getSurplus()));
         userAccountParam.setCurBalance(surplusPaymentCallbackDTO.getCurBalance());
         userAccountParam.setProcessType(ProjectConstant.BUY);
+        userAccountParam.setUserId(userId);
         userAccountParam.setOrderSn(surplusPayParam.getOrderSn());
         userAccountParam.setThirdPartName(StringUtils.isEmpty(surplusPayParam.getThirdPartName())?"":surplusPayParam.getThirdPartName());
         userAccountParam.setThirdPartPaid(surplusPayParam.getThirdPartPaid() == null ?BigDecimal.ZERO:surplusPayParam.getThirdPartPaid());
@@ -801,10 +802,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setAccountSn(ua.getAccountSn());
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
            
-            if(ua.getProcessType().equals(ProjectConstant.WITHDRAW)) {
-            	userAccountDTO.setStatus(showStatus(ua));
-            }
-            
+//            if(ua.getProcessType().equals(ProjectConstant.WITHDRAW)) {
+//            	userAccountDTO.setStatus(showStatus(ua));
+//            }
+            userAccountDTO.setStatus("");
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
             userAccountDTO.setProcessTypeName(AccountEnum.getName(ua.getProcessType()));

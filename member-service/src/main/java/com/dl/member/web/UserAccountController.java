@@ -1,19 +1,11 @@
 package com.dl.member.web;
-import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
-import com.dl.base.util.DateUtil;
-import com.dl.base.util.SNGenerator;
 import com.dl.member.core.ProjectConstant;
-import com.dl.member.dto.BatchResultDTO;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
-import com.dl.member.dto.UserRechargeDTO;
-import com.dl.member.dto.WithdrawalSnDTO;
-import com.dl.member.model.UserAccount;
-import com.dl.member.param.AmountParam;
 import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
@@ -21,28 +13,20 @@ import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.UpdateUserAccountParam;
-import com.dl.member.param.UpdateUserRechargeParam;
-import com.dl.member.param.UpdateUserWithdrawParam;
-import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.UserBonusParam;
-import com.dl.member.param.UserWithdrawParam;
 import com.dl.member.param.WithDrawParam;
 import com.dl.member.service.SysConfigService;
 import com.dl.member.service.UserAccountService;
 import com.dl.member.service.UserBonusService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
-
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
