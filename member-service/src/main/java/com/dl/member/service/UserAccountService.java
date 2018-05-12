@@ -884,13 +884,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
      */
     public String saveUserAccountForThirdPay(UserAccountParamByType userAccountParamByType) {
     	
-    	if() {}
-    	
-    	
     	UserAccount userAccount = new UserAccount();
     	String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
     	userAccount.setAccountSn(accountSn);
-    	userAccount.setProcessType(ProjectConstant.BUY);
+    	userAccount.setProcessType(userAccountParamByType.getAccountType());
     	userAccount.setAmount(userAccountParamByType.getAmount());
     	userAccount.setOrderSn(userAccountParamByType.getOrderSn());
     	userAccount.setPayId(String.valueOf(userAccountParamByType.getPayId()));
