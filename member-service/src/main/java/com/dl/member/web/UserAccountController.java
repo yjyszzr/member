@@ -230,7 +230,7 @@ public class UserAccountController {
      */
     @ApiOperation(value="提现失败回滚账户可提现余额", notes="提现失败回滚账户可提现余额",hidden=false)
 	@RequestMapping(path="/rollbackUserMoneyWithDrawFailure", method=RequestMethod.POST)
-    public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyWithDrawFailure(MemWithDrawSnParam memWithDrawSnParam){
+    public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyWithDrawFailure(@Valid @RequestBody MemWithDrawSnParam memWithDrawSnParam){
     	return userAccountService.rollbackUserMoneyWithDrawFailure(memWithDrawSnParam);
     }
     
