@@ -883,12 +883,21 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @return
      */
     public String saveUserAccountForThirdPay(UserAccountParamByType userAccountParamByType) {
+    	Condition condition = new Condition(UserAccount.class);
+    	Criteria cri = condition.createCriteria();
+    	cri.andCondition("user_id =",userAccountParamByType.getUserId());
+    	cri.andCondition("pay_id =",userAccountParamByType.getPayId());
+    	cri.andCondition("process_type =", userAccountParamByType.getAccountType());
+    	List<UserAccount> userAccountList = this.findByCondition(condition);
+    	if(!CollectionUtils.isEmpty(userAccountList)) {
+    		return "";
+    	}
     	
     	UserAccount userAccount = new UserAccount();
     	String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
     	userAccount.setAccountSn(accountSn);
     	userAccount.setProcessType(userAccountParamByType.getAccountType());
-    	userAccount.setAmount(userAccountParamByType.getAmount());
+    	userAccount.setAmount(BigDecimal.ZERO.subtract(userAccountParamByType.getAmount()));
     	userAccount.setOrderSn(userAccountParamByType.getOrderSn());
     	userAccount.setPayId(String.valueOf(userAccountParamByType.getPayId()));
     	userAccount.setPaymentName(userAccountParamByType.getPaymentName());
@@ -896,21 +905,17 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	userAccount.setNote(this.createNoteForThirdPay(userAccountParamByType));
     	userAccount.setAddTime(DateUtil.getCurrentTimeLong());
     	userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-    	userAccount.setUserSurplus(BigDecimal.ZERO);
-    	userAccount.setUserSurplusLimit(BigDecimal.ZERO);
     	userAccount.setBonusPrice(userAccountParamByType.getBonusPrice());
     	userAccount.setThirdPartName(userAccountParamByType.getThirdPartName());
     	userAccount.setThirdPartPaid(userAccountParamByType.getThirdPartPaid());
     	userAccount.setStatus(Integer.valueOf(ProjectConstant.FINISH));
     	
-    	int rst = userAccountMapper.insertUserAccount(userAccount);
+    	int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
     	if(rst != 1) {
     		log.error("生成流水账户失败");
     		return "";
     	}
 		return accountSn;
-    	
-    	
     }
     
     /**
