@@ -136,6 +136,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         userAccountParam.setUserSurplus(surplusPaymentCallbackDTO.getUserSurplus());
         userAccountParam.setUserSurplusLimit(surplusPaymentCallbackDTO.getUserSurplusLimit());
         userAccountParam.setBonusPrice(surplusPayParam.getBonusMoney());
+        userAccountParam.setAddTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
         userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
         userAccountParam.setNote(this.createNote(surplusPayParam));
