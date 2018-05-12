@@ -53,19 +53,20 @@ public class UserRegisterController {
     @ApiOperation(value = "新用户注册", notes = "新用户注册")
     @PostMapping("/register")
     public BaseResult<UserLoginDTO> register(@RequestBody UserRegisterParam userRegisterParam, HttpServletRequest request) {
-        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.REGISTER_TPLID + "_" + userRegisterParam.getMobile());
-        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
-            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-        }
+//        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.REGISTER_TPLID + "_" + userRegisterParam.getMobile());
+//        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
+//            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+//        }
     	
     	BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
     	if(regRst.getCode() != 0) {
     		return ResultGenerator.genResult(regRst.getCode(),regRst.getMsg());
     	}
     	
-    	userBonusService.receiveUserBonus(ProjectConstant.REGISTER,regRst.getData());
-    	
     	Integer userId = regRst.getData();
+    	userBonusService.receiveUserBonus(ProjectConstant.REGISTER,userId);
+    	
+    	
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
 		

@@ -111,7 +111,12 @@ public class UserService extends AbstractService<User> {
 		user.setRankPoint(0);
 		user.setPassWrongCount(0);
 		user.setIsReal(ProjectConstant.USER_IS_NOT_REAL);
-		Integer userId = userMapper.insertWithReturnId(user);
+		Integer insertRsult = userMapper.insertWithReturnId(user);
+		if(1 != insertRsult) {
+			log.error("注册用户失败");
+			return null;
+		}
+		Integer userId = user.getUserId();
 		return userId;
 	}
 	
