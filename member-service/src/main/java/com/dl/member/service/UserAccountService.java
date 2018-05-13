@@ -709,6 +709,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         UserAccount userAccountParam = new UserAccount();
         String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
         userAccountParam.setAccountSn(accountSn);
+        userAccountParam.setUserId(userId);
         userAccountParam.setAmount(orderDTO.getUserSurplus().add(orderDTO.getUserSurplusLimit()));
         User curUser = userService.findById(userId);
         BigDecimal curBalance = curUser.getUserMoney().add(user.getUserMoneyLimit());
