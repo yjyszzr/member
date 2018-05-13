@@ -42,7 +42,7 @@ public class DlComplainController {
     	dlComplain.setComplainTime(complainTime.intValue());
     	dlComplain.setIsRead(0);
         dlComplainService.save(dlComplain);
-        return ResultGenerator.genSuccessResult("投诉成功！");
+        return ResultGenerator.genSuccessResult("提交成功！");
     }
 
     /*@PostMapping("/delete")
