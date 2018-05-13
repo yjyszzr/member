@@ -506,7 +506,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	userAccount.setLastTime(DateUtil.getCurrentTimeLong());
     	userAccount.setCurBalance(curBalance);
     	userAccount.setStatus(1);
-    	userAccount.setNote(withDrawParam.getThirdPartName()+"提现"+withDrawParam.getThirdPartPaid()+"元");
+    	userAccount.setNote(withDrawParam.getThirdPartName()+"提现"+String.format("%.2f", withDrawParam.getThirdPartPaid().doubleValue())+"元");
     	int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
     	if(rst != 1) {
     		log.error("生成提现流水账户失败");
