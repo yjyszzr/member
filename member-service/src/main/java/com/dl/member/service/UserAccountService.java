@@ -610,11 +610,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	for(UserIdAndRewardDTO u:list) {
     		DlMessage messageAddParam = new DlMessage();
     		messageAddParam.setTitle(CommonConstants.FORMAT_REWARD_TITLE);
-			messageAddParam.setContent(MessageFormat.format(CommonConstants.FORMAT_REWARD_DESC, "竞彩足球",u.getReward()));
-			messageAddParam.setContentDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_DESC, "竞彩足球",u.getReward()));
+			messageAddParam.setContent(MessageFormat.format(CommonConstants.FORMAT_REWARD_CONTENT, u.getReward()));
+			messageAddParam.setContentDesc(CommonConstants.FORMAT_REWARD_CONTENT_DESC);
 			messageAddParam.setContentUrl("www.baidu.com");
 			messageAddParam.setSender(u.getUserId());
-			messageAddParam.setMsgType(10);
+			messageAddParam.setMsgType(0);
 			messageAddParam.setReceiver(u.getUserId());
 			for(User user:userList) {
 				if(user.getUserId().equals(u.getUserId())) {
@@ -625,7 +625,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			messageAddParam.setObjectType(1);
 			messageAddParam.setMsgUrl("www.baidu.com");
 			messageAddParam.setSendTime(DateUtil.getCurrentTimeLong());
-			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_DESC, "竞彩足球",u.getReward()));
+			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
 			userMessageService.save(messageAddParam);
     	}
     }
