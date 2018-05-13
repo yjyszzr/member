@@ -31,7 +31,7 @@
 		        AND is_delete = #{isDelete}
 		    </if>
 	    </where>
-	    order by add_time
+	    order by add_time desc
   </select>
   
   <update id="updateUserCollect"  parameterType="java.lang.Integer">
