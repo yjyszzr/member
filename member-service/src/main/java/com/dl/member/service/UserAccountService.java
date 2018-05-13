@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
@@ -267,7 +268,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	List<UserAccount> withdrawList = new ArrayList<>();
     	List<UserAccount> rewardList = new ArrayList<>();
  
-    	for(UserAccount u:userAccountList) {
+    	Map<String, List<UserAccount>> groupByMap = userAccountList.stream().collect(Collectors.groupingBy(UserAccount::getOrderSn));
+    	for(Map.Entry<String, List<UserAccount>> entry : groupByMap.entrySet()){
+    		List<UserAccount> list = entry.getValue();
+    		if(list.size() == 2) {
+    			continue;
+    		}
+    		UserAccount u = list.get(0);
     		if(ProjectConstant.BUY.equals(u.getProcessType())) {
     			buyList.add(u);
     		}else if(ProjectConstant.RECHARGE.equals(u.getProcessType())) {
