@@ -557,7 +557,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		for(User user:userList) {
     			if(uDTO.getUserId().equals(user.getUserId())) {
     				userMoney = user.getUserMoney();
-    				continue;
+    				break;
     			}
     		}
     		updateUserMoney.setUserMoney(userMoney.add(uDTO.getReward()));
