@@ -612,7 +612,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		messageAddParam.setTitle(CommonConstants.FORMAT_REWARD_TITLE);
 			messageAddParam.setContent(MessageFormat.format(CommonConstants.FORMAT_REWARD_CONTENT, u.getReward()));
 			messageAddParam.setContentDesc(CommonConstants.FORMAT_REWARD_CONTENT_DESC);
-			messageAddParam.setContentUrl("www.baidu.com");
+//			messageAddParam.setContentUrl("www.baidu.com");//通知暂时不需要
 			messageAddParam.setSender(u.getUserId());
 			messageAddParam.setMsgType(0);
 			messageAddParam.setReceiver(u.getUserId());
@@ -623,7 +623,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 				continue;
 			}
 			messageAddParam.setObjectType(1);
-			messageAddParam.setMsgUrl("www.baidu.com");
+//			messageAddParam.setMsgUrl("www.baidu.com");//通知暂时不需要
 			messageAddParam.setSendTime(DateUtil.getCurrentTimeLong());
 			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
 			userMessageService.save(messageAddParam);
