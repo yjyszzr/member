@@ -218,7 +218,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}
 		
 		Integer currentTime = DateUtil.getCurrentTimeLong();
-		if(userBonus.getEndTime() - currentTime <= ProjectConstant.OneDaySecond) {
+		
+		if(userBonus.getEndTime() - currentTime <= ProjectConstant.OneDaySecond &&
+		   userBonus.getEndTime() - currentTime	> 0) {
 			userBonusDTO.setSoonExprireBz(ProjectConstant.BONUS_SOONEXPIREBZ_NOTHIDE);
 		}else {
 			userBonusDTO.setSoonExprireBz(ProjectConstant.BONUS_SOONEXPIREBZ_HIDE);

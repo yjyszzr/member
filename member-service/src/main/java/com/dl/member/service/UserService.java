@@ -163,6 +163,7 @@ public class UserService extends AbstractService<User> {
     	updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
     	this.update(updateUser);
     	
+		stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.RESETPASS_TPLID + "_" + mobileNumber, ""); 
     	return ResultGenerator.genSuccessResult("更新用户登录密码成功");
 	}
 

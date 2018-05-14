@@ -288,7 +288,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	userAccountCurMonthDTO.setBuyMoney(String.valueOf(df.format(0 - buyMoney)));
     	userAccountCurMonthDTO.setRechargeMoney(String.valueOf(df.format(rechargeMoney)));
-    	userAccountCurMonthDTO.setWithDrawMoney(String.valueOf(df.format(withdrawMoney)));
+    	userAccountCurMonthDTO.setWithDrawMoney(String.valueOf(df.format(0 - withdrawMoney)));
     	userAccountCurMonthDTO.setRewardMoney(String.valueOf(df.format(rewardMoney)));
     	
     	return ResultGenerator.genSuccessResult("统计当月的各个用途的资金和成功",userAccountCurMonthDTO);
