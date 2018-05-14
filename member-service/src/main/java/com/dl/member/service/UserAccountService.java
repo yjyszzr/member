@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
@@ -266,7 +267,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	List<UserAccount> rechargeList = new ArrayList<>();
     	List<UserAccount> withdrawList = new ArrayList<>();
     	List<UserAccount> rewardList = new ArrayList<>();
- 
+    	
     	for(UserAccount u:userAccountList) {
     		if(ProjectConstant.BUY.equals(u.getProcessType())) {
     			buyList.add(u);
@@ -556,7 +557,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		for(User user:userList) {
     			if(uDTO.getUserId().equals(user.getUserId())) {
     				userMoney = user.getUserMoney();
-    				continue;
+    				break;
     			}
     		}
     		updateUserMoney.setUserMoney(userMoney.add(uDTO.getReward()));
@@ -804,9 +805,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setAccountSn(ua.getAccountSn());
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
            
-//            if(ua.getProcessType().equals(ProjectConstant.WITHDRAW)) {
-//            	userAccountDTO.setStatus(showStatus(ua));
-//            }
+            if(ua.getProcessType().equals(ProjectConstant.WITHDRAW)) {
+            	userAccountDTO.setStatus(showStatus(ua));
+            }
             userAccountDTO.setStatus("");
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
