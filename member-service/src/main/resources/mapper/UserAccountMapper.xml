@@ -56,7 +56,7 @@
   </select>
   
   <select id="queryUserAccountRewardByOrdersn" parameterType="java.util.List"  resultType="java.lang.String">
-  		select *  from dl_user_account 
+  		select order_sn  from dl_user_account 
   		where process_type = 1 and  order_sn in
   		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
 	         #{item}  

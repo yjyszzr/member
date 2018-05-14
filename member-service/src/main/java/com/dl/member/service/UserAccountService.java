@@ -549,6 +549,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		userIdAndRewardList.removeIf(s -> rewardOrderSnList.contains(s.getOrderSn()));
     	}
     	
+    	
     	List<Integer> userIdList = userIdAndRewardList.stream().map(s->s.getUserId()).collect(Collectors.toList());    	
     	List<User> userList = userMapper.queryUserByUserIds(userIdList);
     	for(UserIdAndRewardDTO uDTO:userIdAndRewardList) {
@@ -573,8 +574,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	        userAccountParam.setAddTime(DateUtil.getCurrentTimeLong());
 	        userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
 			int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
-			if(1 == insertRst) {
+			if(1 != insertRst) {
 				log.error("中奖订单号为"+uDTO.getOrderSn()+"生成中奖流水失败");
+			}else {
+				log.error("用户"+uDTO.getUserId()+"中奖订单号为"+uDTO.getOrderSn()+"奖金派发完成");
 			}
     	}
 
