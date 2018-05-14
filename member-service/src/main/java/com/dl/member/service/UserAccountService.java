@@ -627,7 +627,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 				continue;
 			}
 			messageAddParam.setObjectType(1);
-//			messageAddParam.setMsgUrl("www.baidu.com");//通知暂时不需要
+			messageAddParam.setMsgUrl("");//通知暂时不需要
 			messageAddParam.setSendTime(DateUtil.getCurrentTimeLong());
 			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
 			userMessageService.save(messageAddParam);
