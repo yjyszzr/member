@@ -40,6 +40,7 @@ public class MemberSchedul {
 		 List<Integer> userBonusIdList = userBonusMapper.queryUserBonusIdsExpire(now);
 		 if(CollectionUtils.isEmpty(userBonusIdList)) {
 			 log.info("####################没有过期的红包，定时任务结束");
+			 return;
 		 }
 		 
 		 int rst = userBonusService.updateBonusExpire(userBonusIdList);
