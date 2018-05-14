@@ -267,14 +267,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	List<UserAccount> rechargeList = new ArrayList<>();
     	List<UserAccount> withdrawList = new ArrayList<>();
     	List<UserAccount> rewardList = new ArrayList<>();
- 
-    	Map<String, List<UserAccount>> groupByMap = userAccountList.stream().collect(Collectors.groupingBy(UserAccount::getOrderSn));
-    	for(Map.Entry<String, List<UserAccount>> entry : groupByMap.entrySet()){
-    		List<UserAccount> list = entry.getValue();
-    		if(list.size() == 2) {
-    			continue;
-    		}
-    		UserAccount u = list.get(0);
+    	
+    	for(UserAccount u:userAccountList) {
     		if(ProjectConstant.BUY.equals(u.getProcessType())) {
     			buyList.add(u);
     		}else if(ProjectConstant.RECHARGE.equals(u.getProcessType())) {
@@ -811,9 +805,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
             userAccountDTO.setAccountSn(ua.getAccountSn());
             userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
            
-//            if(ua.getProcessType().equals(ProjectConstant.WITHDRAW)) {
-//            	userAccountDTO.setStatus(showStatus(ua));
-//            }
+            if(ua.getProcessType().equals(ProjectConstant.WITHDRAW)) {
+            	userAccountDTO.setStatus(showStatus(ua));
+            }
             userAccountDTO.setStatus("");
             userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
             userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
