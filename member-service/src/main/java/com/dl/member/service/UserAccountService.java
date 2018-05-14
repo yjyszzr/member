@@ -561,6 +561,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     				break;
     			}
     		}
+    		updateUserMoney.setUserId(uDTO.getUserId());
     		updateUserMoney.setUserMoney(userMoney.add(uDTO.getReward()));
     		userMapper.updateUserMoneyAndUserMoneyLimit(updateUserMoney);
     		UserAccount userAccountParam = new UserAccount();
