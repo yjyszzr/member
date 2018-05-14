@@ -142,7 +142,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			Integer userStatus = user.getUserStatus();
 			if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
-				stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), ""); 
+				stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
 				boolean beyond1h = DateUtil.getCurrentTimeLong() - user.getLastTime() > 60 * 1000 ? true : false;
@@ -153,7 +153,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					userService.update(normalUser);
 
 					UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
-					stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), ""); 
+					stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
 					return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 				} else {
 					return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
@@ -181,7 +181,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 
 		} else {
 			int nowWrongPassCount = user.getPassWrongCount();
-			if (nowWrongPassCount <= 5) {
+			if (nowWrongPassCount < 5) {
 				User updatePassWrongCountUser = new User();
 				updatePassWrongCountUser.setUserId(user.getUserId());
 				updatePassWrongCountUser.setPassWrongCount(++nowWrongPassCount);
