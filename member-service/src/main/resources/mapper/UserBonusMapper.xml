@@ -66,7 +66,7 @@
 	    order by start_time ASC,end_time ASC,bonus_price ASC,min_goods_amount ASC
   </select>
   
-  <select id="queryUserBonusIdsExpire" parameterType="java.lang.String" resultType="java.lang.Integer">
+  <select id="queryUserBonusIdsExpire" parameterType="java.lang.Integer" resultType="java.lang.Integer">
 	  SELECT user_bonus_id FROM dl_user_bonus WHERE  bonus_status = 0 AND end_time &lt;= #{now}
   </select>
   
@@ -92,8 +92,8 @@
    </insert >
     
    <update id ="updateBatchUserBonusExpire" parameterType="java.util.List" >
-      update  dl_user_bonus set bonus_status = 3 where user_bonus_id in 
-          <foreach collection ="list" item="item" index= "index" separator =",">
+      update  dl_user_bonus set bonus_status = 2 where user_bonus_id in 
+          <foreach collection="list" index="index" item="item" open="(" separator="," close=")"> 
 			#{item}  
           </foreach >
    </update > 
