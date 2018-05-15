@@ -551,6 +551,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	
     	
     	List<Integer> userIdList = userIdAndRewardList.stream().map(s->s.getUserId()).collect(Collectors.toList());    	
+    	Integer accountTime = DateUtil.getCurrentTimeLong();
     	List<User> userList = userMapper.queryUserByUserIds(userIdList);
     	for(UserIdAndRewardDTO uDTO:userIdAndRewardList) {
     		User updateUserMoney = new User();
@@ -572,7 +573,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	        userAccountParam.setAmount(uDTO.getReward());
 	        userAccountParam.setProcessType(ProjectConstant.REWARD);
 	        userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-	        userAccountParam.setAddTime(DateUtil.getCurrentTimeLong());
+	        userAccountParam.setAddTime(accountTime);
 	        userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
 			int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
 			if(1 != insertRst) {
@@ -592,7 +593,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 		log.info("更新用户中奖订单为已派奖成功");
 		
-		saveRewardMessageAsync(userIdAndRewardList);
+		saveRewardMessageAsync(userIdAndRewardList,accountTime);
 		
 		log.info("=^_^= =^_^= =^_^= =^_^= "+DateUtil.getCurrentDateTime()+"用户派发奖金完成"+"=^_^= =^_^= =^_^= =^_^= ");
     	
@@ -605,7 +606,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
      * @param list
      */
     @Async
-	public void saveRewardMessageAsync(List<UserIdAndRewardDTO> list) {
+	public void saveRewardMessageAsync(List<UserIdAndRewardDTO> list,Integer accountTime) {
     	List<Integer> userIdList = list.stream().map(s->s.getUserId()).collect(Collectors.toList());
     	List<User> userList = userMapper.queryUserByUserIds(userIdList);
     	if(CollectionUtils.isEmpty(userList)) {
@@ -629,7 +630,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			}
 			messageAddParam.setObjectType(1);
 			messageAddParam.setMsgUrl("");//通知暂时不需要
-			messageAddParam.setSendTime(DateUtil.getCurrentTimeLong());
+			messageAddParam.setSendTime(accountTime);
 			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
 			userMessageService.save(messageAddParam);
     	}
@@ -688,6 +689,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	if(CollectionUtils.isEmpty(userAccountList)) {
     		return ResultGenerator.genFailResult("订单号为"+surplusPayParam.getOrderSn()+"没有账户记录，无法回滚");
     	}
+    	
+    	UserAccount userAccountRoll = new UserAccount();
+    	userAccountRoll.setUserId(userId);
+    	userAccountRoll.setOrderSn(surplusPayParam.getOrderSn());
+    	userAccountRoll.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
+    	List<UserAccount> userAccountListRoll = userAccountMapper.queryUserAccountBySelective(userAccount);
+    	if(!CollectionUtils.isEmpty(userAccountListRoll)) {
+    		return ResultGenerator.genFailResult("订单号为"+surplusPayParam.getOrderSn()+"已经回滚，无法再次回滚");
+    	}
+    	
     	
     	User updateUser = new User();
     	BigDecimal userSurplus = orderDTO.getUserSurplus();
