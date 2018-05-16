@@ -23,8 +23,20 @@ public class SwitchConfig {
     private Integer platform;
 
     private String version;
+    
+    private String channel;
+    
+    
 
-    /**
+    public String getChannel() {
+		return channel;
+	}
+
+	public void setChannel(String channel) {
+		this.channel = channel;
+	}
+
+	/**
      * @return id
      */
     public Integer getId() {
