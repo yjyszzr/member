@@ -19,8 +19,8 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     @Resource
     private SwitchConfigMapper switchConfigMapper;
     
-    public BaseResult<SwitchConfig> querySwitchConfig(String platform,String version){
-    	List<SwitchConfig> switchConfigList = switchConfigMapper.querySwitchConfigTurnOff(platform,version);
+    public BaseResult<SwitchConfig> querySwitchConfig(String platform,String version,String chanel){
+    	List<SwitchConfig> switchConfigList = switchConfigMapper.querySwitchConfigTurnOff(platform,version,chanel);
     	if(CollectionUtils.isEmpty(switchConfigList)) {
     		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "未设置开关");
     	}

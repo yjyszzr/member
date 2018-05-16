@@ -48,7 +48,7 @@ public class SwitchConfigController {
     		return ResultGenerator.genFailResult("设备信息中的plat参数错误");
     	}
     	
-    	return switchConfigService.querySwitchConfig(plat, userDevice.getAppv());
+    	return switchConfigService.querySwitchConfig(plat, userDevice.getAppv(),userDevice.getChannel());
     }
 
 }
