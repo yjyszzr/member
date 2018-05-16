@@ -43,3 +43,16 @@ INSERT INTO `user` VALUES ('8', '8@qq.com', '1ee04e0b1cb5af7367c80c22e42efd8b', 
 INSERT INTO `user` VALUES ('9', '9@qq.com', '1ee04e0b1cb5af7367c80c22e42efd8b', '土豆-9', '1', '2017-06-23 14:24:23');
 INSERT INTO `user` VALUES ('10', '10@qq.com', '1ee04e0b1cb5af7367c80c22e42efd8b', '土豆-10', '1', '2017-06-23 14:24:23');
 SET FOREIGN_KEY_CHECKS=1;
+
+
+CREATE TABLE `dl_phone_channel` (
+  `id` int(11) NOT NULL,
+  `channel` varchar(45) DEFAULT NULL,
+  `channel_name` varchar(60) CHARACTER SET utf8mb4 DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+INSERT INTO `dl_phone_channel` VALUES (1,'c10010','google'),(2,'c10020','vivo'),(3,'c10021','oppo'),(4,'c10022','华为'),(5,'c10023','阿里应用分发'),(6,'c10024','魅族'),(7,'c10025','金立'),(8,'c10026','三星'),(9,'c10027','小米'),(10,'c10028','百度'),(11,'c10029','360'),(12,'c10030','锤子'),(13,'c10031','联想'),(14,'c10032','搜狗'),(15,'c10033','机锋'),(16,'c10034','应用汇'),(17,'c10035','乐视'),(18,'c16010','appstore');
+
