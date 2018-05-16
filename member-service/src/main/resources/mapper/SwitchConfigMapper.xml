@@ -14,6 +14,6 @@
   </resultMap>
   
   <select id="querySwitchConfigTurnOff" parameterType="java.lang.String" resultMap="BaseResultMap">
-  	   select *  from dl_switch_config where  platform = #{platform} and version = #{version} and chanel = #{channel}
+  	   select *  from dl_switch_config where  platform = #{platform} and version = #{version} and channel = #{channel}
   </select>
 </mapper>
