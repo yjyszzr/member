@@ -688,7 +688,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	userAccountRoll.setUserId(userId);
     	userAccountRoll.setOrderSn(surplusPayParam.getOrderSn());
     	userAccountRoll.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
-    	List<UserAccount> userAccountListRoll = userAccountMapper.queryUserAccountBySelective(userAccount);
+    	List<UserAccount> userAccountListRoll = userAccountMapper.queryUserAccountBySelective(userAccountRoll);
     	if(!CollectionUtils.isEmpty(userAccountListRoll)) {
     		return ResultGenerator.genFailResult("订单号为"+surplusPayParam.getOrderSn()+"已经回滚，无法再次回滚");
     	}
