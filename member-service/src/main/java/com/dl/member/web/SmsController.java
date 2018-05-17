@@ -2,12 +2,14 @@ package com.dl.member.web;
 
 import io.swagger.annotations.ApiOperation;
 
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.util.TextUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,6 +59,23 @@ public class SmsController {
 		if (!RegexUtil.checkMobile(smsParam.getMobile())) {
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
+		
+		int num = 0;
+		String sendNumKey = "num_send_"+smsParam.getMobile();
+		try {
+			String sendNumValue = stringRedisTemplate.opsForValue().get(sendNumKey);
+			if(StringUtils.isNotBlank(sendNumValue)) {
+				num = Integer.parseInt(sendNumValue);
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		
+		if(num >= 6) {
+			return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_ERROR.getMsg());
+		}
+		num++;
+		
 		String smsType = smsParam.getSmsType();
 		String tplId = "";
 		String tplValue = "";
@@ -95,10 +114,21 @@ public class SmsController {
 		int expiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
 		String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
 		stringRedisTemplate.opsForValue().set(key, strRandom4, expiredTime, TimeUnit.SECONDS);
-
+		int sendNumExpire = this.todayEndTime();
+		stringRedisTemplate.opsForValue().set(sendNumKey, num+"", sendNumExpire, TimeUnit.SECONDS);
+		
 		return ResultGenerator.genSuccessResult("发送短信验证码成功");
 	}
 
+	
+    private int todayEndTime() {
+		Calendar date = Calendar.getInstance();
+		int hour = date.get(Calendar.HOUR_OF_DAY);
+		int minute = date.get(Calendar.MINUTE);
+		int second = date.get(Calendar.SECOND);
+		return (59-second) + (59-minute)*60+(23-hour)*3600;
+    }
+    
 	/**
 	 * 发送短信验证码
 	 * 
