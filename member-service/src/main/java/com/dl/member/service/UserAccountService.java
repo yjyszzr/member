@@ -118,7 +118,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
             return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
         }
 
-        if (surplus.compareTo(BigDecimal.ZERO) <= 0) {
+        if (surplus.compareTo(BigDecimal.ZERO) < 0) {
             return ResultGenerator.genResult(MemberEnums.MONEY_PAID_NOTLESS_ZERO.getcode(), MemberEnums.MONEY_PAID_NOTLESS_ZERO.getMsg());
         }
   

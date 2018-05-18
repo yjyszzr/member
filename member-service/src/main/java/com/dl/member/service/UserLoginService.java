@@ -61,7 +61,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		int passWrongCount = 5;
 		User user = userService.findBy("mobile", mobile);
 		if (null == user) {
-			return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), MemberEnums.WRONG_IDENTITY.getMsg());
+			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 		}
 
 		Integer userStatus = user.getUserStatus();
