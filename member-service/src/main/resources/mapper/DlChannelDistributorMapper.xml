@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.DlChannelDistributorMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.DlChannelDistributor">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="channel_distributor_id" jdbcType="INTEGER" property="channelDistributorId" />
+    <result column="channel_id" jdbcType="INTEGER" property="channelId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="channel_distributor_num" jdbcType="VARCHAR" property="channelDistributorNum" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="distributor_commission_rate" jdbcType="VARCHAR" property="distributorCommissionRate" />
+    <result column="channel_name" jdbcType="VARCHAR" property="channelName" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="deleted" jdbcType="TINYINT" property="deleted" />
+  </resultMap>
+  <select id = "getAllDlChannelDistributor" resultMap="BaseResultMap">
+  select *  from  dl_channel_distributor;
+  </select>
+  
+  <select id = "findBettingTotalAmount"   parameterType="String"  >
+  		select SUM(ticket_amount)  from dl_order where order_sn in #{orderSns};
+  </select>
+</mapper>
