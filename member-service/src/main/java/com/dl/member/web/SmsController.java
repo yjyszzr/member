@@ -71,7 +71,7 @@ public class SmsController {
 			e.printStackTrace();
 		}
 		
-		if(num >= 6) {
+		if(num >= 10) {
 			return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_ERROR.getMsg());
 		}
 		num++;
