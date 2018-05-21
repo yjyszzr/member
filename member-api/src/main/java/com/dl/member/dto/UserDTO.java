@@ -1,7 +1,10 @@
 package com.dl.member.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
+
 import javax.persistence.*;
+
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
@@ -194,7 +197,24 @@ public class UserDTO {
     @Column(name = "user_remark")
     private String userRemark;
 
+    private List<com.dl.member.dto.ActivityDTO> activityDTOList;
+    
+    /**
+     * 获取活动集合
+     *
+     */
+    public List<com.dl.member.dto.ActivityDTO> getActivityDTOList() {
+        return activityDTOList;
+    }
 
+    /**
+     * 设置活动集合
+     *
+     */
+    public void setActivityDTOList(List<com.dl.member.dto.ActivityDTO> activityDTOList) {
+        this.activityDTOList = activityDTOList;
+    }
+    
     /**
      * 获取用户名
      *
@@ -726,6 +746,7 @@ public class UserDTO {
     public void setUserRemark(String userRemark) {
         this.userRemark = userRemark;
     }
+    
     
     
 }

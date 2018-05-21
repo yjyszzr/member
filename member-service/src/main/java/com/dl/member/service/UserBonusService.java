@@ -283,8 +283,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 			userBonus.setBonusPrice(s.getBonusAmount());
 			userBonus.setReceiveTime(DateUtil.getCurrentTimeLong());
-			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, s.getStartTime()));
-			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime,s.getEndTime()));
+			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, s.getStartTime(),0,0,0));
+			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime,s.getEndTime(),23,59,59));
 			userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
 			userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
 			userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
