@@ -17,6 +17,7 @@ import com.dl.base.service.AbstractService;
 import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.IncomeRankingDTO;
+import com.dl.member.dto.PromotionIncomeDTO;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.UserAccount;
@@ -161,4 +162,14 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		return channelDistributor;
 	}
 
+	public PromotionIncomeDTO getPromotionIncomeList(DlChannelDistributorParam param) {
+		PromotionIncomeDTO promotionIncome = new PromotionIncomeDTO();
+		Condition conditionByUserId = new Condition(DlChannelDistributor.class);
+		conditionByUserId.createCriteria().andCondition("user_id =", param.getUserId());
+		List<DlChannelDistributor> channelDistributorList = dlChannelDistributorMapper.selectByCondition(conditionByUserId);
+		if (channelDistributorList.size() > 0) {
+			promotionIncome = dlChannelDistributorMapper.getPromotionIncomeList(channelDistributorList.get(0).getChannelDistributorId());
+		}
+		return promotionIncome;
+	}
 }

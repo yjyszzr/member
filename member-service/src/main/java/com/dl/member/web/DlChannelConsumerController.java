@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.ChannelDistributorDTO;
+import com.dl.member.dto.PromotionIncomeDTO;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.param.DlChannelDistributorParam;
 import com.dl.member.service.DlChannelConsumerService;
@@ -75,9 +76,17 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "我的推荐", notes = "我的推荐")
 	@PostMapping("/myRecommendation")
-	public BaseResult<ChannelDistributorDTO> list(@RequestBody DlChannelDistributorParam param) {
+	public BaseResult<ChannelDistributorDTO> myRecommendation(@RequestBody DlChannelDistributorParam param) {
 		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
 		channelDistributor = dlChannelDistributorService.getMyRankingList(param);
 		return ResultGenerator.genSuccessResult("success", channelDistributor);
+	}
+
+	@ApiOperation(value = "我的推广收入", notes = "我的推广收入")
+	@PostMapping("/myPromotionIncome")
+	public BaseResult<PromotionIncomeDTO> myPromotionIncome(@RequestBody DlChannelDistributorParam param) {
+		PromotionIncomeDTO promotionIncome = new PromotionIncomeDTO();
+		promotionIncome = dlChannelDistributorService.getPromotionIncomeList(param);
+		return ResultGenerator.genSuccessResult("success", promotionIncome);
 	}
 }

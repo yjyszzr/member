@@ -20,4 +20,16 @@
   <select id = "getAllDlChannelDistributor" resultMap="BaseResultMap">
   		select *  from  dl_channel_distributor;
   </select>
+  <select id = "getPromotionIncomeList"  parameterType="java.lang.Integer" >
+  SELECT
+	COUNT( * ) AS count,
+	DATE( FROM_UNIXTIME( add_time ) ) AS time,
+	group_concat( consumer_id ) AS ids 
+FROM
+	dl_channel_consumer 
+WHERE
+	channel_distributor_id = #{channelDistributorId}
+GROUP BY
+	DAY ( FROM_UNIXTIME( add_time ) ) DESC;
+  </select>
 </mapper>
