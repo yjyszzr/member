@@ -14,6 +14,8 @@ public class ChannelDistributorDTO {
 	Integer inviteNum;
 	@ApiModelProperty("总购彩金额")
 	Double bettingTotalAmount;
+	@ApiModelProperty("自己的排名")
+	IncomeRankingDTO channelDistributor;
 	@ApiModelProperty("收入排行榜")
 	List<IncomeRankingDTO> channelDistributorList;
 }

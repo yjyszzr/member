@@ -2,7 +2,6 @@ package com.dl.member.web;
 
 import io.swagger.annotations.ApiOperation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -16,12 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.ChannelDistributorDTO;
-import com.dl.member.dto.IncomeRankingDTO;
 import com.dl.member.model.DlChannelConsumer;
-import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.param.DlChannelDistributorParam;
 import com.dl.member.service.DlChannelConsumerService;
 import com.dl.member.service.DlChannelDistributorService;
+import com.dl.member.service.UserAccountService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -35,6 +33,8 @@ public class DlChannelConsumerController {
 	private DlChannelConsumerService dlChannelConsumerService;
 	@Resource
 	private DlChannelDistributorService dlChannelDistributorService;
+	@Resource
+	private UserAccountService userAccountService;
 
 	@ApiOperation(value = "顾客添加", notes = "顾客添加")
 	@PostMapping("/add")
@@ -77,18 +77,7 @@ public class DlChannelConsumerController {
 	@PostMapping("/myRecommendation")
 	public BaseResult<ChannelDistributorDTO> list(@RequestBody DlChannelDistributorParam param) {
 		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
-		Integer inviteNum = dlChannelConsumerService.findinviteNumByUserId(param);
-		Double bettingTotalAmount = dlChannelConsumerService.findBettingTotalAmount(param);
-		List<DlChannelDistributor> channelDistributorList = dlChannelDistributorService.getAllDlChannelDistributor();
-		channelDistributor.setInviteNum(inviteNum);
-		channelDistributor.setBettingTotalAmount(bettingTotalAmount);
-		List<IncomeRankingDTO> incomeRankingList = new ArrayList<IncomeRankingDTO>();
-		for (int i = 0; i < channelDistributorList.size(); i++) {
-			IncomeRankingDTO incomeRanking = new IncomeRankingDTO();
-			incomeRanking.setRanking(i);
-			incomeRanking.setDistributorMobile(channelDistributorList.get(i).getMobile());
-			incomeRankingList.add(incomeRanking);
-		}
+		channelDistributor = dlChannelDistributorService.getMyRankingList(param);
 		return ResultGenerator.genSuccessResult("success", channelDistributor);
 	}
 }

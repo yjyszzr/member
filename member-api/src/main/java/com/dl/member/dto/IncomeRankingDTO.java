@@ -15,4 +15,6 @@ public class IncomeRankingDTO {
 	private Double extraReward;
 	@ApiModelProperty("名次")
 	private Double totalAmount;
+	@ApiModelProperty("用户ID")
+	private Integer userId;
 }

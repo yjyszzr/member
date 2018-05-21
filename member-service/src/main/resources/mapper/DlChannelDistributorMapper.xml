@@ -18,10 +18,6 @@
     <result column="deleted" jdbcType="TINYINT" property="deleted" />
   </resultMap>
   <select id = "getAllDlChannelDistributor" resultMap="BaseResultMap">
-  select *  from  dl_channel_distributor;
-  </select>
-  
-  <select id = "findBettingTotalAmount"   parameterType="String"  >
-  		select SUM(ticket_amount)  from dl_order where order_sn in #{orderSns};
+  		select *  from  dl_channel_distributor;
   </select>
 </mapper>
