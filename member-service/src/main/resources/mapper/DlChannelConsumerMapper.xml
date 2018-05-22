@@ -2,9 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dl.member.dao.DlChannelConsumerMapper">
   <resultMap id="BaseResultMap" type="com.dl.member.model.DlChannelConsumer">
-    <!--
-      WARNING - @mbg.generated
-    -->
     <id column="consumer_id" jdbcType="INTEGER" property="consumerId" />
     <result column="channel_distributor_id" jdbcType="INTEGER" property="channelDistributorId" />
     <result column="user_id" jdbcType="INTEGER" property="userId" />
@@ -15,4 +12,21 @@
     <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
     <result column="deleted" jdbcType="TINYINT" property="deleted" />
   </resultMap>
+    <select id = "getChannelConsumerList"  parameterType="java.lang.String"  resultMap="BaseResultMap">
+		SELECT
+			consumer_id,
+			channel_distributor_id,
+			user_id,
+			user_name,
+			mobile,
+			date_format( FROM_UNIXTIME( add_time ), '%Y-%m-%d  %H:%i:%s' ) AS add_time,
+			device_code,
+			deleted
+		FROM
+			dl_channel_consumer 
+		WHERE
+			channel_distributor_id = #{userId}
+		AND
+			DATE_FORMAT( FROM_UNIXTIME( add_time ), '%Y-%m-%d' ) = #{addTime};
+  </select>
 </mapper>

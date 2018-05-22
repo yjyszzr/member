@@ -17,19 +17,25 @@
     <result column="remark" jdbcType="VARCHAR" property="remark" />
     <result column="deleted" jdbcType="TINYINT" property="deleted" />
   </resultMap>
+  <resultMap id="IncomeRankingResultMap" type="com.dl.member.model.PromotionIncome">
+      <result column="time" jdbcType="VARCHAR" property="time" />
+  	  <result column="registerNum" jdbcType="INTEGER" property="registerNum" />
+  	  <result column="ids" jdbcType="VARCHAR" property="ids" />
+  </resultMap>
   <select id = "getAllDlChannelDistributor" resultMap="BaseResultMap">
   		select *  from  dl_channel_distributor;
   </select>
-  <select id = "getPromotionIncomeList"  parameterType="java.lang.Integer" >
-  SELECT
-	COUNT( * ) AS count,
-	DATE( FROM_UNIXTIME( add_time ) ) AS time,
-	group_concat( consumer_id ) AS ids 
-FROM
-	dl_channel_consumer 
-WHERE
-	channel_distributor_id = #{channelDistributorId}
-GROUP BY
-	DAY ( FROM_UNIXTIME( add_time ) ) DESC;
+  <select id = "getPromotionIncomeList"  parameterType="java.lang.Integer"  resultMap="IncomeRankingResultMap">
+	  SELECT
+		COUNT( * ) AS registerNum,
+		DATE( FROM_UNIXTIME( add_time ) ) AS time,
+		group_concat( user_id ) AS ids 
+	FROM
+		dl_channel_consumer 
+	WHERE
+		channel_distributor_id = #{channelDistributorId}
+	GROUP BY
+		DAY ( FROM_UNIXTIME( add_time ) ) DESC;
   </select>
+
 </mapper>
