@@ -704,6 +704,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 		UserAccount userAccountRoll = new UserAccount();
 		userAccountRoll.setUserId(userId);
+		userAccountRoll.setThirdPartPaid(surplusPayParam.getThirdPartPaid());
 		userAccountRoll.setOrderSn(surplusPayParam.getOrderSn());
 		userAccountRoll.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
 		List<UserAccount> userAccountListRoll = userAccountMapper.queryUserAccountBySelective(userAccountRoll);
