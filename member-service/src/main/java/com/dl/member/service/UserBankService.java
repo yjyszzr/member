@@ -114,28 +114,28 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 		
 		//删除过银行卡，再添加，不再验证银行卡，直接把已删除的银行卡置为未删除和默认状态
-		UserBank userBankDelete = new UserBank();
-		userBankDelete.setCardNo(bankCardNo);
-		userBankDelete.setUserId(userId);
-		userBankDelete.setIsDelete(ProjectConstant.DELETE);
-		List<UserBank> userBankDeleteList = userBankMapper.queryUserBankBySelective(userBankDelete);
-		if(userBankDeleteList.size() > 0) {
-			UserBank userBankUpdate = new UserBank();
-			userBankUpdate.setId(userBankDeleteList.get(0).getId());
-			userBankUpdate.setStatus(ProjectConstant.USER_BANK_DEFAULT);
-			userBankUpdate.setIsDelete(ProjectConstant.NOT_DELETE);
-			int rst = userBankMapper.updateByPrimaryKeySelective(userBankUpdate);
-			if(1 == rst) {
-				UserBank userBank = userBankDeleteList.get(0);
-				try {
-					BeanUtils.copyProperties(userBankDTO, userBank);
-				} catch (Exception e) {
-					log.error("银行卡数据转换异常");
-					return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg(),userBankDTO);
-				}
-			}
-			return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
-		}
+//		UserBank userBankDelete = new UserBank();
+//		userBankDelete.setCardNo(bankCardNo);
+//		userBankDelete.setUserId(userId);
+//		userBankDelete.setIsDelete(ProjectConstant.DELETE);
+//		List<UserBank> userBankDeleteList = userBankMapper.queryUserBankBySelective(userBankDelete);
+//		if(userBankDeleteList.size() > 0) {
+//			UserBank userBankUpdate = new UserBank();
+//			userBankUpdate.setId(userBankDeleteList.get(0).getId());
+//			userBankUpdate.setStatus(ProjectConstant.USER_BANK_DEFAULT);
+//			userBankUpdate.setIsDelete(ProjectConstant.NOT_DELETE);
+//			int rst = userBankMapper.updateByPrimaryKeySelective(userBankUpdate);
+//			if(1 == rst) {
+//				UserBank userBank = userBankDeleteList.get(0);
+//				try {
+//					BeanUtils.copyProperties(userBankDTO, userBank);
+//				} catch (Exception e) {
+//					log.error("银行卡数据转换异常");
+//					return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg(),userBankDTO);
+//				}
+//			}
+//			return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
+//		}
 		
 		//查询银行卡具体信息，并过滤信用卡
 		JSONObject jsonDetect = this.detectUserBank(bankCardNo);
