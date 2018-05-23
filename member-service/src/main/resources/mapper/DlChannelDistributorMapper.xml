@@ -17,7 +17,7 @@
     <result column="remark" jdbcType="VARCHAR" property="remark" />
     <result column="deleted" jdbcType="TINYINT" property="deleted" />
   </resultMap>
-  <resultMap id="IncomeRankingResultMap" type="com.dl.member.model.PromotionIncome">
+  <resultMap id="IncomeRankingResultMap" type="com.dl.member.dto.PromotionIncomeDTO">
       <result column="time" jdbcType="VARCHAR" property="time" />
   	  <result column="registerNum" jdbcType="INTEGER" property="registerNum" />
   	  <result column="ids" jdbcType="VARCHAR" property="ids" />

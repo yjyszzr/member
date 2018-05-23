@@ -197,7 +197,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			}
 			// 设置收入提成
 			BigDecimal bd = new BigDecimal(channelDistributor.getDistributorCommissionRate());
-			promotionIncomes.get(i).setLotteryAmount(-lotteryAmount.doubleValue());
+			promotionIncomes.get(i).setLotteryAmount(0 - lotteryAmount.doubleValue());
 			promotionIncomes.get(i).setIncome(0 - lotteryAmount.multiply(bd).doubleValue() + registerConsumerAmount);
 		}
 		return promotionIncomes;
