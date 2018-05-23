@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.LotteryWinningLogTempMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.LotteryWinningLogTemp">
+    <id column="winning_log_id" jdbcType="INTEGER" property="winningLogId" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="winning_money" jdbcType="DECIMAL" property="winningMoney" />
+    <result column="is_show" jdbcType="INTEGER" property="isShow" />
+  </resultMap>
+</mapper>

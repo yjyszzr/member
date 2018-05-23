@@ -2,6 +2,7 @@ package com.dl.member.web;
 
 import io.swagger.annotations.ApiOperation;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -9,19 +10,22 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.util.TextUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.DateUtilNew;
+import com.dl.base.util.IpUtil;
 import com.dl.base.util.RandomUtil;
+import com.dl.base.util.RegexUtil;
+import com.dl.lottery.dto.DlHallDTO.DlWinningLogDTO;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.ChannelDistributorDTO;
@@ -30,6 +34,7 @@ import com.dl.member.dto.PromotionIncomeDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
+import com.dl.member.model.LotteryWinningLogTemp;
 import com.dl.member.model.User;
 import com.dl.member.param.ConsumerSmsParam;
 import com.dl.member.param.DlChannelConsumerParam;
@@ -38,11 +43,10 @@ import com.dl.member.param.MyQRCodeParam;
 import com.dl.member.param.UserReceiveLotteryAwardParam;
 import com.dl.member.service.DlChannelConsumerService;
 import com.dl.member.service.DlChannelDistributorService;
+import com.dl.member.service.LotteryWinningLogTempService;
 import com.dl.member.service.SmsService;
 import com.dl.member.service.UserAccountService;
 import com.dl.member.service.UserService;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 
 /**
  * Created by CodeGenerator on 2018/05/18.
@@ -64,43 +68,8 @@ public class DlChannelConsumerController {
 	private SmsService smsService;
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
-
-	@ApiOperation(value = "顾客添加", notes = "顾客添加")
-	@PostMapping("/add")
-	public BaseResult add(DlChannelConsumer dlChannelConsumer) {
-		dlChannelConsumerService.save(dlChannelConsumer);
-		return ResultGenerator.genSuccessResult();
-	}
-
-	@ApiOperation(value = "顾客删除", notes = "顾客删除")
-	@PostMapping("/delete")
-	public BaseResult delete(@RequestParam Integer id) {
-		dlChannelConsumerService.deleteById(id);
-		return ResultGenerator.genSuccessResult();
-	}
-
-	@ApiOperation(value = "顾客修改", notes = "顾客修改")
-	@PostMapping("/update")
-	public BaseResult update(DlChannelConsumer dlChannelConsumer) {
-		dlChannelConsumerService.update(dlChannelConsumer);
-		return ResultGenerator.genSuccessResult();
-	}
-
-	@ApiOperation(value = "顾客详情", notes = "顾客详情")
-	@PostMapping("/detail")
-	public BaseResult detail(@RequestParam Integer id) {
-		DlChannelConsumer dlChannelConsumer = dlChannelConsumerService.findById(id);
-		return ResultGenerator.genSuccessResult(null, dlChannelConsumer);
-	}
-
-	@ApiOperation(value = "顾客列表", notes = "顾客列表")
-	@PostMapping("/list")
-	public BaseResult list(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "0") Integer size) {
-		PageHelper.startPage(page, size);
-		List<DlChannelConsumer> list = dlChannelConsumerService.findAll();
-		PageInfo pageInfo = new PageInfo(list);
-		return ResultGenerator.genSuccessResult(null, pageInfo);
-	}
+	@Resource
+	private LotteryWinningLogTempService lotteryWinningLogTempService;
 
 	@ApiOperation(value = "我的推荐", notes = "我的推荐")
 	@PostMapping("/myRecommendation")
@@ -129,7 +98,7 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "发送短信验证码", notes = "发送短信验证码")
 	@PostMapping("/smsCode")
-	public BaseResult<String> sendServiceSms(@RequestBody ConsumerSmsParam smsParam) {
+	public BaseResult<String> sendServiceSms(@RequestBody ConsumerSmsParam smsParam, HttpServletRequest request) {
 		String smsType = smsParam.getSmsType();
 		String tplId = "";
 		String tplValue = "";
@@ -138,6 +107,9 @@ public class DlChannelConsumerController {
 			User user = userService.findBy("mobile", smsParam.getMobile());
 			if (user != null) {
 				return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
+			}
+			if (!RegexUtil.checkMobile(smsParam.getMobile())) {
+				return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 			}
 			tplId = memberConfig.getREGISTER_TPLID();
 			tplValue = "#code#=" + strRandom4;
@@ -157,7 +129,7 @@ public class DlChannelConsumerController {
 			dlChannelConsumer.setDeleted(0);
 			dlChannelConsumer.setConsumerId(0);
 			dlChannelConsumer.setChannelDistributorId(smsParam.getUserId());
-			dlChannelConsumer.setConsumerIp(smsParam.getConsumerIp());
+			dlChannelConsumer.setConsumerIp(IpUtil.getIpAddr(request));
 			dlChannelConsumer.setMobile(smsParam.getMobile());
 			dlChannelConsumerService.save(dlChannelConsumer);
 			return ResultGenerator.genSuccessResult("发送短信验证码成功");
@@ -183,4 +155,23 @@ public class DlChannelConsumerController {
 	public BaseResult<MyQRCodeParam> myQRCode(MyQRCodeParam myQRCodeParam) {
 		return ResultGenerator.genSuccessResult("获取成功", myQRCodeParam);
 	}
+
+	@ApiOperation(value = "大奖喜报列表", notes = "大奖喜报列表")
+	@PostMapping("/getWinningList")
+	private BaseResult<List<DlWinningLogDTO>> winningList() {
+		List<LotteryWinningLogTemp> lotteryWinningLogTemps = lotteryWinningLogTempService.selectWinningLogByIsShow();
+		List<DlWinningLogDTO> winningLogList = new ArrayList<DlWinningLogDTO>();
+		if (CollectionUtils.isNotEmpty(lotteryWinningLogTemps)) {
+			for (LotteryWinningLogTemp winningLog : lotteryWinningLogTemps) {
+				DlWinningLogDTO dlWinningLogDTO = new DlWinningLogDTO();
+				String phone = winningLog.getPhone();
+				phone = phone.substring(0, 3) + "****" + phone.substring(7);
+				dlWinningLogDTO.setWinningMsg(MessageFormat.format(ProjectConstant.FORMAT_WINNING_MSG, phone));
+				dlWinningLogDTO.setWinningMoney(winningLog.getWinningMoney().toString());
+				winningLogList.add(dlWinningLogDTO);
+			}
+		}
+		return ResultGenerator.genSuccessResult("获取成功", winningLogList);
+	}
+
 }
