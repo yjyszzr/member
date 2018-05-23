@@ -25,10 +25,10 @@ import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.IpUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
-import com.dl.lottery.dto.DlHallDTO.DlWinningLogDTO;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.ChannelDistributorDTO;
+import com.dl.member.dto.DlWinningLogDTO;
 import com.dl.member.dto.IncomeDetailsDTO;
 import com.dl.member.dto.PromotionIncomeDTO;
 import com.dl.member.enums.MemberEnums;
@@ -158,7 +158,7 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "大奖喜报列表", notes = "大奖喜报列表")
 	@PostMapping("/getWinningList")
-	private BaseResult<List<DlWinningLogDTO>> winningList() {
+	public BaseResult<List<DlWinningLogDTO>> winningList() {
 		List<LotteryWinningLogTemp> lotteryWinningLogTemps = lotteryWinningLogTempService.selectWinningLogByIsShow();
 		List<DlWinningLogDTO> winningLogList = new ArrayList<DlWinningLogDTO>();
 		if (CollectionUtils.isNotEmpty(lotteryWinningLogTemps)) {
