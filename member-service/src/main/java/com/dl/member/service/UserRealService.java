@@ -1,6 +1,8 @@
 package com.dl.member.service;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.List;
+
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +32,8 @@ import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
 import com.dl.member.model.UserReal;
 import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 @Slf4j
@@ -91,6 +95,15 @@ public class UserRealService extends AbstractService<UserReal> {
 			return ResultGenerator.genResult(MemberEnums.COMMON_ERROR.getcode(), "实名认证的名字包含特殊符号");
 		}
     	
+    	//一个身份证最多绑定4个用户
+    	Condition condition = new Condition(UserReal.class);
+    	Criteria criteria = condition.createCriteria();
+    	criteria.andCondition("id_code = ", iDCode);
+    	List<UserReal> userRealList = this.findByCondition(condition);
+    	if(userRealList.size() > 4) {
+			return ResultGenerator.genResult(MemberEnums.USER_REAL_COUNTLIMIT.getcode(),MemberEnums.USER_REAL_COUNTLIMIT.getMsg());
+    	}
+    		
     	JSONObject json = this.realNameAuth2(realName, iDCode);
     	String reason = json.getString("reason");
 		Integer errorCode =  (Integer) json.get("error_code");
