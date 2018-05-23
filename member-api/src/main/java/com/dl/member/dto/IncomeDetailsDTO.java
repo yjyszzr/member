@@ -4,21 +4,22 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("推广收入")
+@ApiModel("收入明细")
 @Data
-public class PromotionIncomeDTO {
-	@ApiModelProperty("时间")
-	private String time;
+public class IncomeDetailsDTO {
 
-	@ApiModelProperty("	注册人数")
-	private Integer registerNum;
+	@ApiModelProperty("时间")
+	private String addTime;
+
+	@ApiModelProperty("用户ID")
+	private Integer userId;
+
+	@ApiModelProperty("电话")
+	private String mobile;
 
 	@ApiModelProperty("	购彩金额")
 	private Double lotteryAmount;
 
 	@ApiModelProperty("收入")
 	private Double income;
-
-	@ApiModelProperty("id集合")
-	private String ids;
 }

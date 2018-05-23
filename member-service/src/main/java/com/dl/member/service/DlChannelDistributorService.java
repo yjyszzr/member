@@ -2,6 +2,7 @@ package com.dl.member.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,10 +39,10 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 	}
 
 	public int findinviteNumByUserId(DlChannelDistributorParam param) {
-		return findConsumerByUserList(param).size();
+		return findConsumerByUserId(param).size();
 	}
 
-	private List<DlChannelConsumer> findConsumerByUserList(DlChannelDistributorParam param) {
+	private List<DlChannelConsumer> findConsumerByUserId(DlChannelDistributorParam param) {
 		// 先根据入参ID查出来分销员的ID
 		Condition conditionByUserId = new Condition(DlChannelDistributor.class);
 		conditionByUserId.createCriteria().andCondition("user_id =", param.getUserId());
@@ -55,7 +56,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 
 	public Double findBettingTotalAmount(DlChannelDistributorParam param) {
 		Double bettingTotalAmount = 0.0;
-		List<DlChannelConsumer> dlChannelConsumerList = findConsumerByUserList(param);
+		List<DlChannelConsumer> dlChannelConsumerList = findConsumerByUserId(param);
 		if (dlChannelConsumerList != null) {
 			List<String> userIds = dlChannelConsumerList.stream().map(dto -> dto.getUserId().toString()).collect(Collectors.toList());
 			if (userIds.size() > 0) {
@@ -108,7 +109,6 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			incomeRankingList.add(incomeRanking);
 		}
 		if (incomeRankingList.size() != 0) {
-
 			incomeRankingList = incomeRankingList.stream().sorted(Comparator.comparing(IncomeRankingDTO::getTotalAmount).reversed()).collect(Collectors.toList());
 			IncomeRankingDTO incomeRankingForSelf = new IncomeRankingDTO();
 			// incomeRankingList需要再次排序 首先将自己的记录排到第一,然后按照收入倒序排列
@@ -153,7 +153,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			// 排名列表
 			channelDistributor.setChannelDistributorList(incomeRankingListFinal);
 			// 查询该分销员下的扫码量
-			Integer inviteNum = findConsumerByUserList(param) == null ? 0 : findConsumerByUserList(param).size();
+			Integer inviteNum = findConsumerByUserId(param) == null ? 0 : findConsumerByUserId(param).size();
 			channelDistributor.setInviteNum(inviteNum);
 			// 查询该分销员下的客户所有的投注金额
 			Double bettingTotalAmount = this.findBettingTotalAmount(param);
@@ -162,14 +162,44 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		return channelDistributor;
 	}
 
-	public PromotionIncomeDTO getPromotionIncomeList(DlChannelDistributorParam param) {
-		PromotionIncomeDTO promotionIncome = new PromotionIncomeDTO();
+	public DlChannelDistributor findByUserId(Integer userId) {
+		DlChannelDistributor channelDistributor = new DlChannelDistributor();
 		Condition conditionByUserId = new Condition(DlChannelDistributor.class);
-		conditionByUserId.createCriteria().andCondition("user_id =", param.getUserId());
+		conditionByUserId.createCriteria().andCondition("user_id =", userId);
 		List<DlChannelDistributor> channelDistributorList = dlChannelDistributorMapper.selectByCondition(conditionByUserId);
 		if (channelDistributorList.size() > 0) {
-			promotionIncome = dlChannelDistributorMapper.getPromotionIncomeList(channelDistributorList.get(0).getChannelDistributorId());
+			channelDistributor = channelDistributorList.get(0);
 		}
-		return promotionIncome;
+		return channelDistributor;
+	}
+
+	public List<PromotionIncomeDTO> getPromotionIncomeList(DlChannelDistributorParam param) {
+		DlChannelDistributor channelDistributor = new DlChannelDistributor();
+		channelDistributor = this.findByUserId(param.getUserId());
+		List<PromotionIncomeDTO> promotionIncomes = new ArrayList<PromotionIncomeDTO>();
+		if (channelDistributor != null) {
+			promotionIncomes = dlChannelDistributorMapper.getPromotionIncomeList(channelDistributor.getChannelDistributorId());
+		}
+		List<UserAccount> userAccountList = userAccountService.findByProcessType(3);
+		for (int i = 0; i < promotionIncomes.size(); i++) {
+			Double registerConsumerAmount = 0.0;
+			String str = promotionIncomes.get(i).getIds();
+			List<String> idResult = Arrays.asList(str.split(","));
+			BigDecimal lotteryAmount = new BigDecimal(0);
+			for (int j = 0; j < idResult.size(); j++) {
+				for (int k = 0; k < userAccountList.size(); k++) {
+					if (idResult.get(j).equals(userAccountList.get(k).getUserId())) {
+						// 购彩金额相加
+						lotteryAmount.add(userAccountList.get(k).getAmount());
+					}
+				}
+				registerConsumerAmount += 1;
+			}
+			// 设置收入提成
+			BigDecimal bd = new BigDecimal(channelDistributor.getDistributorCommissionRate());
+			promotionIncomes.get(i).setLotteryAmount(-lotteryAmount.doubleValue());
+			promotionIncomes.get(i).setIncome(0 - lotteryAmount.multiply(bd).doubleValue() + registerConsumerAmount);
+		}
+		return promotionIncomes;
 	}
 }

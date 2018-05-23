@@ -2,6 +2,8 @@ package com.dl.member.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.dl.base.mapper.Mapper;
 import com.dl.member.dto.PromotionIncomeDTO;
 import com.dl.member.model.DlChannelDistributor;
@@ -14,7 +16,5 @@ public interface DlChannelDistributorMapper extends Mapper<DlChannelDistributor>
 	 */
 	public List<DlChannelDistributor> getAllDlChannelDistributor();
 
-	public Double findBettingTotalAmount(List<String> orderSns);
-
-	public PromotionIncomeDTO getPromotionIncomeList(Integer channelDistributorId);
+	public List<PromotionIncomeDTO> getPromotionIncomeList(@Param("channelDistributorId") Integer channelDistributorId);
 }
