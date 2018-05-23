@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -160,6 +161,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			return userBonusDTOList;
 		}
 		
+		//userBonusList.sort(Comparator.comparing(UserBonus::getBonusPrice).thenComparing(UserBonus::getMinGoodsAmount).thenComparing(UserBonus::getEndTime));
+		
 		userBonusList.forEach(s->{
 			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(s);
 			userBonusDTOList.add(userBonusDTO);
@@ -168,6 +171,19 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		
 	}
 	
+//	/**
+//	 * 支付红包排序
+//	 * @param lhs
+//	 * @param rhs
+//	 * @return
+//	 */
+//	public static int compareByConditions(UserBonus s1, UserBonus s2) {
+//	    if (s1.getBonusPrice().compareTo(s2.getBonusPrice()) == 0) {
+//	        return s1.getMinGoodsAmount().subtract(s2.getMinGoodsAmount()).intValue();
+//	    } else {
+//	        return s1.getBonusPrice().compareTo(s2.getBonusPrice());
+//	    }
+//	}
 	
 	/**
 	 * 根据状态查询有效的红包集合 ""-全部   0-未使用 1-已使用 2-已过期
