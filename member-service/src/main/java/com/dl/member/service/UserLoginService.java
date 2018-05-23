@@ -86,7 +86,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				normalUser.setUserId(user.getUserId());
 				normalUser.setUserStatus(0);
 				normalUser.setPassWrongCount(0);
-				userService.update(normalUser);
+				userService.saveUserAndUpdateConsumer(normalUser);
 
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else {
@@ -150,7 +150,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					User normalUser = new User();
 					normalUser.setUserId(user.getUserId());
 					normalUser.setUserStatus(0);
-					userService.update(normalUser);
+					userService.saveUserAndUpdateConsumer(normalUser);
 
 					UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 					stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");

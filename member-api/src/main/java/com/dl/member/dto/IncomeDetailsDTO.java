@@ -11,6 +11,9 @@ public class IncomeDetailsDTO {
 	@ApiModelProperty("时间")
 	private String addTime;
 
+	@ApiModelProperty("首次登陆时间")
+	private String fristLoginTime;
+
 	@ApiModelProperty("用户ID")
 	private Integer userId;
 
@@ -19,6 +22,9 @@ public class IncomeDetailsDTO {
 
 	@ApiModelProperty("	购彩金额")
 	private Double lotteryAmount;
+
+	@ApiModelProperty("店员ID")
+	private Integer channelDistributorId;
 
 	@ApiModelProperty("收入")
 	private Double income;

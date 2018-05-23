@@ -12,7 +12,7 @@
     <result column="channel_distributor_num" jdbcType="VARCHAR" property="channelDistributorNum" />
     <result column="mobile" jdbcType="VARCHAR" property="mobile" />
     <result column="distributor_commission_rate" jdbcType="VARCHAR" property="distributorCommissionRate" />
-    <result column="channel_name" jdbcType="VARCHAR" property="channelName" />
+    <result column="channel_name" jdbcType="INTEGER" property="channelName" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
     <result column="deleted" jdbcType="TINYINT" property="deleted" />

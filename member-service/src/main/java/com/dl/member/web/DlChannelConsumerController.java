@@ -92,7 +92,9 @@ public class DlChannelConsumerController {
 	public BaseResult<List<IncomeDetailsDTO>> incomeDetails(@RequestBody DlChannelConsumerParam param) {
 		List<IncomeDetailsDTO> incomeDetailss = new ArrayList<IncomeDetailsDTO>();
 		DlChannelDistributor channelDistributor = dlChannelDistributorService.findByUserId(param.getUserId());
-		incomeDetailss = dlChannelConsumerService.getIncomeDetailsList(channelDistributor.getChannelId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
+		if (channelDistributor != null) {
+			incomeDetailss = dlChannelConsumerService.getIncomeDetailsList(channelDistributor.getChannelId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
+		}
 		return ResultGenerator.genSuccessResult("success", incomeDetailss);
 	}
 

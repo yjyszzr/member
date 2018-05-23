@@ -1,16 +1,20 @@
 package com.dl.member.service;
-import java.lang.reflect.InvocationTargetException;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import tk.mybatis.mapper.entity.Condition;
 
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
@@ -23,48 +27,49 @@ import com.dl.base.util.RegexUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.lottery.api.ILotteryActivityService;
 import com.dl.lottery.dto.ActivityDTO;
-import com.dl.lottery.dto.DlHallDTO.DlActivityDTO;
 import com.dl.lottery.param.ActTypeParam;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.User;
 import com.dl.member.param.UserParam;
 import com.dl.member.util.Encryption;
-
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
 
 @Service
 @Transactional
 @Slf4j
 public class UserService extends AbstractService<User> {
-    @Resource
-    private UserMapper userMapper;
-    
-    @Resource
-    private UserRealService userRealService;
-    
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
-    
-    @Resource
-    private ILotteryActivityService lotteryActivityService;
-    
-    /**
-     * 查询用户信息 （除了密码）
-     * @param userId
-     * @return
-     */
-    public BaseResult<UserDTO> queryUserByUserIdExceptPass() {
-    	Integer userId = SessionUtil.getUserId();
-    	if(null == userId) {
-    		return ResultGenerator.genNeedLoginResult("请登录");
-    	}
-    	
-    	User user = userMapper.queryUserExceptPass(userId);
+	@Resource
+	private UserMapper userMapper;
+
+	@Resource
+	private UserRealService userRealService;
+
+	@Resource
+	private StringRedisTemplate stringRedisTemplate;
+
+	@Resource
+	private ILotteryActivityService lotteryActivityService;
+
+	@Resource
+	private DlChannelConsumerService channelConsumerService;
+
+	/**
+	 * 查询用户信息 （除了密码）
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public BaseResult<UserDTO> queryUserByUserIdExceptPass() {
+		Integer userId = SessionUtil.getUserId();
+		if (null == userId) {
+			return ResultGenerator.genNeedLoginResult("请登录");
+		}
+
+		User user = userMapper.queryUserExceptPass(userId);
 		UserDTO userDTO = new UserDTO();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
@@ -72,11 +77,11 @@ public class UserService extends AbstractService<User> {
 			e1.printStackTrace();
 		}
 		userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
-		userDTO.setIsReal(user.getIsReal().equals("1")?"1":"0");
+		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
 		userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		String realName = "";
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
-		if(userRealDTO != null) {
+		if (userRealDTO != null) {
 			realName = userRealDTO.getRealName();
 		}
 		String mobile = user.getMobile();
@@ -85,22 +90,22 @@ public class UserService extends AbstractService<User> {
 		userDTO.setMobile(mobileStr);
 		userDTO.setRealName(realName);
 		userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
-		
-		//查询推广活动集合
+
+		// 查询推广活动集合
 		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
 		ActTypeParam actTypeParam = new ActTypeParam();
 		actTypeParam.setActType(2);
 		BaseResult<List<ActivityDTO>> activityDTORst = lotteryActivityService.queryActivityByActType(actTypeParam);
-		if(activityDTORst.getCode() != 0) {
-			log.error("查询推广活动异常："+activityDTORst.getMsg());
+		if (activityDTORst.getCode() != 0) {
+			log.error("查询推广活动异常：" + activityDTORst.getMsg());
 			activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
-		}else {
+		} else {
 			activityDTOList = activityDTORst.getData();
 		}
-		
+
 		com.dl.member.dto.ActivityDTO memActivityDTO = new com.dl.member.dto.ActivityDTO();
 		List<com.dl.member.dto.ActivityDTO> activityMemDTOList = new ArrayList<com.dl.member.dto.ActivityDTO>();
-		activityDTOList.forEach(s->{
+		activityDTOList.forEach(s -> {
 			try {
 				BeanUtils.copyProperties(memActivityDTO, s);
 			} catch (Exception e) {
@@ -108,25 +113,26 @@ public class UserService extends AbstractService<User> {
 			}
 			activityMemDTOList.add(memActivityDTO);
 		});
-		
+
 		userDTO.setActivityDTOList(activityMemDTOList);
-		
+
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
-    }
-    
+	}
+
 	/**
 	 * 保存用户
+	 * 
 	 * @param uParams
 	 */
 	@Transactional
 	public Integer saveUser(UserParam userParam) {
 		User user = new User();
-		String userName = generateUserName(userParam.getMobile());//账号
-		String nickName = generateNickName(userParam.getMobile());//昵称
+		String userName = generateUserName(userParam.getMobile());// 账号
+		String nickName = generateNickName(userParam.getMobile());// 昵称
 		user.setMobile(userParam.getMobile());
 		user.setUserName(userName);
-    	user.setNickname(nickName);
-    	user.setHeadImg(ProjectConstant.USER_DEFAULT_HEADING_IMG);
+		user.setNickname(nickName);
+		user.setHeadImg(ProjectConstant.USER_DEFAULT_HEADING_IMG);
 		user.setRegTime(DateUtil.getCurrentTimeLong());
 		user.setLastTime(DateUtil.getCurrentTimeLong());
 		user.setRegIp(userParam.getRegIp());
@@ -148,64 +154,65 @@ public class UserService extends AbstractService<User> {
 		user.setPassWrongCount(0);
 		user.setIsReal(ProjectConstant.USER_IS_NOT_REAL);
 		Integer insertRsult = userMapper.insertWithReturnId(user);
-		if(1 != insertRsult) {
+		if (1 != insertRsult) {
 			log.error("注册用户失败");
 			return null;
 		}
 		Integer userId = user.getUserId();
 		return userId;
 	}
-	
-	
+
 	/**
 	 * 校验用户的手机号
+	 * 
 	 * @param mobileNumberParam
 	 * @return
 	 */
 	public BaseResult<String> validateUserMobile(String mobileNumber) {
-    	if(!RegexUtil.checkMobile(mobileNumber)) {
-    		return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
-    	}
-    	
-    	User user = this.findBy("mobile", mobileNumber);
-    	if(null == user) {
-    		 return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
-    	}
-    	   	
-    	return ResultGenerator.genSuccessResult("用户手机号校验成功");
-	}
-	
-	/**
-	 * 更新用户登录密码
-	 * @param mobileNumberParam
-	 */
-	public BaseResult<String> updateUserLoginPass(String userLoginPass,String mobileNumber,String smsCode){
-    	if(!userLoginPass.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
-    		return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
-    	}
-		
-    	User user = this.findBy("mobile", mobileNumber);
-    	if(null == user) {
-   		 	return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
-    	}
-    	
-        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.RESETPASS_TPLID + "_" + mobileNumber);
-        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(smsCode)) {
-            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-        }
-    	
-    	User updateUser = new User();
-    	updateUser.setUserId(user.getUserId());
-    	updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
-    	this.update(updateUser);
-    	
-		stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.RESETPASS_TPLID + "_" + mobileNumber, ""); 
-    	return ResultGenerator.genSuccessResult("更新用户登录密码成功");
+		if (!RegexUtil.checkMobile(mobileNumber)) {
+			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
+		}
+
+		User user = this.findBy("mobile", mobileNumber);
+		if (null == user) {
+			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+		}
+
+		return ResultGenerator.genSuccessResult("用户手机号校验成功");
 	}
 
+	/**
+	 * 更新用户登录密码
+	 * 
+	 * @param mobileNumberParam
+	 */
+	public BaseResult<String> updateUserLoginPass(String userLoginPass, String mobileNumber, String smsCode) {
+		if (!userLoginPass.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
+			return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
+		}
+
+		User user = this.findBy("mobile", mobileNumber);
+		if (null == user) {
+			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+		}
+
+		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.RESETPASS_TPLID + "_" + mobileNumber);
+		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(smsCode)) {
+			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+		}
+
+		User updateUser = new User();
+		updateUser.setUserId(user.getUserId());
+		updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
+		this.update(updateUser);
+
+		stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.RESETPASS_TPLID + "_" + mobileNumber, "");
+		return ResultGenerator.genSuccessResult("更新用户登录密码成功");
+	}
 
 	/**
 	 * 查询用户信息：所有字段
+	 * 
 	 * @return
 	 */
 	public UserDTO queryUserInfo() {
@@ -227,8 +234,7 @@ public class UserService extends AbstractService<User> {
 		}
 		return userDTO;
 	}
-	
-	
+
 	/**
 	 * 生成昵称：
 	 *
@@ -236,16 +242,29 @@ public class UserService extends AbstractService<User> {
 	 * @return
 	 */
 	public String generateNickName(String mobile) {
-		if(StringUtils.isEmpty(mobile)) {
+		if (StringUtils.isEmpty(mobile)) {
 			return "****彩主";
 		}
-		String userName = String.format("%s彩主", mobile.substring(mobile.length()-4, mobile.length()));
+		String userName = String.format("%s彩主", mobile.substring(mobile.length() - 4, mobile.length()));
 		return userName.toString();
 	}
-	
+
+	public void saveUserAndUpdateConsumer(User user) {
+		this.update(user);
+		Condition condition = new Condition(DlChannelConsumer.class);
+		condition.createCriteria().andCondition("user_id = ", user.getUserId());
+		List<DlChannelConsumer> channelConsumerlist = channelConsumerService.findByCondition(condition);
+		if (channelConsumerlist.size() > 0) {
+			if (channelConsumerlist.get(0).getFristLoginTime() == null) {
+				channelConsumerService.updateByUserId(user.getUserId());
+			}
+		}
+
+	}
+
 	/**
-	 * 生成账号：
-	 * 1.随机生成4位字母 2.生成用户名 3.查询重复的用户名条数 4.如果有重复用户名，则重新生成
+	 * 生成账号： 1.随机生成4位字母 2.生成用户名 3.查询重复的用户名条数 4.如果有重复用户名，则重新生成
+	 * 
 	 * @param mobile
 	 * @return
 	 */
