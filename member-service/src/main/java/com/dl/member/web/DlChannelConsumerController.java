@@ -143,7 +143,7 @@ public class DlChannelConsumerController {
 	@ApiOperation(value = "领取彩金", notes = "领取彩金")
 	@PostMapping("/receiveLotteryAward")
 	public BaseResult<String> receiveLotteryAward(UserReceiveLotteryAwardParam userReceiveLotteryAwardParam, HttpServletRequest request) {
-		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userReceiveLotteryAwardParam.getMobile());
+		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.REGISTER_TPLID + "_" + userReceiveLotteryAwardParam.getMobile());
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userReceiveLotteryAwardParam.getSmsCode())) {
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
