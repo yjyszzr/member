@@ -16,9 +16,6 @@ public class ConsumerSmsParam {
 	@NotBlank(message = "短信类型不能为空")
 	private String smsType;
 
-	@ApiModelProperty(value = "用户Ip")
-	private String consumerIp;
-
 	@ApiModelProperty(value = "推荐者Id")
 	private Integer userId;
 }
