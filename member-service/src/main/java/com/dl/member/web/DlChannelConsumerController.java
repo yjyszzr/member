@@ -34,6 +34,7 @@ import com.dl.member.model.User;
 import com.dl.member.param.ConsumerSmsParam;
 import com.dl.member.param.DlChannelConsumerParam;
 import com.dl.member.param.DlChannelDistributorParam;
+import com.dl.member.param.MyQRCodeParam;
 import com.dl.member.param.UserReceiveLotteryAwardParam;
 import com.dl.member.service.DlChannelConsumerService;
 import com.dl.member.service.DlChannelDistributorService;
@@ -179,9 +180,7 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "我的二维码", notes = "我的二维码")
 	@PostMapping("/myQRCode")
-	public BaseResult<String> myQRCode(UserReceiveLotteryAwardParam userReceiveLotteryAwardParam, HttpServletRequest request) {
-
-		return ResultGenerator.genSuccessResult("获取成功");
+	public BaseResult<MyQRCodeParam> myQRCode(MyQRCodeParam myQRCodeParam) {
+		return ResultGenerator.genSuccessResult("获取成功", myQRCodeParam);
 	}
-
 }
