@@ -197,8 +197,10 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 					}
 				}
 				for (int j2 = 0; j2 < channelConsumerList.size(); j2++) {
-					if (channelConsumerList.get(j2).getUserId().equals(idResult.get(j)) && channelConsumerList.get(j2).getFristLoginTime() != null) {
-						registerConsumerAmount += 1;
+					if (null != channelConsumerList.get(j2).getUserId()) {
+						if (channelConsumerList.get(j2).getUserId().equals(idResult.get(j)) && null != channelConsumerList.get(j2).getFristLoginTime()) {
+							registerConsumerAmount += 1;
+						}
 					}
 				}
 			}
