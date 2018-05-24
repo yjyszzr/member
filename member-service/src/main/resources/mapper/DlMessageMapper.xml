@@ -36,7 +36,7 @@
   </select>
   
   <select id="getUnReadMessageNum" resultType="int">
-  	SELECT count(1) FROM dl_message WHERE receiver=#{userId} and is_delete = 0  and is_read=0
+  	SELECT count(1) FROM dl_message WHERE receiver=#{userId} and is_read=0
   </select>
   
   <update id="updateUnReadMessage">
