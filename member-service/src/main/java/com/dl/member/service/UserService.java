@@ -308,9 +308,9 @@ public class UserService extends AbstractService<User> {
 	 */
 	public int updateUnReadNotice(Integer userId, int type) {
 		int rst = 0;
-		if(type == 0) {
+		if(type == 1) {
 			rst = userBonusMapper.updateUnReadBonus(userId);
-		} else if(type == 1) {
+		} else if(type == 2) {
 			rst = messageMapper.updateUnReadMessage(userId);
 		}
 		return rst;
