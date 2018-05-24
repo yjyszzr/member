@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.DlCashCouponMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.DlCashCoupon">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="cash_coupon_id" jdbcType="INTEGER" property="cashCouponId" />
+    <result column="cash_coupon_name" jdbcType="VARCHAR" property="cashCouponName" />
+    <result column="cash_coupon_denomination" jdbcType="DECIMAL" property="cashCouponDenomination" />
+    <result column="cash_coupon_price" jdbcType="DECIMAL" property="cashCouponPrice" />
+    <result column="active_id" jdbcType="INTEGER" property="activeId" />
+    <result column="cash_couponnum" jdbcType="INTEGER" property="cashCouponnum" />
+    <result column="start_time" jdbcType="INTEGER" property="startTime" />
+    <result column="end_time" jdbcType="INTEGER" property="endTime" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+  </resultMap>
+</mapper>

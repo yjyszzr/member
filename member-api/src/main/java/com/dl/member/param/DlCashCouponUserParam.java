@@ -4,9 +4,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-public class MyQRCodeParam {
-	@ApiModelProperty("店员Id")
+public class DlCashCouponUserParam {
+	@ApiModelProperty("用户Id")
 	private Integer userId;
-	@ApiModelProperty("链接")
-	private String url;
+
 }

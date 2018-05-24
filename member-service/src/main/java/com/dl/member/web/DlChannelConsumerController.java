@@ -160,6 +160,7 @@ public class DlChannelConsumerController {
 	@ApiOperation(value = "我的二维码", notes = "我的二维码")
 	@PostMapping("/myQRCode")
 	public BaseResult<MyQRCodeParam> myQRCode(MyQRCodeParam myQRCodeParam) {
+		myQRCodeParam.setUrl("192.168.31.205:8080/static/activity_Back/tuiguang/index.html?");
 		return ResultGenerator.genSuccessResult("获取成功", myQRCodeParam);
 	}
 
