@@ -35,6 +35,8 @@ public class UserController {
     @ApiOperation(value = "校验手机号", notes = "校验手机号")
     @PostMapping("/validateMobile")
     public BaseResult<String> validateMobile(@RequestBody MobileNumberParam mobileNumberParam) {  
+    	//校验手机号 
+    	System.out.println("校验手机号");
     	return userService.validateUserMobile(mobileNumberParam.getMobileNumber());
     }
     
