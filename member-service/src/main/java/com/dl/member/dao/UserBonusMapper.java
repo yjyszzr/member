@@ -18,4 +18,8 @@ public interface UserBonusMapper extends Mapper<UserBonus> {
 	 List<Integer> queryUserBonusIdsSoonExpire();
 	 
 	 int updateBatchUserBonusExpire(@Param("list") List<Integer> userBonusIdList);
+
+	int getUnReadBonusNum(@Param("userId") Integer userId);
+	
+	int updateUnReadBonus(@Param("userId") Integer userId);
 }

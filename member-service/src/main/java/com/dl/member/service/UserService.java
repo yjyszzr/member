@@ -26,8 +26,11 @@ import com.dl.lottery.dto.ActivityDTO;
 import com.dl.lottery.dto.DlHallDTO.DlActivityDTO;
 import com.dl.lottery.param.ActTypeParam;
 import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.DlMessageMapper;
+import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserDTO;
+import com.dl.member.dto.UserNoticeDTO;
 import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
@@ -43,6 +46,12 @@ import tk.mybatis.mapper.entity.Condition;
 public class UserService extends AbstractService<User> {
     @Resource
     private UserMapper userMapper;
+    
+    @Resource
+    private UserBonusMapper userBonusMapper;
+    
+    @Resource
+    private DlMessageMapper messageMapper;
     
     @Resource
     private UserRealService userRealService;
@@ -260,4 +269,31 @@ public class UserService extends AbstractService<User> {
 		return userName.toString();
 	}
 
+	/**
+	 * 获取用户通知信息
+	 * @return
+	 */
+	public UserNoticeDTO queryUserNotice(Integer userId) {
+		UserNoticeDTO dto = new UserNoticeDTO();
+		int bonusNum = userBonusMapper.getUnReadBonusNum(userId);
+		dto.setBonusNotice(bonusNum);
+		int messageNum = messageMapper.getUnReadMessageNum(userId);
+		dto.setMessageNotice(messageNum);
+		return dto;
+	}
+
+	/**
+	 * 标识已读通知
+	 * @param userId
+	 * @param type
+	 */
+	public int updateUnReadNotice(Integer userId, int type) {
+		int rst = 0;
+		if(type == 0) {
+			rst = userBonusMapper.updateUnReadBonus(userId);
+		} else if(type == 1) {
+			rst = messageMapper.updateUnReadMessage(userId);
+		}
+		return rst;
+	}
 }

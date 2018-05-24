@@ -6,15 +6,15 @@
     <result column="sender" jdbcType="INTEGER" property="sender" />
     <result column="send_time" jdbcType="INTEGER" property="sendTime" />
     <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="msg_type" jdbcType="BIT" property="msgType" />
+    <result column="msg_type" jdbcType="INTEGER" property="msgType" />
     <result column="push_type" jdbcType="VARCHAR" property="pushType" />
     <result column="push_value" jdbcType="VARCHAR" property="pushValue" />
-    <result column="receiver" jdbcType="BIT" property="receiver" />
+    <result column="receiver" jdbcType="INTEGER" property="receiver" />
     <result column="receiver_mobile" jdbcType="VARCHAR" property="receiverMobile" />
     <result column="object_type" jdbcType="INTEGER" property="objectType" />
-    <result column="is_mobile_success" jdbcType="BIT" property="isMobileSuccess" />
-    <result column="is_push_success" jdbcType="BIT" property="isPushSuccess" />
-    <result column="is_read" jdbcType="BIT" property="isRead" />
+    <result column="is_mobile_success" jdbcType="INTEGER" property="isMobileSuccess" />
+    <result column="is_push_success" jdbcType="INTEGER" property="isPushSuccess" />
+    <result column="is_read" jdbcType="INTEGER" property="isRead" />
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
     <result column="content_url" jdbcType="LONGVARCHAR" property="contentUrl" />
     <result column="content_desc" jdbcType="LONGVARCHAR" property="contentDesc" />
@@ -34,4 +34,12 @@
   	where 
   		msg_type=#{msgType} and (receiver=#{receiver} or receiver =-1)
   </select>
+  
+  <select id="getUnReadMessageNum" resultType="int">
+  	SELECT count(1) FROM dl_message WHERE receiver=#{userId} and is_delete = 0  and is_read=0
+  </select>
+  
+  <update id="updateUnReadMessage">
+  	update dl_message set is_read = 1 where receiver=#{userId} and is_read=0
+  </update>
 </mapper>

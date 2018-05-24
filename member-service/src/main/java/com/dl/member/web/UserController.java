@@ -1,21 +1,24 @@
 package com.dl.member.web;
-import com.dl.base.result.BaseResult;
-import com.dl.base.result.ResultGenerator;
-import com.dl.member.dto.UserDTO;
-import com.dl.member.enums.MemberEnums;
-import com.dl.member.model.User;
-import com.dl.member.param.MobileNumberParam;
-import com.dl.member.param.StrParam;
-import com.dl.member.param.UserLoginPassParam;
-import com.dl.member.service.UserService;
-import com.dl.member.util.TokenUtil;
+import javax.annotation.Resource;
 
-import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import javax.annotation.Resource;
+
+import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.SessionUtil;
+import com.dl.member.dto.UserDTO;
+import com.dl.member.dto.UserNoticeDTO;
+import com.dl.member.param.MobileNumberParam;
+import com.dl.member.param.QueryUserNoticeParam;
+import com.dl.member.param.StrParam;
+import com.dl.member.param.UpdateUnReadNoticeParam;
+import com.dl.member.param.UserLoginPassParam;
+import com.dl.member.service.UserService;
+
+import io.swagger.annotations.ApiOperation;
 
 /**
 * Created by CodeGenerator on 2018/03/08.
@@ -59,6 +62,22 @@ public class UserController {
     @PostMapping("/userInfoExceptPass")
     public BaseResult<UserDTO> queryUserInfo(@RequestBody StrParam strParam){
     	return userService.queryUserByUserIdExceptPass();
+    }
+    
+    @ApiOperation(value = "查询用户卡券或消息提示", notes = "查询用户卡券或消息提示")
+    @PostMapping("/queryUserNotice")
+    public BaseResult<UserNoticeDTO> queryUserNotice(@RequestBody QueryUserNoticeParam param){
+    	Integer userId = SessionUtil.getUserId();
+    	UserNoticeDTO queryUserNotice = userService.queryUserNotice(userId);
+    	return ResultGenerator.genSuccessResult("success", queryUserNotice);
+    }
+    
+    @ApiOperation(value = "更新未读消息提示", notes = "更新未读消息提示")
+    @PostMapping("/updateUnReadNotice")
+    public BaseResult<String> updateUnReadNotice(@RequestBody UpdateUnReadNoticeParam param){
+    	Integer userId = SessionUtil.getUserId();
+    	int rst = userService.updateUnReadNotice(userId, param.getType());
+    	return ResultGenerator.genSuccessResult("success");
     }
     
     /**
