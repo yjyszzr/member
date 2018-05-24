@@ -311,7 +311,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		try {
 			int rst = userBonusMapper.insertBatchUserBonus(userBonusLisgt);
 			if(rst != userBonusLisgt.size()) {
-				throw new Exception("用户"+userId+"领取红包异常,已回滚");
+				throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(),"用户"+userId+"领取红包异常,已回滚");
 			}
 		} catch (Exception e) {
 			log.error("用户"+userId+"领取红包异常,已回滚");

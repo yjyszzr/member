@@ -14,6 +14,7 @@ import tk.mybatis.mapper.entity.Condition;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
+import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelConsumerMapper;
@@ -34,11 +35,23 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 	private UserRegisterService userRegisterService;
 	@Resource
 	private UserBonusService userBonusService;
+	@Resource
+	private UserService userService;
 
 	public List<DlChannelConsumer> selectByChannelDistributorId(Integer channelDistributorId) {
 		Condition condition = new Condition(DlChannelConsumer.class);
 		condition.createCriteria().andCondition("channel_distributor_id = ", channelDistributorId);
 		return dlChannelConsumerMapper.selectByCondition(condition);
+	}
+
+	public DlChannelConsumer selectByChannelDistributorIdAndMobile(Integer channelDistributorId, String mobile) {
+		Condition condition = new Condition(DlChannelConsumer.class);
+		condition.createCriteria().andCondition("channel_distributor_id = ", channelDistributorId).andCondition("mobile = ", mobile);
+		List<DlChannelConsumer> channelConsumers = dlChannelConsumerMapper.selectByCondition(condition);
+		if (channelConsumers.size() > 0) {
+			return channelConsumers.get(0);
+		}
+		return null;
 	}
 
 	public List<IncomeDetailsDTO> getIncomeDetailsList(Integer userId, String addTime, Double rate) {
@@ -47,14 +60,16 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 		BigDecimal bd = new BigDecimal(rate);
 		for (int i = 0; i < incomeDetailsList.size(); i++) {
 			// 该list也就是注册人数
-			incomeDetailsList.get(i).setIncome(1D);
+			if (incomeDetailsList.get(i).getFristLoginTime() != null) {
+				incomeDetailsList.get(i).setIncome(1.0);
+			}
 			IncomeDetailsDTO incomeDetails = new IncomeDetailsDTO();
 			// 该list是拿用户Id跟用户流水做对比查出消费列表
 			for (int j = 0; j < userAccountList.size(); j++) {
 				if (incomeDetailsList.get(i).getUserId().equals(userAccountList.get(j).getUserId())) {
-					incomeDetails.setAddTime(userAccountList.get(j).getAddTime().toString());
+					incomeDetails.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(userAccountList.get(j).getAddTime()), DateUtil.datetimeFormat));
 					incomeDetails.setIncome(0 - userAccountList.get(j).getAmount().multiply(bd).doubleValue());
-					incomeDetails.setLotteryAmount(userAccountList.get(j).getAmount().doubleValue());
+					incomeDetails.setLotteryAmount(0 - userAccountList.get(j).getAmount().doubleValue());
 					incomeDetails.setMobile(incomeDetailsList.get(i).getMobile());
 					incomeDetails.setUserId(userId);
 					incomeDetailsList.add(incomeDetails);
@@ -74,13 +89,18 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 		UserRegisterParam userRegisterParam = new UserRegisterParam();
 		userRegisterParam.setLoginSource(userReceiveLotteryAwardParam.getLoginSource());
 		userRegisterParam.setMobile(userReceiveLotteryAwardParam.getMobile());
-		userRegisterParam.setPassWord(RandomUtil.getRandNum(6));
+		userRegisterParam.setPassWord(RandomUtil.getRandNum(6) + "i");
 		BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
 		if (regRst.getCode() != 0) {
 			return ResultGenerator.genResult(regRst.getCode(), regRst.getMsg());
 		}
 		Integer userId = regRst.getData();
+		dlChannelConsumerMapper.updateByChannelDistributorIdAndMobile(userRegisterParam.getMobile(), userId, userReceiveLotteryAwardParam.getChannelDistributorId());
 		userBonusService.receiveUserBonus(ProjectConstant.REGISTER, userId);
 		return ResultGenerator.genSuccessResult("领取成功");
+	}
+
+	public void updateByUserId(Integer userId) {
+		dlChannelConsumerMapper.updateBuUserId(userId, DateUtil.getCurrentTimeLong());
 	}
 }

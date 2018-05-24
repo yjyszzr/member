@@ -25,10 +25,10 @@ import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.IpUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
-import com.dl.lottery.dto.DlHallDTO.DlWinningLogDTO;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.ChannelDistributorDTO;
+import com.dl.member.dto.DlWinningLogDTO;
 import com.dl.member.dto.IncomeDetailsDTO;
 import com.dl.member.dto.PromotionIncomeDTO;
 import com.dl.member.enums.MemberEnums;
@@ -92,7 +92,9 @@ public class DlChannelConsumerController {
 	public BaseResult<List<IncomeDetailsDTO>> incomeDetails(@RequestBody DlChannelConsumerParam param) {
 		List<IncomeDetailsDTO> incomeDetailss = new ArrayList<IncomeDetailsDTO>();
 		DlChannelDistributor channelDistributor = dlChannelDistributorService.findByUserId(param.getUserId());
-		incomeDetailss = dlChannelConsumerService.getIncomeDetailsList(channelDistributor.getChannelId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
+		if (channelDistributor != null) {
+			incomeDetailss = dlChannelConsumerService.getIncomeDetailsList(channelDistributor.getChannelId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
+		}
 		return ResultGenerator.genSuccessResult("success", incomeDetailss);
 	}
 
@@ -108,9 +110,11 @@ public class DlChannelConsumerController {
 			if (user != null) {
 				return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
 			}
+
 			if (!RegexUtil.checkMobile(smsParam.getMobile())) {
 				return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 			}
+
 			tplId = memberConfig.getREGISTER_TPLID();
 			tplValue = "#code#=" + strRandom4;
 		}
@@ -131,7 +135,10 @@ public class DlChannelConsumerController {
 			dlChannelConsumer.setChannelDistributorId(smsParam.getUserId());
 			dlChannelConsumer.setConsumerIp(IpUtil.getIpAddr(request));
 			dlChannelConsumer.setMobile(smsParam.getMobile());
-			dlChannelConsumerService.save(dlChannelConsumer);
+			DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(smsParam.getUserId(), smsParam.getMobile());
+			if (channelConsumer == null) {
+				dlChannelConsumerService.save(dlChannelConsumer);
+			}
 			return ResultGenerator.genSuccessResult("发送短信验证码成功");
 		} else {
 			return ResultGenerator.genFailResult("参数异常");
@@ -140,14 +147,14 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "领取彩金", notes = "领取彩金")
 	@PostMapping("/receiveLotteryAward")
-	public BaseResult<String> receiveLotteryAward(UserReceiveLotteryAwardParam userReceiveLotteryAwardParam, HttpServletRequest request) {
-		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userReceiveLotteryAwardParam.getMobile());
+	public BaseResult<Integer> receiveLotteryAward(UserReceiveLotteryAwardParam userReceiveLotteryAwardParam, HttpServletRequest request) {
+		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.REGISTER_TPLID + "_" + userReceiveLotteryAwardParam.getMobile());
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userReceiveLotteryAwardParam.getSmsCode())) {
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
 		// 领取礼金操作
-		dlChannelConsumerService.receiveLotteryAward(userReceiveLotteryAwardParam, request);
-		return ResultGenerator.genSuccessResult("领取成功");
+
+		return dlChannelConsumerService.receiveLotteryAward(userReceiveLotteryAwardParam, request);
 	}
 
 	@ApiOperation(value = "我的二维码", notes = "我的二维码")
@@ -158,7 +165,7 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "大奖喜报列表", notes = "大奖喜报列表")
 	@PostMapping("/getWinningList")
-	private BaseResult<List<DlWinningLogDTO>> winningList() {
+	public BaseResult<List<DlWinningLogDTO>> winningList() {
 		List<LotteryWinningLogTemp> lotteryWinningLogTemps = lotteryWinningLogTempService.selectWinningLogByIsShow();
 		List<DlWinningLogDTO> winningLogList = new ArrayList<DlWinningLogDTO>();
 		if (CollectionUtils.isNotEmpty(lotteryWinningLogTemps)) {

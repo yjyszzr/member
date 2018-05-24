@@ -68,7 +68,6 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		return bettingTotalAmount;
 	}
 
-	@SuppressWarnings("null")
 	public ChannelDistributorDTO getMyRankingList(DlChannelDistributorParam param) {
 		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
 		List<DlChannelDistributor> channelDistributorList = this.getAllDlChannelDistributor();
@@ -91,7 +90,10 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 							consumerTotalAmount = userAccountList.get(k).getAmount().add(consumerTotalAmount);
 						}
 					}
-					registerConsumerAmount += 1.0;
+					// 首次登录时间不为空 才能判定为该用户登录过该APP只有登录过 才能给员工奖励
+					if (consumerList.get(j).getFristLoginTime() != null) {
+						registerConsumerAmount += 1.0;
+					}
 				}
 			}
 			IncomeRankingDTO incomeRanking = new IncomeRankingDTO();
@@ -180,6 +182,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		if (channelDistributor != null) {
 			promotionIncomes = dlChannelDistributorMapper.getPromotionIncomeList(channelDistributor.getChannelDistributorId());
 		}
+		List<DlChannelConsumer> channelConsumerList = channelConsumerService.findAll();
 		List<UserAccount> userAccountList = userAccountService.findByProcessType(3);
 		for (int i = 0; i < promotionIncomes.size(); i++) {
 			Double registerConsumerAmount = 0.0;
@@ -193,11 +196,17 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 						lotteryAmount.add(userAccountList.get(k).getAmount());
 					}
 				}
-				registerConsumerAmount += 1;
+				for (int j2 = 0; j2 < channelConsumerList.size(); j2++) {
+					if (null != channelConsumerList.get(j2).getUserId()) {
+						if (channelConsumerList.get(j2).getUserId().equals(idResult.get(j)) && null != channelConsumerList.get(j2).getFristLoginTime()) {
+							registerConsumerAmount += 1;
+						}
+					}
+				}
 			}
 			// 设置收入提成
 			BigDecimal bd = new BigDecimal(channelDistributor.getDistributorCommissionRate());
-			promotionIncomes.get(i).setLotteryAmount(-lotteryAmount.doubleValue());
+			promotionIncomes.get(i).setLotteryAmount(0 - lotteryAmount.doubleValue());
 			promotionIncomes.get(i).setIncome(0 - lotteryAmount.multiply(bd).doubleValue() + registerConsumerAmount);
 		}
 		return promotionIncomes;

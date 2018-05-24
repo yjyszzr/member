@@ -289,16 +289,36 @@ public class UserAccountService extends AbstractService<UserAccount> {
 				rewardList.add(u);
 			}
 		}
-
+		
+		//抵消出票失败的退款 和 提现失败的退款
+		BigDecimal backBuyMoney = BigDecimal.ZERO;
+		BigDecimal backWithDrawMoney = BigDecimal.ZERO;
+		List<String> backBuyOrderSns = buyList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
+		List<String> backWithDrawOrderSns = withdrawList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
+		if(backBuyOrderSns.size() > 0) {
+			backBuyMoney = userAccountMapper.countBackMoneyByProcessTyepByOrderSns(backBuyOrderSns,userId);
+			if(null == backBuyMoney) {
+				backBuyMoney = BigDecimal.ZERO;
+			}
+		}
+		if(backWithDrawOrderSns.size() > 0) {
+			backWithDrawMoney = userAccountMapper.countBackMoneyByProcessTyepByOrderSns(backWithDrawOrderSns,userId);
+			if(null == backWithDrawMoney) {
+				backWithDrawMoney = BigDecimal.ZERO;
+			}
+		}
+		
 		DecimalFormat df = new DecimalFormat("0.00");// 保留两位小数
 		Double buyMoney = buyList.stream().map(s -> s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
+		Double totalBuyMoney = buyMoney + backBuyMoney.doubleValue();
 		Double rechargeMoney = rechargeList.stream().map(s -> s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
 		Double withdrawMoney = withdrawList.stream().map(s -> s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
+		Double totalWithDrawMoney = withdrawMoney + backWithDrawMoney.doubleValue();
 		Double rewardMoney = rewardList.stream().map(s -> s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
 
-		userAccountCurMonthDTO.setBuyMoney(String.valueOf(df.format(0 - buyMoney)));
+		userAccountCurMonthDTO.setBuyMoney(String.valueOf(df.format(0 - totalBuyMoney)));
 		userAccountCurMonthDTO.setRechargeMoney(String.valueOf(df.format(rechargeMoney)));
-		userAccountCurMonthDTO.setWithDrawMoney(String.valueOf(df.format(0 - withdrawMoney)));
+		userAccountCurMonthDTO.setWithDrawMoney(String.valueOf(df.format(0 - totalWithDrawMoney)));
 		userAccountCurMonthDTO.setRewardMoney(String.valueOf(df.format(rewardMoney)));
 
 		return ResultGenerator.genSuccessResult("统计当月的各个用途的资金和成功", userAccountCurMonthDTO);
