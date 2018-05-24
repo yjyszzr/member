@@ -25,6 +25,7 @@ import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.IpUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
+import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.ChannelDistributorDTO;
@@ -159,7 +160,9 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "我的二维码", notes = "我的二维码")
 	@PostMapping("/myQRCode")
-	public BaseResult<MyQRCodeParam> myQRCode(MyQRCodeParam myQRCodeParam) {
+	public BaseResult<MyQRCodeParam> myQRCode() {
+		MyQRCodeParam myQRCodeParam = new MyQRCodeParam();
+		myQRCodeParam.setUserId(SessionUtil.getUserId());
 		myQRCodeParam.setUrl("192.168.31.205:8080/static/activity_Back/tuiguang/index.html?");
 		return ResultGenerator.genSuccessResult("获取成功", myQRCodeParam);
 	}

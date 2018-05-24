@@ -37,7 +37,7 @@ public class DlCashCouponController {
 	@PostMapping("/userCashCouponUserList")
 	public BaseResult<List<DlCashCouponUser>> cashCouponUserList(DlCashCouponUserParam param) {
 		List<DlCashCouponUser> list = dlCashCouponUserService.findByUserId(param.getUserId());
+
 		return ResultGenerator.genSuccessResult(null, list);
 	}
-
 }
