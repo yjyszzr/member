@@ -1,5 +1,6 @@
 package com.dl.member.dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -20,5 +21,7 @@ public interface UserAccountMapper extends Mapper<UserAccount> {
 	List<String> queryUserAccountRewardByOrdersn(@Param("list") List<String> list);
 
 	int insertUserAccountBySelective(UserAccount userAccount);
+	
+	BigDecimal countBackMoneyByProcessTyepByOrderSns(@Param("list") List<String> list,@Param("userId") Integer userId);
 
 }

@@ -55,6 +55,14 @@
   		and user_id = #{userId};
   </select>
   
+  <select id="countBackMoneyByProcessTyepByOrderSns"   resultType="DECIMAL">
+  		select sum(amount)  from dl_user_account 
+  		where process_type = 6 and user_id = #{userId} and order_sn in
+  		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+	         #{item}  
+	    </foreach>  		
+  </select>
+  
   <select id="queryUserAccountRewardByOrdersn" parameterType="java.util.List"  resultType="java.lang.String">
   		select order_sn  from dl_user_account 
   		where process_type = 1 and  order_sn in
