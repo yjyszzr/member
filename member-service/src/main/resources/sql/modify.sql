@@ -39,3 +39,10 @@ CREATE TABLE `dl_complain` (
   `is_read` tinyint(1) DEFAULT '0' COMMENT '是否读取',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8 COMMENT='用户投诉信息表';
+
+
+
+
+-- 2018-05-24
+alter table dl_user_bonus add is_read tinyint(1)  default 0 not null comment '用户是否读取：0未读取，1读取'; 
+

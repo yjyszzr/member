@@ -35,11 +35,23 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 	private UserRegisterService userRegisterService;
 	@Resource
 	private UserBonusService userBonusService;
+	@Resource
+	private UserService userService;
 
 	public List<DlChannelConsumer> selectByChannelDistributorId(Integer channelDistributorId) {
 		Condition condition = new Condition(DlChannelConsumer.class);
 		condition.createCriteria().andCondition("channel_distributor_id = ", channelDistributorId);
 		return dlChannelConsumerMapper.selectByCondition(condition);
+	}
+
+	public DlChannelConsumer selectByChannelDistributorIdAndMobile(Integer channelDistributorId, String mobile) {
+		Condition condition = new Condition(DlChannelConsumer.class);
+		condition.createCriteria().andCondition("channel_distributor_id = ", channelDistributorId).andCondition("mobile = ", mobile);
+		List<DlChannelConsumer> channelConsumers = dlChannelConsumerMapper.selectByCondition(condition);
+		if (channelConsumers.size() > 0) {
+			return channelConsumers.get(0);
+		}
+		return null;
 	}
 
 	public List<IncomeDetailsDTO> getIncomeDetailsList(Integer userId, String addTime, Double rate) {
@@ -77,12 +89,13 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 		UserRegisterParam userRegisterParam = new UserRegisterParam();
 		userRegisterParam.setLoginSource(userReceiveLotteryAwardParam.getLoginSource());
 		userRegisterParam.setMobile(userReceiveLotteryAwardParam.getMobile());
-		userRegisterParam.setPassWord(RandomUtil.getRandNum(6));
+		userRegisterParam.setPassWord(RandomUtil.getRandNum(6) + "i");
 		BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
 		if (regRst.getCode() != 0) {
 			return ResultGenerator.genResult(regRst.getCode(), regRst.getMsg());
 		}
 		Integer userId = regRst.getData();
+		dlChannelConsumerMapper.updateByChannelDistributorIdAndMobile(userRegisterParam.getMobile(), userId, userReceiveLotteryAwardParam.getChannelDistributorId());
 		userBonusService.receiveUserBonus(ProjectConstant.REGISTER, userId);
 		return ResultGenerator.genSuccessResult("领取成功");
 	}

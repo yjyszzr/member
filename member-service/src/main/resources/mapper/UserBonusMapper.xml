@@ -98,4 +98,12 @@
           </foreach >
    </update > 
   
+  <select id="getUnReadBonusNum" resultType="int">
+  		SELECT count(1) FROM dl_user_bonus WHERE user_id = #{userId} and is_delete = 0  and is_read=0
+  </select>
+  
+  <update id="updateUnReadBonus">
+  	update dl_user_bonus set is_read = 1 where user_id=#{userId} and is_read=0
+  </update>
+  
 </mapper>

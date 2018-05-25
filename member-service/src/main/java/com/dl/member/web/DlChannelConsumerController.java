@@ -25,6 +25,7 @@ import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.IpUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
+import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.ChannelDistributorDTO;
@@ -40,6 +41,7 @@ import com.dl.member.param.ConsumerSmsParam;
 import com.dl.member.param.DlChannelConsumerParam;
 import com.dl.member.param.DlChannelDistributorParam;
 import com.dl.member.param.MyQRCodeParam;
+import com.dl.member.param.StrParam;
 import com.dl.member.param.UserReceiveLotteryAwardParam;
 import com.dl.member.service.DlChannelConsumerService;
 import com.dl.member.service.DlChannelDistributorService;
@@ -74,6 +76,7 @@ public class DlChannelConsumerController {
 	@ApiOperation(value = "我的推荐", notes = "我的推荐")
 	@PostMapping("/myRecommendation")
 	public BaseResult<ChannelDistributorDTO> myRecommendation(@RequestBody DlChannelDistributorParam param) {
+		param.setUserId(SessionUtil.getUserId());
 		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
 		channelDistributor = dlChannelDistributorService.getMyRankingList(param);
 		return ResultGenerator.genSuccessResult("success", channelDistributor);
@@ -110,9 +113,11 @@ public class DlChannelConsumerController {
 			if (user != null) {
 				return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
 			}
+
 			if (!RegexUtil.checkMobile(smsParam.getMobile())) {
 				return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 			}
+
 			tplId = memberConfig.getREGISTER_TPLID();
 			tplValue = "#code#=" + strRandom4;
 		}
@@ -133,7 +138,10 @@ public class DlChannelConsumerController {
 			dlChannelConsumer.setChannelDistributorId(smsParam.getUserId());
 			dlChannelConsumer.setConsumerIp(IpUtil.getIpAddr(request));
 			dlChannelConsumer.setMobile(smsParam.getMobile());
-			dlChannelConsumerService.save(dlChannelConsumer);
+			DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(smsParam.getUserId(), smsParam.getMobile());
+			if (channelConsumer == null) {
+				dlChannelConsumerService.save(dlChannelConsumer);
+			}
 			return ResultGenerator.genSuccessResult("发送短信验证码成功");
 		} else {
 			return ResultGenerator.genFailResult("参数异常");
@@ -142,25 +150,28 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "领取彩金", notes = "领取彩金")
 	@PostMapping("/receiveLotteryAward")
-	public BaseResult<String> receiveLotteryAward(UserReceiveLotteryAwardParam userReceiveLotteryAwardParam, HttpServletRequest request) {
+	public BaseResult<Integer> receiveLotteryAward(@RequestBody UserReceiveLotteryAwardParam userReceiveLotteryAwardParam, HttpServletRequest request) {
 		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.REGISTER_TPLID + "_" + userReceiveLotteryAwardParam.getMobile());
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userReceiveLotteryAwardParam.getSmsCode())) {
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
 		// 领取礼金操作
-		dlChannelConsumerService.receiveLotteryAward(userReceiveLotteryAwardParam, request);
-		return ResultGenerator.genSuccessResult("领取成功");
+
+		return dlChannelConsumerService.receiveLotteryAward(userReceiveLotteryAwardParam, request);
 	}
 
 	@ApiOperation(value = "我的二维码", notes = "我的二维码")
 	@PostMapping("/myQRCode")
-	public BaseResult<MyQRCodeParam> myQRCode(MyQRCodeParam myQRCodeParam) {
+	public BaseResult<MyQRCodeParam> myQRCode(@RequestBody StrParam strParam) {
+		MyQRCodeParam myQRCodeParam = new MyQRCodeParam();
+		myQRCodeParam.setUserId(SessionUtil.getUserId());
+		myQRCodeParam.setUrl("http://192.168.31.205:8080/static/activity_Back/tuiguang/index.html?");
 		return ResultGenerator.genSuccessResult("获取成功", myQRCodeParam);
 	}
 
 	@ApiOperation(value = "大奖喜报列表", notes = "大奖喜报列表")
 	@PostMapping("/getWinningList")
-	public BaseResult<List<DlWinningLogDTO>> winningList() {
+	public BaseResult<List<DlWinningLogDTO>> winningList(@RequestBody StrParam strParam) {
 		List<LotteryWinningLogTemp> lotteryWinningLogTemps = lotteryWinningLogTempService.selectWinningLogByIsShow();
 		List<DlWinningLogDTO> winningLogList = new ArrayList<DlWinningLogDTO>();
 		if (CollectionUtils.isNotEmpty(lotteryWinningLogTemps)) {

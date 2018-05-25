@@ -28,8 +28,12 @@
 			DATE_FORMAT( FROM_UNIXTIME( add_time ), '%Y-%m-%d' ) = #{addTime};
   </select>
   
-   <update id="updateBuUserId"  parameterType="java.lang.Integer">
+   <update id="updateByUserId"  parameterType="java.lang.Integer">
         UPDATE dl_channel_consumer SET frist_login_time= #{fristLoginTime}  where user_id = #{userId}  
+  </update>
+  
+   <update id="updateByChannelDistributorIdAndMobile" >
+        UPDATE dl_channel_consumer SET user_id = #{userId,jdbcType=INTEGER}    where mobile  = #{mobile,jdbcType=VARCHAR}   and    channel_distributor_id  = #{channelDistributorId,jdbcType=INTEGER} 
   </update>
   
 </mapper>

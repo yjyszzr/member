@@ -18,6 +18,9 @@ public class UserReceiveLotteryAwardParam {
 	@ApiModelProperty(value = "短信验证码", required = true)
 	private String smsCode;
 
+	@ApiModelProperty(value = "渠道分销员Id")
+	private Integer channelDistributorId;
+
 	@ApiModelProperty("登录来源  1 android，2 ios，3 pc，4 h5")
 	private String loginSource;
 }
