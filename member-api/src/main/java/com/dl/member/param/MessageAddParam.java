@@ -25,7 +25,7 @@ public class MessageAddParam {
     private Integer receiver;
 	@ApiModelProperty(value="消息接收者的手机号，可以为空")
     private String receiveMobile;
-	@ApiModelProperty(value="消息业务类型：1:订单，2：提现",required=true)
+	@ApiModelProperty(value="消息业务类型：1:订单，2：提现, 3:出票",required=true)
     private Integer objectType;
 	@ApiModelProperty(value="消息发送时间",required=true)
     private Integer sendTime;

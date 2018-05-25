@@ -1,6 +1,5 @@
 package com.dl.member.dao;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;

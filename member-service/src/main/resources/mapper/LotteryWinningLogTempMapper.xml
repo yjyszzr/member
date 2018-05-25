@@ -7,4 +7,12 @@
     <result column="winning_money" jdbcType="DECIMAL" property="winningMoney" />
     <result column="is_show" jdbcType="INTEGER" property="isShow" />
   </resultMap>
+  
+  <delete id="deleteByLogIds">
+  	delete from dl_winning_log_temp 
+  	where winning_log_id in
+  	<foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+ 		#{id}
+ 	</foreach>
+  </delete>
 </mapper>

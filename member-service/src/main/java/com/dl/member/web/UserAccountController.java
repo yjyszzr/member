@@ -1,4 +1,15 @@
 package com.dl.member.web;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.core.ProjectConstant;
@@ -6,6 +17,7 @@ import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
+import com.dl.member.dto.UserIdAndRewardDTO;
 import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
@@ -14,21 +26,16 @@ import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
-import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.UserBonusParam;
+import com.dl.member.param.UserIdAndRewardListParam;
 import com.dl.member.param.WithDrawParam;
 import com.dl.member.service.SysConfigService;
 import com.dl.member.service.UserAccountService;
 import com.dl.member.service.UserBonusService;
+import com.dl.member.service.UserService;
 import com.github.pagehelper.PageInfo;
+
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import javax.annotation.Resource;
-import javax.validation.Valid;
 
 /**
 * Created by zhangzirong on 2018/03/15.
@@ -42,6 +49,8 @@ public class UserAccountController {
     @Resource
     private UserBonusService userBonusService;
     
+    @Resource
+    private UserService userService;
     
     @Resource
     private SysConfigService sysConfigService;
@@ -150,9 +159,11 @@ public class UserAccountController {
     @ApiOperation(value="批量更新用户账户", notes="批量更新用户账户",hidden=false)
 	@RequestMapping(path="/batchUpdateUserAccount", method=RequestMethod.POST)
     public BaseResult<String> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
-    	return userAccountService.batchUpdateUserAccount(userIdAndRewardListParam.getUserIdAndRewardList(),ProjectConstant.REWARD_AUTO);
+    	List<UserIdAndRewardDTO> userIdAndRewardList = userIdAndRewardListParam.getUserIdAndRewardList();
+    	BaseResult<String> batchUpdateUserAccount = userAccountService.batchUpdateUserAccount(userIdAndRewardList,ProjectConstant.REWARD_AUTO);
+    	userAccountService.updateLotteryWinning(userIdAndRewardList);
+    	return batchUpdateUserAccount;
     }
-    
     
 	/**
 	 * 手动更新用户账户,给后台管理派奖使用

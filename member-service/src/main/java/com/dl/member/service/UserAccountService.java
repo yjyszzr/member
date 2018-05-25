@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -18,9 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
@@ -34,8 +31,10 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.LotteryWinningLogTempMapper;
 import com.dl.member.dao.UserAccountMapper;
 import com.dl.member.dao.UserMapper;
+import com.dl.member.dto.DlWinningLogDTO;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
@@ -43,6 +42,7 @@ import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserIdAndRewardDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlMessage;
+import com.dl.member.model.LotteryWinningLogTemp;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.param.MemWithDrawSnParam;
@@ -63,6 +63,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Joiner;
 
+import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
+
 @Service
 @Slf4j
 public class UserAccountService extends AbstractService<UserAccount> {
@@ -71,6 +75,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 	@Resource
 	private UserMapper userMapper;
+	
+	@Resource
+	private LotteryWinningLogTempMapper lotteryWinningLogTempMapper;
 
 	@Resource
 	private UserService userService;
@@ -1153,5 +1160,40 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			bettingTotalAmount += userAccountList.get(i).getAmount().doubleValue();
 		}
 		return -bettingTotalAmount;
+	}
+
+	/**
+	 * 更新跑马灯中奖信息
+	 * @param userIdAndRewardList
+	 */
+	public void updateLotteryWinning(List<UserIdAndRewardDTO> userIdAndRewardList) {
+		List<UserIdAndRewardDTO> collect = userIdAndRewardList.stream().filter(u->u.getReward().doubleValue() > 500).sorted((item1,item2)->item1.getReward().compareTo(item2.getReward())).collect(Collectors.toList());
+    	if(collect.size() > 10) {
+    		collect = collect.subList(0, 10);
+    	}
+    	List<Integer> userIds = collect.stream().map(dto->dto.getUserId()).collect(Collectors.toList());
+    	List<User> users = userMapper.queryUserByUserIds(userIds);
+    	Map<Integer, String> map = new HashMap<Integer, String>(users.size());
+    	for(User user: users) {
+    		map.put(user.getUserId(), user.getMobile());
+    	}
+    	Condition condition = new Condition(LotteryWinningLogTemp.class);
+		condition.createCriteria().andCondition("is_show=", 1);
+		List<LotteryWinningLogTemp> olds = lotteryWinningLogTempMapper.selectByCondition(condition);
+    	for(UserIdAndRewardDTO dto: collect) {
+    		BigDecimal reward = dto.getReward();
+    		String mobile = map.get(dto.getUserId());
+    		LotteryWinningLogTemp temp = new LotteryWinningLogTemp();
+    		temp.setWinningMoney(reward);
+    		temp.setPhone(mobile);
+    		temp.setIsShow(1);
+    		lotteryWinningLogTempMapper.insert(temp);
+    	}
+    	int num = olds.size() + collect.size() - 10;
+    	if(num > 0) {
+    		List<Integer> ids = olds.stream().sorted((item1,item2)-> item1.getWinningLogId().compareTo(item2.getWinningLogId()))
+    		.limit(num).map(dto->dto.getWinningLogId()).collect(Collectors.toList());
+    		lotteryWinningLogTempMapper.deleteByLogIds(ids);
+    	}
 	}
 }
