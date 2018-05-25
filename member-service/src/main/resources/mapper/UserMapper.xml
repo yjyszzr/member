@@ -107,5 +107,12 @@
   	insert into dl_third_api_log(api_name,api_type,api_param,api_result,api_desc)
   	values(#{apiName},#{apiType},#{apiParam},#{apiResult},#{apiDesc})
   </insert>
-  
+    
+  <update id="updateUserMoneyForCashCoupon" parameterType="com.dl.member.model.User" >
+  	UPDATE dl_user 
+  		 <trim prefix="set" suffixOverrides=",">
+		  <if test="userMoney!=null">user_money=#{userMoney},</if>
+		 </trim>
+  	WHERE user_id = #{userId}
+  </update>
 </mapper>

@@ -41,6 +41,7 @@ import com.dl.member.param.ConsumerSmsParam;
 import com.dl.member.param.DlChannelConsumerParam;
 import com.dl.member.param.DlChannelDistributorParam;
 import com.dl.member.param.MyQRCodeParam;
+import com.dl.member.param.StrParam;
 import com.dl.member.param.UserReceiveLotteryAwardParam;
 import com.dl.member.service.DlChannelConsumerService;
 import com.dl.member.service.DlChannelDistributorService;
@@ -149,7 +150,7 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "领取彩金", notes = "领取彩金")
 	@PostMapping("/receiveLotteryAward")
-	public BaseResult<Integer> receiveLotteryAward(UserReceiveLotteryAwardParam userReceiveLotteryAwardParam, HttpServletRequest request) {
+	public BaseResult<Integer> receiveLotteryAward(@RequestBody UserReceiveLotteryAwardParam userReceiveLotteryAwardParam, HttpServletRequest request) {
 		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.REGISTER_TPLID + "_" + userReceiveLotteryAwardParam.getMobile());
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userReceiveLotteryAwardParam.getSmsCode())) {
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
@@ -161,16 +162,16 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "我的二维码", notes = "我的二维码")
 	@PostMapping("/myQRCode")
-	public BaseResult<MyQRCodeParam> myQRCode() {
+	public BaseResult<MyQRCodeParam> myQRCode(@RequestBody StrParam strParam) {
 		MyQRCodeParam myQRCodeParam = new MyQRCodeParam();
 		myQRCodeParam.setUserId(SessionUtil.getUserId());
-		myQRCodeParam.setUrl("192.168.31.205:8080/static/activity_Back/tuiguang/index.html?");
+		myQRCodeParam.setUrl("http://192.168.31.205:8080/static/activity_Back/tuiguang/index.html?");
 		return ResultGenerator.genSuccessResult("获取成功", myQRCodeParam);
 	}
 
 	@ApiOperation(value = "大奖喜报列表", notes = "大奖喜报列表")
 	@PostMapping("/getWinningList")
-	public BaseResult<List<DlWinningLogDTO>> winningList() {
+	public BaseResult<List<DlWinningLogDTO>> winningList(@RequestBody StrParam strParam) {
 		List<LotteryWinningLogTemp> lotteryWinningLogTemps = lotteryWinningLogTempService.selectWinningLogByIsShow();
 		List<DlWinningLogDTO> winningLogList = new ArrayList<DlWinningLogDTO>();
 		if (CollectionUtils.isNotEmpty(lotteryWinningLogTemps)) {
