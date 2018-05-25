@@ -11,14 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
-import com.dl.base.util.DateUtil;
-import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.model.DlCashCoupon;
-import com.dl.member.model.DlCashCouponOrder;
 import com.dl.member.model.DlCashCouponUser;
 import com.dl.member.model.User;
 import com.dl.member.param.DlCashCouponParam;
@@ -27,7 +23,6 @@ import com.dl.member.param.StrParam;
 import com.dl.member.service.DlCashCouponOrderService;
 import com.dl.member.service.DlCashCouponService;
 import com.dl.member.service.DlCashCouponUserService;
-import com.dl.member.service.UserAccountService;
 import com.dl.member.service.UserService;
 
 @RestController
@@ -37,8 +32,7 @@ public class DlCashCouponController {
 	private DlCashCouponService dlCashCouponService;
 	@Resource
 	private UserService userService;
-	@Resource
-	private UserAccountService userAccountService;
+
 	@Resource
 	private DlCashCouponUserService dlCashCouponUserService;
 	@Resource
@@ -56,7 +50,6 @@ public class DlCashCouponController {
 	public BaseResult<List<DlCashCouponUser>> cashCouponUserList(@RequestBody DlCashCouponUserParam param) {
 		List<DlCashCouponUser> list = dlCashCouponUserService.findByUserId(param.getUserId());
 		userService.queryUserByUserIdExceptPass();// 做判断
-		// userAccountService.
 		return ResultGenerator.genSuccessResult(null, list);
 	}
 
@@ -73,19 +66,7 @@ public class DlCashCouponController {
 	public BaseResult toCreateOrder(@RequestBody DlCashCouponParam param) {
 		DlCashCoupon cashCoupon = dlCashCouponService.findById(param.getCashCouponId());
 		User user = userService.findById(SessionUtil.getUserId());
-		user.getUserMoney();
-		// if (user.getUserMoney() < cashCoupon.getCashCouponPrice()) {
-		//
-		// }
-		DlCashCouponOrder dlCashCouponOrder = new DlCashCouponOrder();
-		dlCashCouponOrder.setIsDelete(0);
-		dlCashCouponOrder.setAddTime(DateUtil.getCurrentTimeLong());
-		dlCashCouponOrder.setMoneyPaid(cashCoupon.getCashCouponPrice());
-		dlCashCouponOrder.setOrderId(0);
-		dlCashCouponOrder.setOrderSn(SNGenerator.nextSN(SNBusinessCodeEnum.ORDER_SN.getCode()));
-		dlCashCouponOrder.setUserId(SessionUtil.getUserId());
-		dlCashCouponOrderService.save(dlCashCouponOrder);
-		// userAccountService.updateUserMoneyForCashCoupon(user);
+		dlCashCouponOrderService.saveForCashCouponOrder(cashCoupon, user);
 		return ResultGenerator.genSuccessResult(null);
 	}
 }
