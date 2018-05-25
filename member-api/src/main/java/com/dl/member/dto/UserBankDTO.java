@@ -37,5 +37,8 @@ public class UserBankDTO {
 	@ApiModelProperty("银行卡号后4位")
     private String lastCardNo4;
 	
+	@ApiModelProperty("银行英文简写")
+    private String abbreviation;
+	
 	
 }

@@ -1,4 +1,28 @@
 package com.dl.member.service;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dl.base.enums.SNBusinessCodeEnum;
+import com.dl.base.exception.ServiceException;
+import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
+import com.dl.base.service.AbstractService;
+import com.dl.base.util.DateUtil;
+import com.dl.base.util.SNGenerator;
+import com.dl.base.util.SessionUtil;
+import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.UserBonusMapper;
+import com.dl.member.dto.UserBonusDTO;
+import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.ActivityBonus;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.BonusLimitConditionParam;
@@ -9,33 +33,6 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
-
-import com.dl.member.core.ProjectConstant;
-import com.dl.member.dao.UserBonusMapper;
-import com.dl.member.dto.UserBonusDTO;
-import com.dl.member.enums.MemberEnums;
-import com.dl.base.enums.SNBusinessCodeEnum;
-import com.dl.base.exception.ServiceException;
-import com.dl.base.result.BaseResult;
-import com.dl.base.result.ResultGenerator;
-import com.dl.base.service.AbstractService;
-import com.dl.base.util.DateUtil;
-import com.dl.base.util.SNGenerator;
-import com.dl.base.util.SessionUtil;
-import org.springframework.beans.BeanUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
 
 @Service
 @Transactional
@@ -232,14 +229,14 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
-		
-		Integer currentTime = DateUtil.getCurrentTimeLong();
-		
-		if(currentTime - userBonus.getEndTime() <= ProjectConstant.OneDaySecond &&
-		   currentTime -userBonus.getEndTime() > 0) {
-			userBonusDTO.setSoonExprireBz(ProjectConstant.BONUS_SOONEXPIREBZ_NOTHIDE);
+
+		if(ProjectConstant.BONUS_STATUS_UNUSED == userBonus.getBonusStatus()) {
+			Integer currentTime = DateUtil.getCurrentTimeLong();
+			userBonusDTO.setSoonExprireBz(this.createSoonExprireBz(currentTime, userBonus));
+			userBonusDTO.setLeaveTime(this.createLeaveTime(currentTime, userBonus));
 		}else {
-			userBonusDTO.setSoonExprireBz(ProjectConstant.BONUS_SOONEXPIREBZ_HIDE);
+			userBonusDTO.setSoonExprireBz("");
+			userBonusDTO.setLeaveTime("");
 		}
 		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
 		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
@@ -248,7 +245,41 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		userBonusDTO.setMinGoodsAmount(userBonusShowDescService.getLimitOrderAmountDesc(userBonus.getMinGoodsAmount(),userBonus.getBonusPrice()));
 		return userBonusDTO;
 	}
+
+	public static String createSoonExprireBz(Integer currentTime,UserBonus userBonus) {
+		if(currentTime - userBonus.getEndTime() <= ProjectConstant.OneDaySecond &&
+		   userBonus.getEndTime() - currentTime > 0) {
+			return ProjectConstant.BONUS_SOONEXPIREBZ_NOTHIDE;
+		}
+		if(currentTime - userBonus.getStartTime() < 0) {//未生效
+			return ProjectConstant.BONUS_NOWORK;
+		}
+		return "";
+	}
 	
+	/**
+	 * 未使用且已生效的才展示leaveTime
+	 * @param currentTime
+	 * @param bonusEndTime
+	 * @return
+	 */
+	public static String createLeaveTime(Integer currentTime,UserBonus userBonus) {
+		if(currentTime > userBonus.getStartTime() && currentTime < userBonus.getEndTime()) {
+			Integer leaveTime = userBonus.getEndTime() - currentTime;
+			Integer leaveDays = leaveTime / ProjectConstant.OneDaySecond;
+			Integer yu = leaveTime % ProjectConstant.OneDaySecond;
+			if(leaveDays >= 1) {
+				if(yu > 0) {
+					leaveDays = leaveDays + 1;
+				}
+				return "剩余"+leaveDays+"天过期";
+			}else {
+				Integer leaveHours = leaveTime / 3600;
+				return "剩余"+leaveHours+"小时过期";
+			}
+		}
+		return "";
+	}
 	/**
 	 * 查询单个红包的数据
 	 *

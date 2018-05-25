@@ -15,6 +15,7 @@
     <result column="last_time" jdbcType="INTEGER" property="lastTime" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="abbreviation" jdbcType="VARCHAR" property="abbreviation" />
   </resultMap>
   
   <update id="batchUpdateUserBankStatus">
