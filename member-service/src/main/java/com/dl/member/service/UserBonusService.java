@@ -254,7 +254,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @return
 	 */
 	public static String createSoonExprireBz(Integer currentTime,UserBonus userBonus) {
-		if(currentTime - userBonus.getEndTime() <= ProjectConstant.OneDaySecond &&
+		if(userBonus.getEndTime() - currentTime  <= ProjectConstant.OneDaySecond &&
 		   userBonus.getEndTime() - currentTime > 0) {
 			return ProjectConstant.BONUS_SOONEXPIREBZ_NOTHIDE;
 		}
