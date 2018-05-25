@@ -11,6 +11,7 @@ import com.dl.member.param.StrParam;
 //import com.pgt.shop.member.param.CancelChangeParam;
 //import com.pgt.shop.member.param.ConfirmOrderParam;
 import com.dl.member.param.UserBonusParam;
+import com.dl.member.param.UserIdParam;
 
 
 /**
@@ -43,5 +44,5 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(path="/user/queryUserInfo", method=RequestMethod.POST)
-	public BaseResult<UserDTO> queryUserInfo(@RequestBody Integer userId);
+	public BaseResult<UserDTO> queryUserInfo(@RequestBody UserIdParam params);
 }
