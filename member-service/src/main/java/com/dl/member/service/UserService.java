@@ -34,6 +34,7 @@ import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.User;
+import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserParam;
 import com.dl.member.util.Encryption;
 
@@ -219,7 +220,8 @@ public class UserService extends AbstractService<User> {
 		return ResultGenerator.genSuccessResult("更新用户登录密码成功");
 	}
 
-	public UserDTO queryUserInfo(Integer userId) {
+	public UserDTO queryUserInfo(UserIdParam params) {
+		Integer userId = params.getUserId();
 		User user = this.findById(userId);
 		UserDTO userDTO = new UserDTO();
 		try {
@@ -245,7 +247,9 @@ public class UserService extends AbstractService<User> {
 	 */
 	public UserDTO queryUserInfo() {
 		Integer userId = SessionUtil.getUserId();
-		return queryUserInfo(userId);
+		UserIdParam userIdParams = new UserIdParam();
+		userIdParams.setUserId(userId);
+		return queryUserInfo(userIdParams);
 	}
 
 	/**
