@@ -77,7 +77,6 @@ public class DlChannelConsumerController {
 	@PostMapping("/myRecommendation")
 	public BaseResult<ChannelDistributorDTO> myRecommendation(@RequestBody DlChannelDistributorParam param) {
 		param.setUserId(SessionUtil.getUserId());
-		// param.setUserId(400102);
 		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
 		channelDistributor = dlChannelDistributorService.getMyRankingList(param);
 		return ResultGenerator.genSuccessResult("success", channelDistributor);

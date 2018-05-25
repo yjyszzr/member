@@ -166,7 +166,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 					bigd = bigd.add(users.get(m).getAmount());
 				}
 				BigDecimal bid = new BigDecimal(cDistributor.getDistributorCommissionRate());
-				incomeRankingForSelf.setTodayAmount(bigd.multiply(bid).doubleValue());
+				incomeRankingForSelf.setTodayAmount(0 - bigd.multiply(bid).doubleValue());
 			}
 			// 设置自己的排名
 			channelDistributor.setChannelDistributor(incomeRankingForSelf);
