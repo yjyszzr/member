@@ -59,7 +59,21 @@ public class UserBank {
     @Column(name = "is_delete")
     private Integer isDelete;
     
+	/**
+     * 英文简称
+     */
+    @Column(name = "abbreviation")
+    private String abbreviation;
+    
  
+	public String getAbbreviation() {
+		return abbreviation;
+	}
+
+	public void setAbbreviation(String abbreviation) {
+		this.abbreviation = abbreviation;
+	}
+
 	public Integer getAddTime() {
 		return addTime;
 	}

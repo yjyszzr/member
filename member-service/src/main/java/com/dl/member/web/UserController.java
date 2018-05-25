@@ -15,6 +15,7 @@ import com.dl.member.param.MobileNumberParam;
 import com.dl.member.param.QueryUserNoticeParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UpdateUnReadNoticeParam;
+import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserLoginPassParam;
 import com.dl.member.service.UserService;
 
@@ -79,6 +80,19 @@ public class UserController {
     	Integer userId = SessionUtil.getUserId();
     	int rst = userService.updateUnReadNotice(userId, param.getType());
     	return ResultGenerator.genSuccessResult("success");
+    }
+    
+    @ApiOperation(value = "根据用户ID查询", notes = "根据用户ID查询")
+    @PostMapping("/queryUserInfo")
+    public BaseResult<UserDTO> queryUserInfo(@RequestBody UserIdParam param){
+    	UserDTO userDTO = userService.queryUserInfo(param);
+    	return ResultGenerator.genSuccessResult("succ",userDTO);
+    }
+    
+    @ApiOperation(value = "查询用户信息除了登录密码和支付密码", notes = "查询用户信息除了登录密码和支付密码")
+    @PostMapping("/userInfoExceptPassReal")
+    public BaseResult<UserDTO> queryUserByUserIdExceptPassReal(@RequestBody UserIdParam param){
+    	return userService.queryUserByUserIdExceptPassReal();
     }
     
     /**

@@ -11,6 +11,7 @@ import com.dl.member.param.StrParam;
 //import com.pgt.shop.member.param.CancelChangeParam;
 //import com.pgt.shop.member.param.ConfirmOrderParam;
 import com.dl.member.param.UserBonusParam;
+import com.dl.member.param.UserIdParam;
 
 
 /**
@@ -30,6 +31,14 @@ public interface IUserService {
 	public BaseResult<UserDTO> userInfoExceptPass(@RequestBody StrParam strParam);
 	
 	/**
+	 * 查询用户接口 手机号码真实信息
+	 * @param UserBonusParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/userInfoExceptPassReal", method=RequestMethod.POST)
+	public BaseResult<UserDTO> userInfoExceptPassReal(@RequestBody StrParam strParam);
+	
+	/**
 	 * 批量查询查询用户
 	 * @param UserBonusParam
 	 * @return
@@ -37,5 +46,11 @@ public interface IUserService {
 	@RequestMapping(path="/user/queryUserInfoListByUserIds", method=RequestMethod.POST)
 	public BaseResult<UserDTO> queryUserInfoListByUserIds(@RequestBody StrParam strParam);
 	
-	
+	/**
+	 * 查询用户接口
+	 * @param UserBonusParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/queryUserInfo", method=RequestMethod.POST)
+	public BaseResult<UserDTO> queryUserInfo(@RequestBody UserIdParam params);
 }

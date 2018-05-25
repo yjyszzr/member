@@ -32,10 +32,14 @@ public class UserBonusDTO {
     @ApiModelProperty(value = "使用说明")
     private String useHelp;
     
-    @ApiModelProperty(value = "快过期标志：1-显示  0-隐藏")
+    @ApiModelProperty(value = "快过期标志：1-快过期   2-未生效")
     private String soonExprireBz;
     
-
+    @ApiModelProperty(value = "红包剩余多长时间")
+    private String leaveTime; 
+    
+    @ApiModelProperty(value = "红包截止时间")
+    private String bonusEndTime; 
     
     @ApiModelProperty(value = "红包类型:暂不使用")
     private Integer bonusType;   

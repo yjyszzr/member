@@ -102,9 +102,10 @@ public class ProjectConstant {
 	// 一天的秒数
 	public static final Integer OneDaySecond = 86400;
 
-	// 红包快过期标识
+	// 红包快过期标识:快过期,未生效
 	public static final String BONUS_SOONEXPIREBZ_NOTHIDE = "1";
 	public static final String BONUS_SOONEXPIREBZ_HIDE = "0";
+	public static final String BONUS_NOWORK = "2";
 
 	// 文章收藏
 	// 用户已收藏

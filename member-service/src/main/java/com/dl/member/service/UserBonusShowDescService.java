@@ -22,12 +22,7 @@ public class UserBonusShowDescService {
 	public String getLimitTimeDesc(Integer startTimeInteger,Integer endTimeInteger) {
 		String startTime = DateUtil.getCurrentTimeString(Long.valueOf(startTimeInteger), DateUtil.date_sdf);
 		String endTime = DateUtil.getCurrentTimeString(Long.valueOf(endTimeInteger), DateUtil.date_sdf);
-		Date endDate = new Date(endTimeInteger);
-		if(DateUtil.isLatestWeek(endDate, new Date())) {
-			return "剩余时间少于等于7天";
-		}else {
-			return startTime+"~"+endTime;
-		}
+		return startTime+"~"+endTime;
 	}
 	
 	/**

@@ -296,25 +296,25 @@ public class UserAccountService extends AbstractService<UserAccount> {
 				rewardList.add(u);
 			}
 		}
-		
-		//抵消出票失败的退款 和 提现失败的退款
+
+		// 抵消出票失败的退款 和 提现失败的退款
 		BigDecimal backBuyMoney = BigDecimal.ZERO;
 		BigDecimal backWithDrawMoney = BigDecimal.ZERO;
-		List<String> backBuyOrderSns = buyList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
-		List<String> backWithDrawOrderSns = withdrawList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
-		if(backBuyOrderSns.size() > 0) {
-			backBuyMoney = userAccountMapper.countBackMoneyByProcessTyepByOrderSns(backBuyOrderSns,userId);
-			if(null == backBuyMoney) {
+		List<String> backBuyOrderSns = buyList.stream().map(s -> s.getOrderSn()).collect(Collectors.toList());
+		List<String> backWithDrawOrderSns = withdrawList.stream().map(s -> s.getOrderSn()).collect(Collectors.toList());
+		if (backBuyOrderSns.size() > 0) {
+			backBuyMoney = userAccountMapper.countBackMoneyByProcessTyepByOrderSns(backBuyOrderSns, userId);
+			if (null == backBuyMoney) {
 				backBuyMoney = BigDecimal.ZERO;
 			}
 		}
-		if(backWithDrawOrderSns.size() > 0) {
-			backWithDrawMoney = userAccountMapper.countBackMoneyByProcessTyepByOrderSns(backWithDrawOrderSns,userId);
-			if(null == backWithDrawMoney) {
+		if (backWithDrawOrderSns.size() > 0) {
+			backWithDrawMoney = userAccountMapper.countBackMoneyByProcessTyepByOrderSns(backWithDrawOrderSns, userId);
+			if (null == backWithDrawMoney) {
 				backWithDrawMoney = BigDecimal.ZERO;
 			}
 		}
-		
+
 		DecimalFormat df = new DecimalFormat("0.00");// 保留两位小数
 		Double buyMoney = buyList.stream().map(s -> s.getAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
 		Double totalBuyMoney = buyMoney + backBuyMoney.doubleValue();
@@ -1195,5 +1195,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		.limit(num).map(dto->dto.getWinningLogId()).collect(Collectors.toList());
     		lotteryWinningLogTempMapper.deleteByLogIds(ids);
     	}
+	}
+	public void updateUserMoneyForCashCoupon(User user) {
+		userMapper.updateUserMoneyForCashCoupon(user);
+	}
+
+	public int insertUserAccount(UserAccount userAccount) {
+		return userAccountMapper.insertUserAccount(userAccount);
 	}
 }
