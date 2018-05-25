@@ -58,12 +58,12 @@ public class DlCashCouponController {
 	// 减掉余额
 	// 记录订单流水
 
-	@ApiOperation(value = "生成订单", notes = "用户代金券列表")
+	@ApiOperation(value = "生成订单", notes = "生成订单")
 	@PostMapping("/toCreateOrder")
-	public BaseResult toCreateOrder(@RequestBody DlCashCouponParam param) {
+	public BaseResult<String> toCreateOrder(@RequestBody DlCashCouponParam param) {
 		DlCashCoupon cashCoupon = dlCashCouponService.findById(param.getCashCouponId());
 		User user = userService.findById(SessionUtil.getUserId());
 		dlCashCouponService.saveForCashCoupon(cashCoupon, user);
-		return ResultGenerator.genSuccessResult(null);
+		return ResultGenerator.genSuccessResult(null, "支付成功!");
 	}
 }
