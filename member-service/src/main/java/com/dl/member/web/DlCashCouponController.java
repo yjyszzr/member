@@ -20,7 +20,6 @@ import com.dl.member.model.User;
 import com.dl.member.param.DlCashCouponParam;
 import com.dl.member.param.DlCashCouponUserParam;
 import com.dl.member.param.StrParam;
-import com.dl.member.service.DlCashCouponOrderService;
 import com.dl.member.service.DlCashCouponService;
 import com.dl.member.service.DlCashCouponUserService;
 import com.dl.member.service.UserService;
@@ -35,8 +34,6 @@ public class DlCashCouponController {
 
 	@Resource
 	private DlCashCouponUserService dlCashCouponUserService;
-	@Resource
-	private DlCashCouponOrderService dlCashCouponOrderService;
 
 	@ApiOperation(value = "代金券列表", notes = "代金券列表")
 	@PostMapping("/cashCouponList")
@@ -66,7 +63,7 @@ public class DlCashCouponController {
 	public BaseResult toCreateOrder(@RequestBody DlCashCouponParam param) {
 		DlCashCoupon cashCoupon = dlCashCouponService.findById(param.getCashCouponId());
 		User user = userService.findById(SessionUtil.getUserId());
-		dlCashCouponOrderService.saveForCashCouponOrder(cashCoupon, user);
+		dlCashCouponService.saveForCashCoupon(cashCoupon, user);
 		return ResultGenerator.genSuccessResult(null);
 	}
 }

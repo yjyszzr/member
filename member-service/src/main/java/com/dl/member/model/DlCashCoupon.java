@@ -46,7 +46,7 @@ public class DlCashCoupon {
 	 * 发行数量
 	 */
 	@Column(name = "cash_coupon_num")
-	private Integer cashCoupon_Num;
+	private Integer cashCouponNum;
 
 	/**
 	 * 红包有效起始时间
