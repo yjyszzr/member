@@ -14,7 +14,6 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SNGenerator;
-import com.dl.base.util.SessionUtil;
 import com.dl.member.dao.DlCashCouponOrderMapper;
 import com.dl.member.model.DlCashCoupon;
 import com.dl.member.model.DlCashCouponOrder;
@@ -38,7 +37,8 @@ public class DlCashCouponOrderService extends AbstractService<DlCashCouponOrder>
 			dlCashCouponOrder.setMoneyPaid(cashCoupon.getCashCouponPrice());
 			dlCashCouponOrder.setOrderId(0);
 			dlCashCouponOrder.setOrderSn(SNGenerator.nextSN(SNBusinessCodeEnum.ORDER_SN.getCode()));
-			dlCashCouponOrder.setUserId(SessionUtil.getUserId());
+			dlCashCouponOrder.setUserId(user.getUserId());
+			dlCashCouponOrder.setPayCode("");
 			dlCashCouponOrder.setPayName("余额支付");
 			// 代金券生成订单并且保存
 			this.save(dlCashCouponOrder);
@@ -53,7 +53,8 @@ public class DlCashCouponOrderService extends AbstractService<DlCashCouponOrder>
 			userAccount.setAccountSn(accountSn);
 			userAccount.setAddTime(DateUtil.getCurrentTimeLong());
 			userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-			userAccount.setAmount(cashCoupon.getCashCouponPrice());
+			BigDecimal bigd = new BigDecimal(0);
+			userAccount.setAmount(bigd.subtract(cashCoupon.getCashCouponPrice()));
 			userAccount.setCurBalance(curBalance);
 			if (StringUtils.isNotEmpty(dlCashCouponOrder.getOrderSn())) {
 				userAccount.setOrderSn(dlCashCouponOrder.getOrderSn());

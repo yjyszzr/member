@@ -79,7 +79,8 @@ public class DlCashCouponController {
 	@PostMapping("/toCreateOrder")
 	public BaseResult<String> toCreateOrder(@RequestBody DlCashCouponParam param) {
 		DlCashCoupon cashCoupon = dlCashCouponService.findById(param.getCashCouponId());
-		User user = userService.findById(SessionUtil.getUserId());
+		User user = userService.findById(400077);
+		// User user = userService.findById(SessionUtil.getUserId());
 		if (user != null) {
 			dlCashCouponService.saveForCashCoupon(cashCoupon, user);
 			return ResultGenerator.genSuccessResult(null, "支付成功!");

@@ -68,8 +68,12 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 			for (int j = 0; j < userAccountList.size(); j++) {
 				if (incomeDetailsList.get(i).getUserId().equals(userAccountList.get(j).getUserId())) {
 					incomeDetails.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(userAccountList.get(j).getAddTime()), DateUtil.datetimeFormat));
-					incomeDetails.setIncome(0 - userAccountList.get(j).getAmount().multiply(bd).doubleValue());
-					incomeDetails.setLotteryAmount(0 - userAccountList.get(j).getAmount().doubleValue());
+					double income = 0;
+					income = 0 - userAccountList.get(j).getAmount().multiply(bd).doubleValue();
+					incomeDetails.setIncome(income);
+					double amount = 0;
+					amount = 0 - userAccountList.get(j).getAmount().doubleValue();
+					incomeDetails.setLotteryAmount(amount);
 					incomeDetails.setMobile(incomeDetailsList.get(i).getMobile());
 					incomeDetails.setUserId(userId);
 					incomeDetailsList.add(incomeDetails);
