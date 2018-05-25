@@ -38,6 +38,9 @@ public class UserBonusDTO {
     @ApiModelProperty(value = "红包剩余多长时间")
     private String leaveTime; 
     
+    @ApiModelProperty(value = "红包截止时间")
+    private String bonusEndTime; 
+    
     @ApiModelProperty(value = "红包类型:暂不使用")
     private Integer bonusType;   
     

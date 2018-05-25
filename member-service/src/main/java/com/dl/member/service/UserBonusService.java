@@ -242,10 +242,17 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
 		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
 		userBonusDTO.setLimitTime(userBonusShowDescService.getLimitTimeDesc(userBonus.getStartTime(),userBonus.getEndTime()));
+		userBonusDTO.setBonusEndTime(DateUtil.getCurrentTimeString(Long.valueOf(userBonus.getEndTime()), DateUtil.datetimeFormat));
 		userBonusDTO.setMinGoodsAmount(userBonusShowDescService.getLimitOrderAmountDesc(userBonus.getMinGoodsAmount(),userBonus.getBonusPrice()));
 		return userBonusDTO;
 	}
 
+	/**
+	 * 快过期和未生效标签
+	 * @param currentTime
+	 * @param userBonus
+	 * @return
+	 */
 	public static String createSoonExprireBz(Integer currentTime,UserBonus userBonus) {
 		if(currentTime - userBonus.getEndTime() <= ProjectConstant.OneDaySecond &&
 		   userBonus.getEndTime() - currentTime > 0) {
