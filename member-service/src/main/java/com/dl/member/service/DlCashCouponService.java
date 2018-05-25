@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dl.base.result.BaseResult;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.member.dao.DlCashCouponMapper;
@@ -22,7 +23,7 @@ public class DlCashCouponService extends AbstractService<DlCashCoupon> {
 	@Resource
 	private DlCashCouponUserService dlCashCouponUserService;
 
-	public void saveForCashCoupon(DlCashCoupon cashCoupon, User user) {
+	public BaseResult<String> saveForCashCoupon(DlCashCoupon cashCoupon, User user) {
 		DlCashCouponUser dlCashCouponUser = new DlCashCouponUser();
 		dlCashCouponUser.setUserId(user.getUserId());
 		dlCashCouponUser.setCashCouponId(cashCoupon.getCashCouponId());
@@ -33,6 +34,6 @@ public class DlCashCouponService extends AbstractService<DlCashCoupon> {
 		// 将代金券放到自己名下
 		dlCashCouponUserService.save(dlCashCouponUser);
 		// 创建相应的订单以及订单流水日志
-		dlCashCouponOrderService.saveForCashCouponOrder(cashCoupon, user);
+		return dlCashCouponOrderService.saveForCashCouponOrder(cashCoupon, user);
 	}
 }

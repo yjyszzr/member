@@ -18,7 +18,6 @@ import com.dl.member.model.DlCashCoupon;
 import com.dl.member.model.DlCashCouponUser;
 import com.dl.member.model.User;
 import com.dl.member.param.DlCashCouponParam;
-import com.dl.member.param.DlCashCouponUserParam;
 import com.dl.member.param.PaymentPageParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.service.DlCashCouponService;
@@ -45,9 +44,8 @@ public class DlCashCouponController {
 
 	@ApiOperation(value = "用户代金券列表", notes = "用户代金券列表")
 	@PostMapping("/userCashCouponUserList")
-	public BaseResult<List<DlCashCouponUser>> cashCouponUserList(@RequestBody DlCashCouponUserParam param) {
-		List<DlCashCouponUser> list = dlCashCouponUserService.findByUserId(param.getUserId());
-		userService.queryUserByUserIdExceptPass();// 做判断
+	public BaseResult<List<DlCashCouponUser>> cashCouponUserList(@RequestBody StrParam strParam) {
+		List<DlCashCouponUser> list = dlCashCouponUserService.findByUserId(SessionUtil.getUserId());
 		return ResultGenerator.genSuccessResult(null, list);
 	}
 
@@ -78,10 +76,10 @@ public class DlCashCouponController {
 	@PostMapping("/toCreateOrder")
 	public BaseResult<String> toCreateOrder(@RequestBody DlCashCouponParam param) {
 		DlCashCoupon cashCoupon = dlCashCouponService.findById(param.getCashCouponId());
-		User user = userService.findById(SessionUtil.getUserId());
+		User user = userService.findById(400077);
+		// User user = userService.findById(SessionUtil.getUserId());
 		if (user != null) {
-			dlCashCouponService.saveForCashCoupon(cashCoupon, user);
-			return ResultGenerator.genSuccessResult(null, "支付成功!");
+			return dlCashCouponService.saveForCashCoupon(cashCoupon, user);
 		}
 		return ResultGenerator.genSuccessResult(null, "该用户不存在");
 	}
