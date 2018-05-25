@@ -2,6 +2,7 @@ package com.dl.member.service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +64,7 @@ public class UserRegisterService extends AbstractService<User> {
 		} else {
 			userParam.setLoginSource("unknown");
 		}
+		userParam.setPushKey(StringUtils.isEmpty(userRegisterParam.getPushKey())?"":userRegisterParam.getPushKey());
 		
     	Integer userId = userService.saveUser(userParam);
    	

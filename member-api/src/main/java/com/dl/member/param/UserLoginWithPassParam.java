@@ -29,4 +29,7 @@ public class UserLoginWithPassParam implements Serializable {
 
     @ApiModelProperty("登录来源 1 android，2 ios，3 pc，4 h5")
     private String loginSource;
+    
+    @ApiModelProperty("消息推送的唯一值")
+    private String pushKey;
 }

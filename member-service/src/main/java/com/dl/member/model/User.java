@@ -179,8 +179,30 @@ public class User {
      */
     @Column(name = "user_remark")
     private String userRemark;
-
+    
     /**
+     * 消息推送key
+     */
+    @Column(name = "push_key")
+    private String pushKey;
+    
+    public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public String getPushKey() {
+		return pushKey;
+	}
+
+	public void setPushKey(String pushKey) {
+		this.pushKey = pushKey;
+	}
+
+	/**
      * 获取用户ID
      *
      * @return user_id - 用户ID

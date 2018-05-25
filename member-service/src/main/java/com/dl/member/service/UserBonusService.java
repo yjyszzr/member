@@ -242,7 +242,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
 		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
 		userBonusDTO.setLimitTime(userBonusShowDescService.getLimitTimeDesc(userBonus.getStartTime(),userBonus.getEndTime()));
-		userBonusDTO.setBonusEndTime(DateUtil.getCurrentTimeString(Long.valueOf(userBonus.getEndTime()), DateUtil.datetimeFormat));
+		userBonusDTO.setBonusEndTime(DateUtil.getCurrentTimeString(Long.valueOf(userBonus.getEndTime()), DateUtil.date_sdf));
 		userBonusDTO.setMinGoodsAmount(userBonusShowDescService.getLimitOrderAmountDesc(userBonus.getMinGoodsAmount(),userBonus.getBonusPrice()));
 		return userBonusDTO;
 	}

@@ -50,5 +50,7 @@ public class UserParam implements Serializable{
 	private BigDecimal frozenMoney;	
 	@ApiModelProperty("支付二维码")
 	private String payQRcodeUrl; 
+	@ApiModelProperty("消息推送key")
+	private String pushKey; 
 	
 }

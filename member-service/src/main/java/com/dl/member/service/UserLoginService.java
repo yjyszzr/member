@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -71,6 +72,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
 			}
 			userLoginDTO = userLoginRst.getData();
+			this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 
 		} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
@@ -87,7 +89,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				normalUser.setUserStatus(0);
 				normalUser.setPassWrongCount(0);
 				userService.saveUserAndUpdateConsumer(normalUser);
-
+				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else {
 				return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
@@ -99,6 +101,23 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		return null;
 	}
 
+	/**
+	 * 更新用户的推送token
+	 * @param pushKey
+	 * @param user
+	 * @return
+	 */
+	@Transactional
+	public void updatePushKey(String pushKey,User user) {
+		String pushTokenDB = user.getPushKey();
+		if(!pushKey.equals(pushTokenDB)) {
+			User updateUser = new User();
+			updateUser.setUserId(user.getUserId());
+			updateUser.setPushKey(pushKey);
+			userMapper.updateByPrimaryKeySelective(updateUser);
+		}
+	}
+	
 	/**
 	 * 短信验证码登录
 	 *
@@ -143,6 +162,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 				stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
+				
+				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
 				boolean beyond1h = DateUtil.getCurrentTimeLong() - user.getLastTime() > 60 * 1000 ? true : false;
@@ -154,6 +176,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 
 					UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 					stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
+					
+					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					
 					return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 				} else {
 					return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
