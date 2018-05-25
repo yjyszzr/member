@@ -6,7 +6,6 @@ import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dl.base.result.BaseResult;
@@ -15,6 +14,7 @@ import com.dl.base.util.SessionUtil;
 import com.dl.member.dto.DlMessageDTO;
 import com.dl.member.model.DlMessage;
 import com.dl.member.model.UserMessageListParam;
+import com.dl.member.param.AddMessageParam;
 import com.dl.member.param.MessageAddParam;
 import com.dl.member.param.MessageListParam;
 import com.dl.member.service.DlMessageService;
@@ -49,21 +49,24 @@ public class DlMessageController {
     }
     
     @PostMapping("/add")
-    public BaseResult add(@RequestBody MessageAddParam param) {
-    	DlMessage dlMessage = new DlMessage();
-    	dlMessage.setContent(param.getContent());
-    	dlMessage.setContentDesc(param.getContentDesc());
-    	dlMessage.setMsgDesc(param.getMsgDesc());
-    	dlMessage.setMsgType(param.getMsgType());
-    	dlMessage.setReceiver(param.getReceiver());
-    	dlMessage.setReceiverMobile(param.getReceiveMobile());
-    	dlMessage.setObjectType(param.getObjectType());
-    	dlMessage.setSendTime(param.getSendTime());
-    	dlMessage.setSender(param.getSender());
-    	dlMessage.setTitle(param.getTitle());
-    	dlMessage.setMsgUrl(param.getMsgUrl());
-    	dlMessage.setContentUrl(param.getContentUrl());
-        dlMessageService.save(dlMessage);
+    public BaseResult add(@RequestBody AddMessageParam addParam) {
+    	List<MessageAddParam> params = addParam.getParams();
+    	for(MessageAddParam param: params) {
+    		DlMessage dlMessage = new DlMessage();
+    		dlMessage.setContent(param.getContent());
+    		dlMessage.setContentDesc(param.getContentDesc());
+    		dlMessage.setMsgDesc(param.getMsgDesc());
+    		dlMessage.setMsgType(param.getMsgType());
+    		dlMessage.setReceiver(param.getReceiver());
+    		dlMessage.setReceiverMobile(param.getReceiveMobile());
+    		dlMessage.setObjectType(param.getObjectType());
+    		dlMessage.setSendTime(param.getSendTime());
+    		dlMessage.setSender(param.getSender());
+    		dlMessage.setTitle(param.getTitle());
+    		dlMessage.setMsgUrl(param.getMsgUrl());
+    		dlMessage.setContentUrl(param.getContentUrl());
+    		dlMessageService.save(dlMessage);
+    	}
         return ResultGenerator.genSuccessResult();
     }
 
