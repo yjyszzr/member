@@ -37,5 +37,11 @@ public interface IUserService {
 	@RequestMapping(path="/user/queryUserInfoListByUserIds", method=RequestMethod.POST)
 	public BaseResult<UserDTO> queryUserInfoListByUserIds(@RequestBody StrParam strParam);
 	
-	
+	/**
+	 * 查询用户接口
+	 * @param UserBonusParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/queryUserInfo", method=RequestMethod.POST)
+	public BaseResult<UserDTO> queryUserInfo(@RequestBody Integer userId);
 }

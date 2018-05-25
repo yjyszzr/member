@@ -210,13 +210,7 @@ public class UserService extends AbstractService<User> {
 		return ResultGenerator.genSuccessResult("更新用户登录密码成功");
 	}
 
-	/**
-	 * 查询用户信息：所有字段
-	 * 
-	 * @return
-	 */
-	public UserDTO queryUserInfo() {
-		Integer userId = SessionUtil.getUserId();
+	public UserDTO queryUserInfo(Integer userId) {
 		User user = this.findById(userId);
 		UserDTO userDTO = new UserDTO();
 		try {
@@ -233,6 +227,16 @@ public class UserService extends AbstractService<User> {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 		}
 		return userDTO;
+	}
+	
+	/**
+	 * 查询用户信息：所有字段
+	 * 
+	 * @return
+	 */
+	public UserDTO queryUserInfo() {
+		Integer userId = SessionUtil.getUserId();
+		return queryUserInfo(userId);
 	}
 
 	/**
