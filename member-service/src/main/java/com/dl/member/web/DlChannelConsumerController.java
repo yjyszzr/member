@@ -77,6 +77,7 @@ public class DlChannelConsumerController {
 	@PostMapping("/myRecommendation")
 	public BaseResult<ChannelDistributorDTO> myRecommendation(@RequestBody DlChannelDistributorParam param) {
 		param.setUserId(SessionUtil.getUserId());
+		// param.setUserId(400102);
 		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
 		channelDistributor = dlChannelDistributorService.getMyRankingList(param);
 		return ResultGenerator.genSuccessResult("success", channelDistributor);
@@ -85,6 +86,7 @@ public class DlChannelConsumerController {
 	@ApiOperation(value = "我的推广收入", notes = "我的推广收入")
 	@PostMapping("/myPromotionIncome")
 	public BaseResult<List<PromotionIncomeDTO>> myPromotionIncome(@RequestBody DlChannelDistributorParam param) {
+		param.setUserId(SessionUtil.getUserId());
 		List<PromotionIncomeDTO> promotionIncomes = new ArrayList<PromotionIncomeDTO>();
 		promotionIncomes = dlChannelDistributorService.getPromotionIncomeList(param);
 		return ResultGenerator.genSuccessResult("success", promotionIncomes);
@@ -93,6 +95,7 @@ public class DlChannelConsumerController {
 	@ApiOperation(value = "收入明细", notes = "收入明细")
 	@PostMapping("/incomeDetails")
 	public BaseResult<List<IncomeDetailsDTO>> incomeDetails(@RequestBody DlChannelConsumerParam param) {
+		param.setUserId(SessionUtil.getUserId());
 		List<IncomeDetailsDTO> incomeDetailss = new ArrayList<IncomeDetailsDTO>();
 		DlChannelDistributor channelDistributor = dlChannelDistributorService.findByUserId(param.getUserId());
 		if (channelDistributor != null) {

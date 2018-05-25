@@ -40,12 +40,12 @@ public class DlCashCouponOrderService extends AbstractService<DlCashCouponOrder>
 			dlCashCouponOrder.setOrderSn(SNGenerator.nextSN(SNBusinessCodeEnum.ORDER_SN.getCode()));
 			dlCashCouponOrder.setUserId(SessionUtil.getUserId());
 			dlCashCouponOrder.setPayName("余额支付");
-			// 代金券订单保存
+			// 代金券生成订单并且保存
 			this.save(dlCashCouponOrder);
 			User userA = new User();
 			userA.setUserId(user.getUserId());
 			userA.setUserMoney(user.getUserMoney().subtract(cashCoupon.getCashCouponPrice()));
-			// 更改余额
+			// 更改自己的可提现余额
 			userAccountService.updateUserMoneyForCashCoupon(userA);
 			BigDecimal curBalance = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(cashCoupon.getCashCouponPrice());
 			UserAccount userAccount = new UserAccount();

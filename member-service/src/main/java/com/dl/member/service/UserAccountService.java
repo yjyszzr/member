@@ -1203,4 +1203,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	public int insertUserAccount(UserAccount userAccount) {
 		return userAccountMapper.insertUserAccount(userAccount);
 	}
+	public List<UserAccount> findByUserIdsAndType(List<String> userIds, String data, int i) {
+		List<UserAccount> list = userAccountMapper.findByUserIdsAndType(userIds, data, i);
+		return list;
+	}
 }

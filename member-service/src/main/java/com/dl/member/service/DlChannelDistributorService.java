@@ -1,6 +1,7 @@
 package com.dl.member.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
 
 import com.dl.base.service.AbstractService;
+import com.dl.base.util.DateUtil;
 import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.IncomeRankingDTO;
@@ -149,6 +151,22 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 				}
 				// 添加到List
 				incomeRankingListFinal.add(incomeRankingfinal);
+			}
+			// 查询今天的收入
+			// 根据自己的Id查询出自己的渠道分销Id
+			DlChannelDistributor cDistributor = this.findByUserId(param.getUserId());
+			// 根据分销Id查询该分销下的用户
+			List<DlChannelConsumer> list = channelConsumerService.selectByChannelDistributorId(cDistributor.getChannelDistributorId());
+			List<String> userIds = list.stream().map(dto -> dto.getUserId().toString()).collect(Collectors.toList());
+			String data = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
+			if (userIds.size() > 0) {
+				BigDecimal bigd = new BigDecimal(0);
+				List<UserAccount> users = userAccountService.findByUserIdsAndType(userIds, data, 3);
+				for (int m = 0; m < users.size(); m++) {
+					bigd = bigd.add(users.get(m).getAmount());
+				}
+				BigDecimal bid = new BigDecimal(cDistributor.getDistributorCommissionRate());
+				incomeRankingForSelf.setTodayAmount(bigd.multiply(bid).doubleValue());
 			}
 			// 设置自己的排名
 			channelDistributor.setChannelDistributor(incomeRankingForSelf);

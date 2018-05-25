@@ -30,7 +30,9 @@ public class DlCashCouponService extends AbstractService<DlCashCoupon> {
 		dlCashCouponUser.setCashCouponPrice(cashCoupon.getCashCouponPrice());
 		dlCashCouponUser.setId(0);
 		dlCashCouponUser.setReceiveTime(DateUtil.getCurrentTimeLong());
+		// 将代金券放到自己名下
 		dlCashCouponUserService.save(dlCashCouponUser);
+		// 创建相应的订单以及订单流水日志
 		dlCashCouponOrderService.saveForCashCouponOrder(cashCoupon, user);
 	}
 }

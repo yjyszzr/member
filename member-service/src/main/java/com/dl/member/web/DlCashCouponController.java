@@ -19,6 +19,7 @@ import com.dl.member.model.DlCashCouponUser;
 import com.dl.member.model.User;
 import com.dl.member.param.DlCashCouponParam;
 import com.dl.member.param.DlCashCouponUserParam;
+import com.dl.member.param.PaymentPageParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.service.DlCashCouponService;
 import com.dl.member.service.DlCashCouponUserService;
@@ -50,6 +51,22 @@ public class DlCashCouponController {
 		return ResultGenerator.genSuccessResult(null, list);
 	}
 
+	@ApiOperation(value = "去支付页面", notes = "去支付页面")
+	@PostMapping("/toPaymentPage")
+	public BaseResult<PaymentPageParam> toPaymentPage(@RequestBody DlCashCouponParam param) {
+		DlCashCoupon cashCoupon = dlCashCouponService.findById(param.getCashCouponId());
+		PaymentPageParam paymentPage = new PaymentPageParam();
+		User user = userService.findById(SessionUtil.getUserId());
+		dlCashCouponService.saveForCashCoupon(cashCoupon, user);
+		if (cashCoupon != null) {
+			paymentPage.setCashCouponPrice(cashCoupon.getCashCouponPrice());
+		}
+		if (user != null) {
+			paymentPage.setMyAmount(user.getUserMoney());
+		}
+		return ResultGenerator.genSuccessResult(null, paymentPage);
+	}
+
 	/**
 	 * (下单逻辑) 读取商品价格 读取余额 商品保存进订单 减掉余额 记录订单流水 代金券进入该用户名下
 	 */
@@ -63,7 +80,10 @@ public class DlCashCouponController {
 	public BaseResult<String> toCreateOrder(@RequestBody DlCashCouponParam param) {
 		DlCashCoupon cashCoupon = dlCashCouponService.findById(param.getCashCouponId());
 		User user = userService.findById(SessionUtil.getUserId());
-		dlCashCouponService.saveForCashCoupon(cashCoupon, user);
-		return ResultGenerator.genSuccessResult(null, "支付成功!");
+		if (user != null) {
+			dlCashCouponService.saveForCashCoupon(cashCoupon, user);
+			return ResultGenerator.genSuccessResult(null, "支付成功!");
+		}
+		return ResultGenerator.genSuccessResult(null, "该用户不存在");
 	}
 }

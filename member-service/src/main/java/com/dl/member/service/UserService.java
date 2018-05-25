@@ -6,11 +6,15 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import tk.mybatis.mapper.entity.Condition;
 
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
@@ -38,23 +42,20 @@ import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserParam;
 import com.dl.member.util.Encryption;
 
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-
 @Service
 @Transactional
 @Slf4j
 public class UserService extends AbstractService<User> {
 
-    @Resource
-    private UserMapper userMapper;
-    
-    @Resource
-    private UserBonusMapper userBonusMapper;
-    
-    @Resource
-    private DlMessageMapper messageMapper;
-    
+	@Resource
+	private UserMapper userMapper;
+
+	@Resource
+	private UserBonusMapper userBonusMapper;
+
+	@Resource
+	private DlMessageMapper messageMapper;
+
 	@Resource
 	private UserRealService userRealService;
 
@@ -69,9 +70,10 @@ public class UserService extends AbstractService<User> {
 
 	/**
 	 * real真实信息
+	 * 
 	 * @return
 	 */
-	public BaseResult<UserDTO> queryUserByUserIdExceptPassReal(){
+	public BaseResult<UserDTO> queryUserByUserIdExceptPassReal() {
 		Integer userId = SessionUtil.getUserId();
 		if (null == userId) {
 			return ResultGenerator.genNeedLoginResult("请登录");
@@ -121,8 +123,7 @@ public class UserService extends AbstractService<User> {
 		userDTO.setActivityDTOList(activityMemDTOList);
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
-	
-	
+
 	/**
 	 * 查询用户信息 （除了密码）
 	 * 
@@ -295,7 +296,7 @@ public class UserService extends AbstractService<User> {
 		}
 		return userDTO;
 	}
-	
+
 	/**
 	 * 查询用户信息：所有字段
 	 * 
@@ -332,7 +333,6 @@ public class UserService extends AbstractService<User> {
 				channelConsumerService.updateByUserId(user.getUserId());
 			}
 		}
-
 	}
 
 	/**
@@ -354,6 +354,7 @@ public class UserService extends AbstractService<User> {
 
 	/**
 	 * 获取用户通知信息
+	 * 
 	 * @return
 	 */
 	public UserNoticeDTO queryUserNotice(Integer userId) {
@@ -367,14 +368,15 @@ public class UserService extends AbstractService<User> {
 
 	/**
 	 * 标识已读通知
+	 * 
 	 * @param userId
 	 * @param type
 	 */
 	public int updateUnReadNotice(Integer userId, int type) {
 		int rst = 0;
-		if(type == 1) {
+		if (type == 1) {
 			rst = userBonusMapper.updateUnReadBonus(userId);
-		} else if(type == 2) {
+		} else if (type == 2) {
 			rst = messageMapper.updateUnReadMessage(userId);
 		}
 		return rst;

@@ -21,7 +21,9 @@ public interface UserAccountMapper extends Mapper<UserAccount> {
 	List<String> queryUserAccountRewardByOrdersn(@Param("list") List<String> list);
 
 	int insertUserAccountBySelective(UserAccount userAccount);
-	
-	BigDecimal countBackMoneyByProcessTyepByOrderSns(@Param("list") List<String> list,@Param("userId") Integer userId);
+
+	BigDecimal countBackMoneyByProcessTyepByOrderSns(@Param("list") List<String> list, @Param("userId") Integer userId);
+
+	List<UserAccount> findByUserIdsAndType(@Param("list") List<String> userIds, @Param("data") String data, @Param("type") int type);
 
 }
