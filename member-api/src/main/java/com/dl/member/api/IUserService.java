@@ -31,6 +31,14 @@ public interface IUserService {
 	public BaseResult<UserDTO> userInfoExceptPass(@RequestBody StrParam strParam);
 	
 	/**
+	 * 查询用户接口 手机号码真实信息
+	 * @param UserBonusParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/userInfoExceptPassReal", method=RequestMethod.POST)
+	public BaseResult<UserDTO> userInfoExceptPassReal(@RequestBody StrParam strParam);
+	
+	/**
 	 * 批量查询查询用户
 	 * @param UserBonusParam
 	 * @return

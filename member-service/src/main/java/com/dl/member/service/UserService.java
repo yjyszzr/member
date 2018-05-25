@@ -68,6 +68,62 @@ public class UserService extends AbstractService<User> {
 	private DlChannelConsumerService channelConsumerService;
 
 	/**
+	 * real真实信息
+	 * @return
+	 */
+	public BaseResult<UserDTO> queryUserByUserIdExceptPassReal(){
+		Integer userId = SessionUtil.getUserId();
+		if (null == userId) {
+			return ResultGenerator.genNeedLoginResult("请登录");
+		}
+
+		User user = userMapper.queryUserExceptPass(userId);
+		UserDTO userDTO = new UserDTO();
+		try {
+			BeanUtils.copyProperties(userDTO, user);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
+		userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
+		String realName = "";
+		UserRealDTO userRealDTO = userRealService.queryUserReal();
+		if (userRealDTO != null) {
+			realName = userRealDTO.getRealName();
+		}
+		String mobile = user.getMobile();
+		userDTO.setMobile(mobile);
+		userDTO.setRealName(realName);
+		userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
+
+		// 查询推广活动集合
+		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
+		ActTypeParam actTypeParam = new ActTypeParam();
+		actTypeParam.setActType(2);
+		BaseResult<List<ActivityDTO>> activityDTORst = lotteryActivityService.queryActivityByActType(actTypeParam);
+		if (activityDTORst.getCode() != 0) {
+			log.error("查询推广活动异常：" + activityDTORst.getMsg());
+			activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
+		} else {
+			activityDTOList = activityDTORst.getData();
+		}
+		com.dl.member.dto.ActivityDTO memActivityDTO = new com.dl.member.dto.ActivityDTO();
+		List<com.dl.member.dto.ActivityDTO> activityMemDTOList = new ArrayList<com.dl.member.dto.ActivityDTO>();
+		activityDTOList.forEach(s -> {
+			try {
+				BeanUtils.copyProperties(memActivityDTO, s);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			activityMemDTOList.add(memActivityDTO);
+		});
+		userDTO.setActivityDTOList(activityMemDTOList);
+		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
+	}
+	
+	
+	/**
 	 * 查询用户信息 （除了密码）
 	 * 
 	 * @param userId
