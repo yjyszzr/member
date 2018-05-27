@@ -119,7 +119,7 @@
   </update>
   
   <select id="getClientIds" resultType="string">
-  	select push_key from dl_user where user_id IN
+  	select DISTINCT push_key from dl_user where user_id IN
   	<foreach collection="userIds" index="index" item="item" open="(" separator="," close=")">
 		#{item}
 	</foreach>
