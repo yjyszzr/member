@@ -1,7 +1,15 @@
 package com.dl.member.service;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -11,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
@@ -21,12 +30,16 @@ import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBonusMapper;
+import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.ActivityBonus;
+import com.dl.member.model.User;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.BonusLimitConditionParam;
 import com.dl.member.param.UserBonusParam;
+import com.dl.member.util.GeTuiMessage;
+import com.dl.member.util.GeTuiUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -46,6 +59,12 @@ public class UserBonusService extends AbstractService<UserBonus> {
     
     @Resource
     private ActivityBonusService activityBonusService;
+    
+    @Resource
+    private UserMapper userMapper;
+    
+    @Resource
+    private GeTuiUtil geTuiUtil;
     
     
 	/**
@@ -367,4 +386,33 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		 return rst;
 	 }
 
+	 /**
+	  * 定时任务
+	  * 针对过期红包发送push消息
+	  * @param userBonusIdList
+	  */
+	 public void pushBonusMessage() {
+		 LocalDate now = LocalDate.now();
+		 LocalDate tomorrow = now.plusDays(1);
+		 LocalDate houtian = now.plusDays(2);
+		 Long start = LocalDateTime.of(tomorrow, LocalTime.MIN).atZone(ZoneId.systemDefault()).toEpochSecond();
+		 Long end = LocalDateTime.of(houtian, LocalTime.MIN).atZone(ZoneId.systemDefault()).toEpochSecond();
+		 List<UserBonus> queryUnableBonusList = userBonusMapper.queryPUshBonusList(start.intValue(), end.intValue());
+		 if(queryUnableBonusList == null) {
+			 return ;
+		 }
+		 Set<Integer> collect = queryUnableBonusList.stream().map(item->item.getUserId()).collect(Collectors.toSet());
+		 List<Integer> list = new ArrayList<Integer>(collect);
+		 List<User> users = userMapper.queryUserByUserIds(list);
+		 if(users == null) {
+			 return ;
+		 }
+		 users.forEach(item->{
+			 String clientId = item.getPushKey();
+			 if(StringUtils.isNotBlank(clientId)) {
+				 GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_BONUS_TITLE, CommonConstants.FORMAT_BONUS_DESC, DateUtil.getCurrentTimeLong());
+				 geTuiUtil.pushMessage(clientId, getuiMessage);
+			 }
+		 });
+	 }
 }

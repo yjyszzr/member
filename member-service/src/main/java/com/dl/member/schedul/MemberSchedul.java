@@ -47,5 +47,13 @@ public class MemberSchedul {
 		 log.info("本次更新过期的红包"+rst+"个");
 		 log.info("更新过期的红包的定时任务结束");
 	 }
+	 
+	 /**
+	  * 更新过期的红包
+	  */
+	 @Scheduled(cron = "0 0 19 * * ?")
+	 public void pushBonusMessage() {
+		 userBonusService.pushBonusMessage();
+	 }
 
 }

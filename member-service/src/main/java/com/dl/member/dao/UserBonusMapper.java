@@ -22,4 +22,6 @@ public interface UserBonusMapper extends Mapper<UserBonus> {
 	int getUnReadBonusNum(@Param("userId") Integer userId);
 	
 	int updateUnReadBonus(@Param("userId") Integer userId);
+	
+	List<UserBonus> queryPUshBonusList(@Param("start")Integer start, @Param("end")Integer end);
 }

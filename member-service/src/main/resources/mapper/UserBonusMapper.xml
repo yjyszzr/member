@@ -98,6 +98,10 @@
           </foreach >
    </update > 
   
+  <select id="queryPUshBonusList" resultMap="BaseResultMap">
+  	select * from dl_user_bonus where bonus_status = 0 AND end_time &lt; #{end} AND end_time &gt;= #{start} 
+  </select>
+  
   <select id="getUnReadBonusNum" resultType="int">
   		SELECT count(1) FROM dl_user_bonus WHERE user_id = #{userId} and is_delete = 0  and is_read=0
   </select>
