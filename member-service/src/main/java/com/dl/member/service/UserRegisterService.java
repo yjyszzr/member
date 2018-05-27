@@ -64,7 +64,12 @@ public class UserRegisterService extends AbstractService<User> {
 		} else {
 			userParam.setLoginSource("unknown");
 		}
-		userParam.setPushKey(StringUtils.isEmpty(userRegisterParam.getPushKey())?"":userRegisterParam.getPushKey());
+		
+		if(!userRegisterParam.getLoginSource().equals(ProjectConstant.H5)) {
+			userParam.setPushKey(userRegisterParam.getPushKey());
+		}else {
+			userParam.setPushKey("");
+		}
 		
     	Integer userId = userService.saveUser(userParam);
    	
