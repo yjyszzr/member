@@ -73,7 +73,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			}
 			userLoginDTO = userLoginRst.getData();
 			
-			if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.H5)) {
+			if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 			}
 			
@@ -94,7 +94,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				normalUser.setPassWrongCount(0);
 				userService.saveUserAndUpdateConsumer(normalUser);
 				
-				if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.H5)) {
+				if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 				}
 				
@@ -171,7 +171,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 				stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
 				
-				if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.H5)) {
+				if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 				}
 				
@@ -187,7 +187,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 					stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
 					
-					if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.H5)) {
+					if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 					}
 					
