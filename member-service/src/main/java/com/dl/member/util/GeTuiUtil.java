@@ -1,5 +1,7 @@
 package com.dl.member.util;
 
+import javax.annotation.Resource;
+
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +10,7 @@ import com.dl.member.configurer.GeTuiConfig;
 import com.gexin.rp.sdk.base.IPushResult;
 import com.gexin.rp.sdk.base.impl.SingleMessage;
 import com.gexin.rp.sdk.base.impl.Target;
+import com.gexin.rp.sdk.base.payload.APNPayload;
 import com.gexin.rp.sdk.exceptions.RequestException;
 import com.gexin.rp.sdk.http.IGtPush;
 import com.gexin.rp.sdk.template.LinkTemplate;
@@ -21,26 +24,28 @@ public class GeTuiUtil {
 	
 	private static String host = "http://sdk.open.api.igexin.com/apiex.htm";
 	
-//	@Resource
+	@Resource
 	public GeTuiConfig geTuiConfig;
 
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		GeTuiConfig geTuiConfig = new GeTuiConfig();
-		geTuiConfig.setAppId("zH0e8aiYaa73oVVsElXX");
-		geTuiConfig.setAppkey("R4iI9PslDe5LSXjpd7XSy");
-		geTuiConfig.setAppSecret("24e2HwXbm064CiewPXklE6");
-		geTuiConfig.setMasterSecret("wyvPFirDwS6iFRKhLR5wk6");
+		geTuiConfig.setAppId("BWgBz2PhAq5ZxmZ7e4yINA");
+		geTuiConfig.setAppkey("o74Y1SjdzI73MhkkAwuXp4");
+		geTuiConfig.setAppSecret("vaBGD6ddiO7LrnarEJO5hA");
+		geTuiConfig.setMasterSecret("ZkxNSKsKAc9zSl5kjmXuN2");
 		GeTuiUtil util = new GeTuiUtil();
 		util.geTuiConfig = geTuiConfig;
-		String clientId = "4554f58b20758db36884ee4b0de2fc63";
-		String title = "test";
-		String content = "this is a test message!";
+//		String clientId = "f6ca881b596b5dc0149957d0934cb602";//android
+		String clientId = "b14b94104f5605e27a41e33ccc6cca78";
+		String title = "优惠券到期通知";
+		String content = "您有优惠券即将到期，请尽快使用";
 		GeTuiMessage getuiMessage = new GeTuiMessage();
 		getuiMessage.setContent(content);
 		getuiMessage.setTitle(title);
+		getuiMessage.setPushTime(DateUtil.getCurrentTimeLong());
 		util.pushMessage(clientId, getuiMessage);
-	}
+	}*/
 	
 	/**
 	 * 推送消息
@@ -51,8 +56,7 @@ public class GeTuiUtil {
 	public void pushMessage(String clientId, GeTuiMessage getuiMessage ){
 		IGtPush push = new IGtPush(host, geTuiConfig.getAppkey(), geTuiConfig.getMasterSecret());
 //		LinkTemplate template = this.linkTemplateDemo(title, content);
-		String messageJson = JSONHelper.bean2json(getuiMessage);
-		TransmissionTemplate template = this.transmissionTemplate(messageJson);
+		TransmissionTemplate template = this.transmissionTemplate(getuiMessage);
 		SingleMessage message = new SingleMessage();
 		message.setOffline(true);
 		// 离线有效时间，单位为毫秒，可选
@@ -78,12 +82,40 @@ public class GeTuiUtil {
 		}
 	}
 	//透传消息
-	private TransmissionTemplate transmissionTemplate(String messageJson) {
+	private TransmissionTemplate transmissionTemplate(GeTuiMessage getuiMessage ) {
+		String messageJson = JSONHelper.bean2json(getuiMessage);
 		TransmissionTemplate template = new TransmissionTemplate();
 		template.setAppId(geTuiConfig.getAppId());
 		template.setAppkey(geTuiConfig.getAppkey());
 		template.setTransmissionType(1);
 		template.setTransmissionContent(messageJson);
+		APNPayload payload = new APNPayload();
+		//在已有数字基础上加1显示，设置为-1时，在已有数字上减1显示，设置为数字时，显示指定数字
+//		payload.setAutoBadge("+1");
+//		payload.setContentAvailable(1);
+//		payload.setSound("default");
+//		payload.setCategory("$由客户端定义");
+
+		//简单模式APNPayload.SimpleMsg
+//		payload.setAlertMsg(new APNPayload.SimpleAlertMsg("测试不确定数据"));
+
+		//字典模式使用APNPayload.DictionaryAlertMsg
+		APNPayload.DictionaryAlertMsg alterMsg = new APNPayload.DictionaryAlertMsg();
+		alterMsg.setBody(getuiMessage.getContent());
+		alterMsg.setTitle(getuiMessage.getTitle());
+		payload.setAlertMsg(alterMsg);
+
+		// 添加多媒体资源
+		/*payload.addMultiMedia(new MultiMedia().setResType(MultiMedia.MediaType.video)
+				.setResUrl("http://ol5mrj259.bkt.clouddn.com/test2.mp4")
+				.setOnlyWifi(true));*/
+		//需要使用IOS语音推送，请使用VoIPPayload代替APNPayload
+		// VoIPPayload payload = new VoIPPayload();
+		// JSONObject jo = new JSONObject();
+		// jo.put("key1","value1");         
+		//		         payload.setVoIPPayload(jo.toString());
+		//
+		template.setAPNInfo(payload);
 		return template;
 	}
 	//消息模板,通知消息

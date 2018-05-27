@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 public class GeTuiMessage {
 
-	@ApiModelProperty(value="类型")
+	/*@ApiModelProperty(value="类型")
 	private String type;
 	@ApiModelProperty(value="一级id")
 	private String id;
 	@ApiModelProperty(value="二级id")
-	private String subid;
+	private String subid;*/
 	@ApiModelProperty(value="标题")
 	private String title;
 	@ApiModelProperty(value="描述")
@@ -33,8 +33,8 @@ public class GeTuiMessage {
 		this.title = param.getTitle();
 		this.content = param.getContent();
 		this.pushTime = param.getPushTime();
-		this.type = param.getType();
+		/*this.type = param.getType();
 		this.id = param.getId();
-		this.subid = param.getSubid();
+		this.subid = param.getSubid();*/
 	}
 }
