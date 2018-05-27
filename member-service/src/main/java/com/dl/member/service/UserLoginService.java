@@ -72,7 +72,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
 			}
 			userLoginDTO = userLoginRst.getData();
-			this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+			
+			if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.H5)) {
+				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+			}
+			
 			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 
 		} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
@@ -89,7 +93,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				normalUser.setUserStatus(0);
 				normalUser.setPassWrongCount(0);
 				userService.saveUserAndUpdateConsumer(normalUser);
-				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				
+				if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.H5)) {
+					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				}
+				
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else {
 				return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
@@ -163,7 +171,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 				stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
 				
-				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.H5)) {
+					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				}
 				
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
@@ -177,7 +187,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 					stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
 					
-					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.H5)) {
+						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					}
 					
 					return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 				} else {
