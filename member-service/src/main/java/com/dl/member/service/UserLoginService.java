@@ -138,7 +138,6 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		}
 
 		String mobile = userLoginMobileParam.getMobile();
-		String strRandom4 = RandomUtil.generateUpperString(4);
 		// UserDeviceParam device = userLoginMobileParam.getDevice();
 		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
@@ -169,7 +168,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			Integer userStatus = user.getUserStatus();
 			if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
-				stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
+				stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
 				
 				if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
@@ -185,7 +184,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					userService.saveUserAndUpdateConsumer(normalUser);
 
 					UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
-					stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile(), "");
+					stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
 					
 					if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
