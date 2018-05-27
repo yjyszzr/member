@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.DlChannelOptionLogMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.DlChannelOptionLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="option_id" jdbcType="INTEGER" property="optionId" />
+    <result column="channel_id" jdbcType="INTEGER" property="channelId" />
+    <result column="distributor_id" jdbcType="INTEGER" property="distributorId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="id_card_num" jdbcType="INTEGER" property="idCardNum" />
+    <result column="true_name" jdbcType="VARCHAR" property="trueName" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="operation_node" jdbcType="VARCHAR" property="operationNode" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="option_amount" jdbcType="DECIMAL" property="optionAmount" />
+    <result column="option_time" jdbcType="INTEGER" property="optionTime" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+  </resultMap>
+  
+    <resultMap id="IncomeRankingResultMap" type="com.dl.member.dto.PromotionIncomeDTO">
+      <result column="time" jdbcType="VARCHAR" property="time" />
+  	  <result column="registerNum" jdbcType="INTEGER" property="registerNum" />
+  	  <result column="ids" jdbcType="VARCHAR" property="ids" />
+  </resultMap>
+    <select id = "getPromotionIncomeList"  parameterType="java.lang.Integer"  resultMap="IncomeRankingResultMap">
+	  SELECT
+	  	COUNT( IF ( operation_node = 1, TRUE, NULL ) ) AS registerNum,
+		DATE( FROM_UNIXTIME( option_time ) ) AS time,
+		SUM( option_amount ) AS lotteryAmount
+	FROM
+		dl_channel_option_log 
+	WHERE
+		channel_distributor_id = #{channelDistributorId},
+		AND status = 1
+	GROUP BY
+		DAY ( FROM_UNIXTIME( option_time ) ) DESC;
+  </select>
+  
+  
+  
+    <resultMap id="ChannelConsumerResultMap" type="com.dl.member.dto.IncomeDetailsDTO">
+    <result column="distributor_id" jdbcType="INTEGER" property="channelDistributorId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="add_time" jdbcType="VARCHAR" property="addTime" />
+    <result column="option_amount" jdbcType="DECIMAL" property="lotteryAmount" />
+    <result column="operation_node" jdbcType="INTEGER" property="operationNode" />
+  </resultMap>
+    <select id = "getChannelConsumerList" resultMap="ChannelConsumerResultMap">
+		SELECT
+			distributor_id,
+			user_id,
+			user_name,
+			mobile,
+			option_amount,
+			operation_node,
+			date_format( FROM_UNIXTIME( add_time ), '%Y-%m-%d  %H:%i:%s' ) AS add_time
+		FROM
+			dl_channel_option_log 
+		WHERE
+			distributor_id = #{channelDistributorId}
+		AND
+			status = 1		
+		AND
+			DATE_FORMAT( FROM_UNIXTIME( add_time ), '%Y-%m-%d' ) = #{addTime};
+  </select>
+</mapper>

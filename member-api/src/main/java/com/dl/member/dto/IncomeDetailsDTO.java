@@ -17,6 +17,12 @@ public class IncomeDetailsDTO {
 	@ApiModelProperty("用户ID")
 	private Integer userId;
 
+	@ApiModelProperty("状态")
+	private Integer status;
+
+	@ApiModelProperty("操作节点")
+	private Integer operationNode;
+
 	@ApiModelProperty("电话")
 	private String mobile;
 
