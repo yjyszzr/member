@@ -34,7 +34,6 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.LotteryWinningLogTempMapper;
 import com.dl.member.dao.UserAccountMapper;
 import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.DlWinningLogDTO;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
@@ -51,6 +50,8 @@ import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.WithDrawParam;
+import com.dl.member.util.GeTuiMessage;
+import com.dl.member.util.GeTuiUtil;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnListParam;
@@ -105,6 +106,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 	@Resource
 	private DlMessageService userMessageService;
+
+	@Resource
+	private GeTuiUtil geTuiUtil;
 
 	/**
 	 * @param SurplusPayParam
@@ -658,9 +662,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			messageAddParam.setSender(u.getUserId());
 			messageAddParam.setMsgType(0);
 			messageAddParam.setReceiver(u.getUserId());
+			String clientId = null;
 			for (User user : userList) {
 				if (user.getUserId().equals(u.getUserId())) {
 					messageAddParam.setReceiverMobile(user.getMobile());
+					clientId = user.getPushKey();
 				}
 				continue;
 			}
@@ -669,6 +675,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			messageAddParam.setSendTime(accountTime);
 			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
 			userMessageService.save(messageAddParam);
+			//push
+			if(StringUtils.isNotBlank(clientId)) {
+				String content = MessageFormat.format(CommonConstants.FORMAT_REWARD_PUSH_DESC, u.getReward());
+				GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_REWARD_PUSH_TITLE, content, DateUtil.getCurrentTimeLong());
+				geTuiUtil.pushMessage(clientId, getuiMessage);
+			}
 		}
 	}
 

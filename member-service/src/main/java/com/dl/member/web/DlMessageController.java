@@ -1,15 +1,19 @@
 package com.dl.member.web;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dl.base.constant.CommonConstants;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.dto.DlMessageDTO;
 import com.dl.member.model.DlMessage;
@@ -17,7 +21,11 @@ import com.dl.member.model.UserMessageListParam;
 import com.dl.member.param.AddMessageParam;
 import com.dl.member.param.MessageAddParam;
 import com.dl.member.param.MessageListParam;
+import com.dl.member.param.PushMessageParam;
 import com.dl.member.service.DlMessageService;
+import com.dl.member.service.UserService;
+import com.dl.member.util.GeTuiMessage;
+import com.dl.member.util.GeTuiUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -31,7 +39,13 @@ import io.swagger.annotations.ApiOperation;
 public class DlMessageController {
     @Resource
     private DlMessageService dlMessageService;
+    
+    @Resource
+    private GeTuiUtil geTuiUtil;
 
+    @Resource
+    private UserService userService;
+    
     @ApiOperation(value = "用户消息列表", notes = "用户消息列表")
     @PostMapping("/list")
     public BaseResult<PageInfo<DlMessageDTO>> list(@RequestBody MessageListParam param) {
@@ -49,8 +63,9 @@ public class DlMessageController {
     }
     
     @PostMapping("/add")
-    public BaseResult add(@RequestBody AddMessageParam addParam) {
+    public BaseResult<String> add(@RequestBody AddMessageParam addParam) {
     	List<MessageAddParam> params = addParam.getParams();
+    	List<Integer> lotteryFailUserIds = new ArrayList<Integer>(params.size());
     	for(MessageAddParam param: params) {
     		DlMessage dlMessage = new DlMessage();
     		dlMessage.setContent(param.getContent());
@@ -66,10 +81,28 @@ public class DlMessageController {
     		dlMessage.setMsgUrl(param.getMsgUrl());
     		dlMessage.setContentUrl(param.getContentUrl());
     		dlMessageService.save(dlMessage);
+    		if(3 == param.getObjectType()) {
+    			lotteryFailUserIds.add(param.getReceiver());
+    		}
+    	}
+    	//出票失败提示
+    	if(CollectionUtils.isNotEmpty(lotteryFailUserIds)) {
+    		List<String> clientIds = userService.getClientIds(lotteryFailUserIds);
+    		for(String clientId : clientIds) {
+    			GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_PRINTLOTTERY_PUSH_TITLE, CommonConstants.FORMAT_PRINTLOTTERY_PUSH_DESC, DateUtil.getCurrentTimeLong());
+    			geTuiUtil.pushMessage(clientId, getuiMessage);
+    		}
     	}
         return ResultGenerator.genSuccessResult();
     }
 
+    @ApiOperation(value = "推送消息", notes = "推送消息")
+    @PostMapping("/push")
+    public BaseResult<String> pushMessage(@RequestBody PushMessageParam param) {
+    	GeTuiMessage getuiMessage = new GeTuiMessage(param);
+    	geTuiUtil.pushMessage(param.getClientId(), getuiMessage);
+    	return ResultGenerator.genSuccessResult();
+    }
    /* @PostMapping("/update")
     public BaseResult update(DlMessage dlMessage) {
         dlMessageService.update(dlMessage);

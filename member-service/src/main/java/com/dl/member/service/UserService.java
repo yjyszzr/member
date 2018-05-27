@@ -382,4 +382,8 @@ public class UserService extends AbstractService<User> {
 		}
 		return rst;
 	}
+	
+	public List<String> getClientIds(List<Integer> userIds){
+		return userMapper.getClientIds(userIds);
+	}
 }
