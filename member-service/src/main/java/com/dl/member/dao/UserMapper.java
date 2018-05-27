@@ -38,4 +38,6 @@ public interface UserMapper extends Mapper<User> {
 	int saveMemberThirdApiLog(MemberThirdApiLog thirdApiLog);
 
 	int updateUserMoneyForCashCoupon(User user);
+
+	List<String> getClientIds(@Param("userIds") List<Integer> userIds);
 }
