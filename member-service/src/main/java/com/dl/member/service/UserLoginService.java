@@ -1,5 +1,7 @@
 package com.dl.member.service;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -10,16 +12,18 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import tk.mybatis.mapper.entity.Condition;
+
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
-import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.User;
 import com.dl.member.model.UserLoginLog;
 import com.dl.member.param.UserLoginWithPassParam;
@@ -48,6 +52,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	@Resource
 	private UserRegisterService userRegisterService;
 
+	@Resource
+	private DlChannelConsumerService channelConsumerService;
+
 	/**
 	 * 密码登录
 	 *
@@ -72,11 +79,18 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
 			}
 			userLoginDTO = userLoginRst.getData();
-			
-			if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
+
+			if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 			}
-			
+			Condition condition = new Condition(DlChannelConsumer.class);
+			condition.createCriteria().andCondition("user_id = ", user.getUserId());
+			List<DlChannelConsumer> channelConsumerlist = channelConsumerService.findByCondition(condition);
+			if (channelConsumerlist.size() > 0) {
+				if (channelConsumerlist.get(0).getFristLoginTime() == null) {
+					channelConsumerService.updateByUserId(user.getUserId());
+				}
+			}
 			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 
 		} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
@@ -93,11 +107,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				normalUser.setUserStatus(0);
 				normalUser.setPassWrongCount(0);
 				userService.saveUserAndUpdateConsumer(normalUser);
-				
-				if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
+
+				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 				}
-				
+
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else {
 				return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
@@ -111,21 +125,22 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 
 	/**
 	 * 更新用户的推送token
+	 * 
 	 * @param pushKey
 	 * @param user
 	 * @return
 	 */
 	@Transactional
-	public void updatePushKey(String pushKey,User user) {
+	public void updatePushKey(String pushKey, User user) {
 		String pushTokenDB = user.getPushKey();
-		if(!pushKey.equals(pushTokenDB)) {
+		if (!pushKey.equals(pushTokenDB)) {
 			User updateUser = new User();
 			updateUser.setUserId(user.getUserId());
 			updateUser.setPushKey(pushKey);
 			userMapper.updateByPrimaryKeySelective(updateUser);
 		}
 	}
-	
+
 	/**
 	 * 短信验证码登录
 	 *
@@ -169,11 +184,18 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 				stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
-				
-				if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
+				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 				}
-				
+
+				Condition condition = new Condition(DlChannelConsumer.class);
+				condition.createCriteria().andCondition("user_id = ", user.getUserId());
+				List<DlChannelConsumer> channelConsumerlist = channelConsumerService.findByCondition(condition);
+				if (channelConsumerlist.size() > 0) {
+					if (channelConsumerlist.get(0).getFristLoginTime() == null) {
+						channelConsumerService.updateByUserId(user.getUserId());
+					}
+				}
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
 				boolean beyond1h = DateUtil.getCurrentTimeLong() - user.getLastTime() > 60 * 1000 ? true : false;
@@ -185,11 +207,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 
 					UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 					stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
-					
-					if(!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
+
+					if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 					}
-					
+
 					return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 				} else {
 					return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());

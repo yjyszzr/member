@@ -278,7 +278,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		// List<UserAccount> userAccountList =
 		// userAccountService.findByProcessType(3);
 		// 查询所有用户购彩的正常记录
-		List<DlChannelOptionLog> optionLogList = dlChannelOptionLogService.findAll().stream().filter(s -> s.getStatus().equals(1)).collect(Collectors.toList());
+		List<DlChannelOptionLog> optionLogList = dlChannelOptionLogService.findAll().stream().filter(s -> s.getStatus() == 1).collect(Collectors.toList());
 		List<IncomeRankingDTO> incomeRankingList = new ArrayList<IncomeRankingDTO>();
 		List<IncomeRankingDTO> incomeRankingListFinal = new ArrayList<IncomeRankingDTO>();
 		// 遍历所有分销员
@@ -308,7 +308,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			// 设置收入提成
 			BigDecimal bd = new BigDecimal(channelDistributorList.get(i).getDistributorCommissionRate());
 			// 新注册用户获取一块钱奖励 首次登录时间不为空 才能判定为该用户登录过该APP只有登录过 才能给员工奖励
-			List<DlChannelOptionLog> collect = optionLogList.stream().filter(s -> s.getOperationNode().equals(1)).collect(Collectors.toList());
+			List<DlChannelOptionLog> collect = optionLogList.stream().filter(s -> s.getOperationNode() == 1).collect(Collectors.toList());
 			int registerConsumerNum = collect.size();
 			incomeRanking.setTotalAmount((consumerTotalAmount.multiply(bd).doubleValue()) + registerConsumerNum);
 			// 设置用户Id
@@ -382,10 +382,25 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			Integer inviteNum = findConsumerByUserId(param) == null ? 0 : findConsumerByUserId(param).size();
 			channelDistributor.setInviteNum(inviteNum);
 			// 查询该分销员下的客户所有的投注金额
-			Double bettingTotalAmount = this.findBettingTotalAmount(param);
+			Double bettingTotalAmount = this.findBettingTotalAmountByDistributorId(param);
 			channelDistributor.setBettingTotalAmount(bettingTotalAmount);
 		}
 		return channelDistributor;
+	}
+
+	private Double findBettingTotalAmountByDistributorId(DlChannelDistributorParam param) {
+		BigDecimal bettingTotalAmount = new BigDecimal(0);
+		List<DlChannelConsumer> dlChannelConsumerList = findConsumerByUserId(param);
+		List<DlChannelOptionLog> promotionIncomes = new ArrayList<DlChannelOptionLog>();
+		if (dlChannelConsumerList != null) {
+			Condition condition = new Condition(DlChannelOptionLog.class);
+			condition.createCriteria().andCondition("distributor_id =", dlChannelConsumerList.get(0).getChannelDistributorId());
+			promotionIncomes = dlChannelOptionLogService.findByCondition(condition);
+			for (int i = 0; i < promotionIncomes.size(); i++) {
+				bettingTotalAmount.add(promotionIncomes.get(i).getOptionAmount());
+			}
+		}
+		return bettingTotalAmount.doubleValue();
 	}
 
 	/**
