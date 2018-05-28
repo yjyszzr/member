@@ -277,7 +277,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		List<DlChannelConsumer> channelConsumerList = channelConsumerService.findAll();
 		// List<UserAccount> userAccountList =
 		// userAccountService.findByProcessType(3);
-		// 查询所以用户购彩的正常记录
+		// 查询所有用户购彩的正常记录
 		List<DlChannelOptionLog> optionLogList = dlChannelOptionLogService.findAll().stream().filter(s -> s.getStatus().equals(1)).collect(Collectors.toList());
 		List<IncomeRankingDTO> incomeRankingList = new ArrayList<IncomeRankingDTO>();
 		List<IncomeRankingDTO> incomeRankingListFinal = new ArrayList<IncomeRankingDTO>();

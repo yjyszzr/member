@@ -57,7 +57,7 @@
 			mobile,
 			option_amount,
 			operation_node,
-			date_format( FROM_UNIXTIME( add_time ), '%Y-%m-%d  %H:%i:%s' ) AS add_time
+			date_format( FROM_UNIXTIME( option_time ), '%Y-%m-%d  %H:%i:%s' ) AS add_time
 		FROM
 			dl_channel_option_log 
 		WHERE
@@ -65,6 +65,6 @@
 		AND
 			status = 1		
 		AND
-			DATE_FORMAT( FROM_UNIXTIME( add_time ), '%Y-%m-%d' ) = #{addTime};
+			DATE_FORMAT( FROM_UNIXTIME( option_time ), '%Y-%m-%d' ) = #{addTime};
   </select>
 </mapper>
