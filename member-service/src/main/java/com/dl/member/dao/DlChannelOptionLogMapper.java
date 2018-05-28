@@ -14,5 +14,4 @@ public interface DlChannelOptionLogMapper extends Mapper<DlChannelOptionLog> {
 	List<PromotionIncomeDTO> getPromotionIncomeList(@Param("channelDistributorId") Integer channelDistributorId);
 
 	List<IncomeDetailsDTO> getChannelConsumerList(@Param("addTime") String addTime, @Param("channelDistributorId") Integer channelDistributorId);
-
 }

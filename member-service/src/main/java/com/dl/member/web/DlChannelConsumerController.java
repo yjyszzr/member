@@ -78,7 +78,7 @@ public class DlChannelConsumerController {
 	public BaseResult<ChannelDistributorDTO> myRecommendation(@RequestBody DlChannelDistributorParam param) {
 		param.setUserId(SessionUtil.getUserId());
 		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
-		channelDistributor = dlChannelDistributorService.getMyRankingList(param);
+		channelDistributor = dlChannelDistributorService.getMyRankingListBak(param);
 		return ResultGenerator.genSuccessResult("success", channelDistributor);
 	}
 
@@ -87,7 +87,7 @@ public class DlChannelConsumerController {
 	public BaseResult<List<PromotionIncomeDTO>> myPromotionIncome(@RequestBody DlChannelDistributorParam param) {
 		param.setUserId(SessionUtil.getUserId());
 		List<PromotionIncomeDTO> promotionIncomes = new ArrayList<PromotionIncomeDTO>();
-		promotionIncomes = dlChannelDistributorService.getPromotionIncomeList(param);
+		promotionIncomes = dlChannelDistributorService.getPromotionIncomeListBak(param);
 		return ResultGenerator.genSuccessResult("success", promotionIncomes);
 	}
 
@@ -98,7 +98,7 @@ public class DlChannelConsumerController {
 		List<IncomeDetailsDTO> incomeDetailss = new ArrayList<IncomeDetailsDTO>();
 		DlChannelDistributor channelDistributor = dlChannelDistributorService.findByUserId(param.getUserId());
 		if (channelDistributor != null) {
-			incomeDetailss = dlChannelConsumerService.getIncomeDetailsList(channelDistributor.getChannelId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
+			incomeDetailss = dlChannelConsumerService.getIncomeDetailsListBak(channelDistributor.getChannelId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
 		}
 		return ResultGenerator.genSuccessResult("success", incomeDetailss);
 	}

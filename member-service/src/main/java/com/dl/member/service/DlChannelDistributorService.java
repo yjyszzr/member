@@ -19,6 +19,7 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dto.ChannelDistributorDTO;
+import com.dl.member.dto.IncomeDetailsDTO;
 import com.dl.member.dto.IncomeRankingDTO;
 import com.dl.member.dto.PromotionIncomeDTO;
 import com.dl.member.model.DlChannelConsumer;
@@ -359,18 +360,20 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			// 根据自己的Id查询出自己的渠道分销Id
 			DlChannelDistributor cDistributor = this.findByUserId(param.getUserId());
 			// 根据分销Id查询该分销下的用户
-			List<DlChannelConsumer> list = channelConsumerService.selectByChannelDistributorId(cDistributor.getChannelDistributorId());
-			List<String> userIds = list.stream().map(dto -> dto.getUserId().toString()).collect(Collectors.toList());
 			String data = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
-			if (userIds.size() > 0) {
-				BigDecimal bigd = new BigDecimal(0);
-				List<UserAccount> users = userAccountService.findByUserIdsAndType(userIds, data, 3);
-				for (int m = 0; m < users.size(); m++) {
-					bigd = bigd.add(users.get(m).getAmount());
+			List<IncomeDetailsDTO> totalAmountList = dlChannelOptionLogService.getChannelConsumerList(data, cDistributor.getChannelDistributorId());
+			double lotteryAmount = 0;
+			int income = 0;
+			for (int i = 0; i < totalAmountList.size(); i++) {
+				if (totalAmountList.get(i).getOperationNode().equals(1)) {
+					income += 1;
+				} else if (totalAmountList.get(i).getOperationNode().equals(2)) {
+					lotteryAmount += totalAmountList.get(i).getLotteryAmount();
 				}
-				BigDecimal bid = new BigDecimal(cDistributor.getDistributorCommissionRate());
-				incomeRankingForSelf.setTodayAmount(0 - bigd.multiply(bid).doubleValue());
 			}
+			BigDecimal bigdAmount = new BigDecimal(lotteryAmount);
+			BigDecimal bigdRate = new BigDecimal(cDistributor.getDistributorCommissionRate());
+			incomeRankingForSelf.setTodayAmount(bigdAmount.multiply(bigdRate).doubleValue() + income);
 			// 设置自己的排名
 			channelDistributor.setChannelDistributor(incomeRankingForSelf);
 			// 排名列表
