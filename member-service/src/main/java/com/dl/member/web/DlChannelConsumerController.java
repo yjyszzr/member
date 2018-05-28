@@ -137,7 +137,10 @@ public class DlChannelConsumerController {
 			dlChannelConsumer.setAddTime(DateUtilNew.getCurrentTimeLong());
 			dlChannelConsumer.setDeleted(0);
 			dlChannelConsumer.setConsumerId(0);
-			dlChannelConsumer.setChannelDistributorId(smsParam.getUserId());
+			DlChannelDistributor distributor = dlChannelDistributorService.findByUserId(smsParam.getUserId());
+			if (null != distributor) {
+				dlChannelConsumer.setChannelDistributorId(distributor.getChannelDistributorId());
+			}
 			dlChannelConsumer.setConsumerIp(IpUtil.getIpAddr(request));
 			dlChannelConsumer.setMobile(smsParam.getMobile());
 			DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(smsParam.getUserId(), smsParam.getMobile());
