@@ -107,7 +107,7 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 	}
 
 	public void updateByUserId(Integer userId) {
-		dlChannelConsumerMapper.updateBuUserId(userId, DateUtil.getCurrentTimeLong());
+		dlChannelConsumerMapper.updateByUserId(userId, DateUtil.getCurrentTimeLong());
 	}
 
 	// ----------------------------------------------------(↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑)骚骚的分隔线上边是老代码老逻辑(↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑)------------------------------------------------------------//
