@@ -171,13 +171,11 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		userBonus.setStartTime(DateUtil.getCurrentTimeLong());
 		userBonus.setEndTime(DateUtil.getCurrentTimeLong());
 		userBonus.setMinGoodsAmount(bonusLimitConditionParam.getOrderMoneyPaid());
-		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
+		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
 		List<UserBonusDTO> userBonusDTOList = new ArrayList<UserBonusDTO>();
 		if(CollectionUtils.isEmpty(userBonusList)) {
 			return userBonusDTOList;
 		}
-		
-		//userBonusList.sort(Comparator.comparing(UserBonus::getBonusPrice).thenComparing(UserBonus::getMinGoodsAmount).thenComparing(UserBonus::getEndTime));
 		
 		userBonusList.forEach(s->{
 			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(s);
@@ -215,7 +213,13 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setBonusStatus(Integer.valueOf(status));
 		}
 		PageHelper.startPage(pageNum, pageSize);
-		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
+		List<UserBonus> userBonusList = null;
+		if(!status.equals("1")) {
+			userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
+		}else {
+			userBonusList = userBonusMapper.queryUserBonusForUsed(userBonus);
+		}
+		
 		PageInfo<UserBonus> pageInfo = new PageInfo<UserBonus>(userBonusList);
 		
 		List<UserBonusDTO> userBonusDTOList = new ArrayList<UserBonusDTO>();
