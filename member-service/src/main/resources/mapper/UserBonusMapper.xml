@@ -66,6 +66,68 @@
 	    order by start_time ASC,end_time ASC,bonus_price ASC,min_goods_amount ASC
   </select>
   
+  <select id="queryUserBonusForPay" parameterType="com.dl.member.model.UserBonus" resultMap="BaseResultMap">
+	  	SELECT * FROM dl_user_bonus
+		<where>
+		  	<if test="userId != null">
+		        AND user_id = #{userId}
+		    </if>
+		    <if test="isDelete != null">
+		        AND is_delete = #{isDelete}
+		    </if>
+		    <if test="bonusStatus != null">
+		        AND bonus_status = #{bonusStatus}
+		    </if>
+		    <if test="bonusId != null">
+		        AND bonus_id = #{bonusId}
+		    </if>
+		    <if test="minGoodsAmount != null">
+		        AND min_goods_amount &lt;= #{minGoodsAmount}
+		    </if>
+		    <if test="userBonusId != null">
+		        AND user_bonus_id = #{userBonusId}
+		    </if>
+		    <if test="startTime != null">
+		        AND start_time &lt;= #{startTime}
+		    </if>
+		    <if test="endTime != null">
+		        AND end_time &gt;= #{endTime}
+		    </if>
+	    </where>
+	    order by bonus_price DESC,min_goods_amount ASC,end_time ASC
+  </select>
+  
+    <select id="queryUserBonusForUsed" parameterType="com.dl.member.model.UserBonus" resultMap="BaseResultMap">
+	  	SELECT * FROM dl_user_bonus
+		<where>
+		  	<if test="userId != null">
+		        AND user_id = #{userId}
+		    </if>
+		    <if test="isDelete != null">
+		        AND is_delete = #{isDelete}
+		    </if>
+		    <if test="bonusStatus != null">
+		        AND bonus_status = #{bonusStatus}
+		    </if>
+		    <if test="bonusId != null">
+		        AND bonus_id = #{bonusId}
+		    </if>
+		    <if test="minGoodsAmount != null">
+		        AND min_goods_amount &lt;= #{minGoodsAmount}
+		    </if>
+		    <if test="userBonusId != null">
+		        AND user_bonus_id = #{userBonusId}
+		    </if>
+		    <if test="startTime != null">
+		        AND start_time &lt;= #{startTime}
+		    </if>
+		    <if test="endTime != null">
+		        AND end_time &gt;= #{endTime}
+		    </if>
+	    </where>
+	    order by used_time DESC
+  </select>
+  
   <select id="queryUserBonusIdsExpire" parameterType="java.lang.Integer" resultType="java.lang.Integer">
 	  SELECT user_bonus_id FROM dl_user_bonus WHERE  bonus_status = 0 AND end_time &lt;= #{now}
   </select>
