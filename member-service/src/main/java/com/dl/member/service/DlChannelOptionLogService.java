@@ -23,7 +23,7 @@ public class DlChannelOptionLogService extends AbstractService<DlChannelOptionLo
 		return dlChannelOptionLogMapper.getPromotionIncomeList(channelDistributorId);
 	}
 
-	public List<IncomeDetailsDTO> getChannelConsumerList(String addTime, Integer userId) {
-		return dlChannelOptionLogMapper.getChannelConsumerList(addTime, userId);
+	public List<IncomeDetailsDTO> getChannelConsumerList(String addTime, Integer channelDistributorId) {
+		return dlChannelOptionLogMapper.getChannelConsumerList(addTime, channelDistributorId);
 	}
 }

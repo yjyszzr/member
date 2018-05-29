@@ -97,10 +97,11 @@ public class DlChannelConsumerController {
 	@PostMapping("/incomeDetails")
 	public BaseResult<List<IncomeDetailsDTO>> incomeDetails(@RequestBody DlChannelConsumerParam param) {
 		param.setUserId(SessionUtil.getUserId());
+		// param.setUserId(400160);
 		List<IncomeDetailsDTO> incomeDetailss = new ArrayList<IncomeDetailsDTO>();
 		DlChannelDistributor channelDistributor = dlChannelDistributorService.findByUserId(param.getUserId());
 		if (channelDistributor != null) {
-			incomeDetailss = dlChannelConsumerService.getIncomeDetailsListBak(channelDistributor.getChannelId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
+			incomeDetailss = dlChannelConsumerService.getIncomeDetailsListBak(channelDistributor.getChannelDistributorId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
 		}
 		return ResultGenerator.genSuccessResult("success", incomeDetailss);
 	}
