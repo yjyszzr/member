@@ -61,6 +61,6 @@ public interface IUserService {
 	 * @param UserBonusParam
 	 * @return
 	 */
-	@RequestMapping(path="/user/queryChannelConsumerByUserId", method=RequestMethod.POST)
-	public BaseResult<ChannelDistributorBindDTO> queryChannelConsumerByUserId(@RequestBody UserIdParam params);
+	@RequestMapping(path="/user/queryChannelDistributorByUserId", method=RequestMethod.POST)
+	public BaseResult<ChannelDistributorBindDTO> queryChannelDistributorByUserId(@RequestBody UserIdParam params);
 }

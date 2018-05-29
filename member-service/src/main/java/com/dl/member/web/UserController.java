@@ -115,8 +115,9 @@ public class UserController {
 	 * @param UserBonusParam
 	 * @return
 	 */
-	@RequestMapping("/queryChannelConsumerByUserId")
-	public BaseResult<ChannelDistributorBindDTO> queryChannelConsumerByUserId(@RequestBody UserIdParam params){
+    @ApiOperation(value = "查询用户是否与店员绑定过", notes = "查询用户是否与店员绑定过")
+	@RequestMapping("/queryChannelDistributorByUserId")
+	public BaseResult<ChannelDistributorBindDTO> queryChannelDistributorByUserId(@RequestBody UserIdParam params){
 		Condition condition = new Condition(DlChannelDistributor.class);
 		Criteria criteria = condition.createCriteria();
 		criteria.andCondition("user_id =",params.getUserId());
