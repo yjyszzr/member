@@ -392,7 +392,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		BigDecimal bettingTotalAmount = new BigDecimal(0);
 		List<DlChannelConsumer> dlChannelConsumerList = findConsumerByUserId(param);
 		List<DlChannelOptionLog> promotionIncomes = new ArrayList<DlChannelOptionLog>();
-		if (dlChannelConsumerList != null) {
+		if (dlChannelConsumerList.size() > 0) {
 			Condition condition = new Condition(DlChannelOptionLog.class);
 			condition.createCriteria().andCondition("distributor_id =", dlChannelConsumerList.get(0).getChannelDistributorId());
 			promotionIncomes = dlChannelOptionLogService.findByCondition(condition);
