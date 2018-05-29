@@ -145,7 +145,7 @@ public class DlChannelConsumerController {
 			}
 			dlChannelConsumer.setConsumerIp(IpUtil.getIpAddr(request));
 			dlChannelConsumer.setMobile(smsParam.getMobile());
-			DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(smsParam.getUserId(), smsParam.getMobile());
+			DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(distributor.getChannelDistributorId(), smsParam.getMobile());
 			if (channelConsumer == null) {
 				dlChannelConsumerService.save(dlChannelConsumer);
 			}
