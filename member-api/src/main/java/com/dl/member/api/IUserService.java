@@ -40,13 +40,13 @@ public interface IUserService {
 	@RequestMapping(path="/user/userInfoExceptPassReal", method=RequestMethod.POST)
 	public BaseResult<UserDTO> userInfoExceptPassReal(@RequestBody StrParam strParam);
 	
-	/**
-	 * 批量查询查询用户
-	 * @param UserBonusParam
-	 * @return
-	 */
-	@RequestMapping(path="/user/queryUserInfoListByUserIds", method=RequestMethod.POST)
-	public BaseResult<ChannelDistributorDTO> queryUserInfoListByUserIds(@RequestBody UserIdParam param);
+//	/**
+//	 * 批量查询查询用户
+//	 * @param UserBonusParam
+//	 * @return
+//	 */
+//	@RequestMapping(path="/user/queryUserInfoListByUserIds", method=RequestMethod.POST)
+//	public BaseResult<ChannelDistributorDTO> queryUserInfoListByUserIds(@RequestBody UserIdParam param);
 	
 	/**
 	 * 查询用户接口
