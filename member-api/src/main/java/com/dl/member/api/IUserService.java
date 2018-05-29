@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.dl.base.result.BaseResult;
+import com.dl.member.dto.ChannelCustomerBindDTO;
 import com.dl.member.dto.ChannelDistributorBindDTO;
 import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.UserDTO;
@@ -62,5 +63,5 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(path="/user/queryChannelDistributorByUserId", method=RequestMethod.POST)
-	public BaseResult<ChannelDistributorBindDTO> queryChannelDistributorByUserId(@RequestBody UserIdParam params);
+	public BaseResult<ChannelCustomerBindDTO> queryChannelDistributorByUserId(@RequestBody UserIdParam params);
 }

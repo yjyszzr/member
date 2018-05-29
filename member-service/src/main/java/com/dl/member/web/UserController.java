@@ -15,10 +15,12 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.dao.DlChannelDistributorMapper;
+import com.dl.member.dto.ChannelCustomerBindDTO;
 import com.dl.member.dto.ChannelDistributorBindDTO;
 import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserNoticeDTO;
+import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.param.MobileNumberParam;
 import com.dl.member.param.QueryUserNoticeParam;
@@ -26,6 +28,7 @@ import com.dl.member.param.StrParam;
 import com.dl.member.param.UpdateUnReadNoticeParam;
 import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserLoginPassParam;
+import com.dl.member.service.DlChannelConsumerService;
 import com.dl.member.service.DlChannelDistributorService;
 import com.dl.member.service.UserService;
 
@@ -43,7 +46,7 @@ public class UserController {
     private UserService userService;
     
 	@Resource
-	private DlChannelDistributorService dlChannelDistributorService;
+	private DlChannelConsumerService dlChannelConsumerService;
     
 
     /**
@@ -117,17 +120,17 @@ public class UserController {
 	 */
     @ApiOperation(value = "查询用户是否与店员绑定过", notes = "查询用户是否与店员绑定过")
 	@RequestMapping("/queryChannelDistributorByUserId")
-	public BaseResult<ChannelDistributorBindDTO> queryChannelDistributorByUserId(@RequestBody UserIdParam params){
+	public BaseResult<ChannelCustomerBindDTO> queryChannelDistributorByUserId(@RequestBody UserIdParam params){
 		Condition condition = new Condition(DlChannelDistributor.class);
 		Criteria criteria = condition.createCriteria();
 		criteria.andCondition("user_id =",params.getUserId());
-		List<DlChannelDistributor> channelDistributors = dlChannelDistributorService.findByCondition(condition);
-		DlChannelDistributor dlChannelDistributor = new DlChannelDistributor();
-		ChannelDistributorBindDTO channelDistributorBindDTO = new ChannelDistributorBindDTO();
-		if(!CollectionUtils.isEmpty(channelDistributors)) {
-			dlChannelDistributor = channelDistributors.get(0);
-			BeanUtils.copyProperties(dlChannelDistributor, channelDistributorBindDTO);
-			return ResultGenerator.genSuccessResult("succ",channelDistributorBindDTO);
+		List<DlChannelConsumer> channelConsumers = dlChannelConsumerService.findByCondition(condition);
+		DlChannelConsumer channelConsumer = new DlChannelConsumer();
+		ChannelCustomerBindDTO customerBindDTO = new ChannelCustomerBindDTO();
+		if(!CollectionUtils.isEmpty(channelConsumers)) {
+			channelConsumer = channelConsumers.get(0);
+			BeanUtils.copyProperties(channelConsumer, customerBindDTO);
+			return ResultGenerator.genSuccessResult("succ",customerBindDTO);
 		}
 		
 		return ResultGenerator.genFailResult("failure");

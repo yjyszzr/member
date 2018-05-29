@@ -176,29 +176,37 @@ public class UserService extends AbstractService<User> {
 		userDTO.setRealName(realName);
 		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 
-		// 查询推广活动集合
-		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
-		ActTypeParam actTypeParam = new ActTypeParam();
-		actTypeParam.setActType(2);
-		BaseResult<List<ActivityDTO>> activityDTORst = lotteryActivityService.queryActivityByActType(actTypeParam);
-		if (activityDTORst.getCode() != 0) {
-			log.error("查询推广活动异常：" + activityDTORst.getMsg());
-			activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
-		} else {
-			activityDTOList = activityDTORst.getData();
-		}
-
-		com.dl.member.dto.ActivityDTO memActivityDTO = new com.dl.member.dto.ActivityDTO();
+		//只有店员才展示推广链接
 		List<com.dl.member.dto.ActivityDTO> activityMemDTOList = new ArrayList<com.dl.member.dto.ActivityDTO>();
-		activityDTOList.forEach(s -> {
-			try {
-				BeanUtils.copyProperties(memActivityDTO, s);
-			} catch (Exception e) {
-				e.printStackTrace();
+		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
+		Condition condition = new Condition(DlChannelConsumer.class);
+		condition.createCriteria().andCondition("user_id = ", userId);
+		List<DlChannelDistributor> channelDistributor = dlChannelDistributorMapper.selectByCondition(condition);
+		if (channelDistributor.size() > 0) {
+			com.dl.member.dto.ActivityDTO memActivityDTO = new com.dl.member.dto.ActivityDTO();
+			ActTypeParam actTypeParam = new ActTypeParam();
+			actTypeParam.setActType(2);
+			BaseResult<List<ActivityDTO>> activityDTORst = lotteryActivityService.queryActivityByActType(actTypeParam);
+			if (activityDTORst.getCode() != 0) {
+				log.error("查询推广活动异常：" + activityDTORst.getMsg());
+				activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
+			} else {
+				activityDTOList = activityDTORst.getData();
 			}
-			activityMemDTOList.add(memActivityDTO);
-		});
 
+			if(null != activityDTOList && activityDTOList.size() > 0) {
+				activityDTOList.forEach(s -> {
+					try {
+						BeanUtils.copyProperties(memActivityDTO, s);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					activityMemDTOList.add(memActivityDTO);
+				});
+			}
+		}		
+		
+		// 查询推广活动集合
 		userDTO.setActivityDTOList(activityMemDTOList);
 
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
