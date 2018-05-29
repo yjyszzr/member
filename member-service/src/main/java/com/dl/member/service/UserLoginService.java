@@ -55,6 +55,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	@Resource
 	private DlChannelConsumerService channelConsumerService;
 
+	@Resource
+	private DlChannelOptionLogService dlChannelOptionLogService;
+
 	/**
 	 * 密码登录
 	 *
@@ -84,7 +87,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 			}
 			Condition condition = new Condition(DlChannelConsumer.class);
-			condition.createCriteria().andCondition("user_id = ", user.getUserId());
+			// condition.createCriteria().andCondition("user_id = ",
+			// user.getUserId());
+			condition.createCriteria().andEqualTo("userId", user.getUserId());
 			List<DlChannelConsumer> channelConsumerlist = channelConsumerService.findByCondition(condition);
 			if (channelConsumerlist.size() > 0) {
 				if (channelConsumerlist.get(0).getFristLoginTime() == null) {
@@ -189,7 +194,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				}
 
 				Condition condition = new Condition(DlChannelConsumer.class);
-				condition.createCriteria().andCondition("user_id = ", user.getUserId());
+				condition.createCriteria().andEqualTo("userId", user.getUserId());
 				List<DlChannelConsumer> channelConsumerlist = channelConsumerService.findByCondition(condition);
 				if (channelConsumerlist.size() > 0) {
 					if (channelConsumerlist.get(0).getFristLoginTime() == null) {
