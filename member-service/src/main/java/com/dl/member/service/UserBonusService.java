@@ -1,23 +1,27 @@
 package com.dl.member.service;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.SNBusinessCodeEnum;
@@ -43,51 +47,47 @@ import com.dl.member.util.GeTuiUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
-
 @Service
 @Transactional
 @Slf4j
 public class UserBonusService extends AbstractService<UserBonus> {
-    @Resource
-    private UserBonusMapper userBonusMapper;
-    
-    @Resource
-    private UserBonusShowDescService userBonusShowDescService;
-    
-    @Resource
-    private ActivityBonusService activityBonusService;
-    
-    @Resource
-    private UserMapper userMapper;
-    
-    @Resource
-    private GeTuiUtil geTuiUtil;
-    
-    
+	@Resource
+	private UserBonusMapper userBonusMapper;
+
+	@Resource
+	private UserBonusShowDescService userBonusShowDescService;
+
+	@Resource
+	private ActivityBonusService activityBonusService;
+
+	@Resource
+	private UserMapper userMapper;
+
+	@Resource
+	private GeTuiUtil geTuiUtil;
+
 	/**
-	 * 下单时的账户变动：目前仅红包置为已使用 
+	 * 下单时的账户变动：目前仅红包置为已使用
+	 * 
 	 * @param userBonusParam
 	 * @return
 	 */
 	public BaseResult<String> changeUserAccountByCreateOrder(UserBonusParam userBonusParam) {
-		this.updateUserBonusStatusUsed(userBonusParam.getUserBonusId(),userBonusParam.getOrderSn());
+		this.updateUserBonusStatusUsed(userBonusParam.getUserBonusId(), userBonusParam.getOrderSn());
 		return ResultGenerator.genSuccessResult("更新红包状态成功");
 	}
-	
-	
+
 	/**
 	 * 回滚下单时的账户变动：目前仅红包置为未使用
+	 * 
 	 * @param userBonusParam
 	 * @return
 	 */
-	public BaseResult<String> rollbackChangeUserAccountByCreateOrder(UserBonusParam userBonusParam){
+	public BaseResult<String> rollbackChangeUserAccountByCreateOrder(UserBonusParam userBonusParam) {
 		this.updateUserBonusStatusUnused(userBonusParam.getUserBonusId());
 		return ResultGenerator.genSuccessResult("回滚红包状态成功");
 	}
-	
+
 	/**
 	 * 更新红包状态为已使用
 	 *
@@ -96,14 +96,13 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 */
 	@Transactional
 	public void updateUserBonusStatusUsed(Integer userBonusId, String orderSn) {
-		if(userBonusId == null || StringUtils.isEmpty(orderSn)) {
-			throw new ServiceException(MemberEnums.PARAMS_NOT_NULL.getcode(),MemberEnums.PARAMS_NOT_NULL.getMsg());
+		if (userBonusId == null || StringUtils.isEmpty(orderSn)) {
+			throw new ServiceException(MemberEnums.PARAMS_NOT_NULL.getcode(), MemberEnums.PARAMS_NOT_NULL.getMsg());
 		}
-		
+
 		UserBonus userBonus = this.findById(userBonusId);
 		if (userBonus == null) {
-			throw new ServiceException(MemberEnums.BONUS_UNEXITS.getcode(),
-					"用户红包编号为" + userBonusId + MemberEnums.BONUS_UNEXITS.getMsg());
+			throw new ServiceException(MemberEnums.BONUS_UNEXITS.getcode(), "用户红包编号为" + userBonusId + MemberEnums.BONUS_UNEXITS.getMsg());
 		}
 		Condition cUsed = new Condition(UserBonus.class);
 		Criteria criteria = cUsed.createCriteria();
@@ -112,8 +111,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		criteria.andCondition("is_delete =" + ProjectConstant.NOT_DELETE);
 		List<UserBonus> userBonusList = this.findByCondition(cUsed);
 		if (userBonusList.size() > 0) {
-			throw new ServiceException(MemberEnums.BONUS_USED.getcode(),
-					"用户红包编号为" + userBonusId + MemberEnums.BONUS_USED.getMsg());
+			throw new ServiceException(MemberEnums.BONUS_USED.getcode(), "用户红包编号为" + userBonusId + MemberEnums.BONUS_USED.getMsg());
 		}
 
 		UserBonus usedUserBonus = new UserBonus();
@@ -133,36 +131,35 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 */
 	@Transactional
 	public void updateUserBonusStatusUnused(Integer userBonusId) {
-			UserBonus userBonus = this.findById(userBonusId);
-			if (userBonus == null) {
-				throw new ServiceException(MemberEnums.BONUS_UNEXITS.getcode(),
-						"用户红包编号为" + userBonusId + MemberEnums.BONUS_UNEXITS.getMsg());
-			}
-			Condition cUsed = new Condition(UserBonus.class);
-			Criteria criteria = cUsed.createCriteria();
-			criteria.andCondition("user_bonus_id =", userBonusId);
-			criteria.andCondition("bonus_status =", ProjectConstant.BONUS_STATUS_UNUSED);
-			criteria.andCondition("is_delete =", ProjectConstant.NOT_DELETE);
-			List<UserBonus> userBonusList = this.findByCondition(cUsed);
-			if (userBonusList.size() > 0) {
-				throw new ServiceException(MemberEnums.BONUS_UNUSED.getcode(),
-						"用户红包编号为" + userBonusId + MemberEnums.BONUS_UNUSED.getMsg());
-			}
+		UserBonus userBonus = this.findById(userBonusId);
+		if (userBonus == null) {
+			throw new ServiceException(MemberEnums.BONUS_UNEXITS.getcode(), "用户红包编号为" + userBonusId + MemberEnums.BONUS_UNEXITS.getMsg());
+		}
+		Condition cUsed = new Condition(UserBonus.class);
+		Criteria criteria = cUsed.createCriteria();
+		criteria.andCondition("user_bonus_id =", userBonusId);
+		criteria.andCondition("bonus_status =", ProjectConstant.BONUS_STATUS_UNUSED);
+		criteria.andCondition("is_delete =", ProjectConstant.NOT_DELETE);
+		List<UserBonus> userBonusList = this.findByCondition(cUsed);
+		if (userBonusList.size() > 0) {
+			throw new ServiceException(MemberEnums.BONUS_UNUSED.getcode(), "用户红包编号为" + userBonusId + MemberEnums.BONUS_UNUSED.getMsg());
+		}
 
-			UserBonus usedUserBonus = new UserBonus();
-			usedUserBonus.setUserBonusId(userBonusId);
-			usedUserBonus.setUsedTime(DateUtil.getCurrentTimeLong());
-			usedUserBonus.setOrderSn("");
-			usedUserBonus.setUserId(SessionUtil.getUserId());
-			usedUserBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
-			this.update(usedUserBonus);
+		UserBonus usedUserBonus = new UserBonus();
+		usedUserBonus.setUserBonusId(userBonusId);
+		usedUserBonus.setUsedTime(DateUtil.getCurrentTimeLong());
+		usedUserBonus.setOrderSn("");
+		usedUserBonus.setUserId(SessionUtil.getUserId());
+		usedUserBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
+		this.update(usedUserBonus);
 	}
 
 	/**
 	 * 给支付提供查询用户可用的红包列表
+	 * 
 	 * @return
 	 */
-	public List<UserBonusDTO> queryValidBonusListForPay(BonusLimitConditionParam bonusLimitConditionParam){
+	public List<UserBonusDTO> queryValidBonusListForPay(BonusLimitConditionParam bonusLimitConditionParam) {
 		Integer userId = SessionUtil.getUserId();
 		UserBonus userBonus = new UserBonus();
 		userBonus.setUserId(userId);
@@ -173,143 +170,148 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		userBonus.setMinGoodsAmount(bonusLimitConditionParam.getOrderMoneyPaid());
 		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
 		List<UserBonusDTO> userBonusDTOList = new ArrayList<UserBonusDTO>();
-		if(CollectionUtils.isEmpty(userBonusList)) {
+		if (CollectionUtils.isEmpty(userBonusList)) {
 			return userBonusDTOList;
 		}
-		
-		userBonusList.forEach(s->{
+
+		userBonusList.forEach(s -> {
 			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(s);
 			userBonusDTOList.add(userBonusDTO);
 		});
-		return userBonusDTOList;		
-		
+		return userBonusDTOList;
+
 	}
-	
-//	/**
-//	 * 支付红包排序
-//	 * @param lhs
-//	 * @param rhs
-//	 * @return
-//	 */
-//	public static int compareByConditions(UserBonus s1, UserBonus s2) {
-//	    if (s1.getBonusPrice().compareTo(s2.getBonusPrice()) == 0) {
-//	        return s1.getMinGoodsAmount().subtract(s2.getMinGoodsAmount()).intValue();
-//	    } else {
-//	        return s1.getBonusPrice().compareTo(s2.getBonusPrice());
-//	    }
-//	}
-	
+
+	// /**
+	// * 支付红包排序
+	// * @param lhs
+	// * @param rhs
+	// * @return
+	// */
+	// public static int compareByConditions(UserBonus s1, UserBonus s2) {
+	// if (s1.getBonusPrice().compareTo(s2.getBonusPrice()) == 0) {
+	// return
+	// s1.getMinGoodsAmount().subtract(s2.getMinGoodsAmount()).intValue();
+	// } else {
+	// return s1.getBonusPrice().compareTo(s2.getBonusPrice());
+	// }
+	// }
+
 	/**
-	 * 根据状态查询有效的红包集合 ""-全部   0-未使用 1-已使用 2-已过期
+	 * 根据状态查询有效的红包集合 ""-全部 0-未使用 1-已使用 2-已过期
+	 * 
 	 * @param status
 	 * @return
 	 */
-	public PageInfo<UserBonusDTO> queryBonusListByStatus(String status,Integer pageNum,Integer pageSize) {
+	public PageInfo<UserBonusDTO> queryBonusListByStatus(String status, Integer pageNum, Integer pageSize) {
 		Integer userId = SessionUtil.getUserId();
 		UserBonus userBonus = new UserBonus();
 		userBonus.setUserId(userId);
 		userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
-		if(!StringUtils.isEmpty(status)) {
+		if (!StringUtils.isEmpty(status)) {
 			userBonus.setBonusStatus(Integer.valueOf(status));
 		}
 		PageHelper.startPage(pageNum, pageSize);
 		List<UserBonus> userBonusList = null;
-		if(!status.equals("1")) {
+		if (!status.equals("1")) {
 			userBonusList = userBonusMapper.queryUserBonusBySelective(userBonus);
-		}else {
+		} else {
 			userBonusList = userBonusMapper.queryUserBonusForUsed(userBonus);
 		}
-		
+
 		PageInfo<UserBonus> pageInfo = new PageInfo<UserBonus>(userBonusList);
-		
+
 		List<UserBonusDTO> userBonusDTOList = new ArrayList<UserBonusDTO>();
-		userBonusList.forEach(s->{
+		userBonusList.forEach(s -> {
 			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(s);
 			userBonusDTOList.add(userBonusDTO);
 		});
-		
+
 		PageInfo<UserBonusDTO> result = new PageInfo<UserBonusDTO>();
 		try {
 			BeanUtils.copyProperties(pageInfo, result);
 		} catch (Exception e) {
 			log.error(e.getMessage());
-		} 
-		
+		}
+
 		result.setList(userBonusDTOList);
 		return result;
 	}
-	
+
 	/**
 	 * 统一构造返回前台红包列表的数据结构
+	 * 
 	 * @param shopBonusDTOList
 	 * @param userBonusList
 	 * @return
 	 */
-	public UserBonusDTO createReturnUserBonusDTO(UserBonus userBonus){
+	public UserBonusDTO createReturnUserBonusDTO(UserBonus userBonus) {
 		UserBonusDTO userBonusDTO = new UserBonusDTO();
 		try {
-			BeanUtils.copyProperties(userBonus,userBonusDTO);
+			BeanUtils.copyProperties(userBonus, userBonusDTO);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 
-		if(ProjectConstant.BONUS_STATUS_UNUSED == userBonus.getBonusStatus()) {
+		if (ProjectConstant.BONUS_STATUS_UNUSED == userBonus.getBonusStatus()) {
 			Integer currentTime = DateUtil.getCurrentTimeLong();
 			userBonusDTO.setSoonExprireBz(this.createSoonExprireBz(currentTime, userBonus));
 			userBonusDTO.setLeaveTime(this.createLeaveTime(currentTime, userBonus));
-		}else {
+		} else {
 			userBonusDTO.setSoonExprireBz("");
 			userBonusDTO.setLeaveTime("");
 		}
 		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
 		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
 		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
-		userBonusDTO.setLimitTime(userBonusShowDescService.getLimitTimeDesc(userBonus.getStartTime(),userBonus.getEndTime()));
+		userBonusDTO.setLimitTime(userBonusShowDescService.getLimitTimeDesc(userBonus.getStartTime(), userBonus.getEndTime()));
 		userBonusDTO.setBonusEndTime(DateUtil.getCurrentTimeString(Long.valueOf(userBonus.getEndTime()), DateUtil.date_sdf));
-		userBonusDTO.setMinGoodsAmount(userBonusShowDescService.getLimitOrderAmountDesc(userBonus.getMinGoodsAmount(),userBonus.getBonusPrice()));
+		userBonusDTO.setMinGoodsAmount(userBonusShowDescService.getLimitOrderAmountDesc(userBonus.getMinGoodsAmount(), userBonus.getBonusPrice()));
 		return userBonusDTO;
 	}
 
 	/**
 	 * 快过期和未生效标签
+	 * 
 	 * @param currentTime
 	 * @param userBonus
 	 * @return
 	 */
-	public static String createSoonExprireBz(Integer currentTime,UserBonus userBonus) {
-		if(userBonus.getEndTime() - currentTime  <= ProjectConstant.OneDaySecond &&
-		   userBonus.getEndTime() - currentTime > 0) {
+	public static String createSoonExprireBz(Integer currentTime, UserBonus userBonus) {
+		if (userBonus.getEndTime() - currentTime <= ProjectConstant.OneDaySecond && userBonus.getEndTime() - currentTime > 0) {
 			return ProjectConstant.BONUS_SOONEXPIREBZ_NOTHIDE;
 		}
-		if(currentTime - userBonus.getStartTime() < 0) {//未生效
+		if (currentTime - userBonus.getStartTime() < 0) {// 未生效
 			return ProjectConstant.BONUS_NOWORK;
 		}
 		return "";
 	}
-	
+
 	/**
 	 * 未使用且已生效的才展示leaveTime
+	 * 
 	 * @param currentTime
 	 * @param bonusEndTime
 	 * @return
 	 */
-	public static String createLeaveTime(Integer currentTime,UserBonus userBonus) {
-		if(currentTime > userBonus.getStartTime() && currentTime < userBonus.getEndTime()) {
+	public static String createLeaveTime(Integer currentTime, UserBonus userBonus) {
+		if (currentTime > userBonus.getStartTime() && currentTime < userBonus.getEndTime()) {
 			Integer leaveTime = userBonus.getEndTime() - currentTime;
 			Integer leaveDays = leaveTime / ProjectConstant.OneDaySecond;
 			Integer yu = leaveTime % ProjectConstant.OneDaySecond;
-			if(leaveDays >= 1) {
-				if(yu > 0) {
+			if (leaveDays >= 1) {
+				if (yu > 0) {
 					leaveDays = leaveDays + 1;
 				}
-				return "剩余"+leaveDays+"天过期";
-			}else {
+				return "剩余" + leaveDays + "天过期";
+			} else {
 				Integer leaveHours = leaveTime / 3600;
-				return "剩余"+leaveHours+"小时过期";
+				return "剩余" + leaveHours + "小时过期";
 			}
 		}
 		return "";
 	}
+
 	/**
 	 * 查询单个红包的数据
 	 *
@@ -319,9 +321,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	public UserBonusDTO queryUserBonus(Integer userBonusId) {
 		Integer curTime = DateUtil.getCurrentTimeLong();
 		Integer userId = SessionUtil.getUserId();
-		Integer[] userBonusIdArr = new Integer[] {userBonusId};
-		
-		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusList(userBonusIdArr,userId,curTime);
+		Integer[] userBonusIdArr = new Integer[] { userBonusId };
+
+		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusList(userBonusIdArr, userId, curTime);
 		if (userBonusList.size() == 0) {
 			return null;
 		}
@@ -332,91 +334,93 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
 		return userBonusDTO;
 	}
-	
+
 	/**
 	 * 领取红包
+	 * 
 	 * @return
 	 */
 	@Transactional
-	public Boolean receiveUserBonus(Integer type,Integer userId) {
-		if(null == userId) {
+	public Boolean receiveUserBonus(Integer type, Integer userId) {
+		if (null == userId) {
 			return false;
 		}
 		List<ActivityBonus> activityBonusList = new ArrayList<ActivityBonus>();
-		if(ProjectConstant.REGISTER.equals(type)) {
-			activityBonusList = activityBonusService.queryActivityBonusList(type);
-		}
-		if(activityBonusList.size() == 0) {
+		// if(ProjectConstant.REGISTER.equals(type)) {
+		activityBonusList = activityBonusService.queryActivityBonusList(type);
+		// }
+		if (activityBonusList.size() == 0) {
 			return false;
 		}
-		
+
 		Integer now = DateUtil.getCurrentTimeLong();
 		Date currentTime = new Date();
-		List<UserBonus> userBonusLisgt  = new ArrayList<UserBonus>();
-		activityBonusList.stream().forEach(s->{
+		List<UserBonus> userBonusLisgt = new ArrayList<UserBonus>();
+		activityBonusList.stream().forEach(s -> {
 			UserBonus userBonus = new UserBonus();
 			userBonus.setBonusId(s.getBonusId());
 			userBonus.setUserId(userId);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 			userBonus.setBonusPrice(s.getBonusAmount());
 			userBonus.setReceiveTime(DateUtil.getCurrentTimeLong());
-			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, s.getStartTime(),0,0,0));
-			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime,s.getEndTime(),23,59,59));
+			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, s.getStartTime(), 0, 0, 0));
+			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, s.getEndTime(), 23, 59, 59));
 			userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
 			userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
 			userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
 			userBonus.setMinGoodsAmount(s.getMinGoodsAmount());
 			userBonusLisgt.add(userBonus);
 		});
-		
+
 		try {
 			int rst = userBonusMapper.insertBatchUserBonus(userBonusLisgt);
-			if(rst != userBonusLisgt.size()) {
-				throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(),"用户"+userId+"领取红包异常,已回滚");
+			if (rst != userBonusLisgt.size()) {
+				throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "用户" + userId + "领取红包异常,已回滚");
 			}
 		} catch (Exception e) {
-			log.error("用户"+userId+"领取红包异常,已回滚");
+			log.error("用户" + userId + "领取红包异常,已回滚");
 		}
 		return true;
 	}
-	
-	 /**
-	  * 更新红包为已过期
-	  * @param userBonusIdList
-	  */
-	 @Transactional
-	 public int updateBonusExpire(List<Integer> userBonusIdList) {
-		 int rst = userBonusMapper.updateBatchUserBonusExpire(userBonusIdList);
-		 return rst;
-	 }
 
-	 /**
-	  * 定时任务
-	  * 针对过期红包发送push消息
-	  * @param userBonusIdList
-	  */
-	 public void pushBonusMessage() {
-		 LocalDate now = LocalDate.now();
-		 LocalDate tomorrow = now.plusDays(1);
-		 LocalDate houtian = now.plusDays(2);
-		 Long start = LocalDateTime.of(tomorrow, LocalTime.MIN).atZone(ZoneId.systemDefault()).toEpochSecond();
-		 Long end = LocalDateTime.of(houtian, LocalTime.MIN).atZone(ZoneId.systemDefault()).toEpochSecond();
-		 List<UserBonus> queryUnableBonusList = userBonusMapper.queryPUshBonusList(start.intValue(), end.intValue());
-		 if(queryUnableBonusList == null) {
-			 return ;
-		 }
-		 Set<Integer> collect = queryUnableBonusList.stream().map(item->item.getUserId()).collect(Collectors.toSet());
-		 List<Integer> list = new ArrayList<Integer>(collect);
-		 List<User> users = userMapper.queryUserByUserIds(list);
-		 if(users == null) {
-			 return ;
-		 }
-		 users.forEach(item->{
-			 String clientId = item.getPushKey();
-			 if(StringUtils.isNotBlank(clientId)) {
-				 GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_BONUS_TITLE, CommonConstants.FORMAT_BONUS_DESC, DateUtil.getCurrentTimeLong());
-				 geTuiUtil.pushMessage(clientId, getuiMessage);
-			 }
-		 });
-	 }
+	/**
+	 * 更新红包为已过期
+	 * 
+	 * @param userBonusIdList
+	 */
+	@Transactional
+	public int updateBonusExpire(List<Integer> userBonusIdList) {
+		int rst = userBonusMapper.updateBatchUserBonusExpire(userBonusIdList);
+		return rst;
+	}
+
+	/**
+	 * 定时任务 针对过期红包发送push消息
+	 * 
+	 * @param userBonusIdList
+	 */
+	public void pushBonusMessage() {
+		LocalDate now = LocalDate.now();
+		LocalDate tomorrow = now.plusDays(1);
+		LocalDate houtian = now.plusDays(2);
+		Long start = LocalDateTime.of(tomorrow, LocalTime.MIN).atZone(ZoneId.systemDefault()).toEpochSecond();
+		Long end = LocalDateTime.of(houtian, LocalTime.MIN).atZone(ZoneId.systemDefault()).toEpochSecond();
+		List<UserBonus> queryUnableBonusList = userBonusMapper.queryPUshBonusList(start.intValue(), end.intValue());
+		if (queryUnableBonusList == null) {
+			return;
+		}
+		Set<Integer> collect = queryUnableBonusList.stream().map(item -> item.getUserId()).collect(Collectors.toSet());
+		List<Integer> list = new ArrayList<Integer>(collect);
+		List<User> users = userMapper.queryUserByUserIds(list);
+		if (users == null) {
+			return;
+		}
+		users.forEach(item -> {
+			String clientId = item.getPushKey();
+			if (StringUtils.isNotBlank(clientId)) {
+				GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_BONUS_TITLE, CommonConstants.FORMAT_BONUS_DESC, DateUtil.getCurrentTimeLong());
+				geTuiUtil.pushMessage(clientId, getuiMessage);
+			}
+		});
+	}
 }
