@@ -145,11 +145,11 @@ public class DlChannelConsumerController {
 			}
 			dlChannelConsumer.setConsumerIp(IpUtil.getIpAddr(request));
 			dlChannelConsumer.setMobile(smsParam.getMobile());
-			DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(smsParam.getUserId(), smsParam.getMobile());
+			DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(distributor.getChannelDistributorId(), smsParam.getMobile());
 			if (channelConsumer == null) {
 				dlChannelConsumerService.save(dlChannelConsumer);
 			}
-			return ResultGenerator.genSuccessResult("发送短信验证码成功");
+			return ResultGenerator.genSuccessResult("发送短信验证码成功", distributor.getChannelDistributorId().toString());
 		} else {
 			return ResultGenerator.genFailResult("参数异常");
 		}

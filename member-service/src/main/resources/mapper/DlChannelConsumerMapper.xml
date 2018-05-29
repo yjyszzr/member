@@ -28,7 +28,7 @@
 			DATE_FORMAT( FROM_UNIXTIME( add_time ), '%Y-%m-%d' ) = #{addTime};
   </select>
   
-   <update id="updateByUserId"  parameterType="java.lang.Integer">
+   <update id="updateByUserId">
         UPDATE dl_channel_consumer SET frist_login_time= #{fristLoginTime}  where user_id = #{userId}  
   </update>
   
