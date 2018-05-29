@@ -149,7 +149,7 @@ public class DlChannelConsumerController {
 			if (channelConsumer == null) {
 				dlChannelConsumerService.save(dlChannelConsumer);
 			}
-			return ResultGenerator.genSuccessResult("发送短信验证码成功");
+			return ResultGenerator.genSuccessResult("发送短信验证码成功", distributor.getChannelDistributorId().toString());
 		} else {
 			return ResultGenerator.genFailResult("参数异常");
 		}
