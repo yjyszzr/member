@@ -87,6 +87,7 @@ public class DlChannelConsumerController {
 	@PostMapping("/myPromotionIncome")
 	public BaseResult<List<PromotionIncomeDTO>> myPromotionIncome(@RequestBody DlChannelDistributorParam param) {
 		param.setUserId(SessionUtil.getUserId());
+		// param.setUserId(400102);
 		List<PromotionIncomeDTO> promotionIncomes = new ArrayList<PromotionIncomeDTO>();
 		promotionIncomes = dlChannelDistributorService.getPromotionIncomeListBak(param);
 		return ResultGenerator.genSuccessResult("success", promotionIncomes);

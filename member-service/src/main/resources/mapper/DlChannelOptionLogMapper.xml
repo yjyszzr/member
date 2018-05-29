@@ -33,7 +33,7 @@
 	FROM
 		dl_channel_option_log 
 	WHERE
-		channel_distributor_id = #{channelDistributorId},
+		distributor_id = #{channelDistributorId}
 		AND status = 1
 	GROUP BY
 		DAY ( FROM_UNIXTIME( option_time ) ) DESC;
