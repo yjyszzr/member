@@ -15,6 +15,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.dao.DlChannelDistributorMapper;
+import com.dl.member.dto.ChannelDistributorBindDTO;
 import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserNoticeDTO;
@@ -115,17 +116,17 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping(path="/queryChannelConsumerByUserId", method=RequestMethod.POST)
-	public BaseResult<ChannelDistributorDTO> queryChannelConsumerByUserId(@RequestBody UserIdParam params){
+	public BaseResult<ChannelDistributorBindDTO> queryChannelConsumerByUserId(@RequestBody UserIdParam params){
 		Condition condition = new Condition(DlChannelDistributor.class);
 		Criteria criteria = condition.createCriteria();
 		criteria.andCondition("user_id =",params.getUserId());
 		List<DlChannelDistributor> channelDistributors = dlChannelDistributorService.findByCondition(condition);
 		DlChannelDistributor dlChannelDistributor = new DlChannelDistributor();
-		ChannelDistributorDTO channelDistributorDTO = new ChannelDistributorDTO();
+		ChannelDistributorBindDTO channelDistributorBindDTO = new ChannelDistributorBindDTO();
 		if(!CollectionUtils.isEmpty(channelDistributors)) {
 			dlChannelDistributor = channelDistributors.get(0);
-			BeanUtils.copyProperties(dlChannelDistributor, channelDistributorDTO);
-			return ResultGenerator.genSuccessResult("succ",channelDistributorDTO);
+			BeanUtils.copyProperties(dlChannelDistributor, channelDistributorBindDTO);
+			return ResultGenerator.genSuccessResult("succ",channelDistributorBindDTO);
 		}
 		
 		return ResultGenerator.genFailResult("failure");
