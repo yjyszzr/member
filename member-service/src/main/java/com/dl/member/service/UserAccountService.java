@@ -596,12 +596,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userIdAndRewardList.removeIf(s -> rewardOrderSnList.contains(s.getOrderSn()));
 		}
 
-		List<Integer> userIdList = userIdAndRewardList.stream().map(s -> s.getUserId()).collect(Collectors.toList());
 		Integer accountTime = DateUtil.getCurrentTimeLong();
-		List<User> userList = userMapper.queryUserByUserIds(userIdList);
+		/*List<Integer> userIdList = userIdAndRewardList.stream().map(s -> s.getUserId()).collect(Collectors.toList());
+		List<User> userList = userMapper.queryUserByUserIds(userIdList);*/
 		for (UserIdAndRewardDTO uDTO : userIdAndRewardList) {
 			User updateUserMoney = new User();
-			BigDecimal userMoney = BigDecimal.ZERO;
+//			BigDecimal userMoney = BigDecimal.ZERO;
 			updateUserMoney.setUserId(uDTO.getUserId());
 			updateUserMoney.setUserMoney(uDTO.getReward());
 			userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUserMoney);

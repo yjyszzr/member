@@ -143,9 +143,11 @@ public class UserService extends AbstractService<User> {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+		BigDecimal userMoney = user.getUserMoney();
+		String userMoneyStr = userMoney==null?"0":userMoney.toString();
+		userDTO.setUserMoney(userMoneyStr);
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
-		userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
+		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		String realName = "";
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		if (userRealDTO != null) {
@@ -156,7 +158,7 @@ public class UserService extends AbstractService<User> {
 		String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
 		userDTO.setMobile(mobileStr);
 		userDTO.setRealName(realName);
-		userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
+		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 
 		// 查询推广活动集合
 		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
