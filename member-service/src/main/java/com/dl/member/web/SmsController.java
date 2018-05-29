@@ -105,15 +105,20 @@ public class SmsController {
 			tplValue = "#code#=" + strRandom4;
 		}
 
+		// 缓存验证码
+		int defineExpiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
+		String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
+		Long expireTime = stringRedisTemplate.getExpire(key);
+		if(null != expireTime && expireTime < 54 && expireTime > 0) {
+			return ResultGenerator.genResult(MemberEnums.MESSAGE_SENDLOT_ERROR.getcode(), MemberEnums.MESSAGE_SENDLOT_ERROR.getMsg());
+		}
+		
 		BaseResult<String> smsRst = smsService.sendSms(smsParam.getMobile(), tplId, tplValue);
 		if (smsRst.getCode() != 0) {
 			return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
 		}
 
-		// 缓存验证码
-		int expiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
-		String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
-		stringRedisTemplate.opsForValue().set(key, strRandom4, expiredTime, TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(key, strRandom4, defineExpiredTime, TimeUnit.SECONDS);
 		int sendNumExpire = this.todayEndTime();
 		stringRedisTemplate.opsForValue().set(sendNumKey, num+"", sendNumExpire, TimeUnit.SECONDS);
 		
@@ -161,6 +166,11 @@ public class SmsController {
 			// 缓存验证码
 			int expiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
 			String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
+			Long expireTime = stringRedisTemplate.getExpire(key);
+			if(null != expireTime && expireTime < 54 && expireTime > 0) {
+				return ResultGenerator.genResult(MemberEnums.MESSAGE_SENDLOT_ERROR.getcode(), MemberEnums.MESSAGE_SENDLOT_ERROR.getMsg());
+			}
+			
 			stringRedisTemplate.opsForValue().set(key, verifyCode, expiredTime, TimeUnit.SECONDS);
 			return ResultGenerator.genSuccessResult("发送短信验证码成功");
 		} else {

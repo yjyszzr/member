@@ -76,9 +76,11 @@ public class DlChannelConsumerController {
 	@ApiOperation(value = "我的推荐", notes = "我的推荐")
 	@PostMapping("/myRecommendation")
 	public BaseResult<ChannelDistributorDTO> myRecommendation(@RequestBody DlChannelDistributorParam param) {
-		param.setUserId(SessionUtil.getUserId());
+		param.setUserId(400102);
+		// param.setUserId(SessionUtil.getUserId());
+
 		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
-		channelDistributor = dlChannelDistributorService.getMyRankingList(param);
+		channelDistributor = dlChannelDistributorService.getMyRankingListBak(param);
 		return ResultGenerator.genSuccessResult("success", channelDistributor);
 	}
 
@@ -87,7 +89,7 @@ public class DlChannelConsumerController {
 	public BaseResult<List<PromotionIncomeDTO>> myPromotionIncome(@RequestBody DlChannelDistributorParam param) {
 		param.setUserId(SessionUtil.getUserId());
 		List<PromotionIncomeDTO> promotionIncomes = new ArrayList<PromotionIncomeDTO>();
-		promotionIncomes = dlChannelDistributorService.getPromotionIncomeList(param);
+		promotionIncomes = dlChannelDistributorService.getPromotionIncomeListBak(param);
 		return ResultGenerator.genSuccessResult("success", promotionIncomes);
 	}
 
@@ -98,7 +100,7 @@ public class DlChannelConsumerController {
 		List<IncomeDetailsDTO> incomeDetailss = new ArrayList<IncomeDetailsDTO>();
 		DlChannelDistributor channelDistributor = dlChannelDistributorService.findByUserId(param.getUserId());
 		if (channelDistributor != null) {
-			incomeDetailss = dlChannelConsumerService.getIncomeDetailsList(channelDistributor.getChannelId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
+			incomeDetailss = dlChannelConsumerService.getIncomeDetailsListBak(channelDistributor.getChannelId(), param.getAddTime(), channelDistributor.getDistributorCommissionRate());
 		}
 		return ResultGenerator.genSuccessResult("success", incomeDetailss);
 	}
@@ -137,7 +139,10 @@ public class DlChannelConsumerController {
 			dlChannelConsumer.setAddTime(DateUtilNew.getCurrentTimeLong());
 			dlChannelConsumer.setDeleted(0);
 			dlChannelConsumer.setConsumerId(0);
-			dlChannelConsumer.setChannelDistributorId(smsParam.getUserId());
+			DlChannelDistributor distributor = dlChannelDistributorService.findByUserId(smsParam.getUserId());
+			if (null != distributor) {
+				dlChannelConsumer.setChannelDistributorId(distributor.getChannelDistributorId());
+			}
 			dlChannelConsumer.setConsumerIp(IpUtil.getIpAddr(request));
 			dlChannelConsumer.setMobile(smsParam.getMobile());
 			DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(smsParam.getUserId(), smsParam.getMobile());
