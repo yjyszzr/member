@@ -397,7 +397,9 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			condition.createCriteria().andCondition("distributor_id =", dlChannelConsumerList.get(0).getChannelDistributorId());
 			promotionIncomes = dlChannelOptionLogService.findByCondition(condition);
 			for (int i = 0; i < promotionIncomes.size(); i++) {
-				bettingTotalAmount.add(promotionIncomes.get(i).getOptionAmount());
+				if (promotionIncomes.get(i).getOperationNode() == 2) {
+					bettingTotalAmount = bettingTotalAmount.add(promotionIncomes.get(i).getOptionAmount());
+				}
 			}
 		}
 		return bettingTotalAmount.doubleValue();
