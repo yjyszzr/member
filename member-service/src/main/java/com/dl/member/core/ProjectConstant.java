@@ -94,6 +94,8 @@ public class ProjectConstant {
 
 	// 业务类型
 	public static final Integer REGISTER = 1;
+	// 西安活动送红包
+	public static final Integer XNREGISTER = 2;
 
 	// ------红包使用范围------//
 	// 全场通用
