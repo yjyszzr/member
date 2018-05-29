@@ -126,7 +126,7 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 		for (int i = 0; i < incomeDetailsList.size(); i++) {
 			double income = 0;
 			if (incomeDetailsList.get(i).getOperationNode() == 1) {
-				income = 1;
+				income += 1;
 			} else {
 				BigDecimal bd = new BigDecimal(rate);
 				BigDecimal bdIncome = new BigDecimal(incomeDetailsList.get(i).getLotteryAmount());

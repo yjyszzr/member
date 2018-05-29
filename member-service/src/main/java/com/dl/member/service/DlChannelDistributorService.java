@@ -422,8 +422,12 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			for (int i = 0; i < promotionIncomes.size(); i++) {
 				// 设置收入提成
 				BigDecimal bd = new BigDecimal(channelDistributor.getDistributorCommissionRate());
-				BigDecimal lotteryAmount = new BigDecimal(promotionIncomes.get(i).getLotteryAmount());
-				promotionIncomes.get(i).setIncome(lotteryAmount.multiply(bd).doubleValue() + promotionIncomes.get(i).getRegisterNum());
+				if (promotionIncomes.get(i).getLotteryAmount() != null) {
+					BigDecimal lotteryAmount = new BigDecimal(promotionIncomes.get(i).getLotteryAmount());
+					promotionIncomes.get(i).setIncome(lotteryAmount.multiply(bd).doubleValue() + promotionIncomes.get(i).getRegisterNum());
+				} else {
+					promotionIncomes.get(i).setIncome(promotionIncomes.get(i).getRegisterNum().doubleValue());
+				}
 			}
 		}
 		return promotionIncomes;
