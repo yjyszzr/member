@@ -137,6 +137,9 @@ public class UserService extends AbstractService<User> {
 		}
 
 		User user = userMapper.queryUserExceptPass(userId);
+		if(user == null) {
+			return ResultGenerator.genFailResult("用户不存在");
+		}
 		UserDTO userDTO = new UserDTO();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
