@@ -115,7 +115,7 @@ public class UserController {
 	 * @param UserBonusParam
 	 * @return
 	 */
-	@RequestMapping(path="/queryChannelConsumerByUserId", method=RequestMethod.POST)
+	@RequestMapping("/queryChannelConsumerByUserId")
 	public BaseResult<ChannelDistributorBindDTO> queryChannelConsumerByUserId(@RequestBody UserIdParam params){
 		Condition condition = new Condition(DlChannelDistributor.class);
 		Criteria criteria = condition.createCriteria();
