@@ -601,7 +601,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		List<User> userList = userMapper.queryUserByUserIds(userIdList);*/
 		for (UserIdAndRewardDTO uDTO : userIdAndRewardList) {
 			User updateUserMoney = new User();
-			BigDecimal userMoney = BigDecimal.ZERO;
+//			BigDecimal userMoney = BigDecimal.ZERO;
 			updateUserMoney.setUserId(uDTO.getUserId());
 			updateUserMoney.setUserMoney(uDTO.getReward());
 			userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUserMoney);
