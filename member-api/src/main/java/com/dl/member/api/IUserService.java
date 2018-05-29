@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.dl.base.result.BaseResult;
+import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.UserDTO;
 import com.dl.member.param.StrParam;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
@@ -44,7 +45,7 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(path="/user/queryUserInfoListByUserIds", method=RequestMethod.POST)
-	public BaseResult<UserDTO> queryUserInfoListByUserIds(@RequestBody StrParam strParam);
+	public BaseResult<ChannelDistributorDTO> queryUserInfoListByUserIds(@RequestBody UserIdParam param);
 	
 	/**
 	 * 查询用户接口
@@ -53,4 +54,12 @@ public interface IUserService {
 	 */
 	@RequestMapping(path="/user/queryUserInfo", method=RequestMethod.POST)
 	public BaseResult<UserDTO> queryUserInfo(@RequestBody UserIdParam params);
+	
+	/**
+	 * 查询用户是否与店员绑定过
+	 * @param UserBonusParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/queryChannelConsumerByUserId", method=RequestMethod.POST)
+	public BaseResult<ChannelDistributorDTO> queryChannelConsumerByUserId(@RequestBody UserIdParam params);
 }

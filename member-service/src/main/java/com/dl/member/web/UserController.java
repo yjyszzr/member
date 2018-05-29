@@ -1,25 +1,36 @@
 package com.dl.member.web;
+import java.util.List;
+
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.SessionUtil;
+import com.dl.member.dao.DlChannelDistributorMapper;
+import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserNoticeDTO;
+import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.param.MobileNumberParam;
 import com.dl.member.param.QueryUserNoticeParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UpdateUnReadNoticeParam;
 import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserLoginPassParam;
+import com.dl.member.service.DlChannelDistributorService;
 import com.dl.member.service.UserService;
 
 import io.swagger.annotations.ApiOperation;
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 /**
 * Created by CodeGenerator on 2018/03/08.
@@ -29,6 +40,9 @@ import io.swagger.annotations.ApiOperation;
 public class UserController {
     @Resource
     private UserService userService;
+    
+	@Resource
+	private DlChannelDistributorService dlChannelDistributorService;
     
 
     /**
@@ -94,6 +108,28 @@ public class UserController {
     public BaseResult<UserDTO> queryUserByUserIdExceptPassReal(@RequestBody UserIdParam param){
     	return userService.queryUserByUserIdExceptPassReal();
     }
+  
+	/**
+	 * 查询用户是否与店员绑定过
+	 * @param UserBonusParam
+	 * @return
+	 */
+	@RequestMapping(path="/queryChannelConsumerByUserId", method=RequestMethod.POST)
+	public BaseResult<ChannelDistributorDTO> queryChannelConsumerByUserId(@RequestBody UserIdParam params){
+		Condition condition = new Condition(DlChannelDistributor.class);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("user_id =",params.getUserId());
+		List<DlChannelDistributor> channelDistributors = dlChannelDistributorService.findByCondition(condition);
+		DlChannelDistributor dlChannelDistributor = new DlChannelDistributor();
+		ChannelDistributorDTO channelDistributorDTO = new ChannelDistributorDTO();
+		if(!CollectionUtils.isEmpty(channelDistributors)) {
+			dlChannelDistributor = channelDistributors.get(0);
+			BeanUtils.copyProperties(dlChannelDistributor, channelDistributorDTO);
+			return ResultGenerator.genSuccessResult("succ",channelDistributorDTO);
+		}
+		
+		return ResultGenerator.genFailResult("failure");
+	}
     
     /**
      * 根据手机号获取token

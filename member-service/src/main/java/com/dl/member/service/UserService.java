@@ -29,6 +29,7 @@ import com.dl.lottery.api.ILotteryActivityService;
 import com.dl.lottery.dto.ActivityDTO;
 import com.dl.lottery.param.ActTypeParam;
 import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
@@ -37,6 +38,7 @@ import com.dl.member.dto.UserNoticeDTO;
 import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
+import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
 import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserParam;
@@ -67,6 +69,9 @@ public class UserService extends AbstractService<User> {
 
 	@Resource
 	private DlChannelConsumerService channelConsumerService;
+	
+	@Resource
+	private DlChannelDistributorMapper dlChannelDistributorMapper;
 
 	/**
 	 * real真实信息
@@ -100,6 +105,7 @@ public class UserService extends AbstractService<User> {
 		userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 
 		// 查询推广活动集合
+		List<com.dl.member.dto.ActivityDTO> activityMemDTOList = new ArrayList<com.dl.member.dto.ActivityDTO>();
 		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
 		ActTypeParam actTypeParam = new ActTypeParam();
 		actTypeParam.setActType(2);
@@ -110,16 +116,23 @@ public class UserService extends AbstractService<User> {
 		} else {
 			activityDTOList = activityDTORst.getData();
 		}
-		com.dl.member.dto.ActivityDTO memActivityDTO = new com.dl.member.dto.ActivityDTO();
-		List<com.dl.member.dto.ActivityDTO> activityMemDTOList = new ArrayList<com.dl.member.dto.ActivityDTO>();
-		activityDTOList.forEach(s -> {
-			try {
-				BeanUtils.copyProperties(memActivityDTO, s);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			activityMemDTOList.add(memActivityDTO);
-		});
+		
+		//店员才推广展示
+		Condition condition = new Condition(DlChannelConsumer.class);
+		condition.createCriteria().andCondition("user_id = ", userId);
+		List<DlChannelDistributor> channelDistributor = dlChannelDistributorMapper.selectByCondition(condition);
+		if (channelDistributor.size() > 0) {
+			com.dl.member.dto.ActivityDTO memActivityDTO = new com.dl.member.dto.ActivityDTO();
+			activityDTOList.forEach(s -> {
+				try {
+					BeanUtils.copyProperties(memActivityDTO, s);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				activityMemDTOList.add(memActivityDTO);
+			});
+		}
+
 		userDTO.setActivityDTOList(activityMemDTOList);
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}

@@ -3,6 +3,7 @@ package com.dl.member.param;
 import java.math.BigDecimal;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,6 +22,7 @@ public class RecharegeParam {
     
     
     @ApiModelProperty(value = "支付id")
+    @NotNull(message="payId 不能为空")
     private String payId;
     
     @ApiModelProperty(value = "第三方名称")

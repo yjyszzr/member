@@ -10,12 +10,12 @@ import lombok.Data;
 @ApiModel("我的推荐")
 @Data
 public class ChannelDistributorDTO {
-	@ApiModelProperty("邀请用户量")
-	Integer inviteNum;
-	@ApiModelProperty("总购彩金额")
-	Double bettingTotalAmount;
-	@ApiModelProperty("自己的排名")
-	IncomeRankingDTO channelDistributor;
-	@ApiModelProperty("收入排行榜")
-	List<IncomeRankingDTO> channelDistributorList;
+	@ApiModelProperty("顾客id")
+	private Integer consumerId;
+	@ApiModelProperty("用户id")
+	private Integer userId;
+	@ApiModelProperty("手机号")
+	private String mobile;
+	@ApiModelProperty("顾客ip")
+	private String consumerIp;
 }
