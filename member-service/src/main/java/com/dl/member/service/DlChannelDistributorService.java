@@ -283,7 +283,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		for (int i = 0; i < channelDistributorList.size(); i++) {
 			Integer id = channelDistributorList.get(i).getChannelDistributorId();
 			// 取出该分销员下的消费者
-			List<DlChannelConsumer> consumerList = channelConsumerList.stream().filter(s -> s.getChannelDistributorId().equals(id)).collect(Collectors.toList());
+			List<DlChannelConsumer> consumerList = channelConsumerList.stream().filter(s -> s.getChannelDistributorId() == id).collect(Collectors.toList());
 			// 计算该分销员下消费者的总购彩金额,然后根据提成比例计算该分销员的收入
 			BigDecimal consumerTotalAmount = new BigDecimal(0);
 			int registerConsumerNum = 0;
