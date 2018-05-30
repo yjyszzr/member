@@ -648,6 +648,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	@Async
 	public void saveRewardMessageAsync(List<UserIdAndRewardDTO> list, Integer accountTime) {
 		List<Integer> userIdList = list.stream().map(s -> s.getUserId()).collect(Collectors.toList());
+		if(CollectionUtils.isEmpty(userIdList)) {
+			return;
+		}
 		List<User> userList = userMapper.queryUserByUserIds(userIdList);
 		if (CollectionUtils.isEmpty(userList)) {
 			return;
