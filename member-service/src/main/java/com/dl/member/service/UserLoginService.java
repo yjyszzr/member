@@ -203,7 +203,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				}
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
-				boolean beyond1h = DateUtil.getCurrentTimeLong() - user.getLastTime() > 60 * 1000 ? true : false;
+				boolean beyond1h = DateUtil.getCurrentTimeLong() - user.getLastTime() > 60  ? true : false;
 				if (beyond1h) {
 					User normalUser = new User();
 					normalUser.setUserId(user.getUserId());
