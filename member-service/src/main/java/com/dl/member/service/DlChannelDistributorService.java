@@ -272,123 +272,79 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 	 * @return
 	 */
 	public ChannelDistributorDTO getMyRankingListBak(DlChannelDistributorParam param) {
-		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
 		List<DlChannelDistributor> channelDistributorList = this.getAllDlChannelDistributor();
-		List<DlChannelConsumer> channelConsumerList = channelConsumerService.findAll();
 		// 查询所有用户购彩的正常记录
 		List<DlChannelOptionLog> optionLogList = dlChannelOptionLogService.findAll().stream().filter(s -> s.getStatus() == 1).collect(Collectors.toList());
 		List<IncomeRankingDTO> incomeRankingList = new ArrayList<IncomeRankingDTO>();
 		List<IncomeRankingDTO> incomeRankingListFinal = new ArrayList<IncomeRankingDTO>();
-		// 遍历所有分销员
 		for (int i = 0; i < channelDistributorList.size(); i++) {
-			Integer id = channelDistributorList.get(i).getChannelDistributorId();
-			// 取出该分销员下的消费者
-			List<DlChannelConsumer> consumerList = channelConsumerList.stream().filter(s -> s.getChannelDistributorId() == id).collect(Collectors.toList());
-			// 计算该分销员下消费者的总购彩金额,然后根据提成比例计算该分销员的收入
-			BigDecimal consumerTotalAmount = new BigDecimal(0);
-			int registerConsumerNum = 0;
-			for (int j = 0; j < consumerList.size(); j++) {
-				if (consumerList.get(j).getUserId() != null) {
-					for (int k = 0; k < optionLogList.size(); k++) {
-						// 操作节点等于2表示该记录为购彩
-						if (optionLogList.get(k).getOperationNode() == 2) {
-							if (optionLogList.get(k).getUserId().equals(consumerList.get(j).getUserId())) {
-								consumerTotalAmount = optionLogList.get(k).getOptionAmount().add(consumerTotalAmount);
-							}
-						}
-						// 新注册用户获取一块钱奖励 首次登录时间不为空 才能判定为该用户登录过该APP只有登录过 才能给员工奖励
-						if (optionLogList.get(k).getOperationNode() == 1) {
-							if (optionLogList.get(k).getDistributorId() == id) {
-								registerConsumerNum += 1;
-							}
-						}
-					}
-				}
-			}
 			IncomeRankingDTO incomeRanking = new IncomeRankingDTO();
-			// 设置排名
-			// incomeRanking.setRanking(i);
-			// 设置电话
-			incomeRanking.setDistributorMobile(channelDistributorList.get(i).getMobile());
-			// 设置收入提成
-			BigDecimal bd = new BigDecimal(channelDistributorList.get(i).getDistributorCommissionRate());
-			incomeRanking.setTotalAmount((consumerTotalAmount.multiply(bd).doubleValue()) + registerConsumerNum);
-			// 设置用户Id
-			incomeRanking.setUserId(channelDistributorList.get(i).getUserId());
-			// 将incomeRanking实体添加到incomeRankingList返回给客户端
+			DlChannelDistributor cDistributor = channelDistributorList.get(i);
+			int distributorId = cDistributor.getChannelDistributorId();
+			List<DlChannelOptionLog> thisDistributorOptionLogList = optionLogList.stream().filter(s -> s.getDistributorId() == distributorId).collect(Collectors.toList());
+			List<DlChannelOptionLog> thisDistributorOptionLogListNode2 = thisDistributorOptionLogList.stream().filter(s -> s.getOperationNode() == 2).collect(Collectors.toList());
+			List<DlChannelOptionLog> thisDistributorOptionLogListNode1 = thisDistributorOptionLogList.stream().filter(s -> s.getOperationNode() == 1).collect(Collectors.toList());
+			Double totalAmount = thisDistributorOptionLogListNode2.stream().map(s -> s.getOptionAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
+			incomeRanking.setDistributorMobile(cDistributor.getMobile());
+			BigDecimal bdCommissionRate = new BigDecimal(cDistributor.getDistributorCommissionRate());
+			BigDecimal bdTotalAmount = new BigDecimal(totalAmount);
+			incomeRanking.setTotalAmount(bdCommissionRate.multiply(bdTotalAmount).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() + thisDistributorOptionLogListNode1.size());
+			incomeRanking.setUserId(cDistributor.getUserId());
 			incomeRankingList.add(incomeRanking);
 		}
-		List<IncomeRankingDTO> incomeRankingList1 = new ArrayList<IncomeRankingDTO>();
-		if (incomeRankingList.size() != 0) {
-			incomeRankingList1 = incomeRankingList.stream().sorted(Comparator.comparing(IncomeRankingDTO::getTotalAmount).reversed()).collect(Collectors.toList());
-			IncomeRankingDTO incomeRankingForSelf = new IncomeRankingDTO();
-			// incomeRankingList需要按照收入倒序排列
-			// 前八名按倒叙额外奖励
-			for (int i = 0; i < incomeRankingList1.size(); i++) {
-				IncomeRankingDTO incomeRankingfinal = new IncomeRankingDTO();
-				if (i == 0) {
-					incomeRankingfinal.setExtraReward(100.00);
-				} else if (i == 1) {
-					incomeRankingfinal.setExtraReward(80.00);
-				} else if (i == 2) {
-					incomeRankingfinal.setExtraReward(60.00);
-				} else if (i == 3) {
-					incomeRankingfinal.setExtraReward(40.00);
-				} else if (i == 4) {
-					incomeRankingfinal.setExtraReward(20.00);
-				} else if (i == 5) {
-					incomeRankingfinal.setExtraReward(15.00);
-				} else if (i == 6) {
-					incomeRankingfinal.setExtraReward(10.00);
-				} else if (i == 7) {
-					incomeRankingfinal.setExtraReward(5.00);
-				} else {
-					incomeRankingfinal.setExtraReward(0.00);
-				}
-				// 设置电话
-				incomeRankingfinal.setDistributorMobile(incomeRankingList1.get(i).getDistributorMobile());
-				// 设置排行
-				incomeRankingfinal.setRanking(i + 1);
-				incomeRankingfinal.setUserId(incomeRankingList1.get(i).getUserId());
-				// 设置总金额
-				incomeRankingfinal.setTotalAmount(incomeRankingList1.get(i).getTotalAmount());
-				// 根据userId做比对 将自己的排名抽出来放到榜首
-				if (incomeRankingList1.get(i).getUserId().equals(param.getUserId())) {
-					incomeRankingForSelf = incomeRankingfinal;
-				}
-				// 添加到List
-				incomeRankingListFinal.add(incomeRankingfinal);
+		// 设置排名,添加额外奖励和取出自己的排名
+		incomeRankingListFinal = incomeRankingList.stream().sorted(Comparator.comparing(IncomeRankingDTO::getTotalAmount).reversed()).collect(Collectors.toList());
+		IncomeRankingDTO incomeRankingfinal = new IncomeRankingDTO();
+		for (int i = 0; i < incomeRankingListFinal.size(); i++) {
+			if (i == 0) {
+				incomeRankingListFinal.get(i).setExtraReward(100.00);
+			} else if (i == 1) {
+				incomeRankingListFinal.get(i).setExtraReward(80.00);
+			} else if (i == 2) {
+				incomeRankingListFinal.get(i).setExtraReward(60.00);
+			} else if (i == 3) {
+				incomeRankingListFinal.get(i).setExtraReward(40.00);
+			} else if (i == 4) {
+				incomeRankingListFinal.get(i).setExtraReward(20.00);
+			} else if (i == 5) {
+				incomeRankingListFinal.get(i).setExtraReward(15.00);
+			} else if (i == 6) {
+				incomeRankingListFinal.get(i).setExtraReward(10.00);
+			} else if (i == 7) {
+				incomeRankingListFinal.get(i).setExtraReward(5.00);
+			} else {
+				incomeRankingListFinal.get(i).setExtraReward(0.00);
 			}
-			// 查询今天的收入
-			// 根据自己的Id查询出自己的渠道分销Id
-			DlChannelDistributor cDistributor = this.findByUserId(param.getUserId());
-			// 根据分销Id查询该分销下的用户
-			String data = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
-			List<IncomeDetailsDTO> totalAmountList = dlChannelOptionLogService.getChannelConsumerList(data, cDistributor.getChannelDistributorId());
-			double lotteryAmount = 0;
-			int income = 0;
-			for (int i = 0; i < totalAmountList.size(); i++) {
-				if (totalAmountList.get(i).getOperationNode() == 1) {
-					income += 1;
-				} else if (totalAmountList.get(i).getOperationNode() == 2) {
-					lotteryAmount += totalAmountList.get(i).getLotteryAmount();
-				}
+			incomeRankingListFinal.get(i).setRanking(i + 1);
+			if (incomeRankingListFinal.get(i).getUserId().equals(param.getUserId())) {
+				incomeRankingfinal = incomeRankingListFinal.get(i);
 			}
-			BigDecimal bigdAmount = new BigDecimal(lotteryAmount);
-			BigDecimal bigdRate = new BigDecimal(cDistributor.getDistributorCommissionRate());
-			incomeRankingForSelf.setTodayAmount(bigdAmount.multiply(bigdRate).doubleValue() + income);
-			// 设置自己的收入信息
-			channelDistributor.setChannelDistributor(incomeRankingForSelf);
-			// 排名列表
-			channelDistributor.setChannelDistributorList(incomeRankingListFinal);
-			// 查询该分销员下的扫码量
-			Integer inviteNum = findConsumerByUserId(param) == null ? 0 : findConsumerByUserId(param).size();
-			channelDistributor.setInviteNum(inviteNum);
-			// 查询该分销员下的客户所有的投注金额
-			Double bettingTotalAmount = this.findBettingTotalAmountByDistributorId(param);
-			channelDistributor.setBettingTotalAmount(bettingTotalAmount);
 		}
-		return channelDistributor;
+		ChannelDistributorDTO channelDistributorDTO = new ChannelDistributorDTO();
+		// 查询今天的收入(开始)
+		DlChannelDistributor cDistributor = this.findByUserId(param.getUserId());
+		String data = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
+		List<IncomeDetailsDTO> totalAmountList = dlChannelOptionLogService.getChannelConsumerList(data, cDistributor.getChannelDistributorId());
+		double lotteryAmount = 0;
+		int income = 0;
+		for (int i = 0; i < totalAmountList.size(); i++) {
+			if (totalAmountList.get(i).getOperationNode() == 1) {
+				income += 1;
+			} else if (totalAmountList.get(i).getOperationNode() == 2) {
+				lotteryAmount += totalAmountList.get(i).getLotteryAmount();
+			}
+		}
+		BigDecimal bigdAmount = new BigDecimal(lotteryAmount);
+		BigDecimal bigdRate = new BigDecimal(cDistributor.getDistributorCommissionRate());
+		incomeRankingfinal.setTodayAmount(bigdAmount.multiply(bigdRate).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() + income);
+		// 查询今天的收入(结束)
+		channelDistributorDTO.setChannelDistributor(incomeRankingfinal);
+		Integer inviteNum = findConsumerByUserId(param) == null ? 0 : findConsumerByUserId(param).size();
+		channelDistributorDTO.setInviteNum(inviteNum);
+		Double bettingTotalAmount = this.findBettingTotalAmountByDistributorId(param);
+		channelDistributorDTO.setBettingTotalAmount(bettingTotalAmount);
+		channelDistributorDTO.setChannelDistributorList(incomeRankingListFinal);
+		return channelDistributorDTO;
 	}
 
 	private Double findBettingTotalAmountByDistributorId(DlChannelDistributorParam param) {
