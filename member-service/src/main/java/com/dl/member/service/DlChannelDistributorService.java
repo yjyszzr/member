@@ -44,10 +44,6 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		return dlChannelDistributorMapper.getAllDlChannelDistributor();
 	}
 
-	public int findinviteNumByUserId(DlChannelDistributorParam param) {
-		return findConsumerByUserId(param).size();
-	}
-
 	private List<DlChannelConsumer> findConsumerByUserId(DlChannelDistributorParam param) {
 		// 先根据入参ID查出来分销员的ID
 		Condition conditionByUserId = new Condition(DlChannelDistributor.class);
@@ -380,7 +376,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 				BigDecimal bd = new BigDecimal(channelDistributor.getDistributorCommissionRate());
 				if (promotionIncomes.get(i).getLotteryAmount() != null) {
 					BigDecimal lotteryAmount = new BigDecimal(promotionIncomes.get(i).getLotteryAmount());
-					promotionIncomes.get(i).setIncome(lotteryAmount.multiply(bd).doubleValue() + promotionIncomes.get(i).getRegisterNum());
+					promotionIncomes.get(i).setIncome(lotteryAmount.multiply(bd).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() + promotionIncomes.get(i).getRegisterNum());
 				} else {
 					promotionIncomes.get(i).setIncome(promotionIncomes.get(i).getRegisterNum().doubleValue());
 				}
