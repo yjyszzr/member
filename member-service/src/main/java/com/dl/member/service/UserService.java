@@ -310,12 +310,18 @@ public class UserService extends AbstractService<User> {
 		Integer userId = params.getUserId();
 		User user = this.findById(userId);
 		UserDTO userDTO = new UserDTO();
+		boolean isReal = params.isReal();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
-			String strRandom4 = RandomUtil.generateUpperString(4);
-			String mobile = user.getMobile();
-			mobile = mobile.replace(mobile.substring(3, 7), strRandom4);
-			userDTO.setMobile(mobile);
+			if(!isReal) {
+				String strRandom4 = RandomUtil.generateUpperString(4);
+				String mobile = user.getMobile();
+				mobile = mobile.replace(mobile.substring(3, 7), strRandom4);
+				userDTO.setMobile(mobile);
+			}else {
+				String mobile = user.getMobile();
+				userDTO.setMobile(mobile);
+			}
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
 			BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
