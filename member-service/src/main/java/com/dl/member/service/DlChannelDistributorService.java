@@ -1,6 +1,7 @@
 package com.dl.member.service;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -284,7 +285,9 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			incomeRanking.setDistributorMobile(cDistributor.getMobile());
 			BigDecimal bdCommissionRate = new BigDecimal(cDistributor.getDistributorCommissionRate());
 			BigDecimal bdTotalAmount = new BigDecimal(totalAmount);
-			incomeRanking.setTotalAmount(bdCommissionRate.multiply(bdTotalAmount).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() + thisDistributorOptionLogListNode1.size());
+			Double totalA = bdCommissionRate.multiply(bdTotalAmount).doubleValue() + thisDistributorOptionLogListNode1.size();
+			DecimalFormat df = new DecimalFormat("#.00");
+			incomeRanking.setTotalAmount(Double.parseDouble(df.format(totalA)));
 			incomeRanking.setUserId(cDistributor.getUserId());
 			incomeRankingList.add(incomeRanking);
 		}
@@ -332,7 +335,9 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		}
 		BigDecimal bigdAmount = new BigDecimal(lotteryAmount);
 		BigDecimal bigdRate = new BigDecimal(cDistributor.getDistributorCommissionRate());
-		incomeRankingfinal.setTodayAmount(bigdAmount.multiply(bigdRate).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() + income);
+		Double incomeBd = bigdAmount.multiply(bigdRate).doubleValue() + income;
+		DecimalFormat df = new DecimalFormat("#.00");
+		incomeRankingfinal.setTodayAmount(Double.parseDouble(df.format(incomeBd)));
 		// 查询今天的收入(结束)
 		channelDistributorDTO.setChannelDistributor(incomeRankingfinal);
 		Integer inviteNum = findConsumerByUserId(param) == null ? 0 : findConsumerByUserId(param).size();
@@ -376,7 +381,9 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 				BigDecimal bd = new BigDecimal(channelDistributor.getDistributorCommissionRate());
 				if (promotionIncomes.get(i).getLotteryAmount() != null) {
 					BigDecimal lotteryAmount = new BigDecimal(promotionIncomes.get(i).getLotteryAmount());
-					promotionIncomes.get(i).setIncome(lotteryAmount.multiply(bd).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() + promotionIncomes.get(i).getRegisterNum());
+					Double a = lotteryAmount.multiply(bd).doubleValue() + promotionIncomes.get(i).getRegisterNum();
+					DecimalFormat df = new DecimalFormat("#.00");
+					promotionIncomes.get(i).setIncome(Double.parseDouble(df.format(a)));
 				} else {
 					promotionIncomes.get(i).setLotteryAmount(0D);
 					promotionIncomes.get(i).setIncome(promotionIncomes.get(i).getRegisterNum().doubleValue());
