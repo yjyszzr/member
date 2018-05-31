@@ -5,14 +5,10 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import tk.mybatis.mapper.entity.Condition;
 
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -28,8 +24,12 @@ import com.dl.member.model.User;
 import com.dl.member.model.UserLoginLog;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
+import com.dl.member.param.UserRegisterParam;
 import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
+
+import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
 
 /**
  * 用户登录服务
@@ -163,27 +163,20 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
-		int passWrongCount = 5;
 		User user = userService.findBy("mobile", mobile);
 		if (null == user) {// 新用户注册并登录
-			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
-			// UserRegisterParam userRegisterParam = new UserRegisterParam();
-			// userRegisterParam.setMobile(userLoginMobileParam.getMobile());
-			// userRegisterParam.setPassWord("");
-			// userRegisterParam.setLoginSource(userLoginMobileParam.getLoginSource());
-			// userRegisterParam.setDevice(userLoginMobileParam.getDevice());
-			// BaseResult<Integer> regRst =
-			// userRegisterService.registerUser(userRegisterParam, request);
-			// if(regRst.getCode() != 0) {
-			// return ResultGenerator.genFailResult(regRst.getMsg());
-			// }
-			//
-			// UserLoginDTO userLoginDTO =
-			// queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(),
-			// userLoginMobileParam.getLoginSource());
-			// return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
-			// User user = userService.findBy("mobile",
-			// userRegisterParam.getMobile());
+//			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+			 UserRegisterParam userRegisterParam = new UserRegisterParam();
+			 userRegisterParam.setMobile(userLoginMobileParam.getMobile());
+			 userRegisterParam.setPassWord("");
+			 userRegisterParam.setLoginSource(userLoginMobileParam.getLoginSource());
+			 BaseResult<Integer> regRst =  userRegisterService.registerUser(userRegisterParam, request);
+			 if(regRst.getCode() != 0) {
+				 return ResultGenerator.genFailResult(regRst.getMsg());
+			 }
+			
+			 UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
+			 return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 		} else {
 			Integer userStatus = user.getUserStatus();
 			if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
