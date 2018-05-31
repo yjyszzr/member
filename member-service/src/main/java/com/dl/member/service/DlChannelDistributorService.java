@@ -378,6 +378,7 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 					BigDecimal lotteryAmount = new BigDecimal(promotionIncomes.get(i).getLotteryAmount());
 					promotionIncomes.get(i).setIncome(lotteryAmount.multiply(bd).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() + promotionIncomes.get(i).getRegisterNum());
 				} else {
+					promotionIncomes.get(i).setLotteryAmount(0D);
 					promotionIncomes.get(i).setIncome(promotionIncomes.get(i).getRegisterNum().doubleValue());
 				}
 			}
