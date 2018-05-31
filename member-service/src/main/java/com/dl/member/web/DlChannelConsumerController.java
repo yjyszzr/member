@@ -76,7 +76,7 @@ public class DlChannelConsumerController {
 	@ApiOperation(value = "我的推荐", notes = "我的推荐")
 	@PostMapping("/myRecommendation")
 	public BaseResult<ChannelDistributorDTO> myRecommendation(@RequestBody DlChannelDistributorParam param) {
-		// param.setUserId(400165);
+		// param.setUserId(400102);
 		param.setUserId(SessionUtil.getUserId());
 		ChannelDistributorDTO channelDistributor = new ChannelDistributorDTO();
 		channelDistributor = dlChannelDistributorService.getMyRankingListBak(param);
@@ -136,21 +136,23 @@ public class DlChannelConsumerController {
 			String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
 			stringRedisTemplate.opsForValue().set(key, strRandom4, expiredTime, TimeUnit.SECONDS);
 			// 短信发送成功执行保存操作
-			DlChannelConsumer dlChannelConsumer = new DlChannelConsumer();
-			dlChannelConsumer.setAddTime(DateUtilNew.getCurrentTimeLong());
-			dlChannelConsumer.setDeleted(0);
-			dlChannelConsumer.setConsumerId(0);
 			DlChannelDistributor distributor = dlChannelDistributorService.findByUserId(smsParam.getUserId());
 			if (null != distributor) {
-				dlChannelConsumer.setChannelDistributorId(distributor.getChannelDistributorId());
+				DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(distributor.getChannelDistributorId(), smsParam.getMobile());
+				if (channelConsumer == null) {
+					DlChannelConsumer dlChannelConsumer = new DlChannelConsumer();
+					dlChannelConsumer.setAddTime(DateUtilNew.getCurrentTimeLong());
+					dlChannelConsumer.setDeleted(0);
+					dlChannelConsumer.setConsumerId(0);
+					dlChannelConsumer.setChannelDistributorId(distributor.getChannelDistributorId());
+					dlChannelConsumer.setConsumerIp(IpUtil.getIpAddr(request));
+					dlChannelConsumer.setMobile(smsParam.getMobile());
+					dlChannelConsumerService.save(dlChannelConsumer);
+					return ResultGenerator.genSuccessResult("发送短信验证码成功", distributor.getChannelDistributorId().toString());
+				}
+				return ResultGenerator.genSuccessResult("发送短信验证码成功", distributor.getChannelDistributorId().toString());
 			}
-			dlChannelConsumer.setConsumerIp(IpUtil.getIpAddr(request));
-			dlChannelConsumer.setMobile(smsParam.getMobile());
-			DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(distributor.getChannelDistributorId(), smsParam.getMobile());
-			if (channelConsumer == null) {
-				dlChannelConsumerService.save(dlChannelConsumer);
-			}
-			return ResultGenerator.genSuccessResult("发送短信验证码成功", distributor.getChannelDistributorId().toString());
+			return ResultGenerator.genFailResult("参数异常");
 		} else {
 			return ResultGenerator.genFailResult("参数异常");
 		}

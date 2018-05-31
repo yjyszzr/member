@@ -28,6 +28,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
+import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
@@ -648,6 +649,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	@Async
 	public void saveRewardMessageAsync(List<UserIdAndRewardDTO> list, Integer accountTime) {
 		List<Integer> userIdList = list.stream().map(s -> s.getUserId()).collect(Collectors.toList());
+		if(CollectionUtils.isEmpty(userIdList)) {
+			return;
+		}
+		log.info(" 00000   " + JSONHelper.bean2json(userIdList));
 		List<User> userList = userMapper.queryUserByUserIds(userIdList);
 		if (CollectionUtils.isEmpty(userList)) {
 			return;
