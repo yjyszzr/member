@@ -278,8 +278,8 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			DlChannelDistributor cDistributor = channelDistributorList.get(i);
 			int distributorId = cDistributor.getChannelDistributorId();
 			List<DlChannelOptionLog> thisDistributorOptionLogList = optionLogList.stream().filter(s -> s.getDistributorId() == distributorId).collect(Collectors.toList());
-			List<DlChannelOptionLog> thisDistributorOptionLogListNode2 = thisDistributorOptionLogList.stream().filter(s -> s.getOperationNode() == 2).collect(Collectors.toList());
 			List<DlChannelOptionLog> thisDistributorOptionLogListNode1 = thisDistributorOptionLogList.stream().filter(s -> s.getOperationNode() == 1).collect(Collectors.toList());
+			List<DlChannelOptionLog> thisDistributorOptionLogListNode2 = thisDistributorOptionLogList.stream().filter(s -> s.getOperationNode() == 2).collect(Collectors.toList());
 			Double totalAmount = thisDistributorOptionLogListNode2.stream().map(s -> s.getOptionAmount().doubleValue()).reduce(Double::sum).orElse(0.00);
 			incomeRanking.setDistributorMobile(cDistributor.getMobile());
 			BigDecimal bdCommissionRate = new BigDecimal(cDistributor.getDistributorCommissionRate());
