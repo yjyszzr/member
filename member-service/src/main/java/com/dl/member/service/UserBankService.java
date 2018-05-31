@@ -110,11 +110,6 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg(),userBankDTO);
 		}
 		
-		//把已经添加的默认银行卡 设为非默认
-		BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
-		if(userBankDTORst.getCode() != 0) {
-			return ResultGenerator.genFailResult(userBankDTORst.getMsg());
-		}
 		//删除过银行卡，再添加，不再验证银行卡，直接把已删除的银行卡置为未删除和默认状态
 //		UserBank userBankDelete = new UserBank();
 //		userBankDelete.setCardNo(bankCardNo);
@@ -173,6 +168,12 @@ public class UserBankService extends AbstractService<UserBank> {
 			}
 		}else {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), reason,userBankDTO);
+		}
+
+		//把已经添加的默认银行卡 设为非默认
+		BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
+		if(userBankDTORst.getCode() != 0) {
+			return ResultGenerator.genFailResult(userBankDTORst.getMsg());
 		}
 		
 		//保存到数据库

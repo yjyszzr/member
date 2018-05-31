@@ -208,6 +208,8 @@ public class UserService extends AbstractService<User> {
 		
 		// 查询推广活动集合
 		userDTO.setActivityDTOList(activityMemDTOList);
+		
+		//查询是否
 
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
