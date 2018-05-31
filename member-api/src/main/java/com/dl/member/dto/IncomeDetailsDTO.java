@@ -29,6 +29,9 @@ public class IncomeDetailsDTO {
 	@ApiModelProperty("	购彩金额")
 	private Double lotteryAmount;
 
+	@ApiModelProperty("收入类型")
+	private String incomeType;
+
 	@ApiModelProperty("店员ID")
 	private Integer channelDistributorId;
 

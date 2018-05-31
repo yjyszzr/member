@@ -1,9 +1,11 @@
 package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.member.dto.DonationPriceDTO;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.model.UserBonus;
+import com.dl.member.param.PayLogIdParam;
 import com.dl.member.param.BonusLimitConditionParam;
 import com.dl.member.param.RollackSurplusPayParam;
 import com.dl.member.param.StrParam;
@@ -52,6 +54,14 @@ public class UserBonusController {
     public BaseResult<List<UserBonusDTO>> queryValidBonusList(@RequestBody BonusLimitConditionParam bonusLimitConditionParam) {
     	List<UserBonusDTO> userBonusDTOList =  userBonusService.queryValidBonusListForPay(bonusLimitConditionParam);
     	return ResultGenerator.genSuccessResult("查询用户有效的红包列表成功",userBonusDTOList);
+    }
+    
+    
+    @ApiOperation(value="领取充值送随机红包", notes="充值成功后领取充值送随机红包",hidden=false)
+    @PostMapping("/rechargeSucReiceiveBonus")
+    public BaseResult<DonationPriceDTO> rechargeSucReiceiveBonus(@RequestBody PayLogIdParam payLogIdParam) {
+    	DonationPriceDTO donationPriceDTO = userBonusService.receiveRechargeUserBonus(Integer.valueOf(payLogIdParam.getPayLogId()));
+    	return ResultGenerator.genSuccessResult("查领取充值送随机红包成功",donationPriceDTO);
     }
     
 }

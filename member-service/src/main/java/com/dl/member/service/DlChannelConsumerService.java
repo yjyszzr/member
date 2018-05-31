@@ -126,13 +126,18 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 		for (int i = 0; i < incomeDetailsList.size(); i++) {
 			double income = 0;
 			if (incomeDetailsList.get(i).getOperationNode() == 1) {
+				incomeDetailsList.get(i).setIncomeType("注册");
 				income += 1;
 			} else {
+				incomeDetailsList.get(i).setIncomeType("购彩" + incomeDetailsList.get(i).getLotteryAmount() + "元");
 				BigDecimal bd = new BigDecimal(rate);
 				BigDecimal bdIncome = new BigDecimal(incomeDetailsList.get(i).getLotteryAmount());
 				income = bdIncome.multiply(bd).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 			}
 			incomeDetailsList.get(i).setIncome(income);
+			if (null != incomeDetailsList.get(i).getMobile()) {
+				incomeDetailsList.get(i).setMobile(incomeDetailsList.get(i).getMobile().substring(0, 3) + "****" + incomeDetailsList.get(i).getMobile().substring(7));
+			}
 		}
 		return incomeDetailsList;
 	}

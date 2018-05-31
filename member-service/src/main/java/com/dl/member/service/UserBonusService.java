@@ -1,5 +1,6 @@
 package com.dl.member.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -30,11 +31,13 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
+import com.dl.base.util.RandomUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
+import com.dl.member.dto.DonationPriceDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.ActivityBonus;
@@ -42,8 +45,12 @@ import com.dl.member.model.User;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.BonusLimitConditionParam;
 import com.dl.member.param.UserBonusParam;
+import com.dl.member.util.BonusUtil;
 import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
+import com.dl.shop.payment.api.IpaymentService;
+import com.dl.shop.payment.dto.PayLogDTO;
+import com.dl.shop.payment.param.PayLogIdParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -62,6 +69,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 
 	@Resource
 	private UserMapper userMapper;
+	
+	@Resource
+	private IpaymentService payMentService;
 
 	@Resource
 	private GeTuiUtil geTuiUtil;
@@ -335,6 +345,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		return userBonusDTO;
 	}
 
+	
+	
 	/**
 	 * 领取红包
 	 * 
@@ -383,6 +395,55 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		return true;
 	}
 
+	/**
+	 * 领取充值赠送的随机数额的红包
+	 * 
+	 * @return
+	 */
+	@Transactional
+	public DonationPriceDTO receiveRechargeUserBonus(Integer payLogId) {
+		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
+		PayLogIdParam payLogIdParam = new PayLogIdParam();
+		payLogIdParam.setPayLogId(payLogId);
+		BaseResult<PayLogDTO> payLogDTORst = payMentService.queryPayLogByPayLogId(payLogIdParam);
+		if(payLogDTORst.getCode() != 0) {
+			return null;
+		}
+		
+		BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
+		Integer userId = SessionUtil.getUserId();
+		List<Double> randomDataList = BonusUtil.getBonusRandomData(recharegePrice.doubleValue());
+		Double bonusPrice = RandomUtil.randomBonusPrice(randomDataList.get(0),randomDataList.get(1),randomDataList.get(2),randomDataList.get(3),randomDataList.get(4),randomDataList.get(5));
+		
+		Integer now = DateUtil.getCurrentTimeLong();
+		Date currentTime = new Date();
+		List<UserBonus> userBonusLisgt = new ArrayList<UserBonus>();
+		UserBonus userBonus = new UserBonus();
+		userBonus.setUserId(userId);
+		userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+		userBonus.setBonusPrice(new BigDecimal(bonusPrice));
+		userBonus.setReceiveTime(now);
+		userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
+		userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, 3, 23, 59, 59));
+		userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
+		userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+		userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
+		userBonus.setMinGoodsAmount(new BigDecimal(bonusPrice * 3));
+		userBonusLisgt.add(userBonus);
+
+		try {
+			int rst = userBonusMapper.insertBatchUserBonus(userBonusLisgt);
+			if (rst != userBonusLisgt.size()) {
+				throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "用户" + userId + "领取红包异常,已回滚");
+			}
+		} catch (Exception e) {
+			log.error("用户" + userId + "领取红包异常,已回滚");
+		}
+		
+		donationPriceDTO.setDonationPrice(bonusPrice);
+		return donationPriceDTO;
+	}
+	
 	/**
 	 * 更新红包为已过期
 	 * 
