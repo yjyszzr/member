@@ -1,6 +1,7 @@
 package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.member.dto.DonationPriceDTO;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.model.UserBonus;
@@ -56,10 +57,11 @@ public class UserBonusController {
     }
     
     
-    @ApiOperation(value="充值成功后领取充值送随机红包", notes="充值成功后领取充值送随机红包",hidden=false)
+    @ApiOperation(value="领取充值送随机红包", notes="充值成功后领取充值送随机红包",hidden=false)
     @PostMapping("/rechargeSucReiceiveBonus")
-    public BaseResult<Boolean> rechargeSucReiceiveBonus(@RequestBody PayLogIdParam payLogIdParam) {
-    	return ResultGenerator.genSuccessResult("充值成功后领取充值送随机红包",userBonusService.receiveRechargeUserBonus(Integer.valueOf(payLogIdParam.getPayLogId())));
+    public BaseResult<DonationPriceDTO> rechargeSucReiceiveBonus(@RequestBody PayLogIdParam payLogIdParam) {
+    	DonationPriceDTO donationPriceDTO = userBonusService.receiveRechargeUserBonus(Integer.valueOf(payLogIdParam.getPayLogId()));
+    	return ResultGenerator.genSuccessResult("查领取充值送随机红包成功",donationPriceDTO);
     }
     
 }
