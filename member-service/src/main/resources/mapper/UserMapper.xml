@@ -100,9 +100,9 @@
   
   <select id="queryUserByUserIds" resultMap="BaseResultMap">
   	 	SELECT * FROM dl_user WHERE user_id IN
-	  	<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
-	         #{item}  
-	    </foreach>
+	  	<foreach collection="userIds" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
   </select>
   
   <insert id="saveMemberThirdApiLog">
