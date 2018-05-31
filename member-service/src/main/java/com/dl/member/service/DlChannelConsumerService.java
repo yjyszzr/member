@@ -42,7 +42,7 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 
 	public List<DlChannelConsumer> selectByChannelDistributorId(Integer channelDistributorId) {
 		Condition condition = new Condition(DlChannelConsumer.class);
-		condition.createCriteria().andCondition("channel_distributor_id = ", channelDistributorId);
+		condition.createCriteria().andCondition("channel_distributor_id = ", channelDistributorId).andIsNotNull("userId");
 		return dlChannelConsumerMapper.selectByCondition(condition);
 	}
 
@@ -130,7 +130,7 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 			} else {
 				BigDecimal bd = new BigDecimal(rate);
 				BigDecimal bdIncome = new BigDecimal(incomeDetailsList.get(i).getLotteryAmount());
-				income = bdIncome.multiply(bd).doubleValue();
+				income = bdIncome.multiply(bd).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 			}
 			incomeDetailsList.get(i).setIncome(income);
 		}
