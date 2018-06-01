@@ -160,6 +160,11 @@ public class UserService extends AbstractService<User> {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
+		if(StringUtils.isBlank(user.getPassword())) {
+			userDTO.setHasPass(0);
+		}else {
+			userDTO.setHasPass(1);
+		}
 		BigDecimal userMoney = user.getUserMoney();
 		String userMoneyStr = userMoney==null?"0":userMoney.toString();
 		userDTO.setUserMoney(userMoneyStr);
