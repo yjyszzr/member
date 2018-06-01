@@ -53,8 +53,7 @@ public class UserBonusController {
     @ApiOperation(value="领取充值送随机红包", notes="充值成功后领取充值送随机红包",hidden=false)
     @PostMapping("/rechargeSucReiceiveBonus")
     public BaseResult<DonationPriceDTO> rechargeSucReiceiveBonus(@RequestBody PayLogIdParam payLogIdParam) {
-    	DonationPriceDTO donationPriceDTO = userBonusService.receiveRechargeUserBonus(Integer.valueOf(payLogIdParam.getPayLogId()));
-    	return ResultGenerator.genSuccessResult("查领取充值送随机红包成功",donationPriceDTO);
+    	return userBonusService.receiveRechargeUserBonus(Integer.valueOf(payLogIdParam.getPayLogId()));
     }
     
 }

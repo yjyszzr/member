@@ -401,9 +401,20 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @return
 	 */
 	@Transactional
-	public DonationPriceDTO receiveRechargeUserBonus(Integer payLogId) {
+	public BaseResult<DonationPriceDTO> receiveRechargeUserBonus(Integer payLogId) {
 		//过期的活动不能领取该活动的红包
+		
+		//已经领取的红包不能再领取
 		Integer userId = SessionUtil.getUserId();
+		Condition condition = new Condition(UserBonus.class);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("user_id =", userId);
+		criteria.andCondition("bonus_id =", 2);
+		List<UserBonus> reiceiveRechargeBonusList = this.findByCondition(condition);
+		if(reiceiveRechargeBonusList.size() > 0) {
+			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),"用户已经领取过该充值红包");
+		}
+		
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
 		PayLogIdParam payLogIdParam = new PayLogIdParam();
 		payLogIdParam.setPayLogId(payLogId);
@@ -421,7 +432,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		List<UserBonus> userBonusListRecharge = this.createRechargeUserBonusList(userId, bonusPrice);
 		userBonusMapper.insertBatchUserBonus(userBonusListRecharge);
 		donationPriceDTO.setDonationPrice(bonusPrice);
-		return donationPriceDTO;
+		return 	ResultGenerator.genSuccessResult("success", donationPriceDTO);
 	}
 	
 	/**
@@ -439,6 +450,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		for(RechargeBonusLimitDTO rechargeBonusLimit:recharegeBonusList) {
 			UserBonus userBonus = new UserBonus();
 			userBonus.setUserId(userId);
+			userBonus.setBonusId(2);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 			userBonus.setBonusPrice(new BigDecimal(rechargeBonusLimit.getBonusPrice()));
 			userBonus.setReceiveTime(now);
