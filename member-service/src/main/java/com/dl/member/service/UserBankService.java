@@ -173,7 +173,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		//把已经添加的默认银行卡 设为非默认
 		BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT);
 		if(userBankDTORst.getCode() != 0) {
-			return ResultGenerator.genFailResult(userBankDTORst.getMsg());
+			log.error(userBankDTORst.getMsg());
 		}
 		
 		//保存到数据库

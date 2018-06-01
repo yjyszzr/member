@@ -2,6 +2,7 @@ package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.DonationRechargeCardDTO;
+import com.dl.member.dto.RechargeActivityDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.model.DonationRechargeCard;
 import com.dl.member.param.PageParam;
@@ -32,7 +33,7 @@ public class DonationRechargeCardController {
     private DonationRechargeCardService donationRechargeCardService;
 
     @PostMapping("/list")
-    public BaseResult<PageInfo<DonationRechargeCardDTO>> list(@RequestBody PageParam pageParam) {
+    public BaseResult<RechargeActivityDTO> list(@RequestBody PageParam pageParam) {
     	return donationRechargeCardService.queryAllRechargeCards(pageParam);
     }
 }

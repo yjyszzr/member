@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.DLActivityMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.DLActivity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="act_id" jdbcType="INTEGER" property="actId" />
+    <result column="act_name" jdbcType="VARCHAR" property="actName" />
+    <result column="act_title" jdbcType="VARCHAR" property="actTitle" />
+    <result column="act_type" jdbcType="INTEGER" property="actType" />
+    <result column="act_img" jdbcType="VARCHAR" property="actImg" />
+    <result column="act_url" jdbcType="VARCHAR" property="actUrl" />
+    <result column="start_time" jdbcType="INTEGER" property="startTime" />
+    <result column="end_time" jdbcType="INTEGER" property="endTime" />
+    <result column="is_finish" jdbcType="BIT" property="isFinish" />
+    <result column="purchase_num" jdbcType="INTEGER" property="purchaseNum" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="use_range" jdbcType="BIT" property="useRange" />
+  </resultMap>
+  
+  <select id="queryActivityByType" parameterType="java.lang.Integer"  resultMap="BaseResultMap">
+  	select * from dl_activity where act_type = #{actType}
+  </select>
+  
+</mapper>

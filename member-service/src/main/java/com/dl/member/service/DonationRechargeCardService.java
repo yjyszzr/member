@@ -11,8 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
+import com.dl.member.dao.DLActivityMapper;
 import com.dl.member.dao.DonationRechargeCardMapper;
 import com.dl.member.dto.DonationRechargeCardDTO;
+import com.dl.member.dto.RechargeActivityDTO;
+import com.dl.member.model.DLActivity;
 import com.dl.member.model.DonationRechargeCard;
 import com.dl.member.param.PageParam;
 import com.github.pagehelper.PageHelper;
@@ -27,7 +30,10 @@ public class DonationRechargeCardService extends AbstractService<DonationRecharg
     @Resource
     private DonationRechargeCardMapper donationRechargeCardMapper;
 
-	public BaseResult<PageInfo<DonationRechargeCardDTO>> queryAllRechargeCards(PageParam pageParam) {
+    @Resource
+    private DLActivityMapper dLActivityMapper;
+    
+	public BaseResult<RechargeActivityDTO> queryAllRechargeCards(PageParam pageParam) {
         PageHelper.startPage(pageParam.getPageNum(), pageParam.getPageSize());
         List<DonationRechargeCard> list = this.findAll();
         PageInfo<DonationRechargeCard> pageInfo = new PageInfo(list);
@@ -44,14 +50,11 @@ public class DonationRechargeCardService extends AbstractService<DonationRecharg
         	donationRechargeCardDTOList.add(donationRechargeCardDTO);
         });
         
-		PageInfo<DonationRechargeCardDTO> result = new PageInfo<DonationRechargeCardDTO>();
-		try {
-			BeanUtils.copyProperties(pageInfo, result);
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
-		
-		result.setList(donationRechargeCardDTOList);
-        return ResultGenerator.genSuccessResult("success",result);
+    	DLActivity dLActivity = dLActivityMapper.queryActivityByType(2);
+        RechargeActivityDTO rechargeActivityDTO = new RechargeActivityDTO();
+        rechargeActivityDTO.setStartTime(dLActivity.getStartTime());
+        rechargeActivityDTO.setEndTime(dLActivity.getEndTime());
+        rechargeActivityDTO.setRechargeCardList(donationRechargeCardDTOList);
+        return ResultGenerator.genSuccessResult("success",rechargeActivityDTO);
 	}
 }
