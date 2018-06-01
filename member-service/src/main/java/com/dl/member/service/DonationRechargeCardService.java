@@ -33,15 +33,15 @@ public class DonationRechargeCardService extends AbstractService<DonationRecharg
         List<DonationRechargeCard> list = this.findAll();
         PageInfo<DonationRechargeCard> pageInfo = new PageInfo(list);
         
-        DonationRechargeCardDTO donationRechargeCardDTO = new DonationRechargeCardDTO();
         List<DonationRechargeCardDTO> donationRechargeCardDTOList = new ArrayList<>();
         list.forEach(s->{
+        	DonationRechargeCardDTO donationRechargeCardDTO = new DonationRechargeCardDTO();
         	donationRechargeCardDTO.setRechargeCardId(String.valueOf(s.getRechargeCardId()));
         	donationRechargeCardDTO.setDescription(s.getDescription());
         	donationRechargeCardDTO.setName(s.getName());
         	donationRechargeCardDTO.setType(String.valueOf(s.getType()));
         	donationRechargeCardDTO.setTypeLabel(0 == s.getType()?"新用户专享,仅限1次":"单笔充值");
-        	donationRechargeCardDTO.setRealValue(String.valueOf(s.getRealValue().doubleValue()));
+        	donationRechargeCardDTO.setRealValue(String.valueOf(s.getRealValue().intValue()));
         	donationRechargeCardDTOList.add(donationRechargeCardDTO);
         });
         

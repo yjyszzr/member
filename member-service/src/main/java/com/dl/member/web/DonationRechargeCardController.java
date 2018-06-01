@@ -31,30 +31,6 @@ public class DonationRechargeCardController {
     @Resource
     private DonationRechargeCardService donationRechargeCardService;
 
-    @PostMapping("/add")
-    public BaseResult add(DonationRechargeCard donationRechargeCard) {
-        donationRechargeCardService.save(donationRechargeCard);
-        return ResultGenerator.genSuccessResult();
-    }
-
-    @PostMapping("/delete")
-    public BaseResult delete(@RequestParam Integer id) {
-        donationRechargeCardService.deleteById(id);
-        return ResultGenerator.genSuccessResult();
-    }
-
-    @PostMapping("/update")
-    public BaseResult update(DonationRechargeCard donationRechargeCard) {
-        donationRechargeCardService.update(donationRechargeCard);
-        return ResultGenerator.genSuccessResult();
-    }
-
-    @PostMapping("/detail")
-    public BaseResult detail(@RequestParam Integer id) {
-        DonationRechargeCard donationRechargeCard = donationRechargeCardService.findById(id);
-        return ResultGenerator.genSuccessResult(null,donationRechargeCard);
-    }
-
     @PostMapping("/list")
     public BaseResult<PageInfo<DonationRechargeCardDTO>> list(@RequestBody PageParam pageParam) {
     	return donationRechargeCardService.queryAllRechargeCards(pageParam);
