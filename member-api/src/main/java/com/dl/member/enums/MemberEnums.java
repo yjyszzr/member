@@ -40,7 +40,8 @@ public enum MemberEnums {
 	MESSAGE_SENDLOT_ERROR(301047,"验证码60秒内仅可发送一次，再次发送后前一条验证码失效！"),
 	USER_NOT_FOUND_ERROR(301048,"用户获取失败或不存在！"),
 	NO_OLD_LOGIN_PASS_ERROR(301049,"请提供原始密码！"),
-	ERR_OLD_LOGIN_PASS_ERROR(301050,"原始密码输入有误！");
+	ERR_OLD_LOGIN_PASS_ERROR(301050,"原始密码输入有误！"),
+	ACTIVITY_NOT_VALID(301051,"活动已过期");
 
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	

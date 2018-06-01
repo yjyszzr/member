@@ -30,6 +30,7 @@ import com.dl.base.util.RandomUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.DLActivityMapper;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.DonationPriceDTO;
@@ -37,6 +38,7 @@ import com.dl.member.dto.RechargeBonusLimitDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.ActivityBonus;
+import com.dl.member.model.DLActivity;
 import com.dl.member.model.User;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.BonusLimitConditionParam;
@@ -72,6 +74,12 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	
 	@Resource
 	private IpaymentService payMentService;
+	
+    @Resource
+    private DLActivityMapper dLActivityMapper;
+    
+    @Resource
+    private DLActivityService activityService;
 
 	@Resource
 	private GeTuiUtil geTuiUtil;
@@ -402,25 +410,31 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 */
 	@Transactional
 	public BaseResult<DonationPriceDTO> receiveRechargeUserBonus(Integer payLogId) {
-		//过期的活动不能领取该活动的红包
+		//过期的充值活动不能领取该活动的红包
+		Integer now = DateUtil.getCurrentTimeLong();
+		Integer countRst = dLActivityMapper.countRechargeActivity(now);
+		if(countRst == 0) {
+			return ResultGenerator.genResult(MemberEnums.ACTIVITY_NOT_VALID.getcode(),MemberEnums.ACTIVITY_NOT_VALID.getMsg());
+		}
 		
 		//已经领取的红包不能再领取
 		Integer userId = SessionUtil.getUserId();
-		Condition condition = new Condition(UserBonus.class);
-		Criteria criteria = condition.createCriteria();
-		criteria.andCondition("user_id =", userId);
-		criteria.andCondition("bonus_id =", 2);
-		List<UserBonus> reiceiveRechargeBonusList = this.findByCondition(condition);
-		if(reiceiveRechargeBonusList.size() > 0) {
-			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),"用户已经领取过该充值红包");
-		}
+//		Condition condition = new Condition(UserBonus.class);
+//		Criteria criteria = condition.createCriteria();
+//		criteria.andCondition("user_id =", userId);
+//		criteria.andCondition("bonus_id =", 2);
+//		List<UserBonus> reiceiveRechargeBonusList = this.findByCondition(condition);
+//		if(reiceiveRechargeBonusList.size() > 0) {
+//			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),"用户已经领取过该充值红包");
+//		}
 		
+		//已支付的的充值才能参与充值领红包
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
 		PayLogIdParam payLogIdParam = new PayLogIdParam();
 		payLogIdParam.setPayLogId(payLogId);
 		BaseResult<PayLogDTO> payLogDTORst = payMentService.queryPayLogByPayLogId(payLogIdParam);
 		if(payLogDTORst.getCode() != 0) {
-			return null;
+			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),"不能参与充值领红包活动");
 		}
 		
 		BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();

@@ -9,4 +9,6 @@ public interface DLActivityMapper extends Mapper<DLActivity> {
 	
 	DLActivity queryActivityByType(@Param("actType") Integer actType);
 	
+	Integer countRechargeActivity(@Param("now") Integer now);
+	
 }
