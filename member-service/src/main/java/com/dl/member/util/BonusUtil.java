@@ -3,6 +3,8 @@ package com.dl.member.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dl.member.dto.RechargeBonusLimitDTO;
+
 public class BonusUtil {
 	
 	public static List<Double> getBonusRandomData(Double recharegePrice){
@@ -37,6 +39,93 @@ public class BonusUtil {
 			return new ArrayList<Double>(){{add(0.8);add(0.15);add(0.05);add(50.0);add(100.0);add(200.0);}};
 		}
 		
+		return list;
+	}
+	
+	
+	public static List<RechargeBonusLimitDTO> getRandomBonusList(Double randomBonusPrice){
+		List<RechargeBonusLimitDTO> list = new ArrayList<RechargeBonusLimitDTO>();
+		RechargeBonusLimitDTO rechargeBonusLimitDTO = new RechargeBonusLimitDTO();
+		if(randomBonusPrice == 0.04) {
+			rechargeBonusLimitDTO.setBonusPrice(0.04);
+			return new ArrayList<RechargeBonusLimitDTO>(){{add(rechargeBonusLimitDTO);}};
+		}else if(randomBonusPrice == 0.5) {
+			rechargeBonusLimitDTO.setBonusPrice(0.5);
+			return new ArrayList<RechargeBonusLimitDTO>(){{add(rechargeBonusLimitDTO);}};
+		}else if(randomBonusPrice == 1) {
+			rechargeBonusLimitDTO.setBonusPrice(1.0);
+			return new ArrayList<RechargeBonusLimitDTO>(){{add(rechargeBonusLimitDTO);}};
+		}else if(randomBonusPrice == 0.42) {
+			rechargeBonusLimitDTO.setBonusPrice(0.42);
+			return new ArrayList<RechargeBonusLimitDTO>(){{add(rechargeBonusLimitDTO);}};
+		}else if(randomBonusPrice == 4.8) {
+			rechargeBonusLimitDTO.setBonusPrice(4.8);
+			return new ArrayList<RechargeBonusLimitDTO>(){{add(rechargeBonusLimitDTO);}};			
+		}else if(randomBonusPrice == 5.0) {
+			RechargeBonusLimitDTO rechargeBonusLimitDTO1 = new RechargeBonusLimitDTO();
+			rechargeBonusLimitDTO1.setBonusPrice(1.0);
+			RechargeBonusLimitDTO rechargeBonusLimitDTO2 = new RechargeBonusLimitDTO();
+			rechargeBonusLimitDTO2.setBonusPrice(2.0);
+			return new ArrayList<RechargeBonusLimitDTO>(){{add(rechargeBonusLimitDTO1);add(rechargeBonusLimitDTO2);add(rechargeBonusLimitDTO2);}};
+		}else if(randomBonusPrice == 10.0) {
+			RechargeBonusLimitDTO rechargeBonusLimitDTO1 = new RechargeBonusLimitDTO();
+			rechargeBonusLimitDTO1.setBonusPrice(1.0);
+			RechargeBonusLimitDTO rechargeBonusLimitDTO2 = new RechargeBonusLimitDTO();
+			rechargeBonusLimitDTO2.setBonusPrice(2.0);
+			
+			return new ArrayList<RechargeBonusLimitDTO>(){{add(rechargeBonusLimitDTO1);add(rechargeBonusLimitDTO2);add(rechargeBonusLimitDTO2);add(rechargeBonusLimitDTO2);add(rechargeBonusLimitDTO2);}};
+		}else if(randomBonusPrice == 50.0) {
+			for(int i = 0;i < 5;i++) {
+				RechargeBonusLimitDTO rechargeBonusLimitDTO1 = new RechargeBonusLimitDTO();
+				rechargeBonusLimitDTO1.setBonusPrice(2.0);
+				RechargeBonusLimitDTO rechargeBonusLimitDTO2 = new RechargeBonusLimitDTO();
+				rechargeBonusLimitDTO2.setBonusPrice(3.0);
+				RechargeBonusLimitDTO rechargeBonusLimitDTO3 = new RechargeBonusLimitDTO();
+				rechargeBonusLimitDTO2.setBonusPrice(5.0);
+				list.add(rechargeBonusLimitDTO1);
+				list.add(rechargeBonusLimitDTO2);
+				list.add(rechargeBonusLimitDTO3);
+			}
+			return list;
+		}else if(randomBonusPrice == 100.0) {
+			for(int i = 0;i < 10;i++) {
+				RechargeBonusLimitDTO rechargeBonusLimitDTO1 = new RechargeBonusLimitDTO();
+				rechargeBonusLimitDTO1.setBonusPrice(3.0);
+				list.add(rechargeBonusLimitDTO1);
+			}
+			
+			for(int i = 0;i < 6;i++) {
+				RechargeBonusLimitDTO rechargeBonusLimitDTO2 = new RechargeBonusLimitDTO();
+				rechargeBonusLimitDTO2.setBonusPrice(5.0);
+				list.add(rechargeBonusLimitDTO2);
+			}
+			
+			for(int i = 0;i < 4;i++) {
+				RechargeBonusLimitDTO rechargeBonusLimitDTO3 = new RechargeBonusLimitDTO();
+				rechargeBonusLimitDTO3.setBonusPrice(10.0);
+				list.add(rechargeBonusLimitDTO3);
+			}
+			return list;
+		}else if(randomBonusPrice == 200.0) {
+			for(int i = 0;i < 5;i++) {
+				RechargeBonusLimitDTO rechargeBonusLimitDTO1 = new RechargeBonusLimitDTO();
+				rechargeBonusLimitDTO1.setBonusPrice(10.0);
+				list.add(rechargeBonusLimitDTO1);
+			}
+			
+			for(int i = 0;i < 3;i++) {
+				RechargeBonusLimitDTO rechargeBonusLimitDTO2 = new RechargeBonusLimitDTO();
+				rechargeBonusLimitDTO2.setBonusPrice(20.0);
+				list.add(rechargeBonusLimitDTO2);
+			}
+			
+			for(int i = 0;i < 3;i++) {
+				RechargeBonusLimitDTO rechargeBonusLimitDTO3 = new RechargeBonusLimitDTO();
+				rechargeBonusLimitDTO3.setBonusPrice(30.0);
+				list.add(rechargeBonusLimitDTO3);
+			}
+			return list;
+		}
 		return list;
 	}
 

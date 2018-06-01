@@ -38,6 +38,7 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.DonationPriceDTO;
+import com.dl.member.dto.RechargeBonusLimitDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.ActivityBonus;
@@ -402,6 +403,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 */
 	@Transactional
 	public DonationPriceDTO receiveRechargeUserBonus(Integer payLogId) {
+		//过期的活动不能领取该活动的红包
+		Integer userId = SessionUtil.getUserId();
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
 		PayLogIdParam payLogIdParam = new PayLogIdParam();
 		payLogIdParam.setPayLogId(payLogId);
@@ -411,39 +414,46 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}
 		
 		BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
-		Integer userId = SessionUtil.getUserId();
+		//存储对应着各个概率的随机金额
 		List<Double> randomDataList = BonusUtil.getBonusRandomData(recharegePrice.doubleValue());
+		//领取的随机金额
 		Double bonusPrice = RandomUtil.randomBonusPrice(randomDataList.get(0),randomDataList.get(1),randomDataList.get(2),randomDataList.get(3),randomDataList.get(4),randomDataList.get(5));
-		
-		Integer now = DateUtil.getCurrentTimeLong();
-		Date currentTime = new Date();
-		List<UserBonus> userBonusLisgt = new ArrayList<UserBonus>();
-		UserBonus userBonus = new UserBonus();
-		userBonus.setUserId(userId);
-		userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
-		userBonus.setBonusPrice(new BigDecimal(bonusPrice));
-		userBonus.setReceiveTime(now);
-		userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
-		userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, 3, 23, 59, 59));
-		userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
-		userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
-		userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
-		userBonus.setMinGoodsAmount(new BigDecimal(bonusPrice * 3));
-		userBonusLisgt.add(userBonus);
-
-		try {
-			int rst = userBonusMapper.insertBatchUserBonus(userBonusLisgt);
-			if (rst != userBonusLisgt.size()) {
-				throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "用户" + userId + "领取红包异常,已回滚");
-			}
-		} catch (Exception e) {
-			log.error("用户" + userId + "领取红包异常,已回滚");
-		}
-		
+		//领取的随机金额对应的红包组成
+		List<UserBonus> userBonusListRecharge = this.createRechargeUserBonusList(userId, bonusPrice);
+		userBonusMapper.insertBatchUserBonus(userBonusListRecharge);
 		donationPriceDTO.setDonationPrice(bonusPrice);
 		return donationPriceDTO;
 	}
 	
+	/**
+	 * 构造充值送的红包集合
+	 * @param userId
+	 * @param randomBonusPrice
+	 * @return
+	 */
+	public List<UserBonus> createRechargeUserBonusList(Integer userId,Double randomBonusPrice) {
+		List<RechargeBonusLimitDTO> recharegeBonusList = BonusUtil.getRandomBonusList(randomBonusPrice);
+		Date currentTime = new Date();
+		Integer now = DateUtil.getCurrentTimeLong();
+		
+		List<UserBonus> userBonusList = new ArrayList<UserBonus>();
+		for(RechargeBonusLimitDTO rechargeBonusLimit:recharegeBonusList) {
+			UserBonus userBonus = new UserBonus();
+			userBonus.setUserId(userId);
+			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+			userBonus.setBonusPrice(new BigDecimal(rechargeBonusLimit.getBonusPrice()));
+			userBonus.setReceiveTime(now);
+			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
+			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, 7, 23, 59, 59));
+			userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
+			userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+			userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
+			userBonus.setMinGoodsAmount(BigDecimal.ZERO);
+			userBonusList.add(userBonus);
+		}
+
+		return userBonusList;
+	}
 	/**
 	 * 更新红包为已过期
 	 * 
