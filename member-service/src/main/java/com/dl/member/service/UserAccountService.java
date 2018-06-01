@@ -824,7 +824,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		BaseResult<com.dl.shop.payment.dto.UserWithdrawDTO> withDrawRst = payMentService.queryUserWithdrawBySnAndUserId(paywithDrawSnParam);
 		log.info("回滚时，查询提现单参数：" + JSON.toJSONString(withDrawRst));
 		if (withDrawRst.getCode() != 0) {
-			log.info("[rollbackUserMoneyWithDrawFailure]" + " 查询提现单成功...");
+			log.info("[rollbackUserMoneyWithDrawFailure]" + " 查询提现单失败...");
 			return ResultGenerator.genFailResult("查询提现单失败，无法对这笔提现单对应的提现预扣款进行回滚");
 		}
 		com.dl.shop.payment.dto.UserWithdrawDTO userWithdrawDTO = withDrawRst.getData();
