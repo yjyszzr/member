@@ -16,6 +16,5 @@ public class RechargeActivityDTO {
 	private Integer startTime;
 	@ApiModelProperty(value="充值活动结束时间")
 	private Integer endTime;
-
 	
 }
