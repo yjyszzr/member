@@ -6,15 +6,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.ChannelCustomerBindDTO;
-import com.dl.member.dto.ChannelDistributorBindDTO;
-import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.UserDTO;
 import com.dl.member.param.StrParam;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
 //import com.pgt.shop.member.param.CancelChangeParam;
 //import com.pgt.shop.member.param.ConfirmOrderParam;
-import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserIdParam;
+import com.dl.member.param.UserIdRealParam;
 
 
 /**
@@ -64,4 +62,12 @@ public interface IUserService {
 	 */
 	@RequestMapping(path="/user/queryChannelDistributorByUserId", method=RequestMethod.POST)
 	public BaseResult<ChannelCustomerBindDTO> queryChannelDistributorByUserId(@RequestBody UserIdParam params);
+	
+	/**
+	 * 查询用户接口
+	 * @param UserBonusParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/queryUserInfoReal", method=RequestMethod.POST)
+	public BaseResult<UserDTO> queryUserInfoReal(@RequestBody UserIdRealParam params);
 }

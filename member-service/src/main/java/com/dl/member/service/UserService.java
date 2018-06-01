@@ -41,6 +41,7 @@ import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
 import com.dl.member.param.UserIdParam;
+import com.dl.member.param.UserIdRealParam;
 import com.dl.member.param.UserParam;
 import com.dl.member.util.Encryption;
 
@@ -306,22 +307,39 @@ public class UserService extends AbstractService<User> {
 		return ResultGenerator.genSuccessResult("更新用户登录密码成功");
 	}
 
+	/***
+	 * 获取真实的UserDTO
+	 * @param params
+	 * @return
+	 */
+	public UserDTO queryUserInfoReal(UserIdRealParam params) {
+		Integer userId = params.getUserId();
+		User user = this.findById(userId);
+		UserDTO userDTO = new UserDTO();
+		try {
+			BeanUtils.copyProperties(userDTO, user);
+			String mobile = user.getMobile();
+			userDTO.setMobile(mobile);
+			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
+			BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
+			userDTO.setTotalMoney(String.valueOf(totalMoney));
+		} catch (Exception e) {
+			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
+		}
+		return userDTO;
+	}
+	
 	public UserDTO queryUserInfo(UserIdParam params) {
 		Integer userId = params.getUserId();
 		User user = this.findById(userId);
 		UserDTO userDTO = new UserDTO();
-		boolean isReal = params.isReal();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
-			if(!isReal) {
-				String strRandom4 = RandomUtil.generateUpperString(4);
-				String mobile = user.getMobile();
-				mobile = mobile.replace(mobile.substring(3, 7), strRandom4);
-				userDTO.setMobile(mobile);
-			}else {
-				String mobile = user.getMobile();
-				userDTO.setMobile(mobile);
-			}
+			String strRandom4 = RandomUtil.generateUpperString(4);
+			String mobile = user.getMobile();
+			mobile = mobile.replace(mobile.substring(3, 7), strRandom4);
+			userDTO.setMobile(mobile);
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
 			BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());

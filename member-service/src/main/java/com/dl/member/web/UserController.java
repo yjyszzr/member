@@ -27,6 +27,7 @@ import com.dl.member.param.QueryUserNoticeParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UpdateUnReadNoticeParam;
 import com.dl.member.param.UserIdParam;
+import com.dl.member.param.UserIdRealParam;
 import com.dl.member.param.UserLoginPassParam;
 import com.dl.member.service.DlChannelConsumerService;
 import com.dl.member.service.DlChannelDistributorService;
@@ -104,6 +105,13 @@ public class UserController {
     @PostMapping("/queryUserInfo")
     public BaseResult<UserDTO> queryUserInfo(@RequestBody UserIdParam param){
     	UserDTO userDTO = userService.queryUserInfo(param);
+    	return ResultGenerator.genSuccessResult("succ",userDTO);
+    }
+    
+    @ApiOperation(value = "根据用户ID查询真实信息", notes = "根据用户ID查询")
+    @PostMapping("/queryUserInfoReal")
+    public BaseResult<UserDTO> queryUserInfoReal(@RequestBody UserIdRealParam param){
+    	UserDTO userDTO = userService.queryUserInfoReal(param);
     	return ResultGenerator.genSuccessResult("succ",userDTO);
     }
     
