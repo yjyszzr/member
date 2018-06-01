@@ -130,7 +130,7 @@ public class UserController {
 	 * @return
 	 */
     @ApiOperation(value = "查询用户是否与店员绑定过", notes = "查询用户是否与店员绑定过")
-	@RequestMapping("/queryChannelDistributorByUserId")
+	@PostMapping("/queryChannelDistributorByUserId")
 	public BaseResult<ChannelCustomerBindDTO> queryChannelDistributorByUserId(@RequestBody UserIdParam params){
 		Condition condition = new Condition(DlChannelDistributor.class);
 		Criteria criteria = condition.createCriteria();
