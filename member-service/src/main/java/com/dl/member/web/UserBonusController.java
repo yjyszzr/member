@@ -1,27 +1,21 @@
 package com.dl.member.web;
-import com.dl.base.result.BaseResult;
-import com.dl.base.result.ResultGenerator;
-import com.dl.member.dto.DonationPriceDTO;
-import com.dl.member.dto.SurplusPaymentCallbackDTO;
-import com.dl.member.dto.UserBonusDTO;
-import com.dl.member.model.UserBonus;
-import com.dl.member.param.PayLogIdParam;
-import com.dl.member.param.BonusLimitConditionParam;
-import com.dl.member.param.RollackSurplusPayParam;
-import com.dl.member.param.StrParam;
-import com.dl.member.param.UserBonusIdParam;
-import com.dl.member.param.UserBonusStatusParam;
-import com.dl.member.service.UserBonusService;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import io.swagger.annotations.ApiOperation;
+import java.util.List;
+import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import javax.annotation.Resource;
-import java.util.List;
+import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
+import com.dl.member.dto.DonationPriceDTO;
+import com.dl.member.dto.UserBonusDTO;
+import com.dl.member.param.BonusLimitConditionParam;
+import com.dl.member.param.PayLogIdParam;
+import com.dl.member.param.UserBonusIdParam;
+import com.dl.member.param.UserBonusStatusParam;
+import com.dl.member.service.UserBonusService;
+import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.ApiOperation;
 
 /**
 * Created by zhangzirong on 2018/03/15.
@@ -55,7 +49,6 @@ public class UserBonusController {
     	List<UserBonusDTO> userBonusDTOList =  userBonusService.queryValidBonusListForPay(bonusLimitConditionParam);
     	return ResultGenerator.genSuccessResult("查询用户有效的红包列表成功",userBonusDTOList);
     }
-    
     
     @ApiOperation(value="领取充值送随机红包", notes="充值成功后领取充值送随机红包",hidden=false)
     @PostMapping("/rechargeSucReiceiveBonus")
