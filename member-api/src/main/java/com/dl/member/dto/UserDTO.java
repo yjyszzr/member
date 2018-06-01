@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -196,6 +197,10 @@ public class UserDTO {
      */
     @Column(name = "user_remark")
     private String userRemark;
+    
+    @ApiModelProperty("1已有密码0没有密码")
+    private int hasPass=1;
+    
 
     private List<com.dl.member.dto.ActivityDTO> activityDTOList;
     

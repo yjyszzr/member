@@ -8,29 +8,25 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.SessionUtil;
-import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dto.ChannelCustomerBindDTO;
-import com.dl.member.dto.ChannelDistributorBindDTO;
-import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserNoticeDTO;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.param.MobileNumberParam;
 import com.dl.member.param.QueryUserNoticeParam;
+import com.dl.member.param.SetLoginPassParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UpdateUnReadNoticeParam;
 import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserIdRealParam;
 import com.dl.member.param.UserLoginPassParam;
 import com.dl.member.service.DlChannelConsumerService;
-import com.dl.member.service.DlChannelDistributorService;
 import com.dl.member.service.UserService;
 
 import io.swagger.annotations.ApiOperation;
@@ -70,6 +66,13 @@ public class UserController {
     @PostMapping("/updateLoginPass")
     public BaseResult<String> updateLoginPass(@RequestBody UserLoginPassParam userLoginPassParam){
     	return userService.updateUserLoginPass(userLoginPassParam.getUserLoginPass(),userLoginPassParam.getMobileNumber(),userLoginPassParam.getSmsCode());
+    }
+    
+    @ApiOperation(value = "设置用户登录密码", notes = "设置用户登录密码")
+    @PostMapping("/setLoginPass")
+    public BaseResult<String> setLoginPass(@RequestBody SetLoginPassParam param){
+    	Integer userId = SessionUtil.getUserId();
+    	return userService.setUserLoginPass(param, userId);
     }
     
     
@@ -127,7 +130,7 @@ public class UserController {
 	 * @return
 	 */
     @ApiOperation(value = "查询用户是否与店员绑定过", notes = "查询用户是否与店员绑定过")
-	@RequestMapping("/queryChannelDistributorByUserId")
+	@PostMapping("/queryChannelDistributorByUserId")
 	public BaseResult<ChannelCustomerBindDTO> queryChannelDistributorByUserId(@RequestBody UserIdParam params){
 		Condition condition = new Condition(DlChannelDistributor.class);
 		Criteria criteria = condition.createCriteria();
