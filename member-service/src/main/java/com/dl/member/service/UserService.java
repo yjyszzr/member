@@ -6,15 +6,11 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import tk.mybatis.mapper.entity.Condition;
 
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
@@ -40,10 +36,14 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
+import com.dl.member.param.SetLoginPassParam;
 import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserIdRealParam;
 import com.dl.member.param.UserParam;
 import com.dl.member.util.Encryption;
+
+import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
 
 @Service
 @Transactional
@@ -305,6 +305,38 @@ public class UserService extends AbstractService<User> {
 
 		stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.RESETPASS_TPLID + "_" + mobileNumber, "");
 		return ResultGenerator.genSuccessResult("更新用户登录密码成功");
+	}
+	/**
+	 * 设置密码
+	 * @param userLoginPass
+	 * @param mobileNumber
+	 * @param smsCode
+	 * @return
+	 */
+	public BaseResult<String> setUserLoginPass(SetLoginPassParam param, Integer userId) {
+		if(param.getType() ==0 && StringUtils.isBlank(param.getOldLoginPass()) ) {
+			return ResultGenerator.genResult(MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getMsg());
+		}
+		String userLoginPass = param.getUserLoginPass();
+		if (StringUtils.isBlank(userLoginPass) || !userLoginPass.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
+			return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
+		}
+		User user = this.findById(userId);
+		if (null == user) {
+			return ResultGenerator.genResult(MemberEnums.USER_NOT_FOUND_ERROR.getcode(), MemberEnums.USER_NOT_FOUND_ERROR.getMsg());
+		}
+		if(param.getType() ==0) {
+			String oldPass = Encryption.encryption(param.getOldLoginPass(), user.getSalt());
+			if(!oldPass.equals(user.getPassword())) {
+				return ResultGenerator.genResult(MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getMsg());
+			}
+		}
+		User updateUser = new User();
+		updateUser.setUserId(user.getUserId());
+		updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
+		this.update(updateUser);
+		
+		return ResultGenerator.genSuccessResult("用户登录密码设置成功");
 	}
 
 	/***

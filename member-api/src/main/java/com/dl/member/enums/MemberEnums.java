@@ -37,7 +37,10 @@ public enum MemberEnums {
 	COMMON_ERROR(301044,"提示消息自定义"),
 	MESSAGE_COUNT_ERROR(301045,"您今天已发送10条验证码，请明天再试"),
 	USER_REAL_COUNTLIMIT(301046,"一张身份证最多绑定4个用户"),
-	MESSAGE_SENDLOT_ERROR(301047,"验证码60秒内仅可发送一次，再次发送后前一条验证码失效！");
+	MESSAGE_SENDLOT_ERROR(301047,"验证码60秒内仅可发送一次，再次发送后前一条验证码失效！"),
+	USER_NOT_FOUND_ERROR(301048,"用户获取失败或不存在！"),
+	NO_OLD_LOGIN_PASS_ERROR(301049,"请提供原始密码！"),
+	ERR_OLD_LOGIN_PASS_ERROR(301050,"原始密码输入有误！");
 
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	
