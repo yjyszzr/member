@@ -574,7 +574,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	@Transactional
 	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> dtos, Integer dealType) {
 		List<UserIdAndRewardDTO> userIdAndRewardList = new ArrayList<UserIdAndRewardDTO>();
-		Collections.copy(userIdAndRewardList, dtos);
+		userIdAndRewardList.addAll(dtos);
 		BigDecimal limitValue = BigDecimal.ZERO;
 		if (1 == dealType) {
 			limitValue = this.queryBusinessLimit(CommonConstants.BUSINESS_ID_REWARD);
