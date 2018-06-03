@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -1193,8 +1193,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		collect = collect.subList(0, 10);
     	}
     	log.info(JSONHelper.bean2json(collect));
-    	List<Integer> userIds = collect.stream().map(dto->dto.getUserId()).collect(Collectors.toList());
-    	log.info("111111111111    " + JSONHelper.bean2json(userIds));
+    	Set<Integer> set = collect.stream().map(dto->dto.getUserId()).collect(Collectors.toSet());
+    	log.info("111111111111    " + JSONHelper.bean2json(set));
+    	List<Integer> userIds = new ArrayList<Integer>(set);
     	List<User> users = userMapper.queryUserByUserIds(userIds);
     	Map<Integer, String> map = new HashMap<Integer, String>(users.size());
     	for(User user: users) {
@@ -1208,7 +1209,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		String mobile = map.get(dto.getUserId());
     		LotteryWinningLogTemp temp = new LotteryWinningLogTemp();
     		temp.setWinningMoney(reward);
-    		temp.setPhone(mobile);
+    		temp.setPhone(mobile==null?"":mobile);
     		temp.setIsShow(1);
     		lotteryWinningLogTempMapper.insert(temp);
     	}
