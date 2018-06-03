@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -571,7 +572,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * @param userIdAndRewardList
 	 */
 	@Transactional
-	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList, Integer dealType) {
+	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> dtos, Integer dealType) {
+		List<UserIdAndRewardDTO> userIdAndRewardList = new ArrayList<UserIdAndRewardDTO>();
+		Collections.copy(userIdAndRewardList, dtos);
 		BigDecimal limitValue = BigDecimal.ZERO;
 		if (1 == dealType) {
 			limitValue = this.queryBusinessLimit(CommonConstants.BUSINESS_ID_REWARD);
@@ -1189,6 +1192,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	if(collect.size() > 10) {
     		collect = collect.subList(0, 10);
     	}
+    	log.info(JSONHelper.bean2json(collect));
     	List<Integer> userIds = collect.stream().map(dto->dto.getUserId()).collect(Collectors.toList());
     	log.info("111111111111    " + JSONHelper.bean2json(userIds));
     	List<User> users = userMapper.queryUserByUserIds(userIds);
