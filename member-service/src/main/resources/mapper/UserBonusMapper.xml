@@ -16,6 +16,7 @@
     <result column="end_time" jdbcType="INTEGER" property="endTime" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
+    <result column="pay_log_id" jdbcType="INTEGER" property="payLogId" />
     <result column="bonus_status" jdbcType="VARCHAR" property="bonusStatus" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
     <result column="use_range" jdbcType="INTEGER" property="useRange" />
@@ -149,6 +150,28 @@
                 #{item.isDelete},
                 #{item.useRange},
                 #{item.minGoodsAmount}
+                )
+            </foreach >
+   </insert >
+ 
+   <insert id ="insertBatchUserBonusForRecharge" parameterType="java.util.List" >
+      insert into dl_user_bonus(user_bonus_id,user_id,bonus_id,bonus_sn,bonus_price,receive_time,start_time,end_time,bonus_status,is_delete,use_range,min_goods_amount,pay_log_id)
+            values
+            <foreach collection ="list" item="item" index= "index" separator =",">
+                (
+                #{item.userBonusId},
+                #{item.userId},
+                #{item.bonusId},
+                #{item.bonusSn},
+                #{item.bonusPrice},
+                #{item.receiveTime},
+                #{item.startTime},
+                #{item.endTime},
+                #{item.bonusStatus},
+                #{item.isDelete},
+                #{item.useRange},
+                #{item.minGoodsAmount},
+                #{item.payLogId}
                 )
             </foreach >
    </insert >

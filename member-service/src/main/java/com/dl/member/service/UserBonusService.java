@@ -417,16 +417,21 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			return ResultGenerator.genResult(MemberEnums.ACTIVITY_NOT_VALID.getcode(),MemberEnums.ACTIVITY_NOT_VALID.getMsg());
 		}
 		
-		//已经领取的红包不能再领取
 		Integer userId = SessionUtil.getUserId();
-//		Condition condition = new Condition(UserBonus.class);
-//		Criteria criteria = condition.createCriteria();
-//		criteria.andCondition("user_id =", userId);
-//		criteria.andCondition("bonus_id =", 2);
-//		List<UserBonus> reiceiveRechargeBonusList = this.findByCondition(condition);
-//		if(reiceiveRechargeBonusList.size() > 0) {
-//			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),"用户已经领取过该充值红包");
-//		}
+		if(null == userId) {
+			return ResultGenerator.genNeedLoginResult("请登录");
+		}
+		
+		//已经领取的红包不能再领取
+		Condition condition = new Condition(UserBonus.class);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("user_id =", userId);
+		criteria.andCondition("bonus_id =", 2);
+		criteria.andCondition("pay_log_id =", payLogId);
+		List<UserBonus> reiceiveRechargeBonusList = this.findByCondition(condition);
+		if(reiceiveRechargeBonusList.size() > 0) {
+			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),"用户已经领取过该充值红包");
+		}
 		
 		//已支付的的充值才能参与充值领红包
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
@@ -443,8 +448,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		//领取的随机金额
 		Double bonusPrice = RandomUtil.randomBonusPrice(randomDataList.get(0),randomDataList.get(1),randomDataList.get(2),randomDataList.get(3),randomDataList.get(4),randomDataList.get(5));
 		//领取的随机金额对应的红包组成
-		List<UserBonus> userBonusListRecharge = this.createRechargeUserBonusList(userId, bonusPrice);
-		userBonusMapper.insertBatchUserBonus(userBonusListRecharge);
+		List<UserBonus> userBonusListRecharge = this.createRechargeUserBonusList(userId,payLogId, bonusPrice);
+		userBonusMapper.insertBatchUserBonusForRecharge(userBonusListRecharge);
 		donationPriceDTO.setDonationPrice(bonusPrice);
 		return 	ResultGenerator.genSuccessResult("success", donationPriceDTO);
 	}
@@ -455,7 +460,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @param randomBonusPrice
 	 * @return
 	 */
-	public List<UserBonus> createRechargeUserBonusList(Integer userId,Double randomBonusPrice) {
+	public List<UserBonus> createRechargeUserBonusList(Integer userId,Integer payLogId,Double randomBonusPrice) {
 		List<RechargeBonusLimitDTO> recharegeBonusList = BonusUtil.getRandomBonusList(randomBonusPrice);
 		Date currentTime = new Date();
 		Integer now = DateUtil.getCurrentTimeLong();
@@ -474,6 +479,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
 			userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
 			userBonus.setMinGoodsAmount(BigDecimal.ZERO);
+			userBonus.setPayLogId(payLogId);
 			userBonusList.add(userBonus);
 		}
 
