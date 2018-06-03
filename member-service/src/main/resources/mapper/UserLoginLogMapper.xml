@@ -21,6 +21,7 @@
     <result column="imei" jdbcType="VARCHAR" property="imei" />
     <result column="login_source" jdbcType="VARCHAR" property="loginSource" />
     <result column="login_params" jdbcType="VARCHAR" property="loginParams" />
+    <result column="login_result" jdbcType="VARCHAR" property="loginResult" />
     <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel"/>
   </resultMap>
 </mapper>
