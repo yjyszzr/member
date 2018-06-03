@@ -95,8 +95,22 @@ public class UserBonus {
     @Column(name = "min_goods_amount")
     private BigDecimal minGoodsAmount;
     
+    /**
+     * 支付日志id
+     */
+    @Column(name = "pay_log_id")
+    private Integer payLogId;
+    
+    
+    public Integer getPayLogId() {
+		return payLogId;
+	}
 
-    public Integer getUseRange() {
+	public void setPayLogId(Integer payLogId) {
+		this.payLogId = payLogId;
+	}
+
+	public Integer getUseRange() {
 		return useRange;
 	}
 
