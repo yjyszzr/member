@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
+import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
@@ -255,6 +256,11 @@ public class UserService extends AbstractService<User> {
 		user.setPassWrongCount(0);
 		user.setIsReal(ProjectConstant.USER_IS_NOT_REAL);
 		user.setPushKey(userParam.getPushKey());
+		UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+		if(userDevice != null) {
+			String channel = userDevice.getChannel();
+			user.setDeviceChannel(channel);
+		}
 		Integer insertRsult = userMapper.insertWithReturnId(user);
 		if (1 != insertRsult) {
 			log.error("注册用户失败");

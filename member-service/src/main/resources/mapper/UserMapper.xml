@@ -37,15 +37,18 @@
     <result column="is_real" jdbcType="BIT" property="isReal" />
     <result column="user_remark" jdbcType="LONGVARCHAR" property="userRemark" />
     <result column="push_key" jdbcType="VARCHAR" property="pushKey" />
+    <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel" />
   </resultMap>
   
   
   <insert id="insertWithReturnId"  parameterType="com.dl.member.model.User" useGeneratedKeys="true" keyProperty="userId">
 	INSERT INTO dl_user(user_name,mobile,
 	email,password,salt,nickname,sex,birthday,detail_address,headimg,pay_point,rank_point,
-	reg_time,reg_ip,last_time,last_ip,mobile_supplier,mobile_province,mobile_city,reg_from,surplus_password,pay_pwd_salt,user_status,pass_wrong_count,user_type,is_real,user_remark,add_time,push_key)
+	reg_time,reg_ip,last_time,last_ip,mobile_supplier,mobile_province,mobile_city,reg_from,
+	surplus_password,pay_pwd_salt,user_status,pass_wrong_count,user_type,is_real,user_remark,add_time,push_key,device_channel)
 	VALUES(#{userName},#{mobile},#{email},#{password},#{salt},#{nickName},#{sex},#{birthday},#{detailAddress},#{headImg},#{payPoint},#{rankPoint},
-	#{regTime},#{regIp},#{lastTime},#{lastIp},#{mobileSupplier},#{mobileProvince},#{mobileCity},#{regFrom},#{surplusPassword},#{payPwdSalt},#{userStatus},#{passWrongCount},#{userType},#{isReal},#{userRemark},#{lastTime},#{pushKey})
+	#{regTime},#{regIp},#{lastTime},#{lastIp},#{mobileSupplier},#{mobileProvince},#{mobileCity},#{regFrom},
+	#{surplusPassword},#{payPwdSalt},#{userStatus},#{passWrongCount},#{userType},#{isReal},#{userRemark},#{lastTime},#{pushKey},#{deviceChannel})
   </insert>
   
   <update id="updateUserBySelective" parameterType="com.dl.member.model.User">
@@ -94,7 +97,7 @@
   	 	headimg,user_money,user_money_limit,frozen_money,pay_point,rank_point,
 		reg_time,reg_ip,last_time,last_ip,mobile_supplier,mobile_province,mobile_city,
 		reg_from,user_status,
-		pass_wrong_count,user_type,is_real,user_remark 
+		pass_wrong_count,user_type,is_real,user_remark ,device_channel
   	 	FROM dl_user WHERE user_id = #{userId}
   </select>
   
