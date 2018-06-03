@@ -38,7 +38,6 @@ import com.dl.member.dto.RechargeBonusLimitDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.ActivityBonus;
-import com.dl.member.model.DLActivity;
 import com.dl.member.model.User;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.BonusLimitConditionParam;
@@ -48,7 +47,9 @@ import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDTO;
+import com.dl.shop.payment.dto.YesOrNoDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
+import com.dl.shop.payment.param.StrParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -438,19 +439,53 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		PayLogIdParam payLogIdParam = new PayLogIdParam();
 		payLogIdParam.setPayLogId(payLogId);
 		BaseResult<PayLogDTO> payLogDTORst = payMentService.queryPayLogByPayLogId(payLogIdParam);
-		if(payLogDTORst.getCode() != 0) {
-			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(),"不能参与充值领红包活动");
+		if(payLogDTORst.getCode() == 304058) {
+			return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"不能参与充值领红包活动");
 		}
 		
-		BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
-		//存储对应着各个概率的随机金额
-		List<Double> randomDataList = BonusUtil.getBonusRandomData(recharegePrice.doubleValue());
-		//领取的随机金额
-		Double bonusPrice = RandomUtil.randomBonusPrice(randomDataList.get(0),randomDataList.get(1),randomDataList.get(2),randomDataList.get(3),randomDataList.get(4),randomDataList.get(5));
-		//领取的随机金额对应的红包组成
-		List<UserBonus> userBonusListRecharge = this.createRechargeUserBonusList(userId,payLogId, bonusPrice);
-		userBonusMapper.insertBatchUserBonusForRecharge(userBonusListRecharge);
-		donationPriceDTO.setDonationPrice(bonusPrice);
+		//判断是否充过值
+		StrParam strParam = new StrParam();
+		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countUserRecharge(strParam);
+		if(yesOrNotRst.getCode() != 0) {
+			return ResultGenerator.genFailResult("判断是否充过值接口异常");
+		}
+		
+		YesOrNoDTO yesOrNotDTO = yesOrNotRst.getData();
+		if(yesOrNotDTO.getYesOrNo().equals("0")) {//未成功充过值
+			BigDecimal newUserRechargeMoney = payLogDTORst.getData().getOrderAmount();
+			Date currentTime = new Date();
+			List<UserBonus> uesrBonusList = new ArrayList<UserBonus>();
+			UserBonus userBonus = new UserBonus();
+			userBonus.setUserId(userId);
+			userBonus.setBonusId(2);
+			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+			if(newUserRechargeMoney.compareTo(new BigDecimal(20)) > 0) {
+				newUserRechargeMoney = new BigDecimal(20);
+			}
+			userBonus.setBonusPrice(newUserRechargeMoney);
+			userBonus.setReceiveTime(now);
+			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
+			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, 7, 23, 59, 59));
+			userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
+			userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+			userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
+			userBonus.setMinGoodsAmount(BigDecimal.ZERO);
+			userBonus.setPayLogId(payLogId);
+			uesrBonusList.add(userBonus);
+			userBonusMapper.insertBatchUserBonusForRecharge(uesrBonusList);
+			donationPriceDTO.setDonationPrice(payLogDTORst.getData().getOrderAmount().doubleValue());			
+		}else {//成功充过值
+			BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
+			//存储对应着各个概率的随机金额
+			List<Double> randomDataList = BonusUtil.getBonusRandomData(recharegePrice.doubleValue());
+			//领取的随机金额
+			Double bonusPrice = RandomUtil.randomBonusPrice(randomDataList.get(0),randomDataList.get(1),randomDataList.get(2),randomDataList.get(3),randomDataList.get(4),randomDataList.get(5));
+			//领取的随机金额对应的红包组成
+			List<UserBonus> userBonusListRecharge = this.createRechargeUserBonusList(userId,payLogId, bonusPrice);
+			userBonusMapper.insertBatchUserBonusForRecharge(userBonusListRecharge);
+			donationPriceDTO.setDonationPrice(bonusPrice);
+		}
+
 		return 	ResultGenerator.genSuccessResult("success", donationPriceDTO);
 	}
 	
