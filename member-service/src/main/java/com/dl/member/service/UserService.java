@@ -336,7 +336,7 @@ public class UserService extends AbstractService<User> {
 		if (null == user) {
 			return ResultGenerator.genResult(MemberEnums.USER_NOT_FOUND_ERROR.getcode(), MemberEnums.USER_NOT_FOUND_ERROR.getMsg());
 		}
-		if(param.getType() ==0) {
+		if(param.getType() ==1) {
 			String oldPass = Encryption.encryption(param.getOldLoginPass(), user.getSalt());
 			if(!oldPass.equals(user.getPassword())) {
 				return ResultGenerator.genResult(MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getMsg());

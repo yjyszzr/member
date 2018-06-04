@@ -15,6 +15,6 @@ public class SetLoginPassParam {
     @ApiModelProperty(value = "原登录密码")
     private String oldLoginPass;
     
-    @ApiModelProperty(value = "0修改密码1设置密码")
+    @ApiModelProperty(value = "1修改密码0设置密码")
     private int type;
 }

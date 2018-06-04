@@ -96,7 +96,7 @@
   	 	user_name,mobile,email,nickname,sex,birthday,detail_address,
   	 	headimg,user_money,user_money_limit,frozen_money,pay_point,rank_point,
 		reg_time,reg_ip,last_time,last_ip,mobile_supplier,mobile_province,mobile_city,
-		reg_from,user_status,
+		reg_from,user_status,password,
 		pass_wrong_count,user_type,is_real,user_remark ,device_channel
   	 	FROM dl_user WHERE user_id = #{userId}
   </select>
