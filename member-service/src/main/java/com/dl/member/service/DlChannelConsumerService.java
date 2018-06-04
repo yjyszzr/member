@@ -15,7 +15,6 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
-import com.dl.base.util.RandomUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelConsumerMapper;
 import com.dl.member.dto.IncomeDetailsDTO;
@@ -95,7 +94,7 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 		UserRegisterParam userRegisterParam = new UserRegisterParam();
 		userRegisterParam.setLoginSource(userReceiveLotteryAwardParam.getLoginSource());
 		userRegisterParam.setMobile(userReceiveLotteryAwardParam.getMobile());
-		userRegisterParam.setPassWord(RandomUtil.getRandNum(6) + "i");
+		userRegisterParam.setPassWord("");// 初始密码为空
 		BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
 		if (regRst.getCode() != 0) {
 			return ResultGenerator.genResult(regRst.getCode(), regRst.getMsg());

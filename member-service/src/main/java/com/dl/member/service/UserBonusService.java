@@ -459,20 +459,14 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setUserId(userId);
 			userBonus.setBonusId(2);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
-			if(newUserRechargeMoney.compareTo(new BigDecimal(20)) > 0) {
+			if(newUserRechargeMoney.compareTo(new BigDecimal(10)) >= 0 && newUserRechargeMoney.compareTo(new BigDecimal(20)) < 0) {
+				newUserRechargeMoney = new BigDecimal(10);
+			}
+			if(newUserRechargeMoney.compareTo(new BigDecimal(20)) >= 0) {
 				newUserRechargeMoney = new BigDecimal(20);
 			}
-			userBonus.setBonusPrice(newUserRechargeMoney);
-			userBonus.setReceiveTime(now);
-			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
-			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, 7, 23, 59, 59));
-			userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
-			userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
-			userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
-			userBonus.setMinGoodsAmount(BigDecimal.ZERO);
-			userBonus.setPayLogId(payLogId);
-			uesrBonusList.add(userBonus);
-			userBonusMapper.insertBatchUserBonusForRecharge(uesrBonusList);
+			List<UserBonus> userBonusListForNewUser = this.createRechargeUserBonusListForNewUser(userId,payLogId, newUserRechargeMoney.doubleValue());
+			userBonusMapper.insertBatchUserBonusForRecharge(userBonusListForNewUser);
 			donationPriceDTO.setDonationPrice(payLogDTORst.getData().getOrderAmount().doubleValue());			
 		}else {//成功充过值
 			BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
@@ -497,6 +491,56 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 */
 	public List<UserBonus> createRechargeUserBonusList(Integer userId,Integer payLogId,Double randomBonusPrice) {
 		List<RechargeBonusLimitDTO> recharegeBonusList = BonusUtil.getRandomBonusList(randomBonusPrice);
+		Date currentTime = new Date();
+		Integer now = DateUtil.getCurrentTimeLong();
+		
+		List<UserBonus> userBonusList = new ArrayList<UserBonus>();
+		for(RechargeBonusLimitDTO rechargeBonusLimit:recharegeBonusList) {
+			UserBonus userBonus = new UserBonus();
+			userBonus.setUserId(userId);
+			userBonus.setBonusId(2);
+			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+			userBonus.setBonusPrice(new BigDecimal(rechargeBonusLimit.getBonusPrice()));
+			userBonus.setReceiveTime(now);
+			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
+			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, 7, 23, 59, 59));
+			userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
+			userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+			userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
+			userBonus.setMinGoodsAmount(BigDecimal.ZERO);
+			userBonus.setPayLogId(payLogId);
+			userBonusList.add(userBonus);
+		}
+
+		return userBonusList;
+	}
+	
+	/**
+	 * 构造充值送的红包集合给新用户
+	 * @param userId
+	 * @param randomBonusPrice
+	 * @return
+	 */
+	public List<UserBonus> createRechargeUserBonusListForNewUser(Integer userId,Integer payLogId,Double randomBonusPrice) {
+		List<RechargeBonusLimitDTO> recharegeBonusList = new ArrayList<>();
+		if(randomBonusPrice == 10) {
+			RechargeBonusLimitDTO rechargeBonusLimitDTO = new RechargeBonusLimitDTO();
+			rechargeBonusLimitDTO.setBonusPrice(2.0);
+			recharegeBonusList.add(rechargeBonusLimitDTO);
+			recharegeBonusList.add(rechargeBonusLimitDTO);
+			recharegeBonusList.add(rechargeBonusLimitDTO);
+			recharegeBonusList.add(rechargeBonusLimitDTO);
+			recharegeBonusList.add(rechargeBonusLimitDTO);
+		}else if(randomBonusPrice == 20) {
+			RechargeBonusLimitDTO rechargeBonusLimitDTO = new RechargeBonusLimitDTO();
+			rechargeBonusLimitDTO.setBonusPrice(4.0);
+			recharegeBonusList.add(rechargeBonusLimitDTO);
+			recharegeBonusList.add(rechargeBonusLimitDTO);
+			recharegeBonusList.add(rechargeBonusLimitDTO);
+			recharegeBonusList.add(rechargeBonusLimitDTO);
+			recharegeBonusList.add(rechargeBonusLimitDTO);			
+		}
+		
 		Date currentTime = new Date();
 		Integer now = DateUtil.getCurrentTimeLong();
 		
