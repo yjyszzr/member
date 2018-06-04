@@ -459,6 +459,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setUserId(userId);
 			userBonus.setBonusId(2);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+			if(newUserRechargeMoney.compareTo(new BigDecimal(10)) > 0 && newUserRechargeMoney.compareTo(new BigDecimal(20)) < 0) {
+				newUserRechargeMoney = new BigDecimal(10);
+			}
 			if(newUserRechargeMoney.compareTo(new BigDecimal(20)) > 0) {
 				newUserRechargeMoney = new BigDecimal(20);
 			}
