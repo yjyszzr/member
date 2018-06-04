@@ -186,7 +186,18 @@ public class User {
     @Column(name = "push_key")
     private String pushKey;
     
-    public String getNickName() {
+    @Column(name = "device_channel")
+    private String deviceChannel;
+    
+    public String getDeviceChannel() {
+		return deviceChannel;
+	}
+
+	public void setDeviceChannel(String deviceChannel) {
+		this.deviceChannel = deviceChannel;
+	}
+
+	public String getNickName() {
 		return nickName;
 	}
 

@@ -46,3 +46,9 @@ CREATE TABLE `dl_complain` (
 -- 2018-05-24
 alter table dl_user_bonus add is_read tinyint(1)  default 0 not null comment '用户是否读取：0未读取，1读取'; 
 
+--  2018-06-01
+alter table dl_order add device_channel varchar(16) comment '用户设备渠道';
+alter table dl_user_login_log add device_channel varchar(16) comment '用户设备渠道';
+alter table dl_user add device_channel varchar(16) comment '用户设备渠道';
+alter table dl_user_login_log add login_result varchar(768) comment '登录结果';
+

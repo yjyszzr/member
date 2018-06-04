@@ -93,8 +93,30 @@ public class UserLoginLog {
      */
     @Column(name = "login_params")
     private String loginParams;
+    
+    @Column(name = "login_result")
+    private String loginResult;
 
-    /**
+    @Column(name = "device_channel")
+    private String deviceChannel;
+    
+    public String getLoginResult() {
+		return loginResult;
+	}
+
+	public void setLoginResult(String loginResult) {
+		this.loginResult = loginResult;
+	}
+
+	public String getDeviceChannel() {
+		return deviceChannel;
+	}
+
+	public void setDeviceChannel(String deviceChannel) {
+		this.deviceChannel = deviceChannel;
+	}
+
+	/**
      * 获取主键id
      *
      * @return id - 主键id

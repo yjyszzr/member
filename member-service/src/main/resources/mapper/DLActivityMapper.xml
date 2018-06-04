@@ -24,6 +24,8 @@
   </select>
   
   <select id="countRechargeActivity" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-  	select count(1) from dl_activity where act_type = 1 and status = 1 and is_finish = 0 and end_time &lt; #{now}
+  	select count(1) from dl_activity where act_type = 1 and status = 1 
+  	and is_finish = 0 and start_time &lt; #{now} and end_time &gt; #{now}
   </select>
+  
 </mapper>

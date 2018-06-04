@@ -10,12 +10,16 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
+import com.dl.base.util.JSONHelper;
 import com.dl.base.util.RegexUtil;
+import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.UserLoginLogMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
@@ -42,6 +46,9 @@ import tk.mybatis.mapper.entity.Condition;
 public class UserLoginService extends AbstractService<UserLoginLog> {
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
+	
+	@Resource
+	private UserLoginLogMapper userLoginMapper;
 
 	@Resource
 	private UserMapper userMapper;
@@ -68,10 +75,10 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		String mobile = userLoginMobileParam.getMobile();
 		String password = userLoginMobileParam.getPassword();
 		UserLoginDTO userLoginDTO = new UserLoginDTO();
-		// UserDeviceParam device = userLoginMobileParam.getDevice();
-		int passWrongCount = 5;
+		String loginParams = JSONHelper.bean2json(userLoginMobileParam);
 		User user = userService.findBy("mobile", mobile);
 		if (null == user) {
+			this.loginLog(-1, 0, 1, loginParams, MemberEnums.NO_REGISTER.getMsg());
 			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 		}
 
@@ -79,6 +86,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
 			BaseResult<UserLoginDTO> userLoginRst = this.verifyUserPass(password, user, userLoginMobileParam);
 			if (userLoginRst.getCode() != 0) {
+				this.loginLog(user.getUserId(), 0, 1, loginParams, userLoginRst.getMsg());
 				return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
 			}
 			userLoginDTO = userLoginRst.getData();
@@ -96,6 +104,8 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					channelConsumerService.updateByUserId(user.getUserId());
 				}
 			}
+			
+			this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 
 		} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
@@ -103,6 +113,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			if (time > 60) {
 				BaseResult<UserLoginDTO> userLoginRst = this.verifyUserPass(password, user, userLoginMobileParam);
 				if (userLoginRst.getCode() != 0) {
+					this.loginLog(user.getUserId(), 0, 1, loginParams, userLoginRst.getMsg());
 					return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
 				}
 				userLoginDTO = userLoginRst.getData();
@@ -116,12 +127,14 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 				}
-
+				this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else {
+				this.loginLog(user.getUserId(), 0, 1, loginParams, MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
 				return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
 			}
 		} else if (userStatus.equals(ProjectConstant.USER_STATUS_FROZEN)) {// 账户被冻结
+			this.loginLog(user.getUserId(), 0, 1, loginParams,  MemberEnums.USER_ACCOUNT_FROZEN.getMsg());
 			return ResultGenerator.genResult(MemberEnums.USER_ACCOUNT_FROZEN.getcode(), MemberEnums.USER_ACCOUNT_FROZEN.getMsg());
 		}
 
@@ -153,7 +166,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 * @return
 	 */
 	public BaseResult<UserLoginDTO> loginBySms(UserLoginWithSmsParam userLoginMobileParam, HttpServletRequest request) {
+		String loginParams = JSONHelper.bean2json(userLoginMobileParam);
 		if (!RegexUtil.checkMobile(userLoginMobileParam.getMobile())) {
+			this.loginLog(-1, 0, 1, loginParams, MemberEnums.MOBILE_VALID_ERROR.getMsg());
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
 
@@ -161,6 +176,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		// UserDeviceParam device = userLoginMobileParam.getDevice();
 		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
+			this.loginLog(-1, 0, 1, loginParams, MemberEnums.SMSCODE_WRONG.getMsg());
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
 		User user = userService.findBy("mobile", mobile);
@@ -172,10 +188,12 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			 userRegisterParam.setLoginSource(userLoginMobileParam.getLoginSource());
 			 BaseResult<Integer> regRst =  userRegisterService.registerUser(userRegisterParam, request);
 			 if(regRst.getCode() != 0) {
+				 this.loginLog(-1, 0, 1, loginParams, "注册失败");
 				 return ResultGenerator.genFailResult(regRst.getMsg());
 			 }
 			
 			 UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
+			 this.loginLog(regRst.getData(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 			 return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 		} else {
 			Integer userStatus = user.getUserStatus();
@@ -194,6 +212,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 						channelConsumerService.updateByUserId(user.getUserId());
 					}
 				}
+				this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
 				boolean beyond1h = DateUtil.getCurrentTimeLong() - user.getLastTime() > 60  ? true : false;
@@ -209,12 +228,14 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 					}
-
+					this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 					return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 				} else {
+					this.loginLog(user.getUserId(), 0, 1, loginParams, MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
 					return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
 				}
 			} else if (userStatus.equals(ProjectConstant.USER_STATUS_FROZEN)) {// 账户被冻结
+				this.loginLog(user.getUserId(), 0, 1, loginParams, MemberEnums.USER_ACCOUNT_FROZEN.getMsg());
 				return ResultGenerator.genResult(MemberEnums.USER_ACCOUNT_FROZEN.getcode(), MemberEnums.USER_ACCOUNT_FROZEN.getMsg());
 			}
 		}
@@ -280,42 +301,36 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 * @param loginType
 	 *            登录类型
 	 */
-	// @Transactional
-	// public void loginLog(Integer userId, Integer loginType, Integer source,
-	// UserDeviceParam device) {
-	// if (device == null) {
-	// device = new UserDeviceParam();
-	// }
-	// //登录日志添加
-	// UserLoginLog ull = new UserLoginLog();
-	// ull.setUserId(userId);
-	// ull.setLoginType(loginType);
-	// ull.setLoginStatus(ProjectConstant.LOGIN_STATUS);
-	// ull.setLoginIp(StringUtils.isBlank(device.getIp()) ? "" :
-	// device.getIp());
-	// int time = DateUtil.getCurrentTimeLong();
-	// ull.setLoginTime(time);
-	// ull.setPlat(StringUtils.isBlank(device.getPlat()) ? "" :
-	// device.getPlat());
-	// ull.setBrand(StringUtils.isBlank(device.getBrand()) ? "" :
-	// device.getBrand());
-	// ull.setMid(StringUtils.isBlank(device.getMid()) ? "" : device.getMid());
-	// ull.setOs(StringUtils.isBlank(device.getOs()) ? "" : device.getOs());
-	// ull.setW(StringUtils.isBlank(device.getW()) ? "" : device.getW());
-	// ull.setH(StringUtils.isBlank(device.getH()) ? "" : device.getH());
-	// ull.setImei(StringUtils.isBlank(device.getImei()) ? "" :
-	// device.getImei());
-	// ull.setLoginSource(ObjectUtils.defaultIfNull(source,
-	// 1).toString());//StringUtils.isBlank(device.getLoginSource()) ? "" :
-	// device.getLoginSource()
-	// ull.setLoginParams(StringUtils.isBlank(device.getLoginParams()) ? "" :
-	// device.getLoginParams());
-	//
-	// int number = userLoginLogMapper.insertSelective(ull);
-	// if (number != 1) {
-	// throw new ServiceException(UserResultEnums.USER_GIGN_LOG_ERROR);
-	// }
-	// log.info("登录日志添加");
-	// }
+	@Transactional
+	public void loginLog(Integer userId, Integer loginType,	int loginSstatus, String loginParams, String loginResult) {
+		UserDeviceInfo device = SessionUtil.getUserDevice();
+		if(device == null) {
+			device = new UserDeviceInfo();
+		}
+		//登录日志添加
+		UserLoginLog ull = new UserLoginLog();
+		ull.setUserId(userId);
+		ull.setLoginType(loginType);
+		ull.setLoginStatus(loginSstatus);
+		ull.setLoginIp(StringUtils.isBlank(device.getUserIp()) ? "" : device.getUserIp());
+		int time = DateUtil.getCurrentTimeLong();
+		ull.setLoginTime(time);
+		ull.setPlat(StringUtils.isBlank(device.getPlat()) ? "" : device.getPlat());
+		ull.setBrand(StringUtils.isBlank(device.getBrand()) ? "" :	device.getBrand());
+		ull.setMid(StringUtils.isBlank(device.getMid()) ? "" : device.getMid());
+		ull.setOs(StringUtils.isBlank(device.getOs()) ? "" : device.getOs());
+		ull.setW(StringUtils.isBlank(device.getW()) ? "" : device.getW());
+		ull.setH(StringUtils.isBlank(device.getH()) ? "" : device.getH());
+		ull.setImei("");
+		ull.setLoginSource("");
+		ull.setDeviceChannel(device.getChannel());
+		ull.setLoginParams(loginParams);
+		ull.setLoginResult(loginResult);
+
+		int number = userLoginMapper.insertSelective(ull);
+		if (number != 1) {
+			log.error("登录日志添加失败:" + JSONHelper.bean2json(ull));
+		}
+	}
 
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -571,7 +572,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * @param userIdAndRewardList
 	 */
 	@Transactional
-	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> userIdAndRewardList, Integer dealType) {
+	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> dtos, Integer dealType) {
+		List<UserIdAndRewardDTO> userIdAndRewardList = new ArrayList<UserIdAndRewardDTO>();
+		userIdAndRewardList.addAll(dtos);
 		BigDecimal limitValue = BigDecimal.ZERO;
 		if (1 == dealType) {
 			limitValue = this.queryBusinessLimit(CommonConstants.BUSINESS_ID_REWARD);
@@ -1189,7 +1192,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	if(collect.size() > 10) {
     		collect = collect.subList(0, 10);
     	}
-    	List<Integer> userIds = collect.stream().map(dto->dto.getUserId()).collect(Collectors.toList());
+    	log.info(JSONHelper.bean2json(collect));
+    	Set<Integer> set = collect.stream().map(dto->dto.getUserId()).collect(Collectors.toSet());
+    	log.info("111111111111    " + JSONHelper.bean2json(set));
+    	List<Integer> userIds = new ArrayList<Integer>(set);
     	List<User> users = userMapper.queryUserByUserIds(userIds);
     	Map<Integer, String> map = new HashMap<Integer, String>(users.size());
     	for(User user: users) {
@@ -1203,7 +1209,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		String mobile = map.get(dto.getUserId());
     		LotteryWinningLogTemp temp = new LotteryWinningLogTemp();
     		temp.setWinningMoney(reward);
-    		temp.setPhone(mobile);
+    		temp.setPhone(mobile==null?"":mobile);
     		temp.setIsShow(1);
     		lotteryWinningLogTempMapper.insert(temp);
     	}
