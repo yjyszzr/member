@@ -468,12 +468,14 @@ public class UserBonusService extends AbstractService<UserBonus> {
 				newUserRechargeMoney = new BigDecimal(10);
 				List<UserBonus> userBonusListForNewUser = this.createRechargeUserBonusListForNewUser(userId,payLogId, newUserRechargeMoney.doubleValue());
 				userBonusMapper.insertBatchUserBonusForRecharge(userBonusListForNewUser);
+				donationPriceDTO.setDonationPrice(newUserRechargeMoney.doubleValue());	
 			}
 			
 			if(newUserRechargeMoney.compareTo(new BigDecimal(20)) >= 0 && newUserRechargeMoney.compareTo(new BigDecimal(1000)) < 0) {
 				newUserRechargeMoney = new BigDecimal(20);
 				List<UserBonus> userBonusListForNewUser = this.createRechargeUserBonusListForNewUser(userId,payLogId, newUserRechargeMoney.doubleValue());
 				userBonusMapper.insertBatchUserBonusForRecharge(userBonusListForNewUser);
+				donationPriceDTO.setDonationPrice(newUserRechargeMoney.doubleValue());	
 			}
 
 			//新用户要参与非首次充的充值卡，且>=1000 的按照老用户的规则赠送
@@ -485,9 +487,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 				//领取的随机金额对应的红包组成
 				List<UserBonus> userBonusListRecharge = this.createRechargeUserBonusListForOldUser(userId,payLogId, bonusPrice);
 				userBonusMapper.insertBatchUserBonusForRecharge(userBonusListRecharge);
+				donationPriceDTO.setDonationPrice(bonusPrice);	
 			}
-			
-			donationPriceDTO.setDonationPrice(payLogDTORst.getData().getOrderAmount().doubleValue());			
+					
 		}else {//成功充过值
 			BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
 			//存储对应着各个概率的随机金额
