@@ -51,4 +51,4 @@ alter table dl_order add device_channel varchar(16) comment '用户设备渠道'
 alter table dl_user_login_log add device_channel varchar(16) comment '用户设备渠道';
 alter table dl_user add device_channel varchar(16) comment '用户设备渠道';
 alter table dl_user_login_log add login_result varchar(768) comment '登录结果';
-
+alter table dl_order add award_time int(11) comment '派奖时间';
