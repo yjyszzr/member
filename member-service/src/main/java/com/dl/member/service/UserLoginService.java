@@ -270,7 +270,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				updatePassWrongCountUser.setUserId(user.getUserId());
 				updatePassWrongCountUser.setPassWrongCount(++nowWrongPassCount);
 				userService.update(updatePassWrongCountUser);
-				return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "您输入的密码错误，还有" + (6 - nowWrongPassCount) + "次机会");
+				return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "您输入的密码错误，还有" + (5 - nowWrongPassCount) + "次机会");
 			} else {// 输入错误密码超过5次，锁定用户
 				User lockUser = new User();
 				lockUser.setUserId(user.getUserId());
