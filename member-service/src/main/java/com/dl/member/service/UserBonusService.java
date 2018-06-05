@@ -411,7 +411,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 */
 	@Transactional
 	public BaseResult<DonationPriceDTO> receiveRechargeUserBonus(Integer payLogId) {
-		
 		//过期的充值活动不能领取该活动的红包
 		Integer now = DateUtil.getCurrentTimeLong();
 		Integer countRst = dLActivityMapper.countRechargeActivity(now);
@@ -429,13 +428,12 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		PayLogIdParam payLogIdParam = new PayLogIdParam();
 		payLogIdParam.setPayLogId(payLogId);
 		BaseResult<PayLogDTO> payLogDTORst = payMentService.queryPayLogByPayLogId(payLogIdParam);
-		if(payLogDTORst.getCode() == 304058) {
+		if(payLogDTORst.getCode() != 0) {
 			return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"不能参与充值领红包活动");
 		}
-		
 		if(payLogDTORst.getData().getOrderAmount().compareTo(new BigDecimal(10)) < 0) {
-			return ResultGenerator.genFailResult("不符合充值赠送的最低充值金额，不送红包");
-		}
+			return ResultGenerator.genResult(MemberEnums.RECHARGE_ACT_MIN_LIMIT.getcode(), MemberEnums.RECHARGE_ACT_MIN_LIMIT.getMsg());
+		}	
 		
 		//已经领取的红包不能再领取
 		Condition condition = new Condition(UserBonus.class);
