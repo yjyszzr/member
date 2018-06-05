@@ -251,7 +251,11 @@ public class UserService extends AbstractService<User> {
 		user.setSalt(loginsalt);
 		String paysalt = Encryption.salt();
 		user.setPayPwdSalt(paysalt);
-		user.setPassword(Encryption.encryption(userParam.getPassWord(), loginsalt));
+		if(!StringUtils.isEmpty(userParam.getPassWord())) {
+			user.setPassword(Encryption.encryption(userParam.getPassWord(), loginsalt));
+		}else {
+			user.setPassword("");
+		}
 		user.setRankPoint(0);
 		user.setPassWrongCount(0);
 		user.setIsReal(ProjectConstant.USER_IS_NOT_REAL);
