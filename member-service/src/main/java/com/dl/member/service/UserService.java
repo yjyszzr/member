@@ -329,7 +329,7 @@ public class UserService extends AbstractService<User> {
 	 * @return
 	 */
 	public BaseResult<String> setUserLoginPass(SetLoginPassParam param, Integer userId) {
-		if(param.getType() ==0 && StringUtils.isBlank(param.getOldLoginPass()) ) {
+		if(param.getType() ==1 && StringUtils.isBlank(param.getOldLoginPass()) ) {
 			return ResultGenerator.genResult(MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getMsg());
 		}
 		String userLoginPass = param.getUserLoginPass();
