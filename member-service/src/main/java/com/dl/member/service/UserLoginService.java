@@ -253,6 +253,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 */
 	public BaseResult<UserLoginDTO> verifyUserPass(String password, User user, UserLoginWithPassParam userLoginMobileParam) {
 		if (user.getPassword().equals(Encryption.encryption(password, user.getSalt()))) {// 密码正确
+			if(user.getPassWrongCount() > 0) {
+				User updatePassWrongCountUser = new User();
+				updatePassWrongCountUser.setUserId(user.getUserId());
+				updatePassWrongCountUser.setPassWrongCount(0);
+				updatePassWrongCountUser.setUserStatus(0);
+				userService.update(updatePassWrongCountUser);
+			}
 			UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 
