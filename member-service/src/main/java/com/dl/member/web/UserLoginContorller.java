@@ -45,6 +45,7 @@ public class UserLoginContorller {
     @ApiOperation(value = "用户注销", notes = "用户注销")
     @PostMapping("/logout")
     public BaseResult<String> logout() {
+    	userLoginService.loginLogOut();
         TokenUtil.invalidateCurToken();
         return ResultGenerator.genSuccessResult("用户注销成功");
     }

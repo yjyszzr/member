@@ -341,4 +341,14 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		}
 	}
 
+	public void loginLogOut() {
+		Integer userId = SessionUtil.getUserId();
+		if(userId != null) {
+			UserLoginLog ull = userLoginMapper.getLastLog(userId);
+			if(ull != null) {
+				ull.setLogoutTime(DateUtil.getCurrentTimeLong());
+				userLoginMapper.updateLogOutTime(ull);
+			}
+		}
+	}
 }
