@@ -9,7 +9,7 @@ public class BonusUtil {
 	
 	
 	public static List<Double> getBonusRandomData(Double recharegePrice){
-		List<Double> list = new ArrayList<Double>(){{add(0.95);add(0.05);add(0.00);add(0.04);add(0.5);add(1.00);}};
+		List<Double> list = new ArrayList<Double>();
 		if(recharegePrice >= 10 && recharegePrice <= 20) {
 			return new ArrayList<Double>(){{add(0.95);add(0.05);add(0.00);add(0.04);add(0.5);add(1.00);}};
 		}else if(recharegePrice > 20 && recharegePrice <= 40) {
@@ -82,7 +82,7 @@ public class BonusUtil {
 				RechargeBonusLimitDTO rechargeBonusLimitDTO2 = new RechargeBonusLimitDTO();
 				rechargeBonusLimitDTO2.setBonusPrice(3.0);
 				RechargeBonusLimitDTO rechargeBonusLimitDTO3 = new RechargeBonusLimitDTO();
-				rechargeBonusLimitDTO2.setBonusPrice(5.0);
+				rechargeBonusLimitDTO3.setBonusPrice(5.0);
 				list.add(rechargeBonusLimitDTO1);
 				list.add(rechargeBonusLimitDTO2);
 				list.add(rechargeBonusLimitDTO3);
