@@ -75,6 +75,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		String mobile = userLoginMobileParam.getMobile();
 		String password = userLoginMobileParam.getPassword();
 		UserLoginDTO userLoginDTO = new UserLoginDTO();
+		userLoginMobileParam.setPassword("******");
 		String loginParams = JSONHelper.bean2json(userLoginMobileParam);
 		User user = userService.findBy("mobile", mobile);
 		if (null == user) {
