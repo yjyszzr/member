@@ -42,7 +42,11 @@ public enum MemberEnums {
 	NO_OLD_LOGIN_PASS_ERROR(301049,"请提供原始密码！"),
 	ERR_OLD_LOGIN_PASS_ERROR(301050,"原始密码输入有误！"),
 	ACTIVITY_NOT_VALID(301051,"活动已过期"),
-	RECHARGE_ACT_MIN_LIMIT(301052,"不符合充值赠送的最低充值金额");
+	RECHARGE_ACT_MIN_LIMIT(301052,"不符合充值赠送的最低充值金额"),
+	MESSAGE_5MIN_COUNT_ERROR(301053,"5分钟内不能发送超过3条，5分钟后重试"),
+	MESSAGE_60MIN_COUNT_ERROR(301054,"60分钟内不能发送超过5条，60分钟后重试");
+
+	
 	
 
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
