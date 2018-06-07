@@ -591,6 +591,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setBonusId(2);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 			userBonus.setBonusPrice(BigDecimal.valueOf(rechargeBonusLimit.getBonusPrice()));
+			userBonus.setAddTime(now);
 			userBonus.setReceiveTime(now);
 			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
 			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, 7, 23, 59, 59));
@@ -640,6 +641,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setUserId(userId);
 			userBonus.setBonusId(2);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+			userBonus.setAddTime(now);
 			userBonus.setBonusPrice(new BigDecimal(rechargeBonusLimit.getBonusPrice()));
 			userBonus.setReceiveTime(now);
 			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
