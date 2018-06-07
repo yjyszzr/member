@@ -422,7 +422,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		BaseResult<PriceDTO> priceRst = payMentService.queryMoneyInRedis(payLogIdParam);
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
 		donationPriceDTO.setDonationPrice("0.04");
-		if(priceRst.getCode() != 0) {
+		if(priceRst.getCode() == 0) {
 			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
 		}
 		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
