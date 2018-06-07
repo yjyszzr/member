@@ -63,8 +63,8 @@ public interface IUserBonusService {
       * @param payLogIdParam
       * @return
       */
-     @PostMapping("/user/bonus/rechargeSucReiceiveBonus")
-     public BaseResult<DonationPriceDTO> rechargeSucReiceiveBonus(@RequestBody PayLogIdParam payLogIdParam);
+     @PostMapping("/user/bonus/reiceiveBonusAfterRecharge")
+     public BaseResult<DonationPriceDTO> reiceiveBonusAfterRecharge(@RequestBody PayLogIdParam payLogIdParam);
 
 //	 /**
 //	 * 获取结算页的店铺红包列表

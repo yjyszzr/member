@@ -410,6 +410,80 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @return
 	 */
 	@Transactional
+	public BaseResult<DonationPriceDTO> receiveRechargeUserBonusStr(Integer payLogId) {
+		//过期的充值活动不能领取该活动的红包
+		Integer now = DateUtil.getCurrentTimeLong();
+		Integer countRst = dLActivityMapper.countRechargeActivity(now);
+		if(countRst == 0) {
+			return ResultGenerator.genResult(MemberEnums.ACTIVITY_NOT_VALID.getcode(),MemberEnums.ACTIVITY_NOT_VALID.getMsg());
+		}
+		
+		//已支付的的充值才能参与充值领红包
+		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
+		PayLogIdParam payLogIdParam = new PayLogIdParam();
+		payLogIdParam.setPayLogId(payLogId);
+		BaseResult<PayLogDTO> payLogDTORst = payMentService.queryPayLogByPayLogId(payLogIdParam);
+		if(payLogDTORst.getCode() != 0) {
+			return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"不能参与充值领红包活动");
+		}
+		if(payLogDTORst.getData().getOrderAmount().compareTo(new BigDecimal(10)) < 0) {
+			return ResultGenerator.genResult(MemberEnums.RECHARGE_ACT_MIN_LIMIT.getcode(), MemberEnums.RECHARGE_ACT_MIN_LIMIT.getMsg());
+		}	
+		
+		//已经领取的红包不能再领取
+		Integer userId = payLogDTORst.getData().getUserId();
+		
+		//判断是否充过值
+		StrParam strParam = new StrParam();
+		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countUserRecharge(strParam);
+		if(yesOrNotRst.getCode() != 0) {
+			return ResultGenerator.genFailResult("判断是否充过值接口异常");
+		}
+		
+		YesOrNoDTO yesOrNotDTO = yesOrNotRst.getData();
+		if(yesOrNotDTO.getYesOrNo().equals("0")) {//未成功充过值
+			BigDecimal newUserRechargeMoney = payLogDTORst.getData().getOrderAmount();
+			Date currentTime = new Date();
+			List<UserBonus> uesrBonusList = new ArrayList<UserBonus>();
+			if(newUserRechargeMoney.compareTo(new BigDecimal(10)) >= 0 && newUserRechargeMoney.compareTo(new BigDecimal(20)) < 0) {
+				newUserRechargeMoney = new BigDecimal(10);
+				donationPriceDTO.setDonationPrice(newUserRechargeMoney.doubleValue() + "");	
+			}
+			
+			if(newUserRechargeMoney.compareTo(new BigDecimal(20)) >= 0 && newUserRechargeMoney.compareTo(new BigDecimal(1000)) < 0) {
+				newUserRechargeMoney = new BigDecimal(20);
+				donationPriceDTO.setDonationPrice(newUserRechargeMoney.doubleValue() + "");	
+			}
+
+			//新用户要参与非首次充的充值卡，且>=1000 的按照老用户的规则赠送
+			if(newUserRechargeMoney.compareTo(new BigDecimal(1000)) >= 0 ) {
+				//存储对应着各个概率的随机金额
+				List<Double> randomDataList = BonusUtil.getBonusRandomData(newUserRechargeMoney.doubleValue());
+				//领取的随机金额
+				Double bonusPrice = RandomUtil.randomBonusPrice(randomDataList.get(0),randomDataList.get(1),randomDataList.get(2),randomDataList.get(3),randomDataList.get(4),randomDataList.get(5));
+				donationPriceDTO.setDonationPrice(bonusPrice+"");	
+			}
+					
+		}else {//成功充过值
+			BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
+			//存储对应着各个概率的随机金额
+			List<Double> randomDataList = BonusUtil.getBonusRandomData(recharegePrice.doubleValue());
+			//领取的随机金额
+			Double bonusPrice = RandomUtil.randomBonusPrice(randomDataList.get(0),randomDataList.get(1),randomDataList.get(2),randomDataList.get(3),randomDataList.get(4),randomDataList.get(5));
+			donationPriceDTO.setDonationPrice(bonusPrice+"");
+		}
+
+		return 	ResultGenerator.genSuccessResult("success", donationPriceDTO);
+	}
+	
+	
+	
+	/**
+	 * 领取充值赠送的随机数额的红包
+	 * 
+	 * @return
+	 */
+	@Transactional
 	public BaseResult<DonationPriceDTO> receiveRechargeUserBonus(Integer payLogId) {
 		//过期的充值活动不能领取该活动的红包
 		Integer now = DateUtil.getCurrentTimeLong();
@@ -418,7 +492,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			return ResultGenerator.genResult(MemberEnums.ACTIVITY_NOT_VALID.getcode(),MemberEnums.ACTIVITY_NOT_VALID.getMsg());
 		}
 		
-
 		
 		//已支付的的充值才能参与充值领红包
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();

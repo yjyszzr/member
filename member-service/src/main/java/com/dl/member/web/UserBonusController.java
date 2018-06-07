@@ -50,9 +50,15 @@ public class UserBonusController {
     	return ResultGenerator.genSuccessResult("查询用户有效的红包列表成功",userBonusDTOList);
     }
     
-    @ApiOperation(value="领取充值送随机红包", notes="充值成功后领取充值送随机红包",hidden=false)
+    @ApiOperation(value="领取充值后 弹出的赠送金额", notes="领取充值后 弹出的赠送金额",hidden=false)
     @PostMapping("/rechargeSucReiceiveBonus")
     public BaseResult<DonationPriceDTO> rechargeSucReiceiveBonus(@RequestBody PayLogIdParam payLogIdParam) {
+    	return userBonusService.receiveRechargeUserBonusStr(Integer.valueOf(payLogIdParam.getPayLogId()));
+    }
+    
+    @ApiOperation(value="领取充值送随机红包", notes="充值成功后领取充值送随机红包",hidden=false)
+    @PostMapping("/reiceiveBonusAfterRecharge")
+    public BaseResult<DonationPriceDTO> reiceiveBonusAfterRecharge(@RequestBody PayLogIdParam payLogIdParam) {
     	return userBonusService.receiveRechargeUserBonus(Integer.valueOf(payLogIdParam.getPayLogId()));
     }
     
