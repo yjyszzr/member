@@ -33,6 +33,7 @@
   		dl_message
   	where 
   		msg_type=#{msgType} and (receiver=#{receiver} or receiver =-1)
+  	order by send_time desc
   </select>
   
   <select id="getUnReadMessageNum" resultType="int">

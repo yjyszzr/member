@@ -33,18 +33,22 @@ import com.dl.member.dto.DlWinningLogDTO;
 import com.dl.member.dto.IncomeDetailsDTO;
 import com.dl.member.dto.PromotionIncomeDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.DlChannel;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.LotteryWinningLogTemp;
 import com.dl.member.model.User;
 import com.dl.member.param.ConsumerSmsParam;
+import com.dl.member.param.DistributorSmsParam;
 import com.dl.member.param.DlChannelConsumerParam;
 import com.dl.member.param.DlChannelDistributorParam;
 import com.dl.member.param.MyQRCodeParam;
+import com.dl.member.param.SmsParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UserReceiveLotteryAwardParam;
 import com.dl.member.service.DlChannelConsumerService;
 import com.dl.member.service.DlChannelDistributorService;
+import com.dl.member.service.DlChannelService;
 import com.dl.member.service.LotteryWinningLogTempService;
 import com.dl.member.service.SmsService;
 import com.dl.member.service.UserAccountService;
@@ -56,6 +60,8 @@ import com.dl.member.service.UserService;
 @RestController
 @RequestMapping("/dl/channelConsumer")
 public class DlChannelConsumerController {
+	@Resource
+	private DlChannelService dlChannelService;
 	@Resource
 	private DlChannelConsumerService dlChannelConsumerService;
 	@Resource
@@ -197,4 +203,75 @@ public class DlChannelConsumerController {
 		return ResultGenerator.genSuccessResult("获取成功", winningLogList);
 	}
 
+	@ApiOperation(value = "发送推广员短信验证码", notes = "发送推广员短信验证码")
+	@PostMapping("/smsCodeForDistributor")
+	public BaseResult<String> smsCodeForDistributor(@RequestBody SmsParam smsParam) {
+		String smsType = smsParam.getSmsType();
+		String tplId = "";
+		String tplValue = "";
+		String strRandom4 = RandomUtil.getRandNum(4);
+		if (ProjectConstant.VERIFY_TYPE_REG.equals(smsType)) {
+			User user = userService.findBy("mobile", smsParam.getMobile());
+			if (user != null) {
+				return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
+			}
+
+			if (!RegexUtil.checkMobile(smsParam.getMobile())) {
+				return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
+			}
+
+			tplId = memberConfig.getREGISTER_TPLID();
+			tplValue = "#code#=" + strRandom4;
+		}
+		if (!TextUtils.isEmpty(tplValue)) {
+			BaseResult<String> smsRst = smsService.sendSms(smsParam.getMobile(), tplId, tplValue);
+			if (smsRst.getCode() != 0) {
+				return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
+			}
+			// 缓存验证码
+			int expiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
+			String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
+			stringRedisTemplate.opsForValue().set(key, strRandom4, expiredTime, TimeUnit.SECONDS);
+			return ResultGenerator.genSuccessResult("发送短信验证码成功");
+		} else {
+			return ResultGenerator.genFailResult("参数异常");
+		}
+	}
+
+	@ApiOperation(value = "注册成推广员", notes = "注册成推广员")
+	@PostMapping("/registToDistributor")
+	public BaseResult<String> registToDistributor(@RequestBody DistributorSmsParam smsParam, HttpServletRequest request) {
+		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.REGISTER_TPLID + "_" + smsParam.getMobile());
+		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(smsParam.getSmsCode())) {
+			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+		}
+		// 短信发送成功执行店员保存操作
+		DlChannelDistributor distributor = new DlChannelDistributor();
+		DlChannel dlChannel = dlChannelService.findById(smsParam.getChannelId());
+		if (dlChannel != null) {
+			distributor.setChannelId(0);
+			distributor.setChannelId(smsParam.getChannelId());
+			distributor.setChannelName(dlChannel.getChannelName());
+			distributor.setMobile(smsParam.getMobile());
+			List<DlChannelDistributor> dlChannelDistributorList = dlChannelDistributorService.findAll();
+			Integer num = dlChannelDistributorList.size() + 1;
+			distributor.setChannelDistributorNum(dlChannel.getChannelNum() + "." + num);
+			distributor.setAddTime(DateUtilNew.getCurrentTimeLong());
+			distributor.setDeleted(0);
+			distributor.setRemark("");
+			distributor.setDistributorCommissionRate(0.02);// 佣金比例2%,经产品人员确认
+			dlChannelDistributorService.saveUserAndDistributor(distributor, request);
+			return ResultGenerator.genSuccessResult("发送短信验证码成功", distributor.getChannelDistributorId().toString());
+		} else {
+			return ResultGenerator.genFailResult("参数异常");
+		}
+	}
+
+	@ApiOperation(value = "获取店铺列表", notes = "获取店铺列表")
+	@PostMapping("/getChannelList")
+	public BaseResult<List<DlChannel>> getChannelList() {
+		List<DlChannel> channelList = new ArrayList<DlChannel>();
+		channelList = dlChannelService.findAll();
+		return ResultGenerator.genSuccessResult("获取成功", channelList);
+	}
 }

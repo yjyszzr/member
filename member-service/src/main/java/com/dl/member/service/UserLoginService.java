@@ -75,6 +75,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		String mobile = userLoginMobileParam.getMobile();
 		String password = userLoginMobileParam.getPassword();
 		UserLoginDTO userLoginDTO = new UserLoginDTO();
+		userLoginMobileParam.setPassword("******");
 		String loginParams = JSONHelper.bean2json(userLoginMobileParam);
 		User user = userService.findBy("mobile", mobile);
 		if (null == user) {
@@ -92,7 +93,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			userLoginDTO = userLoginRst.getData();
 
 			if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				if(null == userLoginMobileParam.getPushKey()) {
+					this.updatePushKey("", user);
+				}else {
+					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				}
 			}
 			Condition condition = new Condition(DlChannelConsumer.class);
 			// condition.createCriteria().andCondition("user_id = ",
@@ -125,7 +130,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				userService.saveUserAndUpdateConsumer(normalUser);
 
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					if(null == userLoginMobileParam.getPushKey()) {
+						this.updatePushKey("", user);
+					}else {
+						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					}
 				}
 				this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
@@ -201,7 +210,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 				stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					if(null == userLoginMobileParam.getPushKey()) {
+						this.updatePushKey("", user);
+					}else {
+						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					}
 				}
 
 				Condition condition = new Condition(DlChannelConsumer.class);
@@ -226,8 +239,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
 
 					if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+						if(null == userLoginMobileParam.getPushKey()) {
+							this.updatePushKey("", user);
+						}else {
+							this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+						}
 					}
+					
 					this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 					return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 				} else {
@@ -253,6 +271,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 */
 	public BaseResult<UserLoginDTO> verifyUserPass(String password, User user, UserLoginWithPassParam userLoginMobileParam) {
 		if (user.getPassword().equals(Encryption.encryption(password, user.getSalt()))) {// 密码正确
+			if(user.getPassWrongCount() > 0) {
+				User updatePassWrongCountUser = new User();
+				updatePassWrongCountUser.setUserId(user.getUserId());
+				updatePassWrongCountUser.setPassWrongCount(0);
+				updatePassWrongCountUser.setUserStatus(0);
+				userService.update(updatePassWrongCountUser);
+			}
 			UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 
@@ -263,7 +288,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				updatePassWrongCountUser.setUserId(user.getUserId());
 				updatePassWrongCountUser.setPassWrongCount(++nowWrongPassCount);
 				userService.update(updatePassWrongCountUser);
-				return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "您输入的密码错误，还有" + (6 - nowWrongPassCount) + "次机会");
+				return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "您输入的密码错误，还有" + (5 - nowWrongPassCount) + "次机会");
 			} else {// 输入错误密码超过5次，锁定用户
 				User lockUser = new User();
 				lockUser.setUserId(user.getUserId());
@@ -333,4 +358,14 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		}
 	}
 
+	public void loginLogOut() {
+		Integer userId = SessionUtil.getUserId();
+		if(userId != null) {
+			UserLoginLog ull = userLoginMapper.getLastLog(userId);
+			if(ull != null) {
+				ull.setLogoutTime(DateUtil.getCurrentTimeLong());
+				userLoginMapper.updateLogOutTime(ull);
+			}
+		}
+	}
 }

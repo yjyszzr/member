@@ -71,6 +71,16 @@ public class SmsController {
 			e.printStackTrace();
 		}
 		
+		Long expireTimeLimit5 = stringRedisTemplate.getExpire(sendNumKey+"_3");
+		if(num == 3 && expireTimeLimit5 < 300 && expireTimeLimit5 > 0) {//聚合规定：5min 内不能超过3条
+			return ResultGenerator.genResult(MemberEnums.MESSAGE_5MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_5MIN_COUNT_ERROR.getMsg());
+		}
+		
+		Long expireTimeLimit60 = stringRedisTemplate.getExpire(sendNumKey+"_5");
+		if(num == 5 && expireTimeLimit60 < 3600 && expireTimeLimit60 > 0) {//聚合规定：60min 内不能超过5条
+			return ResultGenerator.genResult(MemberEnums.MESSAGE_60MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_60MIN_COUNT_ERROR.getMsg());
+		}
+		
 		if(num >= 10) {
 			return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_ERROR.getMsg());
 		}
@@ -121,7 +131,9 @@ public class SmsController {
 		stringRedisTemplate.opsForValue().set(key, strRandom4, defineExpiredTime, TimeUnit.SECONDS);
 		int sendNumExpire = this.todayEndTime();
 		stringRedisTemplate.opsForValue().set(sendNumKey, num+"", sendNumExpire, TimeUnit.SECONDS);
-		
+		stringRedisTemplate.opsForValue().set(sendNumKey+"_3", num+"", 300, TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(sendNumKey+"_5", num+"", 3600, TimeUnit.SECONDS);
+
 		return ResultGenerator.genSuccessResult("发送短信验证码成功");
 	}
 

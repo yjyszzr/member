@@ -64,7 +64,7 @@
 		        AND end_time &gt;= #{endTime}
 		    </if>
 	    </where>
-	    order by start_time ASC,end_time ASC,bonus_price ASC,min_goods_amount ASC
+	    order by add_time DESC,start_time ASC,end_time ASC,bonus_price ASC,min_goods_amount ASC
   </select>
   
   <select id="queryUserBonusForPay" parameterType="com.dl.member.model.UserBonus" resultMap="BaseResultMap">

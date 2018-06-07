@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.DlChannelMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.DlChannel">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="channel_id" jdbcType="INTEGER" property="channelId" />
+    <result column="channel_name" jdbcType="VARCHAR" property="channelName" />
+    <result column="act_id" jdbcType="INTEGER" property="actId" />
+    <result column="act_name" jdbcType="VARCHAR" property="actName" />
+    <result column="channel_num" jdbcType="VARCHAR" property="channelNum" />
+    <result column="commission_rate" jdbcType="DECIMAL" property="commissionRate" />
+    <result column="channel_type" jdbcType="TINYINT" property="channelType" />
+    <result column="channel_contact" jdbcType="VARCHAR" property="channelContact" />
+    <result column="channel_mobile" jdbcType="VARCHAR" property="channelMobile" />
+    <result column="channel_address" jdbcType="VARCHAR" property="channelAddress" />
+    <result column="channel_status" jdbcType="TINYINT" property="channelStatus" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="deleted" jdbcType="TINYINT" property="deleted" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+</mapper>

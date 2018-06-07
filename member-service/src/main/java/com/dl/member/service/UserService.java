@@ -251,7 +251,11 @@ public class UserService extends AbstractService<User> {
 		user.setSalt(loginsalt);
 		String paysalt = Encryption.salt();
 		user.setPayPwdSalt(paysalt);
-		user.setPassword(Encryption.encryption(userParam.getPassWord(), loginsalt));
+		if(!StringUtils.isEmpty(userParam.getPassWord())) {
+			user.setPassword(Encryption.encryption(userParam.getPassWord(), loginsalt));
+		}else {
+			user.setPassword("");
+		}
 		user.setRankPoint(0);
 		user.setPassWrongCount(0);
 		user.setIsReal(ProjectConstant.USER_IS_NOT_REAL);
@@ -325,7 +329,7 @@ public class UserService extends AbstractService<User> {
 	 * @return
 	 */
 	public BaseResult<String> setUserLoginPass(SetLoginPassParam param, Integer userId) {
-		if(param.getType() ==0 && StringUtils.isBlank(param.getOldLoginPass()) ) {
+		if(param.getType() ==1 && StringUtils.isBlank(param.getOldLoginPass()) ) {
 			return ResultGenerator.genResult(MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getMsg());
 		}
 		String userLoginPass = param.getUserLoginPass();
@@ -336,7 +340,7 @@ public class UserService extends AbstractService<User> {
 		if (null == user) {
 			return ResultGenerator.genResult(MemberEnums.USER_NOT_FOUND_ERROR.getcode(), MemberEnums.USER_NOT_FOUND_ERROR.getMsg());
 		}
-		if(param.getType() ==0) {
+		if(param.getType() ==1) {
 			String oldPass = Encryption.encryption(param.getOldLoginPass(), user.getSalt());
 			if(!oldPass.equals(user.getPassword())) {
 				return ResultGenerator.genResult(MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getMsg());

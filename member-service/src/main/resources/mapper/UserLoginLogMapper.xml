@@ -24,4 +24,13 @@
     <result column="login_result" jdbcType="VARCHAR" property="loginResult" />
     <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel"/>
   </resultMap>
+  
+  <select id="getLastLog" resultMap="BaseResultMap">
+  	select * from dl_user_login_log where user_id=#{userId} order by login_time desc limit 1
+  </select>
+  
+  <update id="updateLogOutTime">
+  	update dl_user_login_log set logout_time=#{logoutTime} where id=#{id}
+  </update>
+  
 </mapper>

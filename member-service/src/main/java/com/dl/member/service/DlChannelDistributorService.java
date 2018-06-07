@@ -10,14 +10,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tk.mybatis.mapper.entity.Condition;
 
+import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
+import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.IncomeDetailsDTO;
@@ -26,8 +30,10 @@ import com.dl.member.dto.PromotionIncomeDTO;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.DlChannelOptionLog;
+import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.param.DlChannelDistributorParam;
+import com.dl.member.param.UserRegisterParam;
 
 @Service
 @Transactional
@@ -40,6 +46,12 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 	private UserAccountService userAccountService;
 	@Resource
 	private DlChannelOptionLogService dlChannelOptionLogService;
+	@Resource
+	private UserRegisterService userRegisterService;
+	@Resource
+	private UserService userService;
+	@Resource
+	private UserBonusService userBonusService;
 
 	public List<DlChannelDistributor> getAllDlChannelDistributor() {
 		return dlChannelDistributorMapper.getAllDlChannelDistributor();
@@ -391,5 +403,32 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 			}
 		}
 		return promotionIncomes;
+	}
+
+	/**
+	 * 注册成为店员时 先注册成为用户 注册成为用户需要给该用户派发优惠券
+	 * 
+	 * @param distributor
+	 * @param request
+	 * @return
+	 */
+	public BaseResult<String> saveUserAndDistributor(DlChannelDistributor distributor, HttpServletRequest request) {
+		// 先注册用户
+		UserRegisterParam userRegisterParam = new UserRegisterParam();
+		userRegisterParam.setLoginSource("4");
+		userRegisterParam.setMobile(distributor.getMobile());
+		userRegisterParam.setPassWord("");// 初始密码为空
+		BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
+		if (regRst.getCode() != 0) {
+			return ResultGenerator.genResult(regRst.getCode(), regRst.getMsg());
+		}
+		Integer userId = regRst.getData();
+		userBonusService.receiveUserBonus(ProjectConstant.REGISTER, userId);// 送红包
+		distributor.setUserId(userId);
+		User user = userService.findById(userId);
+		distributor.setUserName(user.getUserName());
+		// 注册成为店员
+		this.save(distributor);
+		return ResultGenerator.genSuccessResult("注册成功");
 	}
 }

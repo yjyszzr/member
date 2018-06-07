@@ -57,7 +57,13 @@ public class UserRegisterController {
         if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
             return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
         }
-    	
+        String passWord = userRegisterParam.getPassWord();
+        if(passWord.equals("-1")) {
+        	userRegisterParam.setPassWord("");
+        } else if(!passWord.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
+    		return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
+    	} 	
+        
     	BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
     	if(regRst.getCode() != 0) {
     		return ResultGenerator.genResult(regRst.getCode(),regRst.getMsg());

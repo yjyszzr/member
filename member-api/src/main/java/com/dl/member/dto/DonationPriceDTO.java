@@ -7,6 +7,6 @@ import lombok.Data;
 public class DonationPriceDTO {
 	
 	@ApiModelProperty("赠送的金额")
-	private Double donationPrice;
+	private String donationPrice;
 
 }
