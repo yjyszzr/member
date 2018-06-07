@@ -42,6 +42,7 @@ import com.dl.member.param.ConsumerSmsParam;
 import com.dl.member.param.DistributorSmsParam;
 import com.dl.member.param.DlChannelConsumerParam;
 import com.dl.member.param.DlChannelDistributorParam;
+import com.dl.member.param.DlChannelParam;
 import com.dl.member.param.MyQRCodeParam;
 import com.dl.member.param.SmsParam;
 import com.dl.member.param.StrParam;
@@ -249,9 +250,9 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "获取店铺列表", notes = "获取店铺列表")
 	@PostMapping("/getChannelList")
-	public BaseResult<List<DlChannel>> getChannelList() {
+	public BaseResult<List<DlChannel>> getChannelList(@RequestBody DlChannelParam param) {
 		List<DlChannel> channelList = new ArrayList<DlChannel>();
-		channelList = dlChannelService.findAll();
+		channelList = dlChannelService.findAllOrderByLetter(param);
 		return ResultGenerator.genSuccessResult("获取成功", channelList);
 	}
 }
