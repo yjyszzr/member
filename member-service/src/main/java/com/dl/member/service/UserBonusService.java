@@ -19,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
@@ -494,7 +495,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			return ResultGenerator.genResult(MemberEnums.ACTIVITY_NOT_VALID.getcode(),MemberEnums.ACTIVITY_NOT_VALID.getMsg());
 		}
 		
-		
 		//已支付的的充值才能参与充值领红包
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
 		PayLogIdParam payLogIdParam = new PayLogIdParam();
@@ -528,6 +528,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}
 		
 		YesOrNoDTO yesOrNotDTO = yesOrNotRst.getData();
+		log.info("判断是否充值过:"+JSON.toJSONString(yesOrNotRst.getData()));
 		if(yesOrNotDTO.getYesOrNo().equals("0")) {//未成功充过值
 			BigDecimal newUserRechargeMoney = payLogDTORst.getData().getOrderAmount();
 			Date currentTime = new Date();
@@ -557,7 +558,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 				userBonusMapper.insertBatchUserBonusForRecharge(userBonusListRecharge);
 				donationPriceDTO.setDonationPrice(bonusPrice+"");	
 			}
-					
 		}else {//成功充过值
 			BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
 			//存储对应着各个概率的随机金额
