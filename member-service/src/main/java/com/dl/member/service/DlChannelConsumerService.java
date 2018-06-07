@@ -35,8 +35,6 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 	@Resource
 	private UserBonusService userBonusService;
 	@Resource
-	private UserService userService;
-	@Resource
 	private DlChannelOptionLogService dlChannelOptionLogService;
 
 	public List<DlChannelConsumer> selectByChannelDistributorId(Integer channelDistributorId) {
