@@ -19,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
@@ -494,7 +495,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			return ResultGenerator.genResult(MemberEnums.ACTIVITY_NOT_VALID.getcode(),MemberEnums.ACTIVITY_NOT_VALID.getMsg());
 		}
 		
-		
 		//已支付的的充值才能参与充值领红包
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
 		PayLogIdParam payLogIdParam = new PayLogIdParam();
@@ -522,12 +522,13 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		//判断是否充过值
 		com.dl.shop.payment.param.UserIdParam userIdParam = new com.dl.shop.payment.param.UserIdParam();
 		userIdParam.setUserId(userId);
-		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countUserRecharge(userIdParam);
+		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countChargeByUserId(userIdParam);
 		if(yesOrNotRst.getCode() != 0) {
 			return ResultGenerator.genFailResult("判断是否充过值接口异常");
 		}
 		
 		YesOrNoDTO yesOrNotDTO = yesOrNotRst.getData();
+		log.info("判断是否充值过:"+JSON.toJSONString(yesOrNotRst.getData()));
 		if(yesOrNotDTO.getYesOrNo().equals("0")) {//未成功充过值
 			BigDecimal newUserRechargeMoney = payLogDTORst.getData().getOrderAmount();
 			Date currentTime = new Date();
@@ -557,7 +558,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 				userBonusMapper.insertBatchUserBonusForRecharge(userBonusListRecharge);
 				donationPriceDTO.setDonationPrice(bonusPrice+"");	
 			}
-					
 		}else {//成功充过值
 			BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
 			//存储对应着各个概率的随机金额
@@ -591,6 +591,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setBonusId(2);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 			userBonus.setBonusPrice(BigDecimal.valueOf(rechargeBonusLimit.getBonusPrice()));
+			userBonus.setAddTime(now);
 			userBonus.setReceiveTime(now);
 			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
 			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, 7, 23, 59, 59));
@@ -640,6 +641,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setUserId(userId);
 			userBonus.setBonusId(2);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+			userBonus.setAddTime(now);
 			userBonus.setBonusPrice(new BigDecimal(rechargeBonusLimit.getBonusPrice()));
 			userBonus.setReceiveTime(now);
 			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
