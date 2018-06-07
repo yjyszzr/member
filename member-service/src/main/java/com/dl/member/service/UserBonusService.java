@@ -522,7 +522,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		//判断是否充过值
 		com.dl.shop.payment.param.UserIdParam userIdParam = new com.dl.shop.payment.param.UserIdParam();
 		userIdParam.setUserId(userId);
-		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countUserRecharge(userIdParam);
+		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countChargeByUserId(userIdParam);
 		if(yesOrNotRst.getCode() != 0) {
 			return ResultGenerator.genFailResult("判断是否充过值接口异常");
 		}
