@@ -42,6 +42,7 @@ import com.dl.member.model.User;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.BonusLimitConditionParam;
 import com.dl.member.param.UserBonusParam;
+import com.dl.member.param.UserIdParam;
 import com.dl.member.util.BonusUtil;
 import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
@@ -434,8 +435,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		Integer userId = payLogDTORst.getData().getUserId();
 		
 		//判断是否充过值
-		StrParam strParam = new StrParam();
-		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countUserRecharge(strParam);
+		com.dl.shop.payment.param.UserIdParam userIdParam = new com.dl.shop.payment.param.UserIdParam();
+		userIdParam.setUserId(userId);
+		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countUserRecharge(userIdParam);
 		if(yesOrNotRst.getCode() != 0) {
 			return ResultGenerator.genFailResult("判断是否充过值接口异常");
 		}
@@ -518,8 +520,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}
 		
 		//判断是否充过值
-		StrParam strParam = new StrParam();
-		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countUserRecharge(strParam);
+		com.dl.shop.payment.param.UserIdParam userIdParam = new com.dl.shop.payment.param.UserIdParam();
+		userIdParam.setUserId(userId);
+		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countUserRecharge(userIdParam);
 		if(yesOrNotRst.getCode() != 0) {
 			return ResultGenerator.genFailResult("判断是否充过值接口异常");
 		}
