@@ -50,6 +50,7 @@ import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDTO;
+import com.dl.shop.payment.dto.PriceDTO;
 import com.dl.shop.payment.dto.YesOrNoDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
 import com.dl.shop.payment.param.StrParam;
@@ -416,19 +417,14 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @return
 	 */
 	public BaseResult<DonationPriceDTO> receiveRechargeUserBonusStr(Integer payLogId) {
+		PayLogIdParam payLogIdParam = new PayLogIdParam();
+		payLogIdParam.setPayLogId(payLogId);
+		BaseResult<PriceDTO> priceRst = payMentService.queryMoneyInRedis(payLogIdParam);
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
 		donationPriceDTO.setDonationPrice("0.04");
-		log.info("前端传入："+String.valueOf(payLogId));
-		stringRedisTemplate.getConnectionFactory().getConnection().select(5);
-		String donationPrice = stringRedisTemplate.opsForValue().get(String.valueOf(payLogId));
-		log.info("redis 取出1："+String.valueOf(payLogId));
-		if(!StringUtils.isEmpty(donationPrice)) {
-			donationPriceDTO.setDonationPrice(donationPrice);
+		if(priceRst.getCode() != 0) {
+			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
 		}
-		stringRedisTemplate.delete(String.valueOf(payLogId));
-		stringRedisTemplate.getConnectionFactory().getConnection().select(0);
-
-		log.info("redis 取出2："+donationPrice);
 		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
 	}
 	
