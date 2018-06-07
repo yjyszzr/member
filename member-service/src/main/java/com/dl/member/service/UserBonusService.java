@@ -418,10 +418,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			return ResultGenerator.genResult(MemberEnums.ACTIVITY_NOT_VALID.getcode(),MemberEnums.ACTIVITY_NOT_VALID.getMsg());
 		}
 		
-		Integer userId = SessionUtil.getUserId();
-		if(null == userId) {
-			return ResultGenerator.genNeedLoginResult("请登录");
-		}
+
 		
 		//已支付的的充值才能参与充值领红包
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
@@ -436,6 +433,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}	
 		
 		//已经领取的红包不能再领取
+		Integer userId = payLogDTORst.getData().getUserId();
 		Condition condition = new Condition(UserBonus.class);
 		Criteria criteria = condition.createCriteria();
 		criteria.andCondition("user_id =", userId);
@@ -458,10 +456,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			BigDecimal newUserRechargeMoney = payLogDTORst.getData().getOrderAmount();
 			Date currentTime = new Date();
 			List<UserBonus> uesrBonusList = new ArrayList<UserBonus>();
-			UserBonus userBonus = new UserBonus();
-			userBonus.setUserId(userId);
-			userBonus.setBonusId(2);
-			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 			if(newUserRechargeMoney.compareTo(new BigDecimal(10)) >= 0 && newUserRechargeMoney.compareTo(new BigDecimal(20)) < 0) {
 				newUserRechargeMoney = new BigDecimal(10);
 				List<UserBonus> userBonusListForNewUser = this.createRechargeUserBonusListForNewUser(userId,payLogId, newUserRechargeMoney.doubleValue());
