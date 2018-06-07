@@ -62,8 +62,7 @@ public class UserRegisterController {
         	userRegisterParam.setPassWord("");
         } else if(!passWord.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
     		return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
-    	}
-    	
+    	} 	
         
     	BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
     	if(regRst.getCode() != 0) {

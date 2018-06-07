@@ -61,7 +61,11 @@ public class UserRegisterService extends AbstractService<User> {
 		}
 		
 		if(!userRegisterParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-			userParam.setPushKey(userRegisterParam.getPushKey());
+			if(null == userRegisterParam.getPushKey()) {
+				userParam.setPushKey("");
+			}else {
+				userParam.setPushKey(userRegisterParam.getPushKey());
+			}
 		}else {
 			userParam.setPushKey("");
 		}

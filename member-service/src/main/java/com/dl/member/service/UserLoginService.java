@@ -93,7 +93,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			userLoginDTO = userLoginRst.getData();
 
 			if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-				this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				if(null == userLoginMobileParam.getPushKey()) {
+					this.updatePushKey("", user);
+				}else {
+					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				}
 			}
 			Condition condition = new Condition(DlChannelConsumer.class);
 			// condition.createCriteria().andCondition("user_id = ",
@@ -126,7 +130,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				userService.saveUserAndUpdateConsumer(normalUser);
 
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					if(null == userLoginMobileParam.getPushKey()) {
+						this.updatePushKey("", user);
+					}else {
+						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					}
 				}
 				this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
@@ -202,7 +210,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 				stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					if(null == userLoginMobileParam.getPushKey()) {
+						this.updatePushKey("", user);
+					}else {
+						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+					}
 				}
 
 				Condition condition = new Condition(DlChannelConsumer.class);
@@ -227,8 +239,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
 
 					if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+						if(null == userLoginMobileParam.getPushKey()) {
+							this.updatePushKey("", user);
+						}else {
+							this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+						}
 					}
+					
 					this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 					return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 				} else {
