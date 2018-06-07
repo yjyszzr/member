@@ -21,17 +21,20 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
+import com.dl.base.util.DateUtilNew;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dto.ChannelDistributorDTO;
 import com.dl.member.dto.IncomeDetailsDTO;
 import com.dl.member.dto.IncomeRankingDTO;
 import com.dl.member.dto.PromotionIncomeDTO;
+import com.dl.member.model.DlChannel;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.DlChannelOptionLog;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
+import com.dl.member.param.DistributorSmsParam;
 import com.dl.member.param.DlChannelDistributorParam;
 import com.dl.member.param.UserRegisterParam;
 
@@ -50,6 +53,8 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 	private UserRegisterService userRegisterService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private DlChannelService dlChannelService;
 	@Resource
 	private UserBonusService userBonusService;
 
@@ -412,23 +417,41 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 	 * @param request
 	 * @return
 	 */
-	public BaseResult<String> saveUserAndDistributor(DlChannelDistributor distributor, HttpServletRequest request) {
+	public BaseResult<String> saveUserAndDistributor(DistributorSmsParam smsParam, HttpServletRequest request) {
 		// 先注册用户
 		UserRegisterParam userRegisterParam = new UserRegisterParam();
 		userRegisterParam.setLoginSource("4");
-		userRegisterParam.setMobile(distributor.getMobile());
-		userRegisterParam.setPassWord("");// 初始密码为空
+		userRegisterParam.setMobile(smsParam.getMobile());
+		userRegisterParam.setPassWord(smsParam.getPassword());
 		BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
 		if (regRst.getCode() != 0) {
 			return ResultGenerator.genResult(regRst.getCode(), regRst.getMsg());
 		}
 		Integer userId = regRst.getData();
-		userBonusService.receiveUserBonus(ProjectConstant.REGISTER, userId);// 送红包
-		distributor.setUserId(userId);
-		User user = userService.findById(userId);
-		distributor.setUserName(user.getUserName());
+		// 送红包
+		userBonusService.receiveUserBonus(ProjectConstant.REGISTER, userId);
 		// 注册成为店员
-		this.save(distributor);
-		return ResultGenerator.genSuccessResult("注册成功");
+		DlChannelDistributor distributor = new DlChannelDistributor();
+		DlChannel dlChannel = dlChannelService.findById(smsParam.getChannelId());
+		if (dlChannel != null) {
+			distributor.setChannelId(0);
+			distributor.setChannelId(smsParam.getChannelId());
+			distributor.setChannelName(dlChannel.getChannelName());
+			distributor.setMobile(smsParam.getMobile());
+			List<DlChannelDistributor> dlChannelDistributorList = this.findAll();
+			Integer num = dlChannelDistributorList.size() + 1;
+			distributor.setChannelDistributorNum(dlChannel.getChannelNum() + "." + num);
+			distributor.setAddTime(DateUtilNew.getCurrentTimeLong());
+			distributor.setDeleted(0);
+			distributor.setRemark("");
+			distributor.setUserId(userId);
+			User user = userService.findById(userId);
+			distributor.setUserName(user.getUserName());
+			distributor.setDistributorCommissionRate(0.02);// 佣金比例2%,经产品人员确认
+			this.save(distributor);
+			return ResultGenerator.genSuccessResult("注册成功");
+		} else {
+			return ResultGenerator.genSuccessResult("注册失败,渠道为空");
+		}
 	}
 }

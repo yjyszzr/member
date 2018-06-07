@@ -23,4 +23,8 @@ public class DistributorSmsParam {
 	@NotBlank(message = "渠道Id不能为空")
 	@ApiModelProperty(value = "渠道Id")
 	private Integer channelId;
+
+	@NotBlank(message = "密码")
+	@ApiModelProperty(value = "密码", required = true)
+	private String password;
 }

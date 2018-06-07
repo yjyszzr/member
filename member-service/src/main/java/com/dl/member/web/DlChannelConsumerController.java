@@ -212,14 +212,12 @@ public class DlChannelConsumerController {
 		String strRandom4 = RandomUtil.getRandNum(4);
 		if (ProjectConstant.VERIFY_TYPE_REG.equals(smsType)) {
 			User user = userService.findBy("mobile", smsParam.getMobile());
-			if (user != null) {
+			if (user != null) {// 校验手机号是否存在
 				return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
 			}
-
-			if (!RegexUtil.checkMobile(smsParam.getMobile())) {
+			if (!RegexUtil.checkMobile(smsParam.getMobile())) {// 校验手机号合不合法
 				return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 			}
-
 			tplId = memberConfig.getREGISTER_TPLID();
 			tplValue = "#code#=" + strRandom4;
 		}
@@ -246,25 +244,7 @@ public class DlChannelConsumerController {
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
 		// 短信发送成功执行店员保存操作
-		DlChannelDistributor distributor = new DlChannelDistributor();
-		DlChannel dlChannel = dlChannelService.findById(smsParam.getChannelId());
-		if (dlChannel != null) {
-			distributor.setChannelId(0);
-			distributor.setChannelId(smsParam.getChannelId());
-			distributor.setChannelName(dlChannel.getChannelName());
-			distributor.setMobile(smsParam.getMobile());
-			List<DlChannelDistributor> dlChannelDistributorList = dlChannelDistributorService.findAll();
-			Integer num = dlChannelDistributorList.size() + 1;
-			distributor.setChannelDistributorNum(dlChannel.getChannelNum() + "." + num);
-			distributor.setAddTime(DateUtilNew.getCurrentTimeLong());
-			distributor.setDeleted(0);
-			distributor.setRemark("");
-			distributor.setDistributorCommissionRate(0.02);// 佣金比例2%,经产品人员确认
-			dlChannelDistributorService.saveUserAndDistributor(distributor, request);
-			return ResultGenerator.genSuccessResult("发送短信验证码成功", distributor.getChannelDistributorId().toString());
-		} else {
-			return ResultGenerator.genFailResult("参数异常");
-		}
+		return dlChannelDistributorService.saveUserAndDistributor(smsParam, request);
 	}
 
 	@ApiOperation(value = "获取店铺列表", notes = "获取店铺列表")
