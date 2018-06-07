@@ -419,12 +419,14 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	public BaseResult<DonationPriceDTO> receiveRechargeUserBonusStr(Integer payLogId) {
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
 		donationPriceDTO.setDonationPrice("0.04");
+		log.info("redis 取出1："+String.valueOf(payLogId));
 		String donationPrice = stringRedisTemplate.opsForValue().get(String.valueOf(payLogId));
 		if(!StringUtils.isEmpty(donationPrice)) {
 			donationPriceDTO.setDonationPrice(donationPrice);
 		}
 		stringRedisTemplate.delete(String.valueOf(payLogId));
 
+		log.info("redis 取出2："+donationPrice);
 		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
 //		//过期的充值活动不能领取该活动的红包
 //		Integer now = DateUtil.getCurrentTimeLong();
