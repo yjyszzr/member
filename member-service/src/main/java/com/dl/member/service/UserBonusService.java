@@ -423,7 +423,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		if(!StringUtils.isEmpty(donationPrice)) {
 			donationPriceDTO.setDonationPrice(donationPrice);
 		}
-		
+		stringRedisTemplate.delete(String.valueOf(payLogId));
+
 		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
 //		//过期的充值活动不能领取该活动的红包
 //		Integer now = DateUtil.getCurrentTimeLong();
