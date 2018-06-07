@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.dl.base.result.BaseResult;
+import com.dl.member.dto.DonationPriceDTO;
 //import com.pgt.base.result.BaseResult;
 //import com.pgt.shop.member.dto.UserBonusCountDTO;
 //import com.pgt.shop.member.dto.UserBonusDTO;
@@ -23,6 +24,7 @@ import com.dl.base.result.BaseResult;
 //import com.pgt.shop.member.param.ValidUserBonusParam;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.param.BonusLimitConditionParam;
+import com.dl.member.param.PayLogIdParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UserBonusIdParam;
 import com.dl.member.param.UserBonusStatusParam;
@@ -53,7 +55,16 @@ public interface IUserBonusService {
 	  * @return
 	  */
      @PostMapping("/user/bonus/queryValidBonusList")
-     BaseResult<List<UserBonusDTO>> queryValidBonusList(@RequestBody BonusLimitConditionParam bonusLimitConditionParam);	 
+     BaseResult<List<UserBonusDTO>> queryValidBonusList(@RequestBody BonusLimitConditionParam bonusLimitConditionParam);	
+     
+     
+     /**
+      * 充值成功后领取充值送随机红包
+      * @param payLogIdParam
+      * @return
+      */
+     @PostMapping("/user/bonus/rechargeSucReiceiveBonus")
+     public BaseResult<DonationPriceDTO> rechargeSucReiceiveBonus(@RequestBody PayLogIdParam payLogIdParam);
 
 //	 /**
 //	 * 获取结算页的店铺红包列表
