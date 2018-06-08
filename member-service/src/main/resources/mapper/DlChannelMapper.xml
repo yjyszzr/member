@@ -20,7 +20,7 @@
     <result column="deleted" jdbcType="TINYINT" property="deleted" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
   </resultMap>
-  <select id="findAllOrderByLetter" parameterType="String" resultType="java.util.Map">
+  <select id="findAllOrderByLetter" parameterType="String" resultMap="BaseResultMap">
 		 SELECT
 			* 
 		FROM

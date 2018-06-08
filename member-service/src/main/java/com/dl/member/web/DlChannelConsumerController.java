@@ -253,6 +253,9 @@ public class DlChannelConsumerController {
 	public BaseResult<List<DlChannel>> getChannelList(@RequestBody DlChannelParam param) {
 		List<DlChannel> channelList = new ArrayList<DlChannel>();
 		channelList = dlChannelService.findAllOrderByLetter(param);
+		DlChannel oChannel = channelList.stream().filter(s -> s.getChannelId().equals(1)).findFirst().orElse(null);
+		channelList.remove(oChannel);
+		channelList.add(oChannel);
 		return ResultGenerator.genSuccessResult("获取成功", channelList);
 	}
 }
