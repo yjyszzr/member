@@ -50,7 +50,7 @@ public class DonationRechargeCardService extends AbstractService<DonationRecharg
         	donationRechargeCardDTOList.add(donationRechargeCardDTO);
         });
         
-    	DLActivity dLActivity = dLActivityMapper.queryActivityByType(2);
+    	DLActivity dLActivity = dLActivityMapper.queryActivityByType(1);
         RechargeActivityDTO rechargeActivityDTO = new RechargeActivityDTO();
         rechargeActivityDTO.setStartTime(dLActivity.getStartTime());
         rechargeActivityDTO.setEndTime(dLActivity.getEndTime());

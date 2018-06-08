@@ -20,4 +20,17 @@
     <result column="deleted" jdbcType="TINYINT" property="deleted" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
   </resultMap>
+  <select id="findAllOrderByLetter" parameterType="String" resultType="java.util.Map">
+		 SELECT
+			* 
+		FROM
+			dl_channel where 1=1
+			 	<if test="channelName != null">
+	 				AND channel_name  
+					LIKE CONCAT(CONCAT('%', #{channelName}),'%')
+		    </if>
+		ORDER BY
+			CONVERT ( channel_name USING GBK ) ASC
+  </select>
+  
 </mapper>

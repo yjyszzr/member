@@ -16,9 +16,11 @@ import javax.annotation.Resource;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
@@ -42,11 +44,13 @@ import com.dl.member.model.User;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.BonusLimitConditionParam;
 import com.dl.member.param.UserBonusParam;
+import com.dl.member.param.UserIdParam;
 import com.dl.member.util.BonusUtil;
 import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDTO;
+import com.dl.shop.payment.dto.PriceDTO;
 import com.dl.shop.payment.dto.YesOrNoDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
 import com.dl.shop.payment.param.StrParam;
@@ -84,6 +88,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 
 	@Resource
 	private GeTuiUtil geTuiUtil;
+	
+	@Resource
+	private StringRedisTemplate stringRedisTemplate;
 
 	/**
 	 * 下单时的账户变动：目前仅红包置为已使用
@@ -409,6 +416,25 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * 
 	 * @return
 	 */
+	public BaseResult<DonationPriceDTO> receiveRechargeUserBonusStr(Integer payLogId) {
+		PayLogIdParam payLogIdParam = new PayLogIdParam();
+		payLogIdParam.setPayLogId(payLogId);
+		BaseResult<PriceDTO> priceRst = payMentService.queryMoneyInRedis(payLogIdParam);
+		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
+		donationPriceDTO.setDonationPrice("0.04");
+		if(priceRst.getCode() == 0) {
+			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
+		}
+		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
+	}
+	
+	
+	
+	/**
+	 * 领取充值赠送的随机数额的红包
+	 * 
+	 * @return
+	 */
 	@Transactional
 	public BaseResult<DonationPriceDTO> receiveRechargeUserBonus(Integer payLogId) {
 		//过期的充值活动不能领取该活动的红包
@@ -416,11 +442,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		Integer countRst = dLActivityMapper.countRechargeActivity(now);
 		if(countRst == 0) {
 			return ResultGenerator.genResult(MemberEnums.ACTIVITY_NOT_VALID.getcode(),MemberEnums.ACTIVITY_NOT_VALID.getMsg());
-		}
-		
-		Integer userId = SessionUtil.getUserId();
-		if(null == userId) {
-			return ResultGenerator.genNeedLoginResult("请登录");
 		}
 		
 		//已支付的的充值才能参与充值领红包
@@ -436,6 +457,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}	
 		
 		//已经领取的红包不能再领取
+		Integer userId = payLogDTORst.getData().getUserId();
 		Condition condition = new Condition(UserBonus.class);
 		Criteria criteria = condition.createCriteria();
 		criteria.andCondition("user_id =", userId);
@@ -447,21 +469,19 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}
 		
 		//判断是否充过值
-		StrParam strParam = new StrParam();
-		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countUserRecharge(strParam);
+		com.dl.shop.payment.param.UserIdParam userIdParam = new com.dl.shop.payment.param.UserIdParam();
+		userIdParam.setUserId(userId);
+		BaseResult<YesOrNoDTO> yesOrNotRst = payMentService.countChargeByUserId(userIdParam);
 		if(yesOrNotRst.getCode() != 0) {
 			return ResultGenerator.genFailResult("判断是否充过值接口异常");
 		}
 		
 		YesOrNoDTO yesOrNotDTO = yesOrNotRst.getData();
+		log.info("判断是否充值过:"+JSON.toJSONString(yesOrNotRst.getData()));
 		if(yesOrNotDTO.getYesOrNo().equals("0")) {//未成功充过值
 			BigDecimal newUserRechargeMoney = payLogDTORst.getData().getOrderAmount();
 			Date currentTime = new Date();
 			List<UserBonus> uesrBonusList = new ArrayList<UserBonus>();
-			UserBonus userBonus = new UserBonus();
-			userBonus.setUserId(userId);
-			userBonus.setBonusId(2);
-			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 			if(newUserRechargeMoney.compareTo(new BigDecimal(10)) >= 0 && newUserRechargeMoney.compareTo(new BigDecimal(20)) < 0) {
 				newUserRechargeMoney = new BigDecimal(10);
 				List<UserBonus> userBonusListForNewUser = this.createRechargeUserBonusListForNewUser(userId,payLogId, newUserRechargeMoney.doubleValue());
@@ -487,7 +507,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 				userBonusMapper.insertBatchUserBonusForRecharge(userBonusListRecharge);
 				donationPriceDTO.setDonationPrice(bonusPrice+"");	
 			}
-					
 		}else {//成功充过值
 			BigDecimal recharegePrice = payLogDTORst.getData().getOrderAmount();
 			//存储对应着各个概率的随机金额
@@ -521,6 +540,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setBonusId(2);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 			userBonus.setBonusPrice(BigDecimal.valueOf(rechargeBonusLimit.getBonusPrice()));
+			userBonus.setAddTime(now);
 			userBonus.setReceiveTime(now);
 			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
 			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, 7, 23, 59, 59));
@@ -570,6 +590,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setUserId(userId);
 			userBonus.setBonusId(2);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+			userBonus.setAddTime(now);
 			userBonus.setBonusPrice(new BigDecimal(rechargeBonusLimit.getBonusPrice()));
 			userBonus.setReceiveTime(now);
 			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, 0, 0, 0, 0));
