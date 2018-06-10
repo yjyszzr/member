@@ -390,7 +390,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonus.setUserId(userId);
 			userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 			userBonus.setBonusPrice(s.getBonusAmount());
-			userBonus.setReceiveTime(DateUtil.getCurrentTimeLong());
+			userBonus.setAddTime(now);
+			userBonus.setReceiveTime(now);
 			userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, s.getStartTime(), 0, 0, 0));
 			userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, s.getEndTime(), 23, 59, 59));
 			userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
@@ -421,7 +422,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		payLogIdParam.setPayLogId(payLogId);
 		BaseResult<PriceDTO> priceRst = payMentService.queryMoneyInRedis(payLogIdParam);
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
-		donationPriceDTO.setDonationPrice("0.04");
+		donationPriceDTO.setDonationPrice("0.00");
 		if(priceRst.getCode() == 0) {
 			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
 		}
