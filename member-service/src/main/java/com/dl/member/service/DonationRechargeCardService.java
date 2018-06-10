@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
+import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DLActivityMapper;
 import com.dl.member.dao.DonationRechargeCardMapper;
 import com.dl.member.dto.DonationRechargeCardDTO;
@@ -50,10 +51,15 @@ public class DonationRechargeCardService extends AbstractService<DonationRecharg
         	donationRechargeCardDTOList.add(donationRechargeCardDTO);
         });
         
-    	DLActivity dLActivity = dLActivityMapper.queryActivityByType(1);
+    	DLActivity dLActivity = dLActivityMapper.queryActivityByType(ProjectConstant.RECHARGE_ACT);
         RechargeActivityDTO rechargeActivityDTO = new RechargeActivityDTO();
-        rechargeActivityDTO.setStartTime(dLActivity.getStartTime());
-        rechargeActivityDTO.setEndTime(dLActivity.getEndTime());
+        if(dLActivity.getIsFinish() == true) {//活动失效 
+            rechargeActivityDTO.setStartTime(1514736000);
+            rechargeActivityDTO.setEndTime(1514822400);
+        }else {//活动有效
+            rechargeActivityDTO.setStartTime(dLActivity.getStartTime());
+            rechargeActivityDTO.setEndTime(dLActivity.getEndTime());
+        }
         rechargeActivityDTO.setRechargeCardList(donationRechargeCardDTOList);
         return ResultGenerator.genSuccessResult("success",rechargeActivityDTO);
 	}

@@ -123,5 +123,7 @@ public class ProjectConstant {
 	public static final Integer REWARD_AUTO = 1;
 	public static final Integer REWARD_MANUAL = 2;
 	public static final String FORMAT_WINNING_MSG = "恭喜【{0}】投注竞足中奖";
+	
+	public static final Integer RECHARGE_ACT = 1;
 
 }
