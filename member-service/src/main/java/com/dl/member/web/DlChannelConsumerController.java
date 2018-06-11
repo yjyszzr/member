@@ -29,6 +29,7 @@ import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.ChannelDistributorDTO;
+import com.dl.member.dto.DlChannelDTO;
 import com.dl.member.dto.DlWinningLogDTO;
 import com.dl.member.dto.IncomeDetailsDTO;
 import com.dl.member.dto.PromotionIncomeDTO;
@@ -250,12 +251,19 @@ public class DlChannelConsumerController {
 
 	@ApiOperation(value = "获取店铺列表", notes = "获取店铺列表")
 	@PostMapping("/getChannelList")
-	public BaseResult<List<DlChannel>> getChannelList(@RequestBody DlChannelParam param) {
+	public BaseResult<List<DlChannelDTO>> getChannelList(@RequestBody DlChannelParam param) {
 		List<DlChannel> channelList = new ArrayList<DlChannel>();
+		List<DlChannelDTO> channelDTOList = new ArrayList<DlChannelDTO>();
 		channelList = dlChannelService.findAllOrderByLetter(param);
 		DlChannel oChannel = channelList.stream().filter(s -> s.getChannelId().equals(1)).findFirst().orElse(null);
 		channelList.remove(oChannel);
 		channelList.add(oChannel);
-		return ResultGenerator.genSuccessResult("获取成功", channelList);
+		for (int i = 0; i < channelList.size(); i++) {
+			DlChannelDTO channel = new DlChannelDTO();
+			channel.setChannelId(channelList.get(i).getChannelId());
+			channel.setChannelName(channelList.get(i).getChannelName());
+			channelDTOList.add(channel);
+		}
+		return ResultGenerator.genSuccessResult("获取成功", channelDTOList);
 	}
 }
