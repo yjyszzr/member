@@ -357,7 +357,14 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		incomeRankingfinal.setTodayAmount(Double.parseDouble(df.format(incomeBd)));
 		// 查询今天的收入(结束)
 		channelDistributorDTO.setChannelDistributor(incomeRankingfinal);
-		Integer inviteNum = findConsumerByUserId(param) == null ? 0 : findConsumerByUserId(param).size();
+		List<DlChannelConsumer> consumerList = findConsumerByUserId(param);
+		Integer inviteNum = 0;
+		for (int size = 0; size < consumerList.size(); size++) {
+			DlChannelConsumer DlChannelConsumer = consumerList.get(size);
+			if (DlChannelConsumer.getFristLoginTime() != null) {
+				inviteNum += 1;
+			}
+		}
 		channelDistributorDTO.setInviteNum(inviteNum);
 		Double bettingTotalAmount = this.findBettingTotalAmountByDistributorId(param);
 		channelDistributorDTO.setBettingTotalAmount(bettingTotalAmount);
