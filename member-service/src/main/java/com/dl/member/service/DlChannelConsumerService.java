@@ -100,6 +100,7 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 		Integer userId = regRst.getData();
 		dlChannelConsumerMapper.updateByChannelDistributorIdAndMobile(userRegisterParam.getMobile(), userId, userReceiveLotteryAwardParam.getChannelDistributorId());
 		userBonusService.receiveUserBonus(ProjectConstant.XNREGISTER, userId);
+		userBonusService.receiveUserBonus(ProjectConstant.REGISTER, userId);
 		return ResultGenerator.genSuccessResult("领取成功");
 	}
 
