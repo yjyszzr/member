@@ -11,5 +11,5 @@ public class DlChannelParam implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@ApiModelProperty(value = "渠道名称")
-	private String ChannelName;
+	private String channelName;
 }
