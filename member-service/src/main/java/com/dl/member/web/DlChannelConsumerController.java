@@ -194,12 +194,14 @@ public class DlChannelConsumerController {
 		List<DlWinningLogDTO> winningLogList = new ArrayList<DlWinningLogDTO>();
 		if (CollectionUtils.isNotEmpty(lotteryWinningLogTemps)) {
 			for (LotteryWinningLogTemp winningLog : lotteryWinningLogTemps) {
-				DlWinningLogDTO dlWinningLogDTO = new DlWinningLogDTO();
 				String phone = winningLog.getPhone();
-				phone = phone.substring(0, 3) + "****" + phone.substring(7);
-				dlWinningLogDTO.setWinningMsg(MessageFormat.format(ProjectConstant.FORMAT_WINNING_MSG, phone));
-				dlWinningLogDTO.setWinningMoney(winningLog.getWinningMoney().toString());
-				winningLogList.add(dlWinningLogDTO);
+				if (StringUtils.isNotEmpty(phone)) {
+					DlWinningLogDTO dlWinningLogDTO = new DlWinningLogDTO();
+					phone = phone.substring(0, 3) + "****" + phone.substring(7);
+					dlWinningLogDTO.setWinningMsg(MessageFormat.format(ProjectConstant.FORMAT_WINNING_MSG, phone));
+					dlWinningLogDTO.setWinningMoney(winningLog.getWinningMoney().toString());
+					winningLogList.add(dlWinningLogDTO);
+				}
 			}
 		}
 		return ResultGenerator.genSuccessResult("获取成功", winningLogList);
@@ -256,8 +258,10 @@ public class DlChannelConsumerController {
 		List<DlChannelDTO> channelDTOList = new ArrayList<DlChannelDTO>();
 		channelList = dlChannelService.findAllOrderByLetter(param);
 		DlChannel oChannel = channelList.stream().filter(s -> s.getChannelId().equals(1)).findFirst().orElse(null);
-		channelList.remove(oChannel);
-		channelList.add(oChannel);
+		if (oChannel != null) {
+			channelList.remove(oChannel);
+			channelList.add(oChannel);
+		}
 		for (int i = 0; i < channelList.size(); i++) {
 			DlChannelDTO channel = new DlChannelDTO();
 			channel.setChannelId(channelList.get(i).getChannelId());
