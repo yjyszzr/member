@@ -61,12 +61,12 @@ public class DlChannelOptionLog {
 	 * 操作节点 1 注册 2 购彩
 	 */
 	@Column(name = "operation_node")
-	private Byte operationNode;
+	private Integer operationNode;
 
 	/**
 	 * 状态1 正常 2 冻结
 	 */
-	private Byte status;
+	private Integer status;
 
 	/**
 	 * 操作金额

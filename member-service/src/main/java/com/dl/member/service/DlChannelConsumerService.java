@@ -1,6 +1,7 @@
 package com.dl.member.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -17,8 +18,12 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelConsumerMapper;
+import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dto.IncomeDetailsDTO;
 import com.dl.member.model.DlChannelConsumer;
+import com.dl.member.model.DlChannelDistributor;
+import com.dl.member.model.DlChannelOptionLog;
+import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
 import com.dl.member.param.UserReceiveLotteryAwardParam;
 import com.dl.member.param.UserRegisterParam;
@@ -29,7 +34,11 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 	@Resource
 	private DlChannelConsumerMapper dlChannelConsumerMapper;
 	@Resource
+	private DlChannelDistributorMapper dlhannelDistributorMapper;
+	@Resource
 	private UserAccountService userAccountService;
+	@Resource
+	private UserService userService;
 	@Resource
 	private UserRegisterService userRegisterService;
 	@Resource
@@ -106,6 +115,37 @@ public class DlChannelConsumerService extends AbstractService<DlChannelConsumer>
 
 	public void updateByUserId(Integer userId) {
 		dlChannelConsumerMapper.updateByUserId(userId, DateUtil.getCurrentTimeLong());
+		List<DlChannelConsumer> consumers = this.findAll();
+		List<DlChannelDistributor> distributors = dlhannelDistributorMapper.selectAll();
+		DlChannelOptionLog channelOptionLog = new DlChannelOptionLog();
+		List<User> userList = new ArrayList<User>();
+		userList = userService.findAll();
+		for (int j = 0; j < userList.size(); j++) {
+			if (userId.equals(userList.get(j).getUserId())) {
+				// 封装用户相关信息
+				channelOptionLog.setOptionId(0);
+				channelOptionLog.setUserName(userList.get(j).getUserName());
+				channelOptionLog.setMobile(userList.get(j).getMobile());
+				channelOptionLog.setUserId(userList.get(j).getUserId());
+			}
+		}
+		for (int k = 0; k < consumers.size(); k++) {
+			if (userId.equals(consumers.get(k).getUserId())) {
+				channelOptionLog.setDistributorId(consumers.get(k).getChannelDistributorId());
+			}
+		}
+		channelOptionLog.setOperationNode(1);
+		channelOptionLog.setStatus(1);
+		channelOptionLog.setSource("h5");
+		channelOptionLog.setOptionTime(DateUtil.getCurrentTimeLong());
+
+		for (int j = 0; j < distributors.size(); j++) {
+			if (channelOptionLog.getDistributorId().equals(distributors.get(j).getChannelDistributorId())) {
+				channelOptionLog.setChannelId(distributors.get(j).getChannelId());
+			}
+		}
+		dlChannelOptionLogService.save(channelOptionLog);
+
 	}
 
 	// ----------------------------------------------------(↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑)骚骚的分隔线上边是老代码老逻辑(↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑)------------------------------------------------------------//

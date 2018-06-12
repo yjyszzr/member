@@ -146,8 +146,9 @@ public class DlChannelConsumerController {
 			// 短信发送成功执行保存操作
 			DlChannelDistributor distributor = dlChannelDistributorService.findByUserId(smsParam.getUserId());
 			if (null != distributor) {
-				DlChannelConsumer channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(distributor.getChannelDistributorId(), smsParam.getMobile());
-				if (channelConsumer == null) {
+				DlChannelConsumer channelConsumer = new DlChannelConsumer();
+				channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(distributor.getChannelDistributorId(), smsParam.getMobile());
+				if (null != channelConsumer) {
 					DlChannelConsumer dlChannelConsumer = new DlChannelConsumer();
 					dlChannelConsumer.setAddTime(DateUtilNew.getCurrentTimeLong());
 					dlChannelConsumer.setDeleted(0);
