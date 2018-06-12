@@ -148,7 +148,7 @@ public class DlChannelConsumerController {
 			if (null != distributor) {
 				DlChannelConsumer channelConsumer = new DlChannelConsumer();
 				channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(distributor.getChannelDistributorId(), smsParam.getMobile());
-				if (null != channelConsumer) {
+				if (null == channelConsumer) {
 					DlChannelConsumer dlChannelConsumer = new DlChannelConsumer();
 					dlChannelConsumer.setAddTime(DateUtilNew.getCurrentTimeLong());
 					dlChannelConsumer.setDeleted(0);
