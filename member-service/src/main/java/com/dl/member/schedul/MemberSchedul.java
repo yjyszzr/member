@@ -4,18 +4,20 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.dl.base.util.DateUtil;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.service.UserBonusService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-// @Configuration
-// @EnableScheduling
+@Configuration
+@EnableScheduling
 public class MemberSchedul {
 
 	@Resource
