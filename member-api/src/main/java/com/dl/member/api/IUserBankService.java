@@ -5,22 +5,11 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.dl.base.result.BaseResult;
+import com.dl.member.dto.BankDTO;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.param.BankCardParam;
-//import com.pgt.base.result.BaseResult;
-//import com.pgt.shop.member.dto.UserBonusCountDTO;
-//import com.pgt.shop.member.dto.UserBonusDTO;
-//import com.pgt.shop.member.param.GetShopBonusParam;
-//import com.pgt.shop.member.param.GetUserShopBonusParam;
-//import com.pgt.shop.member.param.OrderInfoIdParam;
-//import com.pgt.shop.member.param.ShopBonusParam;
-//import com.pgt.shop.member.param.UserBonusIdArrParam;
-//import com.pgt.shop.member.param.UserBonusIdsParam;
-//import com.pgt.shop.member.param.ValidUserBonusParam;
 import com.dl.member.param.IDParam;
-import com.dl.member.param.UserBankParam;
 import com.dl.member.param.UserBankQueryParam;
-import com.dl.member.param.UserBonusIdParam;
 
 
 /**
@@ -48,6 +37,11 @@ public interface IUserBankService {
 	 BaseResult<UserBankDTO> queryUserBankByCondition(@RequestBody UserBankQueryParam userBankQueryParam);
     
 	 
-	 @PostMapping("/user/bank/queryUserBankByCondition")    
-	 BaseResult<UserBankDTO> queryUserBankType(@RequestBody BankCardParam bankCardParam);
+	 /**
+	  * 根据银行卡号，聚合查询银行信息
+	  * @param bankCardParam
+	  * @return
+	  */
+	 @PostMapping("/user/bank/queryUserBankType")    
+	 BaseResult<BankDTO> queryUserBankType(@RequestBody BankCardParam bankCardParam);
 }

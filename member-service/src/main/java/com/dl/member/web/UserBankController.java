@@ -115,7 +115,7 @@ public class UserBankController {
      */
     @ApiOperation(value = "查询银行卡", notes = "查询银行卡")
     @PostMapping("/queryUserBankType")
-    public BaseResult<Object> queryUserBankType(@RequestBody BankCardParam bankCardParam){
+    public BaseResult<BankDTO> queryUserBankType(@RequestBody BankCardParam bankCardParam){
     	String bankCardNo = bankCardParam.getBankCardNo();
     	JSONObject jsonObj = userBankService.queryUserBankType(bankCardNo);
     	if(jsonObj == null) {
