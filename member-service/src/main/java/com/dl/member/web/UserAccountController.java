@@ -161,7 +161,6 @@ public class UserAccountController {
     public BaseResult<String> batchUpdateUserAccount(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam){
     	List<UserIdAndRewardDTO> userIdAndRewardList = userIdAndRewardListParam.getUserIdAndRewardList();
     	BaseResult<String> batchUpdateUserAccount = userAccountService.batchUpdateUserAccount(userIdAndRewardList,ProjectConstant.REWARD_AUTO);
-    	userAccountService.updateLotteryWinning(userIdAndRewardList);
     	return batchUpdateUserAccount;
     }
     

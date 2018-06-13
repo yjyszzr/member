@@ -573,8 +573,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 */
 	@Transactional
 	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> dtos, Integer dealType) {
-		List<UserIdAndRewardDTO> userIdAndRewardList = new ArrayList<UserIdAndRewardDTO>();
-		userIdAndRewardList.addAll(dtos);
+		List<UserIdAndRewardDTO> oldUserIdAndRewardDtos = new ArrayList<UserIdAndRewardDTO>(dtos);
+		List<UserIdAndRewardDTO> userIdAndRewardList = new ArrayList<UserIdAndRewardDTO>(dtos);
 		BigDecimal limitValue = BigDecimal.ZERO;
 		if (1 == dealType) {
 			limitValue = this.queryBusinessLimit(CommonConstants.BUSINESS_ID_REWARD);
@@ -637,8 +637,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 		log.info("更新用户中奖订单为已派奖成功");
 
+		//推送消息
 		saveRewardMessageAsync(userIdAndRewardList, accountTime);
 
+		//记录中奖信息
+		this.updateLotteryWinning(oldUserIdAndRewardDtos);
 		log.info("=^_^= =^_^= =^_^= =^_^= " + DateUtil.getCurrentDateTime() + "用户派发奖金完成" + "=^_^= =^_^= =^_^= =^_^= ");
 
 		return ResultGenerator.genSuccessResult("用户派发奖金完成");
@@ -1207,6 +1210,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	for(UserIdAndRewardDTO dto: collect) {
     		BigDecimal reward = dto.getReward();
     		String mobile = map.get(dto.getUserId());
+    		if(StringUtils.isBlank(mobile)) {
+    			continue;
+    		}
     		LotteryWinningLogTemp temp = new LotteryWinningLogTemp();
     		temp.setWinningMoney(reward);
     		temp.setPhone(mobile==null?"":mobile);
