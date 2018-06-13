@@ -1,5 +1,7 @@
 package com.dl.member.web;
+import com.alibaba.fastjson.JSONObject;
 import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.WithDrawShowDTO;
 import com.dl.member.param.BankCardParam;
@@ -9,7 +11,9 @@ import com.dl.member.param.StrParam;
 import com.dl.member.param.UserBankParam;
 import com.dl.member.param.UserBankQueryParam;
 import com.dl.member.service.UserBankService;
+import ch.qos.logback.classic.Logger;
 import io.swagger.annotations.ApiOperation;
+import org.apache.log4j.spi.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -102,6 +106,20 @@ public class UserBankController {
     	return userBankService.queryUserBank(IDParam.getId());
     }
     
+    /**
+     * 根据银行卡号码，查询银行信息
+     * @return
+     */
+    @ApiOperation(value = "查询银行卡", notes = "查询银行卡")
+    @PostMapping("/queryUserBankType")
+    public BaseResult<Object> queryUserBankType(@RequestBody BankCardParam bankCardParam){
+    	String bankCardNo = bankCardParam.getBankCardNo();
+    	JSONObject jsonObj = userBankService.queryUserBankType(bankCardNo);
+    	if(jsonObj == null) {
+    		return ResultGenerator.genFailResult("查询失败");
+    	}
+    	return ResultGenerator.genSuccessResult("查询成功",jsonObj);
+    }
     
 	  /**
 	  * 按条件查询银行卡信息

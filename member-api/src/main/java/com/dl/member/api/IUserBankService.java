@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.UserBankDTO;
+import com.dl.member.param.BankCardParam;
 //import com.pgt.base.result.BaseResult;
 //import com.pgt.shop.member.dto.UserBonusCountDTO;
 //import com.pgt.shop.member.dto.UserBonusDTO;
@@ -33,7 +34,6 @@ public interface IUserBankService {
 	
 	  /**
 	  * 查询根据userBankId查询银行卡信息
-	  *
 	  * @return
 	  */
 	 @PostMapping("/user/bank/queryUserBank")    
@@ -47,4 +47,7 @@ public interface IUserBankService {
 	 @PostMapping("/user/bank/queryUserBankByCondition")    
 	 BaseResult<UserBankDTO> queryUserBankByCondition(@RequestBody UserBankQueryParam userBankQueryParam);
     
+	 
+	 @PostMapping("/user/bank/queryUserBankByCondition")    
+	 BaseResult<UserBankDTO> queryUserBankType(@RequestBody BankCardParam bankCardParam);
 }
