@@ -2,6 +2,7 @@ package com.dl.member.web;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.member.dto.BankDTO;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.WithDrawShowDTO;
 import com.dl.member.param.BankCardParam;
@@ -11,6 +12,8 @@ import com.dl.member.param.StrParam;
 import com.dl.member.param.UserBankParam;
 import com.dl.member.param.UserBankQueryParam;
 import com.dl.member.service.UserBankService;
+import com.gexin.fastjson.JSON;
+
 import ch.qos.logback.classic.Logger;
 import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.spi.LoggerFactory;
@@ -118,7 +121,12 @@ public class UserBankController {
     	if(jsonObj == null) {
     		return ResultGenerator.genFailResult("查询失败");
     	}
-    	return ResultGenerator.genSuccessResult("查询成功",jsonObj);
+    	if(jsonObj.containsKey("result")) {
+    		JSONObject jsonData = jsonObj.getJSONObject("result");
+    		BankDTO bankDTO = JSON.parseObject(jsonData.toString(),BankDTO.class);
+        	return ResultGenerator.genSuccessResult("查询成功",bankDTO);
+    	}
+    	return ResultGenerator.genFailResult("查询失败,result为空");
     }
     
 	  /**
