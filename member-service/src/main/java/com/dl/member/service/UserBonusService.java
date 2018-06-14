@@ -436,7 +436,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * 
 	 * @return
 	 */
-	@Transactional
 	public BaseResult<DonationPriceDTO> receiveRechargeUserBonus(Integer payLogId) {
 		//过期的充值活动不能领取该活动的红包
 		Integer now = DateUtil.getCurrentTimeLong();
