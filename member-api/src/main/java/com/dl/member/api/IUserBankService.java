@@ -8,6 +8,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.member.dto.BankDTO;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.param.BankCardParam;
+import com.dl.member.param.BankCardSaveParam;
 import com.dl.member.param.IDParam;
 import com.dl.member.param.UserBankQueryParam;
 
@@ -44,4 +45,13 @@ public interface IUserBankService {
 	  */
 	 @PostMapping("/user/bank/queryUserBankType")    
 	 BaseResult<BankDTO> queryUserBankType(@RequestBody BankCardParam bankCardParam);
+	 
+
+	 /**
+	  * 保存银行卡信息
+	  * @param bankCardParam
+	  * @return
+	  */
+	 @PostMapping("/user/bank/saveBankCard")    
+	 BaseResult<UserBankDTO> saveBankInfo(@RequestBody BankCardSaveParam bankCardParam);
 }

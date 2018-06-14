@@ -39,6 +39,10 @@ public class UserBankDTO {
 	
 	@ApiModelProperty("银行英文简写")
     private String abbreviation;
+
+	@ApiModelProperty("银行卡类型")
+	private Integer type;
 	
-	
+	@ApiModelProperty("银行卡用途")
+	private Integer purpose;
 }

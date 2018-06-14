@@ -75,7 +75,8 @@ public class UserBankService extends AbstractService<UserBank> {
     	userBank.setAddTime(DateUtil.getCurrentTimeLong());
     	userBank.setLastTime(DateUtil.getCurrentTimeLong());
     	userBank.setAbbreviation(userBankDTO.getAbbreviation());
-    	
+    	userBank.setType(userBankDTO.getType());
+    	userBank.setPurpose(userBankDTO.getPurpose());
     	try {
     		this.save(userBank);
     	}catch (Exception e) {
@@ -183,6 +184,8 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBankDTO.setCardNo(bankCardNo);
 		userBankDTO.setAbbreviation(abbreviation);
 		userBankDTO.setStatus(ProjectConstant.USER_BANK_DEFAULT);
+		userBankDTO.setType(0);
+		userBankDTO.setPurpose(0);
 		this.saveUserBank(userBankDTO);
 		
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
