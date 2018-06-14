@@ -6,6 +6,7 @@ import com.dl.member.dto.BankDTO;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.WithDrawShowDTO;
 import com.dl.member.param.BankCardParam;
+import com.dl.member.param.BankCardSaveParam;
 import com.dl.member.param.DeleteBankCardParam;
 import com.dl.member.param.IDParam;
 import com.dl.member.param.StrParam;
@@ -15,6 +16,7 @@ import com.dl.member.service.UserBankService;
 import com.gexin.fastjson.JSON;
 
 import ch.qos.logback.classic.Logger;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.spi.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -140,4 +142,41 @@ public class UserBankController {
 		 return null;
 	 }
     
+	 /**
+    private String userBankId;
+    private String realName;
+    private String cardNo;
+    private String status;
+    private String bankLogo;
+    private String bankName;
+    private String cardType;
+    private String lastCardNo4;
+    private String abbreviation;
+	private Integer type;
+	private Integer purpose;
+	  */
+	 /**
+     * 添加银行卡
+     * @param userBankParam
+     * @return
+     */
+	@ApiOperation(value = "添加银行卡", notes = "")
+	@PostMapping("/saveBankCard")
+	public BaseResult<UserBankDTO> saveBankCard(@RequestBody BankCardSaveParam saveParam){
+		UserBankDTO userBankDTO = new UserBankDTO();
+		userBankDTO.setUserBankId(saveParam.getUserBankId());
+		userBankDTO.setRealName(saveParam.getRealName());
+		userBankDTO.setCardNo(saveParam.getCardNo());
+		userBankDTO.setStatus(saveParam.getStatus());
+		userBankDTO.setBankLogo(saveParam.getBankLogo());
+		userBankDTO.setBankName(saveParam.getBankName());
+		userBankDTO.setCardType(saveParam.getCardType());
+		userBankDTO.setLastCardNo4(saveParam.getLastCardNo4());
+		userBankDTO.setAbbreviation(saveParam.getAbbreviation());
+		userBankDTO.setType(saveParam.getType());
+		userBankDTO.setPurpose(saveParam.getPurpose());
+		userBankService.saveUserBank(userBankDTO);
+		return ResultGenerator.genSuccessResult("succ");
+	}
+	    
 }

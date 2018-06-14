@@ -66,10 +66,24 @@ public class UserBank {
     private String abbreviation;
     
     /**
+     * 银行卡用途 0借记卡 1贷记卡
+     */
+    @Column(name = "type")
+    private Integer type;
+    
+    /**
      * 银行卡用途 0提现使用  1支付使用
      */
     @Column(name = "purpose")
     private Integer purpose;
+    
+    public Integer getType() {
+    	return type;
+    }
+    
+    public void setType(Integer type) {
+    	this.type = type;
+    }
     
     public Integer getPurpose() {
     	return purpose;
