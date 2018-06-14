@@ -53,7 +53,7 @@ public class UserBankController {
     @ApiOperation(value = "查询银行卡列表", notes = "查询银行卡列表")
     @PostMapping("/queryUserBankList")
     public BaseResult<LinkedList<UserBankDTO>> queryUserBankList(@RequestBody StrParam strParam){
-    	return userBankService.queryUserBankList();
+    	return userBankService.queryUserBankList(0);
     }
     
     
@@ -75,7 +75,7 @@ public class UserBankController {
     @ApiOperation(value = "删除银行卡", notes = "删除银行卡")
     @PostMapping("/deleteUserBank")
     public BaseResult<UserBankDTO> deleteUserBank(@RequestBody DeleteBankCardParam deleteBankCardParam){
-    	return userBankService.deleteUserBank(deleteBankCardParam);
+    	return userBankService.deleteUserBank(deleteBankCardParam,0);
     }
     
     /**
@@ -85,7 +85,7 @@ public class UserBankController {
     @ApiOperation(value = "设置银行卡为当前默认", notes = "设置银行卡为当前默认")
     @PostMapping("/updateUserBankDefault")
     public BaseResult<String> updateUserBankDefault(@RequestBody IDParam iDParam){
-    	return userBankService.updateUserBankDefault(iDParam.getId());
+    	return userBankService.updateUserBankDefault(iDParam.getId(),0);
     }
     
     /**
@@ -95,7 +95,7 @@ public class UserBankController {
     @ApiOperation(value = "提现界面的数据显示", notes = "提现界面的数据显示")
     @PostMapping("/queryWithDrawShow")
     public BaseResult<WithDrawShowDTO> queryWithDrawShow(@RequestBody StrParam strParam){
-    	return userBankService.queryWithDrawShow();
+    	return userBankService.queryWithDrawShow(0);
     }
     
     
@@ -106,7 +106,7 @@ public class UserBankController {
     @ApiOperation(value = "查询银行卡", notes = "查询银行卡")
     @PostMapping("/queryUserBank")
     public BaseResult<UserBankDTO> queryUserBank(@RequestBody IDParam IDParam){
-    	return userBankService.queryUserBank(IDParam.getId());
+    	return userBankService.queryUserBank(IDParam.getId(),0);
     }
     
     /**

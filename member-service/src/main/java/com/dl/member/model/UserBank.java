@@ -65,7 +65,20 @@ public class UserBank {
     @Column(name = "abbreviation")
     private String abbreviation;
     
- 
+    /**
+     * 银行卡用途 0提现使用  1支付使用
+     */
+    @Column(name = "purpose")
+    private Integer purpose;
+    
+    public Integer getPurpose() {
+    	return purpose;
+    }
+    
+    public void setPurpose(Integer purpose) {
+    	this.purpose = purpose;
+    }
+    
 	public String getAbbreviation() {
 		return abbreviation;
 	}
