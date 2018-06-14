@@ -16,6 +16,7 @@
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
     <result column="abbreviation" jdbcType="VARCHAR" property="abbreviation" />
+    <result column="purpose" jdbcType="VARCHAR" property="purpose" />
   </resultMap>
   
   <update id="batchUpdateUserBankStatus">
@@ -32,7 +33,7 @@
 		  <if test="status!=null">status=#{status},</if>
 		  <if test="lastTime!=null">last_time=#{lastTime},</if>
 		 </trim>
-    WHERE id = #{id} and user_id=#{userId}
+    WHERE id = #{id} and user_id=#{userId} and purpose=#{purpose}
   </update>
   
   <!-- <select id ="queryUserBankList" resultMap="BaseResultMap">
@@ -56,6 +57,9 @@
 	    </if>
 	    <if test="id != null">
 	        AND id = #{id}
+	    </if>
+	    <if test="purpose != null">
+	        AND purpose = #{purpose}
 	    </if>
     </where>
     order by add_time DESC
