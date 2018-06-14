@@ -16,7 +16,9 @@ import javax.annotation.Resource;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -426,6 +428,15 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		if(priceRst.getCode() == 0) {
 			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
 		}
+		
+		JedisConnectionFactory  jedisConnectionFactory  = (JedisConnectionFactory) stringRedisTemplate.getConnectionFactory();
+		jedisConnectionFactory.setDatabase(5);
+        stringRedisTemplate.setConnectionFactory(jedisConnectionFactory);
+        ValueOperations valueOperations = stringRedisTemplate.opsForValue();
+        String donationPrice = (String) valueOperations.get(String.valueOf(payLogIdParam.getPayLogId()));
+        
+        log.info("远程访问的donationPrice："+priceRst.getData().getPrice() +"----"+ "切换redis访问的donationPrice："+donationPrice);
+        
 		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
 	}
 	
