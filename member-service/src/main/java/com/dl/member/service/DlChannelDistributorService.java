@@ -313,21 +313,21 @@ public class DlChannelDistributorService extends AbstractService<DlChannelDistri
 		IncomeRankingDTO incomeRankingfinal = new IncomeRankingDTO();
 		for (int i = 0; i < incomeRankingListFinal.size(); i++) {
 			if (i == 0) {
-				incomeRankingListFinal.get(i).setExtraReward(100.00);
+				incomeRankingListFinal.get(i).setExtraReward(1000.00);
 			} else if (i == 1) {
-				incomeRankingListFinal.get(i).setExtraReward(80.00);
+				incomeRankingListFinal.get(i).setExtraReward(800.00);
 			} else if (i == 2) {
-				incomeRankingListFinal.get(i).setExtraReward(60.00);
+				incomeRankingListFinal.get(i).setExtraReward(600.00);
 			} else if (i == 3) {
-				incomeRankingListFinal.get(i).setExtraReward(40.00);
+				incomeRankingListFinal.get(i).setExtraReward(400.00);
 			} else if (i == 4) {
-				incomeRankingListFinal.get(i).setExtraReward(20.00);
+				incomeRankingListFinal.get(i).setExtraReward(200.00);
 			} else if (i == 5) {
-				incomeRankingListFinal.get(i).setExtraReward(15.00);
+				incomeRankingListFinal.get(i).setExtraReward(150.00);
 			} else if (i == 6) {
-				incomeRankingListFinal.get(i).setExtraReward(10.00);
+				incomeRankingListFinal.get(i).setExtraReward(100.00);
 			} else if (i == 7) {
-				incomeRankingListFinal.get(i).setExtraReward(5.00);
+				incomeRankingListFinal.get(i).setExtraReward(50.00);
 			} else {
 				incomeRankingListFinal.get(i).setExtraReward(0.00);
 			}
