@@ -76,6 +76,8 @@ public class UserRegisterController {
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
 		
+    	stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.REGISTER_TPLID + "_" + userRegisterParam.getMobile());
+
 		return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
     }
     
