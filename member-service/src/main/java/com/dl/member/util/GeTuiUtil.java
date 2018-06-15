@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.member.configurer.GeTuiConfig;
 import com.gexin.rp.sdk.base.IPushResult;
@@ -28,16 +29,16 @@ public class GeTuiUtil {
 	public GeTuiConfig geTuiConfig;
 
 	
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		GeTuiConfig geTuiConfig = new GeTuiConfig();
-		geTuiConfig.setAppId("BWgBz2PhAq5ZxmZ7e4yINA");
-		geTuiConfig.setAppkey("o74Y1SjdzI73MhkkAwuXp4");
-		geTuiConfig.setAppSecret("vaBGD6ddiO7LrnarEJO5hA");
-		geTuiConfig.setMasterSecret("ZkxNSKsKAc9zSl5kjmXuN2");
+		geTuiConfig.setAppId("zH0e8aiYaa73oVVsElXX");
+		geTuiConfig.setAppkey("R4iI9PslDe5LSXjpd7XSy");
+		geTuiConfig.setAppSecret("24e2HwXbm064CiewPXklE6");
+		geTuiConfig.setMasterSecret("wyvPFirDwS6iFRKhLR5wk6");
 		GeTuiUtil util = new GeTuiUtil();
 		util.geTuiConfig = geTuiConfig;
 //		String clientId = "f6ca881b596b5dc0149957d0934cb602";//android
-		String clientId = "b14b94104f5605e27a41e33ccc6cca78";
+		String clientId = "8ccbd00f97ef96f69df4f440e52c13c7";
 		String title = "优惠券到期通知";
 		String content = "您有优惠券即将到期，请尽快使用";
 		GeTuiMessage getuiMessage = new GeTuiMessage();
@@ -45,7 +46,7 @@ public class GeTuiUtil {
 		getuiMessage.setTitle(title);
 		getuiMessage.setPushTime(DateUtil.getCurrentTimeLong());
 		util.pushMessage(clientId, getuiMessage);
-	}*/
+	}
 	
 	/**
 	 * 推送消息
@@ -87,7 +88,7 @@ public class GeTuiUtil {
 		TransmissionTemplate template = new TransmissionTemplate();
 		template.setAppId(geTuiConfig.getAppId());
 		template.setAppkey(geTuiConfig.getAppkey());
-		template.setTransmissionType(1);
+		template.setTransmissionType(2);
 		template.setTransmissionContent(messageJson);
 		APNPayload payload = new APNPayload();
 		//在已有数字基础上加1显示，设置为-1时，在已有数字上减1显示，设置为数字时，显示指定数字
