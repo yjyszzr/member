@@ -66,9 +66,39 @@ public class UserRealController {
          int u = Integer.parseInt(year)-Integer.parseInt(dates);
          return u;
      }else {
-     	return 99;
+     	return getAgeByIdCard15(IdNO);
      }
     }
+    
+    
+    /**  
+     * 15位身份证  
+     * 获取 年龄  
+     * @param CardCode  
+     * @return  
+     */  
+    private static int getAgeByIdCard15(String CardCode){  
+        //身份证上的年月日  
+        String idyear = "19" + CardCode.substring(6, 8);  
+        String idyue = CardCode.substring(8, 10);  
+        String idday = CardCode.substring(10, 12);  
+        String idyr = idyue + idday + "";  
+  
+        //当前年月日  
+        String year = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).substring(0, 4);// 当前年份  
+        String yue = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).substring(5, 7);// 月份  
+        String day = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).substring(8, 10);  
+        String yr = yue + day + "";  
+  
+        int age = 0;  
+        if (Integer.parseInt(idyr) <= Integer.parseInt(yr)) { // 表示生日已过  
+            age = Integer.parseInt(year) - Integer.parseInt(idyear) + 1;  
+        } else {// 生日未过  
+            age = Integer.parseInt(year) - Integer.parseInt(idyear);  
+        }  
+        return age;  
+    }  
+    
     
     /**
      * 查询实名认证信息
