@@ -1,11 +1,15 @@
 package com.dl.member.web;
+import com.alibaba.druid.util.StringUtils;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.UserRealDTO;
+import com.dl.member.enums.MemberEnums;
 import com.dl.member.param.RealNameAuthParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.service.UserRealService;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +22,8 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/user/real")
 public class UserRealController {
+	private final static Logger logger = LoggerFactory.getLogger(UserRealController.class);
+	
     @Resource
     private UserRealService userRealService;
 
@@ -29,7 +35,23 @@ public class UserRealController {
     @ApiOperation(value = "实名认证", notes = "实名认证")
     @PostMapping("/realNameAuth")
     public BaseResult<String> realNameAuth(@RequestBody RealNameAuthParam realNameAuthParam){
+    	String idCardNo = realNameAuthParam.getIDCode();
+    	if(StringUtils.isEmpty(idCardNo)) {
+    		return ResultGenerator.genResult(MemberEnums.REAL_IDCARDNO_EMPTY.getcode(),MemberEnums.REAL_IDCARDNO_EMPTY.getMsg());
+    	}
+    	if(idCardNo.length() < 15) {
+    		return ResultGenerator.genResult(MemberEnums.REAL_IDCARDNO_NOTLEGAL.getcode(),MemberEnums.REAL_IDCARDNO_NOTLEGAL.getMsg());
+    	}
+    	int age = IdNOToAge(idCardNo);
+    	logger.info("[realNameAuth]" + " age:" + age);
+    	if(age <= 18) {	//19岁才可以进行实名认证流程
+    		return ResultGenerator.genResult(MemberEnums.REAL_IDCARDNO_NOT18.getcode(),MemberEnums.REAL_IDCARDNO_NOT18.getMsg());
+    	}
     	return userRealService.realNameAuth(realNameAuthParam.getRealName(), realNameAuthParam.getIDCode());
+    }
+    
+    private int IdNOToAge(String idCardNo) {
+    	return -1;
     }
     
     /**

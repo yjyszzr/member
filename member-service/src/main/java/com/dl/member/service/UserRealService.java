@@ -118,12 +118,13 @@ public class UserRealService extends AbstractService<UserReal> {
 		}
     	
     	UserReal userReal = this.findBy("idCode", iDCode);
+    	//如果已存在记录该
     	if(userReal != null) {
-    		return ResultGenerator.genResult(MemberEnums.USERREAL_ALREADY_AUTH.getcode(), MemberEnums.USERREAL_ALREADY_AUTH.getMsg());
+    		userReal.setRealName(realName);
+    		this.update(userReal);
+    	}else {
+    		this.saveUserReal(realName,iDCode);
     	}
-		
-    	this.saveUserReal(realName,iDCode);
-    	
     	User updateUser = new User();
     	updateUser.setUserId(userId);
     	updateUser.setIsReal(ProjectConstant.USER_IS_REAL);
