@@ -145,7 +145,7 @@ public class DlChannelConsumerController {
 			stringRedisTemplate.opsForValue().set(key, strRandom4, expiredTime, TimeUnit.SECONDS);
 			// 短信发送成功执行保存操作
 			DlChannelDistributor distributor = dlChannelDistributorService.findByUserId(smsParam.getUserId());
-			if (null != distributor) {
+			if (null != distributor && distributor.getChannelDistributorId() != null) {
 				DlChannelConsumer channelConsumer = new DlChannelConsumer();
 				channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(distributor.getChannelDistributorId(), smsParam.getMobile());
 				if (null == channelConsumer) {
