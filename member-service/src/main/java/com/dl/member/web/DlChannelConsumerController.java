@@ -142,10 +142,10 @@ public class DlChannelConsumerController {
 			// 缓存验证码
 			int expiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
 			String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
-			stringRedisTemplate.opsForValue().set(key, strRandom4, expiredTime, TimeUnit.SECONDS);
 			// 短信发送成功执行保存操作
 			DlChannelDistributor distributor = dlChannelDistributorService.findByUserId(smsParam.getUserId());
 			if (null != distributor && distributor.getChannelDistributorId() != null) {
+				stringRedisTemplate.opsForValue().set(key, strRandom4, expiredTime, TimeUnit.SECONDS);
 				DlChannelConsumer channelConsumer = new DlChannelConsumer();
 				channelConsumer = dlChannelConsumerService.selectByChannelDistributorIdAndMobile(distributor.getChannelDistributorId(), smsParam.getMobile());
 				if (null == channelConsumer) {
