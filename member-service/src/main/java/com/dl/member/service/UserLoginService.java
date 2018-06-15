@@ -202,6 +202,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			 }
 			
 			 UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
+			 
+			 stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
+
 			 this.loginLog(regRst.getData(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 			 return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 		} else {
