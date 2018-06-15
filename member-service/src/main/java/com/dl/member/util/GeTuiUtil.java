@@ -87,7 +87,7 @@ public class GeTuiUtil {
 		TransmissionTemplate template = new TransmissionTemplate();
 		template.setAppId(geTuiConfig.getAppId());
 		template.setAppkey(geTuiConfig.getAppkey());
-		template.setTransmissionType(1);
+		template.setTransmissionType(2);
 		template.setTransmissionContent(messageJson);
 		APNPayload payload = new APNPayload();
 		//在已有数字基础上加1显示，设置为-1时，在已有数字上减1显示，设置为数字时，显示指定数字
