@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.annotation.Resource;
 
 /**
@@ -50,8 +54,20 @@ public class UserRealController {
     	return userRealService.realNameAuth(realNameAuthParam.getRealName(), realNameAuthParam.getIDCode());
     }
     
-    private int IdNOToAge(String idCardNo) {
-    	return -1;
+    //根据身份证号输出年龄
+    public int IdNOToAge(String IdNO){
+     int leh = IdNO.length();
+     String dates="";
+     if (leh == 18) {
+     	dates = IdNO.substring(6, 10);
+     	SimpleDateFormat df = new SimpleDateFormat("yyyy");
+         String year = df.format(new Date());
+         logger.info("[IdNOToAge]" +"year:" + year);
+         int u = Integer.parseInt(year)-Integer.parseInt(dates);
+         return u;
+     }else {
+     	return 99;
+     }
     }
     
     /**
