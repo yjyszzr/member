@@ -55,9 +55,9 @@ public class UserRealController {
     if (leh == 18) {
     	dates = IdNO.substring(6, 10);
     	SimpleDateFormat df = new SimpleDateFormat("yyyy");
-        String year=df.format(new Date());
-        logger.info("[IdNOToAge]" +"");
-        int u=Integer.parseInt(year)-Integer.parseInt(dates);
+        String year = df.format(new Date());
+        logger.info("[IdNOToAge]" +"year:" + year);
+        int u = Integer.parseInt(year)-Integer.parseInt(dates);
         return u;
     }else{
         dates = IdNO.substring(6, 8);
