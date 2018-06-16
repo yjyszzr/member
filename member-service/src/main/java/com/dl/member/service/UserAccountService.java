@@ -1199,6 +1199,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	Set<Integer> set = collect.stream().map(dto->dto.getUserId()).collect(Collectors.toSet());
     	log.info("111111111111    " + JSONHelper.bean2json(set));
     	List<Integer> userIds = new ArrayList<Integer>(set);
+    	if(null == userIds ||  userIds.size() == 0) {
+    		return;
+    	}
+    	
     	List<User> users = userMapper.queryUserByUserIds(userIds);
     	Map<Integer, String> map = new HashMap<Integer, String>(users.size());
     	for(User user: users) {
