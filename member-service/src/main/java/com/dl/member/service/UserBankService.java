@@ -1,7 +1,10 @@
 package com.dl.member.service;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -11,6 +14,8 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.configurer.RestTemplateConfig;
@@ -62,6 +67,8 @@ public class UserBankService extends AbstractService<UserBank> {
 	@Resource
 	private UserMapper userMapper;
     
+	private static Map<String,String> mMap = new HashMap<String,String>();
+	
     @Transactional
     public void saveUserBank(UserBankDTO userBankDTO) {
     	UserBank userBank = new UserBank();
@@ -153,6 +160,14 @@ public class UserBankService extends AbstractService<UserBank> {
 		String abbreviation = json_tmp.getString("abbreviation");
 		String bankCardLogo = json_tmp.getString("banklogo");
 		String bankName =  json_tmp.getString("bankname");
+		
+		String abbr = getAbbrByMap(bankName);
+		if(!StringUtils.isEmpty(abbr)) {
+			log.info("=============================");
+			log.info("bankname查询到该银行简码:" + abbr +" bankName:" + bankName);
+			log.info("=============================");
+			abbreviation = abbr;
+		}
 		
 		//三元素校验
 		String idCard = userRealDTO.getIdCode();
@@ -540,4 +555,40 @@ public class UserBankService extends AbstractService<UserBank> {
 
 		return ResultGenerator.genSuccessResult("更改银行卡状态成功");
 	}
+	
+	private String getAbbrByMap(String bankName) {
+		String result = null;
+		if(!StringUtils.isEmpty(bankName)) {
+			for(Map.Entry<String, String> entry : mMap.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(!StringUtils.isEmpty(key) && (key.contains(bankName) || bankName.contains(key))) {
+					result = value;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	static {
+		mMap.put("中国建设银行","CCB");
+		mMap.put("上海浦东发展银行","SPDB");
+		mMap.put("交通银行","BOCOM");
+		mMap.put("招商银行股份有限公司","CMB");
+		mMap.put("中国银行","BOC");
+		mMap.put("中国工商银行","ICBC");
+		mMap.put("中国光大银行股份有限公司", "CEB");
+		mMap.put("中国农商银行","CNRCB");
+		mMap.put("中国农业银行股份有限公司","ABC");
+		mMap.put("广发银行","GDB");
+		mMap.put("中国银联","UPOP");
+		mMap.put("宁波银行","NBBC");
+		mMap.put("华夏银行","HXB");
+		mMap.put("北京银行","BCCB");
+		mMap.put("遵义市商业银行","ZYSB");
+		mMap.put("上海银行","BOS");
+		mMap.put("平安银行","PAB");
+	}
+	
 }
