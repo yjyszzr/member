@@ -582,6 +582,22 @@ public class UserBankService extends AbstractService<UserBank> {
 		return result;
 	}
 	
+	/***
+	 * 查询
+	 * @param userId
+	 * @param bankCardNo
+	 * @param purpose
+	 * @return
+	 */
+	public List<UserBank> queryBankByPurpose(Integer userId,String bankCardNo,Integer purpose){
+		UserBank userBank = new UserBank();
+		userBank.setUserId(userId);
+		userBank.setCardNo(bankCardNo);
+		userBank.setPurpose(purpose);
+		return userBankMapper.queryUserBankBySelective(userBank);
+	}
+	
+	
 	static {
 		mMap.put("中国建设银行","CCB");
 		mMap.put("上海浦东发展银行","SPDB");
