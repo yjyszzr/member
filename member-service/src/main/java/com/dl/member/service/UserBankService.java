@@ -577,7 +577,7 @@ public class UserBankService extends AbstractService<UserBank> {
 					String bName = bankCode.getBankName();
 					String bCode = bankCode.getBankCode();
 					mMap.put(bName,bCode);
-					log.info("bName:" + bName +" bCode:" + bCode);
+//					log.info("bName:" + bName +" bCode:" + bCode);
 				}
 			}
 			log.info("====================");
