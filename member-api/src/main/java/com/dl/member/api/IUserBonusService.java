@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.dl.base.constant.EmptyParam;
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.DonationPriceDTO;
 //import com.pgt.base.result.BaseResult;
@@ -66,6 +67,13 @@ public interface IUserBonusService {
      @PostMapping("/user/bonus/reiceiveBonusAfterRecharge")
      public BaseResult<DonationPriceDTO> reiceiveBonusAfterRecharge(@RequestBody PayLogIdParam payLogIdParam);
 
+  	/**
+  	 * 更新红包的过期状态
+  	 * @param UserBonusParam
+  	 * @return
+  	 */
+  	@RequestMapping(path="/user/bonus/updateBonusExpire", method=RequestMethod.POST)
+  	public BaseResult<String> updateBonusExpire(@RequestBody EmptyParam emptyParam);
 //	 /**
 //	 * 获取结算页的店铺红包列表
 //	 * @param

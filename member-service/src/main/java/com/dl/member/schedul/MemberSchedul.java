@@ -1,4 +1,4 @@
-package com.dl.member.schedul;
+/*package com.dl.member.schedul;
 
 import java.util.List;
 
@@ -26,9 +26,9 @@ public class MemberSchedul {
 	@Resource
 	private UserBonusMapper userBonusMapper;
 
-	/**
+	*//**
 	 * 更新过期的红包
-	 */
+	 *//*
 	@Scheduled(cron = "0 0/1 * * * ?")
 	public void updateBonusExpire() {
 		log.info("更新过期的红包定时任务开始");
@@ -45,3 +45,4 @@ public class MemberSchedul {
 	}
 
 }
+*/

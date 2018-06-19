@@ -1,12 +1,18 @@
 package com.dl.member.web;
 import java.util.List;
 import javax.annotation.Resource;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.dl.base.constant.EmptyParam;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.DateUtil;
 import com.dl.member.dto.DonationPriceDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.param.BonusLimitConditionParam;
@@ -61,5 +67,12 @@ public class UserBonusController {
     public BaseResult<DonationPriceDTO> reiceiveBonusAfterRecharge(@RequestBody PayLogIdParam payLogIdParam) {
     	return userBonusService.receiveRechargeUserBonus(Integer.valueOf(payLogIdParam.getPayLogId()));
     }
+    
+    @ApiOperation(value="更新红包的过期状态", notes="更新红包的过期状态",hidden=false)
+	@RequestMapping(path="/updateBonusExpire", method=RequestMethod.POST)
+	public BaseResult<String> updateBonusExpire(@RequestBody EmptyParam emptyParam) {
+    	userBonusService.updateBonusExpire();
+		return ResultGenerator.genSuccessResult("更新过期红包成功");
+	}
     
 }

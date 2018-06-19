@@ -616,15 +616,24 @@ public class UserBonusService extends AbstractService<UserBonus> {
 
 		return userBonusList;
 	}
+	
 	/**
 	 * 更新红包为已过期
 	 * 
 	 * @param userBonusIdList
 	 */
-	@Transactional
-	public int updateBonusExpire(List<Integer> userBonusIdList) {
+	public void updateBonusExpire() {
+		log.info("更新过期的红包定时任务开始");
+		Integer now = DateUtil.getCurrentTimeLong();
+		List<Integer> userBonusIdList = userBonusMapper.queryUserBonusIdsExpire(now);
+		if (CollectionUtils.isEmpty(userBonusIdList)) {
+			log.info("没有过期的红包，定时任务结束");
+			return;
+		}
+
 		int rst = userBonusMapper.updateBatchUserBonusExpire(userBonusIdList);
-		return rst;
+		log.info("本次更新过期的红包" + rst + "个");
+		log.info("更新过期的红包的定时任务结束");
 	}
 
 	/**
