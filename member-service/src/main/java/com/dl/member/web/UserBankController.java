@@ -5,26 +5,23 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.BankDTO;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.WithDrawShowDTO;
+import com.dl.member.model.UserBank;
 import com.dl.member.param.BankCardParam;
 import com.dl.member.param.BankCardSaveParam;
 import com.dl.member.param.DeleteBankCardParam;
 import com.dl.member.param.IDParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UserBankParam;
+import com.dl.member.param.UserBankPurposeQueryParam;
 import com.dl.member.param.UserBankQueryParam;
 import com.dl.member.service.UserBankService;
 import com.gexin.fastjson.JSON;
-
-import ch.qos.logback.classic.Logger;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
-import org.apache.log4j.spi.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -143,19 +140,6 @@ public class UserBankController {
 	 }
     
 	 /**
-    private String userBankId;
-    private String realName;
-    private String cardNo;
-    private String status;
-    private String bankLogo;
-    private String bankName;
-    private String cardType;
-    private String lastCardNo4;
-    private String abbreviation;
-	private Integer type;
-	private Integer purpose;
-	  */
-	 /**
      * 添加银行卡
      * @param userBankParam
      * @return
@@ -178,5 +162,44 @@ public class UserBankController {
 		userBankService.saveUserBank(userBankDTO);
 		return ResultGenerator.genSuccessResult("succ");
 	}
-	    
+
+	/**
+    private String userBankId;
+    private String realName;
+    private String cardNo;
+    private String status;
+    private String bankLogo;
+    private String bankName;
+    private String cardType;
+    private String lastCardNo4;
+    private String abbreviation;
+	private Integer type;
+	private Integer purpose;
+	
+	 * @param queryParam
+	 * @return
+	 */
+	@ApiOperation(value = "查询银行卡", notes = "")
+	@PostMapping("/queryBankByPurpose")
+	public BaseResult<UserBankDTO> queryBankByPurpose(@RequestBody UserBankPurposeQueryParam queryParam){
+		int userId = queryParam.getUserId();
+		String bankCardNo = queryParam.getBankCardCode();
+		int purpose = queryParam.getPurpose();
+		List<UserBank> mList = userBankService.queryBankByPurpose(userId,bankCardNo,purpose);
+		if(mList != null && mList.size() > 0) {
+			UserBank userBank = mList.get(0);
+			UserBankDTO userBankDTO = new UserBankDTO();
+			userBankDTO.setUserBankId(userBank.getId()+"");
+			userBankDTO.setRealName(userBank.getRealName());
+			userBankDTO.setCardNo(userBank.getCardNo());
+			userBankDTO.setStatus(userBank.getStatus());
+			userBankDTO.setBankLogo(userBank.getBankLogo());
+			userBankDTO.setBankName(userBank.getBankName());
+			userBankDTO.setCardType(userBank.getType()+"");
+			userBankDTO.setAbbreviation(userBank.getAbbreviation());
+			userBankDTO.setPurpose(userBank.getPurpose());
+			return ResultGenerator.genSuccessResult("succ",userBankDTO);
+		}
+		return ResultGenerator.genFailResult("empty");
+	}
 }

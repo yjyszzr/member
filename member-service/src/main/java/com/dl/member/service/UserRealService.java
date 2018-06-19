@@ -172,6 +172,7 @@ public class UserRealService extends AbstractService<UserReal> {
     public UserRealDTO queryUserReal(){
     	Integer userId = SessionUtil.getUserId();
     	UserReal userReal = this.findBy("userId", userId);
+    	log.info("[queryUserReal]" + " userId:" + userId + " userReal:" + userReal);
     	UserRealDTO userRealDTO = new UserRealDTO();
     	if(null == userReal) {
     		return null;
