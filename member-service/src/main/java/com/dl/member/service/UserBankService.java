@@ -30,6 +30,7 @@ import com.dl.base.util.RandomUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.UserBankCodeMapper;
 import com.dl.member.dao.UserBankMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserBankDTO;
@@ -39,6 +40,7 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
 import com.dl.member.model.UserBank;
+import com.dl.member.model.UserBankCode;
 import com.dl.member.param.DeleteBankCardParam;
 import com.dl.member.param.UserBankQueryParam;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +50,8 @@ import lombok.extern.slf4j.Slf4j;
 public class UserBankService extends AbstractService<UserBank> {
     @Resource
     private UserBankMapper userBankMapper;
+    @Resource
+    private UserBankCodeMapper userBankCodeMapper;
     
     @Resource
     private UserRealService userRealService;
@@ -557,6 +561,22 @@ public class UserBankService extends AbstractService<UserBank> {
 	}
 	
 	private String getAbbrByMap(String bankName) {
+		if(mMap == null || mMap.size() <= 0) {
+			mMap = new HashMap<String,String>();
+			List<UserBankCode> mList = userBankCodeMapper.listAll();
+			if(mList != null && mList.size() > 0) {
+				for(int i = 0;i < mList.size();i++) {
+					UserBankCode userBank = mList.get(i);
+					String bName = userBank.getBankName();
+					String bCode = userBank.getBankCode();
+					mMap.put(bName,bCode);
+				}
+			}
+			log.info("==========================");
+			log.info("[getAbbrByMap]" + " load map succ size -> " + mMap.size());
+			log.info("==========================");
+		}
+		
 		String result = null;
 		if(!StringUtils.isEmpty(bankName)) {
 			for(Map.Entry<String, String> entry : mMap.entrySet()) {
@@ -569,26 +589,6 @@ public class UserBankService extends AbstractService<UserBank> {
 			}
 		}
 		return result;
-	}
-	
-	static {
-		mMap.put("中国建设银行","CCB");
-		mMap.put("上海浦东发展银行","SPDB");
-		mMap.put("交通银行","BOCOM");
-		mMap.put("招商银行股份有限公司","CMB");
-		mMap.put("中国银行","BOC");
-		mMap.put("中国工商银行","ICBC");
-		mMap.put("中国光大银行股份有限公司", "CEB");
-		mMap.put("中国农商银行","CNRCB");
-		mMap.put("中国农业银行股份有限公司","ABC");
-		mMap.put("广发银行","GDB");
-		mMap.put("中国银联","UPOP");
-		mMap.put("宁波银行","NBBC");
-		mMap.put("华夏银行","HXB");
-		mMap.put("北京银行","BCCB");
-		mMap.put("遵义市商业银行","ZYSB");
-		mMap.put("上海银行","BOS");
-		mMap.put("平安银行","PAB");
 	}
 	
 }
