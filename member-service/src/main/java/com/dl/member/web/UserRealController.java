@@ -84,7 +84,7 @@ public class UserRealController {
   	        	if(Integer.valueOf(month) > Integer.valueOf(idMonth)) {
   	        		isFull18 = true;
   	        	}else if(Integer.valueOf(month) == Integer.valueOf(idMonth)) {
-  	        		if(Integer.valueOf(day) >= Integer.valueOf(idDay)) {
+  	        		if(Integer.valueOf(day) > Integer.valueOf(idDay)) {
   	        			isFull18 = true;
   	        		}else {
   	        			isFull18 = false;
