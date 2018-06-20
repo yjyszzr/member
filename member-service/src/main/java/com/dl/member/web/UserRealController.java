@@ -44,29 +44,63 @@ public class UserRealController {
     	if(idCardNo.length() < 15) {
     		return ResultGenerator.genResult(MemberEnums.REAL_IDCARDNO_NOTLEGAL.getcode(),MemberEnums.REAL_IDCARDNO_NOTLEGAL.getMsg());
     	}
-    	int age = IdNOToAge(idCardNo);
-    	logger.info("[realNameAuth]" + " age:" + age);
-    	if(age <= 18) {	//19岁才可以进行实名认证流程
+    	boolean isFull18 = IdNOToAge(idCardNo);
+    	logger.info("[realNameAuth]" + " isFull18:" + isFull18);
+    	if(!isFull18) {
     		return ResultGenerator.genResult(MemberEnums.REAL_IDCARDNO_NOT18.getcode(),MemberEnums.REAL_IDCARDNO_NOT18.getMsg());
     	}
     	return userRealService.realNameAuth(realNameAuthParam.getRealName(), realNameAuthParam.getIDCode());
     }
     
    //根据身份证号输出年龄
-   public int IdNOToAge(String IdNO){
-    int leh = IdNO.length();
-    String dates="";
-    if (leh == 18) {
-    	dates = IdNO.substring(6, 10);
-    	SimpleDateFormat df = new SimpleDateFormat("yyyy");
-        String year = df.format(new Date());
-        logger.info("[IdNOToAge]" +"year:" + year);
-        int u = Integer.parseInt(year)-Integer.parseInt(dates);
-        return u;
-    }else {
-    	return getAgeByIdCard15(IdNO);
-    }
-   }
+    /**
+     * 是否年满18周岁
+     * @param IdNO
+     * @return
+     */
+  	public boolean IdNOToAge(String IdNO){
+  		boolean isFull18 = false;
+  	    int leh = IdNO.length();
+  	    String idYear="";
+  	    String idMonth = "";
+  	    String idDay = "";
+  	    if (leh == 18) {
+  	    	idYear = IdNO.substring(6, 10);
+  	    	idMonth = IdNO.substring(10,12);
+  	    	idDay = IdNO.substring(12,14);
+  	    	SimpleDateFormat df = new SimpleDateFormat("yyyy");
+  	    	SimpleDateFormat dfMonth = new SimpleDateFormat("M");
+  	    	SimpleDateFormat dfDay = new SimpleDateFormat("d");
+  	        Date date = new Date();
+  	    	String year = df.format(date);
+  	    	String month = dfMonth.format(date);
+  	    	String day = dfDay.format(date);
+  	        logger.info("[IdNOToAge]" +"year:" + year +" month:" + month +" day:" +day);
+  	        logger.info("[IdNOToAge]" +"IDyear:" + idYear +" idMonth:" + idMonth +" idDay:" +idDay);
+  	        int u = Integer.parseInt(year)-Integer.parseInt(idYear);
+  	        if(u < 18) {
+  	        	isFull18 = false;
+  	        }else if(u == 18) {
+  	        	if(Integer.valueOf(month) > Integer.valueOf(idMonth)) {
+  	        		isFull18 = true;
+  	        	}else if(Integer.valueOf(month) == Integer.valueOf(idMonth)) {
+  	        		if(Integer.valueOf(day) >= Integer.valueOf(idDay)) {
+  	        			isFull18 = true;
+  	        		}else {
+  	        			isFull18 = false;
+  	        		}
+  	        	}else {
+  	        		isFull18 = false;
+  	        	}
+  	        }else {
+  	        	isFull18 = true;
+  	        }
+  	        return isFull18;
+  	    }else {
+  	    	isFull18 = true;
+  	    }
+  	    return isFull18;
+  	 }
    
    
    /**  
