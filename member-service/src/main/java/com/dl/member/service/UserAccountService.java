@@ -824,6 +824,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (null == userId) {
 			userId = memWithDrawSnParam.getUserId();
 		}
+		BigDecimal bigDec = null;
+		String strAmt = memWithDrawSnParam.getAmt();
+		if(!StringUtils.isEmpty(strAmt)) {
+			bigDec = new BigDecimal(strAmt);
+		}
 		WithDrawSnAndUserIdParam paywithDrawSnParam = new WithDrawSnAndUserIdParam();
 		paywithDrawSnParam.setWithDrawSn(memWithDrawSnParam.getWithDrawSn());
 		paywithDrawSnParam.setUserId(userId);
