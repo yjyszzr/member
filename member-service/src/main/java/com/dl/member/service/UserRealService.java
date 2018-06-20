@@ -100,7 +100,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	Criteria criteria = condition.createCriteria();
     	criteria.andCondition("id_code = ", iDCode);
     	List<UserReal> userRealList = this.findByCondition(condition);
-    	if(userRealList.size() > 4) {
+    	if(userRealList.size() > 5) {
 			return ResultGenerator.genResult(MemberEnums.USER_REAL_COUNTLIMIT.getcode(),MemberEnums.USER_REAL_COUNTLIMIT.getMsg());
     	}
     		
@@ -117,14 +117,8 @@ public class UserRealService extends AbstractService<UserReal> {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_IDCARD_EROOR.getcode(),reason);
 		}
     	
-    	UserReal userReal = this.findBy("idCode", iDCode);
-    	//如果已存在记录该
-    	if(userReal != null) {
-    		userReal.setRealName(realName);
-    		this.update(userReal);
-    	}else {
-    		this.saveUserReal(realName,iDCode);
-    	}
+    	this.saveUserReal(realName,iDCode);
+    	
     	User updateUser = new User();
     	updateUser.setUserId(userId);
     	updateUser.setIsReal(ProjectConstant.USER_IS_REAL);
