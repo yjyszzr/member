@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dl.base.service.AbstractService;
+import com.dl.base.util.DateUtil;
 import com.dl.member.dao.DlMessageMapper;
 import com.dl.member.dto.DlMessageDTO;
 import com.dl.member.model.DlMessage;
@@ -39,8 +40,9 @@ public class DlMessageService extends AbstractService<DlMessage> {
     		messageDTO.setReceiver(msg.getReceiver());
     		messageDTO.setReceiverMobile(msg.getReceiverMobile());
     		Integer sendTime = msg.getSendTime();
-    		LocalDateTime ofEpochSecond = LocalDateTime.ofEpochSecond(sendTime, 0, ZoneOffset.UTC);
-    		messageDTO.setSendTime(ofEpochSecond.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+    		String strTime = DateUtil.getCurrentTimeString(Long.valueOf(sendTime),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//    		LocalDateTime ofEpochSecond = LocalDateTime.ofEpochSecond(sendTime, 0, ZoneOffset.UTC);
+    		messageDTO.setSendTime(strTime);
     		messageDTO.setTitle(msg.getTitle());
     		messageDTO.setContentDesc(msg.getContentDesc());
     		messageDTO.setMsgUrl(msg.getMsgUrl());
