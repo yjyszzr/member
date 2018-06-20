@@ -1,7 +1,5 @@
 package com.dl.member.service;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,7 +37,7 @@ public class DlMessageService extends AbstractService<DlMessage> {
     		messageDTO.setReceiver(msg.getReceiver());
     		messageDTO.setReceiverMobile(msg.getReceiverMobile());
     		Integer sendTime = msg.getSendTime();
-    		LocalDateTime ofEpochSecond = LocalDateTime.ofEpochSecond(sendTime, 0, ZoneOffset.UTC);
+    		LocalDateTime ofEpochSecond = LocalDateTime.ofEpochSecond(sendTime, 0, ZoneOffset.of("+08:00"));
     		messageDTO.setSendTime(ofEpochSecond.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     		messageDTO.setTitle(msg.getTitle());
     		messageDTO.setContentDesc(msg.getContentDesc());
