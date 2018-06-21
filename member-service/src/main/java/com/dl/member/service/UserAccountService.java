@@ -60,7 +60,10 @@ import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnListParam;
 import com.dl.order.param.OrderSnParam;
 import com.dl.shop.payment.api.IpaymentService;
+import com.dl.shop.payment.dto.PayLogDTO;
+import com.dl.shop.payment.dto.PayLogDetailDTO;
 import com.dl.shop.payment.dto.UserWithdrawDetailDTO;
+import com.dl.shop.payment.param.PayLogOrderSnParam;
 import com.dl.shop.payment.param.WithDrawSnAndUserIdParam;
 import com.dl.shop.payment.param.WithDrawSnParam;
 import com.github.pagehelper.PageHelper;
@@ -851,6 +854,43 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		user.setUserId(userId);
 		int cnt = userMapper.updateInDBUserMoneyAndUserMoneyLimit(user);
 		log.info("[rollbackUserMoneyOrderFailure]" + " userId:" + userId + " amt:" + amt +" result cnt:" + cnt);
+		
+		//===========记录退款流水====================
+		UserAccount userAccountParamByType = new UserAccount();
+		Integer accountType = ProjectConstant.ACCOUNT_ROLLBACK;
+		log.info("===========更新用户流水表=======:" + accountType);
+		userAccountParamByType.setProcessType(accountType);
+		userAccountParamByType.setAmount(BigDecimal.ZERO.subtract(amt));
+		userAccountParamByType.setBonusPrice(BigDecimal.ZERO);//暂无红包金额
+		userAccountParamByType.setOrderSn(orderSn);
+		userAccountParamByType.setThirdPartPaid(amt);
+		userAccountParamByType.setUserId(userId);
+		PayLogDetailDTO payLog = null;
+		PayLogOrderSnParam paySnParam = new PayLogOrderSnParam();
+		paySnParam.setOrderSn(orderSn);
+		BaseResult<PayLogDetailDTO> bR = payMentService.queryPayLogByOrderSn(paySnParam);
+		if(bR.getCode() == 0 && bR.getData() != null) {
+			payLog = bR.getData();
+		}
+		if(payLog != null) {
+			log.info("[rollbackUserMoneyOrderFailure]" +" 已查询到paylog信息...");
+			String payName = "";
+			String payCode = payLog.getPayCode();
+			userAccountParamByType.setPayId(payLog.getLogId()+"");
+			if(payCode.equals("app_weixin") || payCode.equals("app_weixin_h5")) {
+				payName = "微信";
+			}else {
+				payName = "银行卡";
+			}
+			userAccountParamByType.setPaymentName(payName);
+			userAccountParamByType.setThirdPartName(payName);
+		}else {
+			userAccountParamByType.setPayId("0");
+			userAccountParamByType.setPaymentName("");
+			userAccountParamByType.setThirdPartName("");
+		}
+		int count = insertUserAccount(userAccountParamByType);
+		log.info("退款成功记录流水成功 cnt:" + count);
 		return ResultGenerator.genSuccessResult();
 	}
 	
