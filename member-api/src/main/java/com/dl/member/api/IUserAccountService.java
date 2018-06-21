@@ -12,6 +12,7 @@ import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.dto.UserRechargeDTO;
 import com.dl.member.dto.UserWithdrawDTO;
 import com.dl.member.param.AmountParam;
+import com.dl.member.param.MemRollParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.RollackSurplusPayParam;
@@ -126,6 +127,8 @@ public interface IUserAccountService {
 	@RequestMapping(path="/user/account/rollbackUserMoneyWithDrawFailure", method=RequestMethod.POST)
     public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyWithDrawFailure(@RequestBody MemWithDrawSnParam memWithDrawSnParam);
 	
+	@RequestMapping(path="/user/account/rollbackUserMoney", method=RequestMethod.POST)
+    public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyFailure(@RequestBody MemRollParam memRollParam);
 	
 	/**
 	 * 给第三方支付提供的记录账户流水

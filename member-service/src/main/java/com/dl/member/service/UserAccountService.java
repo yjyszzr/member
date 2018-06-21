@@ -46,6 +46,7 @@ import com.dl.member.model.DlMessage;
 import com.dl.member.model.LotteryWinningLogTemp;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
+import com.dl.member.param.MemRollParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.SurplusPayParam;
@@ -810,6 +811,45 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		return ResultGenerator.genSuccessResult("success", surplusPaymentCallbackDTO);
 	}
 
+	/***
+	 * 出票失败，资金回滚到可提现金额中
+	 * @param memRollParam
+	 * @return
+	 */
+	public BaseResult<Object> rollbackUserMoneyOrderFailure(MemRollParam memRollParam){
+		String orderSn = memRollParam.getOrderSn();
+		Integer userId = memRollParam.getUserId();
+		BigDecimal amt = memRollParam.getAmt();
+		log.info("[rollbackUserMoneyOrderFailure]" + " orderSn:" + orderSn + " userId:" + userId + " amt:" + amt);
+		//查看该order是否存在
+		OrderSnParam orderSnParam = new OrderSnParam();
+		orderSnParam.setOrderSn(orderSn);
+		BaseResult<OrderDTO> orderDTORst = orderService.getOrderInfoByOrderSn(orderSnParam);
+		if (orderDTORst.getCode() != 0) {
+			return ResultGenerator.genFailResult(orderDTORst.getMsg());
+		}
+		//账户流水查看
+		UserAccount userAccountRoll = new UserAccount();
+		userAccountRoll.setUserId(userId);
+		userAccountRoll.setThirdPartPaid(amt);
+		userAccountRoll.setOrderSn(orderSn);
+		userAccountRoll.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
+		List<UserAccount> userAccountListRoll = userAccountMapper.queryUserAccountBySelective(userAccountRoll);
+		if (!CollectionUtils.isEmpty(userAccountListRoll)) {
+			return ResultGenerator.genFailResult("订单号为" + orderSn + "已经回滚，无法再次回滚");
+		}
+		//增加用户到可提现余额中
+		User user = userService.findById(userId);
+		if(user == null) {
+			return ResultGenerator.genFailResult("[rollbackUserMoneyOrderFailure]" +" 未查询到该用户 userId:" + userId);
+		}
+		user = new User();
+		user.setUserMoney(amt);
+		int cnt = userMapper.updateInDBUserMoneyAndUserMoneyLimit(user);
+		log.info("[rollbackUserMoneyOrderFailure]" + " cnt:" + cnt);
+		return ResultGenerator.genSuccessResult();
+	}
+	
 	/**
 	 * 提现失败和审核拒绝回滚账户可提现余额
 	 * 
@@ -823,11 +863,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		Integer userId = SessionUtil.getUserId();
 		if (null == userId) {
 			userId = memWithDrawSnParam.getUserId();
-		}
-		BigDecimal bigDec = null;
-		String strAmt = memWithDrawSnParam.getAmt();
-		if(!StringUtils.isEmpty(strAmt)) {
-			bigDec = new BigDecimal(strAmt);
 		}
 		WithDrawSnAndUserIdParam paywithDrawSnParam = new WithDrawSnAndUserIdParam();
 		paywithDrawSnParam.setWithDrawSn(memWithDrawSnParam.getWithDrawSn());
