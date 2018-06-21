@@ -848,8 +848,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 		user = new User();
 		user.setUserMoney(amt);
+		user.setUserId(userId);
 		int cnt = userMapper.updateInDBUserMoneyAndUserMoneyLimit(user);
-		log.info("[rollbackUserMoneyOrderFailure]" + " cnt:" + cnt);
+		log.info("[rollbackUserMoneyOrderFailure]" + " userId:" + userId + " amt:" + amt +" result cnt:" + cnt);
 		return ResultGenerator.genSuccessResult();
 	}
 	
