@@ -865,6 +865,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccountParamByType.setOrderSn(orderSn);
 		userAccountParamByType.setThirdPartPaid(amt);
 		userAccountParamByType.setUserId(userId);
+		userAccountParamByType.setAddTime(DateUtil.getCurrentTimeLong());
+		userAccountParamByType.setLastTime(DateUtil.getCurrentTimeLong());
+		userAccountParamByType.setParentSn("");
 		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
 		userAccountParamByType.setAccountSn(accountSn);
 		PayLogDetailDTO payLog = null;
