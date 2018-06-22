@@ -843,14 +843,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			log.info("[rollbackUserMoneyOrderFailure]" + " 订单已经回滚，无法再次回滚");
 			return ResultGenerator.genFailResult("订单号为" + orderSn + "已经回滚，无法再次回滚");
 		}
-		//增加用户到可提现余额中
 		User user = userService.findById(userId);
 		if(user == null) {
 			log.info("[rollbackUserMoneyOrderFailure]" + " 未查询到该用户 userId:" + userId);
 			return ResultGenerator.genFailResult("[rollbackUserMoneyOrderFailure]" +" 未查询到该用户 userId:" + userId);
 		}
 		user = new User();
-		user.setUserMoney(amt);
+//		user.setUserMoney(amt);
+//		调整为不可提现余额
+		user.setUserMoneyLimit(amt);
 		user.setUserId(userId);
 		int cnt = userMapper.updateInDBUserMoneyAndUserMoneyLimit(user);
 		log.info("[rollbackUserMoneyOrderFailure]" + " userId:" + userId + " amt:" + amt +" result cnt:" + cnt);
