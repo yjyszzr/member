@@ -463,13 +463,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 		BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
 		User updateUser = new User();
-		user_money = user.getUserMoney();
-		user_money_limit = user.getUserMoneyLimit().add(recharegeParam.getAmount());
-		curBalance = user_money_limit.add(user_money);
-		updateUser.setUserMoneyLimit(user_money_limit);
+		updateUser.setUserMoneyLimit(recharegeParam.getAmount());
 		updateUser.setUserId(userId);
 
-		int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+		int moneyRst = userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
 		if (1 != moneyRst) {
 			log.error("充值失败");
 			throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "充值失败");
@@ -484,11 +481,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccount.setThirdPartName(recharegeParam.getThirdPartName());
 		userAccount.setThirdPartPaid(recharegeParam.getThirdPartPaid());
 		userAccount.setPayId(recharegeParam.getPayId());
-
+		User updatedUser = userMapper.queryUserExceptPass(userId);
 		userAccount.setNote(recharegeParam.getThirdPartName() + "充值" + recharegeParam.getAmount() + "元");
 		userAccount.setAddTime(DateUtil.getCurrentTimeLong());
 		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-		userAccount.setCurBalance(curBalance);
+		userAccount.setCurBalance(updatedUser.getUserMoney().add(updatedUser.getUserMoneyLimit()));
 		userAccount.setStatus(Integer.valueOf(ProjectConstant.FINISH));
 
 		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
@@ -506,22 +503,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * @param rechargeMoney
 	 * @return
 	 */
-	@Transactional
 	public BaseResult<String> withdrawUserMoney(WithDrawParam withDrawParam) {
-		Condition condition = new Condition(UserAccount.class);
-		Criteria cri = condition.createCriteria();
-		cri.andCondition("user_id =", withDrawParam.getUserId());
-		cri.andCondition("pay_id =", withDrawParam.getPayId());
-		cri.andCondition("process_type =", ProjectConstant.WITHDRAW);
-		List<UserAccount> userAccountList = this.findByCondition(condition);
-		if (!CollectionUtils.isEmpty(userAccountList)) {
-			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), MemberEnums.DATA_ALREADY_EXIT_IN_DB.getMsg());
-		}
-
-		BigDecimal user_money = BigDecimal.ZERO; // 用户账户变动后的可提现余额
-		BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
-		BigDecimal curBalance = BigDecimal.ZERO;// 当前变动后的总余额
-
 		Integer userId = withDrawParam.getUserId();
 		User user = userService.findById(userId);
 		if (null == user) {
@@ -532,18 +514,14 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
 		}
 
-		BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
 		User updateUser = new User();
-		user_money_limit = user.getUserMoneyLimit();
-		user_money = user.getUserMoney().subtract(withDrawParam.getAmount());
-		curBalance = user_money_limit.add(user_money);
-		updateUser.setUserMoney(user_money);
+		updateUser.setUserMoney(withDrawParam.getAmount());
 		updateUser.setUserId(userId);
 
-		int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+		int moneyRst = userMapper.reduceUserMoneyInDB(updateUser);
 		if (1 != moneyRst) {
 			log.error("提现失败");
-			throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "提现失败");
+			return ResultGenerator.genFailResult("提现失败");
 		}
 
 		UserAccount userAccount = new UserAccount();
@@ -555,16 +533,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccount.setThirdPartName(withDrawParam.getThirdPartName());
 		userAccount.setThirdPartPaid(withDrawParam.getThirdPartPaid());
 		userAccount.setPayId(withDrawParam.getPayId());
-
 		userAccount.setAddTime(DateUtil.getCurrentTimeLong());
 		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-		userAccount.setCurBalance(curBalance);
+		User userUpdated = userMapper.queryUserExceptPass(userId);
+		userAccount.setCurBalance(userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
 		userAccount.setStatus(1);
 		userAccount.setNote(withDrawParam.getThirdPartName() + "提现" + String.format("%.2f", withDrawParam.getThirdPartPaid().doubleValue()) + "元");
 		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
 		if (rst != 1) {
 			log.error("生成提现流水账户失败");
-			throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "生成提现流水账户失败");
+			return ResultGenerator.genFailResult("生成提现流水账户失败");
 		}
 
 		return ResultGenerator.genSuccessResult("提现成功", accountSn);
@@ -575,7 +553,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * 
 	 * @param userIdAndRewardList
 	 */
-	@Transactional
 	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> dtos, Integer dealType) {
 		List<UserIdAndRewardDTO> oldUserIdAndRewardDtos = new ArrayList<UserIdAndRewardDTO>(dtos);
 		List<UserIdAndRewardDTO> userIdAndRewardList = new ArrayList<UserIdAndRewardDTO>(dtos);
@@ -605,14 +582,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		Integer accountTime = DateUtil.getCurrentTimeLong();
-		/*
-		 * List<Integer> userIdList = userIdAndRewardList.stream().map(s ->
-		 * s.getUserId()).collect(Collectors.toList()); List<User> userList =
-		 * userMapper.queryUserByUserIds(userIdList);
-		 */
 		for (UserIdAndRewardDTO uDTO : userIdAndRewardList) {
 			User updateUserMoney = new User();
-			// BigDecimal userMoney = BigDecimal.ZERO;
 			updateUserMoney.setUserId(uDTO.getUserId());
 			updateUserMoney.setUserMoney(uDTO.getReward());
 			userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUserMoney);
@@ -622,6 +593,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountParam.setOrderSn(uDTO.getOrderSn());
 			userAccountParam.setUserId(uDTO.getUserId());
 			userAccountParam.setAmount(uDTO.getReward());
+			Integer userId = uDTO.getUserId();
+			User user = userMapper.queryUserExceptPass(userId);
+			userAccountParam.setCurBalance(user.getUserMoney().add(user.getUserMoneyLimit()));
 			userAccountParam.setProcessType(ProjectConstant.REWARD);
 			userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
 			userAccountParam.setAddTime(accountTime);
@@ -963,10 +937,22 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyWithDrawFailure(MemWithDrawSnParam memWithDrawSnParam) {
 		String inPrams = JSON.toJSONString(memWithDrawSnParam);
 		log.info(DateUtil.getCurrentDateTime() + "提现失败回滚账户可提现余额的参数:" + memWithDrawSnParam);
+
 		Integer userId = SessionUtil.getUserId();
 		if (null == userId) {
 			userId = memWithDrawSnParam.getUserId();
 		}
+
+		Condition condition = new Condition(UserAccount.class);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("user_id =", userId);
+		criteria.andCondition("pay_id =", memWithDrawSnParam.getWithDrawSn());
+		criteria.andCondition("process_type =", ProjectConstant.ACCOUNT_ROLLBACK);
+		List<UserAccount> withdrawAccountList = this.findByCondition(condition);
+		if (withdrawAccountList.size() > 0) {
+			return ResultGenerator.genFailResult("提现单号" + memWithDrawSnParam.getWithDrawSn() + "已经进行了回滚，无法再次回滚");
+		}
+
 		WithDrawSnAndUserIdParam paywithDrawSnParam = new WithDrawSnAndUserIdParam();
 		paywithDrawSnParam.setWithDrawSn(memWithDrawSnParam.getWithDrawSn());
 		paywithDrawSnParam.setUserId(userId);
@@ -985,15 +971,40 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (!userWithdrawDTO.getStatus().equals(ProjectConstant.FAILURE)) {
 			return ResultGenerator.genFailResult("提现单" + paywithDrawSnParam.getWithDrawSn() + "未提现失败，无法对这笔提现单对应的提现预扣款进行回滚");
 		}
+
 		User user = userService.findById(userId);
 		User updateUser = new User();
 		updateUser.setUserId(userId);
-		updateUser.setUserMoney(user.getUserMoney().add(userWithdrawDTO.getAmount()));
-		userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
-		log.info("回滚时，更新" + userId + "账户值：" + user.getUserMoney().add(userWithdrawDTO.getAmount()));
+		updateUser.setUserMoney(userWithdrawDTO.getAmount());
+		userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
+
+		User userUpdated = userMapper.queryUserExceptPass(userId);
+		log.info("回滚后" + userId + "账户值：" + userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
+
+		log.info("开始生成回滚账户流水");
+		UserAccount userAccount = new UserAccount();
+		userAccount.setUserId(userId);
+		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+		userAccount.setAmount(userWithdrawDTO.getAmount());
+		userAccount.setAccountSn(accountSn);
+		userAccount.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
+		userAccount.setThirdPartName("");
+		userAccount.setThirdPartPaid(BigDecimal.ZERO);
+		userAccount.setPayId(userWithdrawDTO.getWithdrawalSn());
+		userAccount.setAddTime(DateUtil.getCurrentTimeLong());
+		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
+		userAccount.setCurBalance(userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
+		userAccount.setStatus(1);
+		userAccount.setNote("提现回滚" + userWithdrawDTO.getAmount());
+		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
+		log.info("生成回滚账户流水返回值" + rst);
+		if (rst != 1) {
+			log.error("生成提现流水账户失败");
+			return ResultGenerator.genFailResult("生成提现流水账户失败");
+		}
+		log.info("生成回滚账户流水结束");
 		SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
 		surplusPaymentCallbackDTO.setCurBalance(user.getUserMoney().add(userWithdrawDTO.getAmount()));
-
 		return ResultGenerator.genSuccessResult("success", surplusPaymentCallbackDTO);
 	}
 
