@@ -929,7 +929,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
 		
 		User userUpdated = userMapper.queryUserExceptPass(userId);
-		log.info("回滚时后" + userId + "账户值：" + userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
+		log.info("回滚后" + userId + "账户值：" + userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
 		
 		
 		log.info("开始生成回滚账户流水");
