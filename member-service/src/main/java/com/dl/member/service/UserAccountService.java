@@ -927,9 +927,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		updateUser.setUserId(userId);
 		updateUser.setUserMoney(userWithdrawDTO.getAmount());
 		userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
-		log.info("回滚时，更新" + userId + "账户值：" + user.getUserMoney().add(userWithdrawDTO.getAmount()));
+		
+		User userUpdated = userMapper.queryUserExceptPass(userId);
+		log.info("回滚时后" + userId + "账户值：" + userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
 		
 		
+		log.info("开始生成回滚账户流水");
 		UserAccount userAccount = new UserAccount();
 		userAccount.setUserId(userId);
 		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
@@ -941,16 +944,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccount.setPayId(userWithdrawDTO.getWithdrawalSn());
 		userAccount.setAddTime(DateUtil.getCurrentTimeLong());
 		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-		User userUpdated = userMapper.queryUserExceptPass(userId);
 		userAccount.setCurBalance(userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
 		userAccount.setStatus(1);
 		userAccount.setNote("提现回滚"+userWithdrawDTO.getAmount());
 		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
+		log.info("生成回滚账户流水返回值"+rst);
 		if (rst != 1) {
 			log.error("生成提现流水账户失败");
 			return ResultGenerator.genFailResult("生成提现流水账户失败");
 		}
-		
+		log.info("生成回滚账户流水结束");
 		SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
 		surplusPaymentCallbackDTO.setCurBalance(user.getUserMoney().add(userWithdrawDTO.getAmount()));
 		return ResultGenerator.genSuccessResult("success", surplusPaymentCallbackDTO);
