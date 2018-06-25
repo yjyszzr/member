@@ -193,7 +193,7 @@ public class UserAccountController {
 	 * @param userIdAndRewardListParam
 	 * @return
 	 */
-	@ApiOperation(value = "手动更新用户不可提现余额", notes = "手动更新用户不可提现余额", hidden = false)
+	@ApiOperation(value = "派奖到用户不可提现余额", notes = "派奖到用户不可提现余额", hidden = false)
 	@RequestMapping(path = "/batchUpdateUserRewardToUserMoneyLimit", method = RequestMethod.POST)
 	public BaseResult<String> batchUpdateUserRewardToUserMoneyLimit(@Valid @RequestBody UserIdAndRewardListParam userIdAndRewardListParam) {
 		return userAccountService.batchUpdateUserRewardToUserMoneyLimit(userIdAndRewardListParam.getUserIdAndRewardList());

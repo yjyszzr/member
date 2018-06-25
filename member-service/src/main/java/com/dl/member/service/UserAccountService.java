@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
@@ -60,7 +65,6 @@ import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnListParam;
 import com.dl.order.param.OrderSnParam;
 import com.dl.shop.payment.api.IpaymentService;
-import com.dl.shop.payment.dto.PayLogDTO;
 import com.dl.shop.payment.dto.PayLogDetailDTO;
 import com.dl.shop.payment.dto.UserWithdrawDetailDTO;
 import com.dl.shop.payment.param.PayLogOrderSnParam;
@@ -70,10 +74,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Joiner;
 
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
-
 @Service
 @Slf4j
 public class UserAccountService extends AbstractService<UserAccount> {
@@ -82,7 +82,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 	@Resource
 	private UserMapper userMapper;
-	
+
 	@Resource
 	private LotteryWinningLogTempMapper lotteryWinningLogTempMapper;
 
@@ -605,11 +605,14 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		Integer accountTime = DateUtil.getCurrentTimeLong();
-		/*List<Integer> userIdList = userIdAndRewardList.stream().map(s -> s.getUserId()).collect(Collectors.toList());
-		List<User> userList = userMapper.queryUserByUserIds(userIdList);*/
+		/*
+		 * List<Integer> userIdList = userIdAndRewardList.stream().map(s ->
+		 * s.getUserId()).collect(Collectors.toList()); List<User> userList =
+		 * userMapper.queryUserByUserIds(userIdList);
+		 */
 		for (UserIdAndRewardDTO uDTO : userIdAndRewardList) {
 			User updateUserMoney = new User();
-//			BigDecimal userMoney = BigDecimal.ZERO;
+			// BigDecimal userMoney = BigDecimal.ZERO;
 			updateUserMoney.setUserId(uDTO.getUserId());
 			updateUserMoney.setUserMoney(uDTO.getReward());
 			userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUserMoney);
@@ -641,17 +644,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 		log.info("更新用户中奖订单为已派奖成功");
 
-		//推送消息
+		// 推送消息
 		saveRewardMessageAsync(userIdAndRewardList, accountTime);
 
-		//记录中奖信息
+		// 记录中奖信息
 		this.updateLotteryWinning(oldUserIdAndRewardDtos);
 		log.info("=^_^= =^_^= =^_^= =^_^= " + DateUtil.getCurrentDateTime() + "用户派发奖金完成" + "=^_^= =^_^= =^_^= =^_^= ");
 
 		return ResultGenerator.genSuccessResult("用户派发奖金完成");
 	}
-
-	
 
 	/**
 	 * 针对单场竞猜答题用户中奖后批量更新到不可提现余额
@@ -702,7 +703,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		return ResultGenerator.genSuccessResult("用户派发奖金完成");
 	}
 
-	
 	/**
 	 * 异步保存中奖消息
 	 * 
@@ -711,7 +711,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	@Async
 	public void saveRewardMessageAsync(List<UserIdAndRewardDTO> list, Integer accountTime) {
 		List<Integer> userIdList = list.stream().map(s -> s.getUserId()).collect(Collectors.toList());
-		if(CollectionUtils.isEmpty(userIdList)) {
+		if (CollectionUtils.isEmpty(userIdList)) {
 			return;
 		}
 		log.info(" 00000   " + JSONHelper.bean2json(userIdList));
@@ -742,8 +742,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			messageAddParam.setSendTime(accountTime);
 			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
 			userMessageService.save(messageAddParam);
-			//push
-			if(StringUtils.isNotBlank(clientId)) {
+			// push
+			if (StringUtils.isNotBlank(clientId)) {
 				String content = MessageFormat.format(CommonConstants.FORMAT_REWARD_PUSH_DESC, u.getReward());
 				GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_REWARD_PUSH_TITLE, content, DateUtil.getCurrentTimeLong());
 				geTuiUtil.pushMessage(clientId, getuiMessage);
@@ -868,15 +868,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 	/***
 	 * 出票失败，资金回滚到可提现金额中
+	 * 
 	 * @param memRollParam
 	 * @return
 	 */
-	public BaseResult<Object> rollbackUserMoneyOrderFailure(MemRollParam memRollParam){
+	public BaseResult<Object> rollbackUserMoneyOrderFailure(MemRollParam memRollParam) {
 		String orderSn = memRollParam.getOrderSn();
 		Integer userId = memRollParam.getUserId();
 		BigDecimal amt = memRollParam.getAmt();
 		log.info("[rollbackUserMoneyOrderFailure]" + " orderSn:" + orderSn + " userId:" + userId + " amt:" + amt);
-		//查看该order是否存在
+		// 查看该order是否存在
 		OrderSnParam orderSnParam = new OrderSnParam();
 		orderSnParam.setOrderSn(orderSn);
 		BaseResult<OrderDTO> orderDTORst = orderService.getOrderInfoByOrderSn(orderSnParam);
@@ -884,7 +885,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			log.info("[rollbackUserMoneyOrderFailure]" + "该订单不存在 orderSn:" + orderSn);
 			return ResultGenerator.genFailResult("该订单不存在");
 		}
-		//账户流水查看
+		// 账户流水查看
 		UserAccount userAccountRoll = new UserAccount();
 		userAccountRoll.setUserId(userId);
 		userAccountRoll.setThirdPartPaid(amt);
@@ -896,25 +897,25 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return ResultGenerator.genFailResult("订单号为" + orderSn + "已经回滚，无法再次回滚");
 		}
 		User user = userService.findById(userId);
-		if(user == null) {
+		if (user == null) {
 			log.info("[rollbackUserMoneyOrderFailure]" + " 未查询到该用户 userId:" + userId);
-			return ResultGenerator.genFailResult("[rollbackUserMoneyOrderFailure]" +" 未查询到该用户 userId:" + userId);
+			return ResultGenerator.genFailResult("[rollbackUserMoneyOrderFailure]" + " 未查询到该用户 userId:" + userId);
 		}
 		user = new User();
-//		user.setUserMoney(amt);
-//		调整为不可提现余额
+		// user.setUserMoney(amt);
+		// 调整为不可提现余额
 		user.setUserMoneyLimit(amt);
 		user.setUserId(userId);
 		int cnt = userMapper.updateInDBUserMoneyAndUserMoneyLimit(user);
-		log.info("[rollbackUserMoneyOrderFailure]" + " userId:" + userId + " amt:" + amt +" result cnt:" + cnt);
-		
-		//===========记录退款流水====================
+		log.info("[rollbackUserMoneyOrderFailure]" + " userId:" + userId + " amt:" + amt + " result cnt:" + cnt);
+
+		// ===========记录退款流水====================
 		UserAccount userAccountParamByType = new UserAccount();
 		Integer accountType = ProjectConstant.ACCOUNT_ROLLBACK;
 		log.info("===========更新用户流水表=======:" + accountType);
 		userAccountParamByType.setProcessType(accountType);
 		userAccountParamByType.setAmount(BigDecimal.ZERO.subtract(amt));
-		userAccountParamByType.setBonusPrice(BigDecimal.ZERO);//暂无红包金额
+		userAccountParamByType.setBonusPrice(BigDecimal.ZERO);// 暂无红包金额
 		userAccountParamByType.setOrderSn(orderSn);
 		userAccountParamByType.setThirdPartPaid(amt);
 		userAccountParamByType.setUserId(userId);
@@ -927,22 +928,22 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		PayLogOrderSnParam paySnParam = new PayLogOrderSnParam();
 		paySnParam.setOrderSn(orderSn);
 		BaseResult<PayLogDetailDTO> bR = payMentService.queryPayLogByOrderSn(paySnParam);
-		if(bR.getCode() == 0 && bR.getData() != null) {
+		if (bR.getCode() == 0 && bR.getData() != null) {
 			payLog = bR.getData();
 		}
-		if(payLog != null) {
-			log.info("[rollbackUserMoneyOrderFailure]" +" 已查询到paylog信息...");
+		if (payLog != null) {
+			log.info("[rollbackUserMoneyOrderFailure]" + " 已查询到paylog信息...");
 			String payName = "";
 			String payCode = payLog.getPayCode();
-			userAccountParamByType.setPayId(payLog.getLogId()+"");
-			if(payCode.equals("app_weixin") || payCode.equals("app_weixin_h5")) {
+			userAccountParamByType.setPayId(payLog.getLogId() + "");
+			if (payCode.equals("app_weixin") || payCode.equals("app_weixin_h5")) {
 				payName = "微信";
-			}else {
+			} else {
 				payName = "银行卡";
 			}
 			userAccountParamByType.setPaymentName(payName);
 			userAccountParamByType.setThirdPartName(payName);
-		}else {
+		} else {
 			userAccountParamByType.setPayId("0");
 			userAccountParamByType.setPaymentName("");
 			userAccountParamByType.setThirdPartName("");
@@ -951,7 +952,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		log.info("退款成功记录流水成功 cnt:" + count);
 		return ResultGenerator.genSuccessResult();
 	}
-	
+
 	/**
 	 * 提现失败和审核拒绝回滚账户可提现余额
 	 * 
@@ -1330,45 +1331,46 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 	/**
 	 * 更新跑马灯中奖信息
+	 * 
 	 * @param userIdAndRewardList
 	 */
 	public void updateLotteryWinning(List<UserIdAndRewardDTO> userIdAndRewardList) {
-		List<UserIdAndRewardDTO> collect = userIdAndRewardList.stream().filter(u->u.getReward().doubleValue() > 500).sorted((item1,item2)->item1.getReward().compareTo(item2.getReward())).collect(Collectors.toList());
-    	if(collect.size() > 10) {
-    		collect = collect.subList(0, 10);
-    	}
-    	log.info(JSONHelper.bean2json(collect));
-    	Set<Integer> set = collect.stream().map(dto->dto.getUserId()).collect(Collectors.toSet());
-    	log.info("111111111111    " + JSONHelper.bean2json(set));
-    	List<Integer> userIds = new ArrayList<Integer>(set);
-    	if(null == userIds ||  userIds.size() == 0) {
-    		return;
-    	}
-    	
-    	List<User> users = userMapper.queryUserByUserIds(userIds);
-    	Map<Integer, String> map = new HashMap<Integer, String>(users.size());
-    	for(User user: users) {
-    		map.put(user.getUserId(), user.getMobile());
-    	}
-    	Condition condition = new Condition(LotteryWinningLogTemp.class);
+		List<UserIdAndRewardDTO> collect = userIdAndRewardList.stream().filter(u -> u.getReward().doubleValue() > 500).sorted((item1, item2) -> item1.getReward().compareTo(item2.getReward())).collect(Collectors.toList());
+		if (collect.size() > 10) {
+			collect = collect.subList(0, 10);
+		}
+		log.info(JSONHelper.bean2json(collect));
+		Set<Integer> set = collect.stream().map(dto -> dto.getUserId()).collect(Collectors.toSet());
+		log.info("111111111111    " + JSONHelper.bean2json(set));
+		List<Integer> userIds = new ArrayList<Integer>(set);
+		if (null == userIds || userIds.size() == 0) {
+			return;
+		}
+
+		List<User> users = userMapper.queryUserByUserIds(userIds);
+		Map<Integer, String> map = new HashMap<Integer, String>(users.size());
+		for (User user : users) {
+			map.put(user.getUserId(), user.getMobile());
+		}
+		Condition condition = new Condition(LotteryWinningLogTemp.class);
 		condition.createCriteria().andCondition("is_show=", 1);
 		List<LotteryWinningLogTemp> olds = lotteryWinningLogTempMapper.selectByCondition(condition);
-    	for(UserIdAndRewardDTO dto: collect) {
-    		BigDecimal reward = dto.getReward();
-    		String mobile = map.get(dto.getUserId());
-    		LotteryWinningLogTemp temp = new LotteryWinningLogTemp();
-    		temp.setWinningMoney(reward);
-    		temp.setPhone(mobile==null?"":mobile);
-    		temp.setIsShow(1);
-    		lotteryWinningLogTempMapper.insert(temp);
-    	}
-    	int num = olds.size() + collect.size() - 10;
-    	if(num > 0) {
-    		List<Integer> ids = olds.stream().sorted((item1,item2)-> item1.getWinningLogId().compareTo(item2.getWinningLogId()))
-    		.limit(num).map(dto->dto.getWinningLogId()).collect(Collectors.toList());
-    		lotteryWinningLogTempMapper.deleteByLogIds(ids);
-    	}
+		for (UserIdAndRewardDTO dto : collect) {
+			BigDecimal reward = dto.getReward();
+			String mobile = map.get(dto.getUserId());
+			LotteryWinningLogTemp temp = new LotteryWinningLogTemp();
+			temp.setWinningMoney(reward);
+			temp.setPhone(mobile == null ? "" : mobile);
+			temp.setIsShow(1);
+			lotteryWinningLogTempMapper.insert(temp);
+		}
+		int num = olds.size() + collect.size() - 10;
+		if (num > 0) {
+			List<Integer> ids = olds.stream().sorted((item1, item2) -> item1.getWinningLogId().compareTo(item2.getWinningLogId())).limit(num).map(dto -> dto.getWinningLogId()).collect(Collectors.toList());
+			lotteryWinningLogTempMapper.deleteByLogIds(ids);
+		}
 	}
+
 	public void updateUserMoneyForCashCoupon(User user) {
 		userMapper.updateUserMoneyForCashCoupon(user);
 	}
@@ -1376,6 +1378,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	public int insertUserAccount(UserAccount userAccount) {
 		return userAccountMapper.insertUserAccount(userAccount);
 	}
+
 	public List<UserAccount> findByUserIdsAndType(List<String> userIds, String data, int i) {
 		List<UserAccount> list = userAccountMapper.findByUserIdsAndType(userIds, data, i);
 		return list;
