@@ -463,13 +463,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 		BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
 		User updateUser = new User();
-		user_money = user.getUserMoney();
-		user_money_limit = user.getUserMoneyLimit().add(recharegeParam.getAmount());
-		curBalance = user_money_limit.add(user_money);
-		updateUser.setUserMoneyLimit(user_money_limit);
+		updateUser.setUserMoneyLimit(recharegeParam.getAmount());
 		updateUser.setUserId(userId);
 
-		int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+		int moneyRst = userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
 		if (1 != moneyRst) {
 			log.error("充值失败");
 			throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "充值失败");
@@ -484,11 +481,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccount.setThirdPartName(recharegeParam.getThirdPartName());
 		userAccount.setThirdPartPaid(recharegeParam.getThirdPartPaid());
 		userAccount.setPayId(recharegeParam.getPayId());
-
+		User updatedUser = userMapper.queryUserExceptPass(userId);
 		userAccount.setNote(recharegeParam.getThirdPartName() + "充值" + recharegeParam.getAmount() + "元");
 		userAccount.setAddTime(DateUtil.getCurrentTimeLong());
 		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-		userAccount.setCurBalance(curBalance);
+		userAccount.setCurBalance(updatedUser.getUserMoney().add(updatedUser.getUserMoneyLimit()));
 		userAccount.setStatus(Integer.valueOf(ProjectConstant.FINISH));
 
 		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
@@ -506,7 +503,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * @param rechargeMoney
 	 * @return
 	 */
-	@Transactional
 	public BaseResult<String> withdrawUserMoney(WithDrawParam withDrawParam) {
 		Condition condition = new Condition(UserAccount.class);
 		Criteria cri = condition.createCriteria();
@@ -518,10 +514,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), MemberEnums.DATA_ALREADY_EXIT_IN_DB.getMsg());
 		}
 
-		BigDecimal user_money = BigDecimal.ZERO; // 用户账户变动后的可提现余额
-		BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
-		BigDecimal curBalance = BigDecimal.ZERO;// 当前变动后的总余额
-
 		Integer userId = withDrawParam.getUserId();
 		User user = userService.findById(userId);
 		if (null == user) {
@@ -532,15 +524,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
 		}
 
-		BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
 		User updateUser = new User();
-		user_money_limit = user.getUserMoneyLimit();
-		user_money = user.getUserMoney().subtract(withDrawParam.getAmount());
-		curBalance = user_money_limit.add(user_money);
-		updateUser.setUserMoney(user_money);
+		updateUser.setUserMoney(withDrawParam.getAmount());
 		updateUser.setUserId(userId);
 
-		int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+		int moneyRst = userMapper.reduceUserMoneyInDB(updateUser);
 		if (1 != moneyRst) {
 			log.error("提现失败");
 			throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "提现失败");
@@ -558,7 +546,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 		userAccount.setAddTime(DateUtil.getCurrentTimeLong());
 		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-		userAccount.setCurBalance(curBalance);
+		User userUpdated = userMapper.queryUserExceptPass(userId);
+		userAccount.setCurBalance(userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
 		userAccount.setStatus(1);
 		userAccount.setNote(withDrawParam.getThirdPartName() + "提现" + String.format("%.2f", withDrawParam.getThirdPartPaid().doubleValue()) + "元");
 		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
@@ -575,7 +564,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * 
 	 * @param userIdAndRewardList
 	 */
-	@Transactional
 	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> dtos, Integer dealType) {
 		List<UserIdAndRewardDTO> oldUserIdAndRewardDtos = new ArrayList<UserIdAndRewardDTO>(dtos);
 		List<UserIdAndRewardDTO> userIdAndRewardList = new ArrayList<UserIdAndRewardDTO>(dtos);
@@ -605,11 +593,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		Integer accountTime = DateUtil.getCurrentTimeLong();
-		/*List<Integer> userIdList = userIdAndRewardList.stream().map(s -> s.getUserId()).collect(Collectors.toList());
-		List<User> userList = userMapper.queryUserByUserIds(userIdList);*/
 		for (UserIdAndRewardDTO uDTO : userIdAndRewardList) {
 			User updateUserMoney = new User();
-//			BigDecimal userMoney = BigDecimal.ZERO;
 			updateUserMoney.setUserId(uDTO.getUserId());
 			updateUserMoney.setUserMoney(uDTO.getReward());
 			userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUserMoney);
@@ -619,6 +604,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountParam.setOrderSn(uDTO.getOrderSn());
 			userAccountParam.setUserId(uDTO.getUserId());
 			userAccountParam.setAmount(uDTO.getReward());
+			Integer userId = uDTO.getUserId();
+			User user = userMapper.queryUserExceptPass(userId);
+			userAccountParam.setCurBalance(user.getUserMoney().add(user.getUserMoneyLimit()));
 			userAccountParam.setProcessType(ProjectConstant.REWARD);
 			userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
 			userAccountParam.setAddTime(accountTime);
@@ -935,8 +923,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		User user = userService.findById(userId);
 		User updateUser = new User();
 		updateUser.setUserId(userId);
-		updateUser.setUserMoney(user.getUserMoney().add(userWithdrawDTO.getAmount()));
-		userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+		updateUser.setUserMoney(userWithdrawDTO.getAmount());
+		userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
 		log.info("回滚时，更新" + userId + "账户值：" + user.getUserMoney().add(userWithdrawDTO.getAmount()));
 		SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
 		surplusPaymentCallbackDTO.setCurBalance(user.getUserMoney().add(userWithdrawDTO.getAmount()));

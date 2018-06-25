@@ -29,6 +29,14 @@ public interface UserMapper extends Mapper<User> {
 	 * @return
 	 */
 	int updateInDBUserMoneyAndUserMoneyLimit(User user);
+	
+	/**
+	 * 提现，扣除用户可提现余额
+	 * 
+	 * @param user
+	 * @return
+	 */	
+	int reduceUserMoneyInDB(User user);
 
 	/**
 	 * 查询多个用户的当前余额

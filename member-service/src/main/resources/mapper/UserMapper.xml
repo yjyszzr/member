@@ -90,6 +90,11 @@
   	WHERE user_id = #{userId}
   </update>
   
+  <update id="reduceUserMoneyInDB" parameterType="com.dl.member.model.User" >
+  	UPDATE dl_user set user_money = user_money - #{userMoney} 
+  	WHERE user_id = #{userId} and user_money &gt;= #{userMoney}
+  </update>
+  
   
   <select id="queryUserExceptPass" resultMap="BaseResultMap">
   	 	SELECT 
@@ -118,7 +123,7 @@
   		 <trim prefix="set" suffixOverrides=",">
 		  <if test="userMoney!=null">user_money=#{userMoney},</if>
 		 </trim>
-  	WHERE user_id = #{userId}
+  	WHERE user_id = #{userId} 
   </update>
   
   <select id="getClientIds" resultType="string">
