@@ -64,6 +64,7 @@ import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnListParam;
 import com.dl.order.param.OrderSnParam;
+import com.dl.order.param.UpdateOrderStatusByAnotherStatusParam;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDetailDTO;
 import com.dl.shop.payment.dto.UserWithdrawDetailDTO;
@@ -565,6 +566,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			}
 
 			Double limitValueDouble = limitValue.doubleValue();
+			this.updateBigRewardChecking(userIdAndRewardList, limitValueDouble);
 			userIdAndRewardList.removeIf(s -> s.getReward().doubleValue() >= limitValueDouble);
 		}
 		if (userIdAndRewardList.size() == 0) {
@@ -628,6 +630,26 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		return ResultGenerator.genSuccessResult("用户派发奖金完成");
 	}
 
+	/**
+	 * 把大额奖金设置为派奖审核中
+	 */
+	public void updateBigRewardChecking(List<UserIdAndRewardDTO> userIdAndRewardList,Double limitValueDouble) {
+		List<UserIdAndRewardDTO> userIdAndRewardDTOList = userIdAndRewardList.stream().filter(s -> s.getReward().doubleValue() >= limitValueDouble).collect(Collectors.toList());
+		if(userIdAndRewardDTOList.size() == 0) {
+			return;
+		}
+
+		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s -> s.getOrderSn()).collect(Collectors.toList());
+		UpdateOrderStatusByAnotherStatusParam param = new UpdateOrderStatusByAnotherStatusParam();
+		param.setOrderSnlist(orderSnRewaredList);
+		param.setOrderStatusAfter("7");//派奖审核中
+		param.setOrderStatusBefore("6");//派奖中
+		BaseResult<Integer> orderRst = orderService.updateOrderStatusAnother(param);
+		if(orderRst.getCode() != 0) {
+			log.error("大额奖金订单设置为派奖审核中异常");
+		}	
+	}
+	
 	/**
 	 * 针对单场竞猜答题用户中奖后批量更新到不可提现余额
 	 * 
