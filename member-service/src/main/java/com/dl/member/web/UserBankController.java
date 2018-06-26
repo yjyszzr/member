@@ -198,6 +198,7 @@ public class UserBankController {
 			userBankDTO.setCardType(userBank.getType()+"");
 			userBankDTO.setAbbreviation(userBank.getAbbreviation());
 			userBankDTO.setPurpose(userBank.getPurpose());
+			userBankDTO.setType(userBank.getType());
 			return ResultGenerator.genSuccessResult("succ",userBankDTO);
 		}
 		return ResultGenerator.genFailResult("empty");
