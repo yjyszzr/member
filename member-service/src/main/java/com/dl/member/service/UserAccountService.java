@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,9 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
@@ -58,9 +53,7 @@ import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.MemRollParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
-import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
-import com.dl.member.param.TimeTypeParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.WithDrawParam;
@@ -80,6 +73,10 @@ import com.dl.shop.payment.param.WithDrawSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Joiner;
+
+import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 @Slf4j
@@ -480,9 +477,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		if (userAccountList.size() == 0) {
+			uDTO.setPageInfo(new PageInfo<UserAccountDTO>(userAccountListDTO));
+			uDTO.setUserAccountByTimeDTO(userAccountByTimeDTO);
 			return ResultGenerator.genSuccessResult("success", uDTO);
 		}
-
+		
 		PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
 		for (UserAccount ua : userAccountList) {
 			UserAccountDTO userAccountDTO = new UserAccountDTO();
