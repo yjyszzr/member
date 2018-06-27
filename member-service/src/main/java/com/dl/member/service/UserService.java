@@ -175,6 +175,7 @@ public class UserService extends AbstractService<User> {
 		userDTO.setUserMoney(userMoneyStr);
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
 		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
+		userDTO.setRealInfo("");
 		String realName = "";
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		if (userRealDTO != null) {
