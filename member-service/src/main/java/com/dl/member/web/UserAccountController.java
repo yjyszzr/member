@@ -113,7 +113,7 @@ public class UserAccountController {
 	@ApiOperation(value = "查询用户账户明细列表", notes = "查询用户账户明细列表", hidden = false)
 	@RequestMapping(path = "/getUserAccountList", method = RequestMethod.POST)
 	public BaseResult<PageInfo<UserAccountDTO>> getUserAccountList(@RequestBody AmountTypeParam amountTypeParam) {
-		PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(Integer.valueOf(amountTypeParam.getAmountType()), amountTypeParam.getPageNum(), amountTypeParam.getPageSize());
+		PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(amountTypeParam);
 		return ResultGenerator.genSuccessResult("查询用户账户明细列表", rst);
 	}
 
@@ -157,8 +157,8 @@ public class UserAccountController {
 
 	@ApiOperation(value = "统计当月的各个用途的资金和", notes = "统计当月的各个用途的资金和", hidden = false)
 	@RequestMapping(path = "/countMoneyCurrentMonth", method = RequestMethod.POST)
-	public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody StrParam strParam) {
-		return userAccountService.countMoneyCurrentMonth();
+	public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody AmountTypeParam amountTypeParam) {
+		return userAccountService.countMoneyCurrentMonth(amountTypeParam);
 	}
 
 	/**
