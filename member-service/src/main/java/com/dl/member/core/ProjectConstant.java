@@ -125,5 +125,13 @@ public class ProjectConstant {
 	public static final String FORMAT_WINNING_MSG = "恭喜【{0}】投注竞足中奖";
 	
 	public static final Integer RECHARGE_ACT = 1;
+	
+	//账户明细的时间段
+	public static final String ALL_TIME = "0";
+	public static final String TODAY = "1";
+	public static final String BEFORE_6_DAY = "2";
+	public static final String BEFORE_29_DAY = "3";
+	public static final String BEFORE_89_DAY = "4";
+	
 
 }
