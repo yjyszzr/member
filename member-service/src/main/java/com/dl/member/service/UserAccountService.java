@@ -46,6 +46,7 @@ import com.dl.member.model.DlMessage;
 import com.dl.member.model.LotteryWinningLogTemp;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
+import com.dl.member.param.MemRollParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.SurplusPayParam;
@@ -59,7 +60,9 @@ import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnListParam;
 import com.dl.order.param.OrderSnParam;
 import com.dl.shop.payment.api.IpaymentService;
+import com.dl.shop.payment.dto.PayLogDetailDTO;
 import com.dl.shop.payment.dto.UserWithdrawDetailDTO;
+import com.dl.shop.payment.param.PayLogOrderSnParam;
 import com.dl.shop.payment.param.WithDrawSnAndUserIdParam;
 import com.dl.shop.payment.param.WithDrawSnParam;
 import com.github.pagehelper.PageHelper;
@@ -854,6 +857,93 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		return ResultGenerator.genSuccessResult("success", surplusPaymentCallbackDTO);
 	}
 
+	
+	/***
+	 * 出票失败，资金回滚到不可提现金额中
+	 * @param memRollParam
+	 * @return
+	 */
+	public BaseResult<Object> rollbackUserMoneyOrderFailure(MemRollParam memRollParam) {
+		String orderSn = memRollParam.getOrderSn();
+		Integer userId = memRollParam.getUserId();
+		BigDecimal amt = memRollParam.getAmt();
+		log.info("[rollbackUserMoneyOrderFailure]" + " orderSn:" + orderSn + " userId:" + userId + " amt:" + amt);
+		// 查看该order是否存在
+		OrderSnParam orderSnParam = new OrderSnParam();
+		orderSnParam.setOrderSn(orderSn);
+		BaseResult<OrderDTO> orderDTORst = orderService.getOrderInfoByOrderSn(orderSnParam);
+		if (orderDTORst.getCode() != 0 || orderDTORst.getData() == null || StringUtils.isEmpty(orderDTORst.getData().getOrderSn())) {
+			log.info("[rollbackUserMoneyOrderFailure]" + "该订单不存在 orderSn:" + orderSn);
+			return ResultGenerator.genFailResult("该订单不存在");
+		}
+		// 账户流水查看
+		UserAccount userAccountRoll = new UserAccount();
+		userAccountRoll.setUserId(userId);
+		userAccountRoll.setThirdPartPaid(amt);
+		userAccountRoll.setOrderSn(orderSn);
+		userAccountRoll.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
+		List<UserAccount> userAccountListRoll = userAccountMapper.queryUserAccountBySelective(userAccountRoll);
+		if (!CollectionUtils.isEmpty(userAccountListRoll)) {
+			log.info("[rollbackUserMoneyOrderFailure]" + " 订单已经回滚，无法再次回滚");
+			return ResultGenerator.genFailResult("订单号为" + orderSn + "已经回滚，无法再次回滚");
+		}
+		User user = userService.findById(userId);
+		if (user == null) {
+			log.info("[rollbackUserMoneyOrderFailure]" + " 未查询到该用户 userId:" + userId);
+			return ResultGenerator.genFailResult("[rollbackUserMoneyOrderFailure]" + " 未查询到该用户 userId:" + userId);
+		}
+		user = new User();
+		// user.setUserMoney(amt);
+		// 调整为不可提现余额
+		user.setUserMoneyLimit(amt);
+		user.setUserId(userId);
+		int cnt = userMapper.updateInDBUserMoneyAndUserMoneyLimit(user);
+		log.info("[rollbackUserMoneyOrderFailure]" + " userId:" + userId + " amt:" + amt + " result cnt:" + cnt);
+
+		// ===========记录退款流水====================
+		UserAccount userAccountParamByType = new UserAccount();
+		Integer accountType = ProjectConstant.ACCOUNT_ROLLBACK;
+		log.info("===========更新用户流水表=======:" + accountType);
+		userAccountParamByType.setProcessType(accountType);
+		userAccountParamByType.setAmount(amt);
+		userAccountParamByType.setBonusPrice(BigDecimal.ZERO);// 暂无红包金额
+		userAccountParamByType.setOrderSn(orderSn);
+		userAccountParamByType.setThirdPartPaid(BigDecimal.ZERO);
+		userAccountParamByType.setUserId(userId);
+		userAccountParamByType.setAddTime(DateUtil.getCurrentTimeLong());
+		userAccountParamByType.setLastTime(DateUtil.getCurrentTimeLong());
+		userAccountParamByType.setParentSn("");
+		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+		userAccountParamByType.setAccountSn(accountSn);
+		PayLogDetailDTO payLog = null;
+		PayLogOrderSnParam paySnParam = new PayLogOrderSnParam();
+		paySnParam.setOrderSn(orderSn);
+		BaseResult<PayLogDetailDTO> bR = payMentService.queryPayLogByOrderSn(paySnParam);
+		if (bR.getCode() == 0 && bR.getData() != null) {
+			payLog = bR.getData();
+		}
+		if (payLog != null) {
+			log.info("[rollbackUserMoneyOrderFailure]" + " 已查询到paylog信息...");
+			String payName = "";
+			String payCode = payLog.getPayCode();
+			userAccountParamByType.setPayId(payLog.getLogId() + "");
+			if (payCode.equals("app_weixin") || payCode.equals("app_weixin_h5")) {
+				payName = "微信";
+			} else {
+				payName = "银行卡";
+			}
+			userAccountParamByType.setPaymentName(payName);
+			userAccountParamByType.setThirdPartName(payName);
+		} else {
+			userAccountParamByType.setPayId("0");
+			userAccountParamByType.setPaymentName("");
+			userAccountParamByType.setThirdPartName("");
+		}
+		int count = insertUserAccount(userAccountParamByType);
+		log.info("退款成功记录流水成功 cnt:" + count);
+		return ResultGenerator.genSuccessResult();
+	}
+	
 	/**
 	 * 查询用户余额明细列表
 	 *

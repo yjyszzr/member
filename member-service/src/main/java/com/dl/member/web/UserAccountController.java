@@ -19,6 +19,7 @@ import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserIdAndRewardDTO;
 import com.dl.member.param.AmountTypeParam;
+import com.dl.member.param.MemRollParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.StrParam;
@@ -218,6 +219,17 @@ public class UserAccountController {
 	@RequestMapping(path="/rollbackUserMoneyWithDrawFailure", method=RequestMethod.POST)
     public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyWithDrawFailure(@Valid @RequestBody MemWithDrawSnParam memWithDrawSnParam){
     	return userAccountService.rollbackUserMoneyWithDrawFailure(memWithDrawSnParam);
+    }
+    
+    /***
+     * 出票失败，回滚到可体现金额中
+     * @param memWithDrawSnParam
+     * @return
+     */
+    @ApiOperation(value = "提现失败回滚账户可提现余额", notes = "提现失败回滚账户可提现余额", hidden = false)
+    @RequestMapping(path = "/rollbackUserMoney", method = RequestMethod.POST)
+    public BaseResult<Object> rollbackUserMoneyOrderFailure(@Valid @RequestBody MemRollParam memRollParam) {
+    	return userAccountService.rollbackUserMoneyOrderFailure(memRollParam);
     }
     
 }

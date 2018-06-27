@@ -16,6 +16,6 @@ public class MemRollParam {
 	@ApiModelProperty("用户id")
 	private Integer userId;
 
-	@ApiModelProperty("amt null全部提现，不为空只是回滚一个订单部分金额")
+	@ApiModelProperty("amt不能为空，回退金额")
 	private BigDecimal amt;
 }
