@@ -28,6 +28,7 @@ import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.SysConfigParam;
+import com.dl.member.param.TimeTypeParam;
 import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserBonusParam;
@@ -157,8 +158,14 @@ public class UserAccountController {
 
 	@ApiOperation(value = "统计当月的各个用途的资金和", notes = "统计当月的各个用途的资金和", hidden = false)
 	@RequestMapping(path = "/countMoneyCurrentMonth", method = RequestMethod.POST)
-	public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody AmountTypeParam amountTypeParam) {
-		return userAccountService.countMoneyCurrentMonth(amountTypeParam);
+	public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody StrParam param) {
+		return userAccountService.countMoneyCurrentMonth();
+	}
+	
+	@ApiOperation(value = "按照时间统计各个用途的资金和", notes = "按照时间统计各个用途的资金和", hidden = false)
+	@RequestMapping(path = "/countMoneyCurrentByTime", method = RequestMethod.POST)
+	public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody TimeTypeParam typeTimeParam) {
+		return userAccountService.countMoneyByTime(typeTimeParam);
 	}
 
 	/**

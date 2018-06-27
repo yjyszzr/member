@@ -45,7 +45,6 @@
 		    <if test="orderSn != null">
 		        AND order_sn = #{orderSn}
 		    </if>
-		    
 	    </where>
   		ORDER BY add_time DESC
   </select>
