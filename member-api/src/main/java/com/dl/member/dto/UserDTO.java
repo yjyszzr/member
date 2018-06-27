@@ -34,6 +34,8 @@ public class UserDTO {
     
     private String realName;
 
+    private String realInfo;
+    
     /**
      * 登录密码
      */
@@ -203,6 +205,14 @@ public class UserDTO {
     
 
     private List<com.dl.member.dto.ActivityDTO> activityDTOList;
+ 
+    public String getRealInfo() {
+        return realInfo;
+    }
+
+    public void setRealInfo(String realInfo) {
+        this.realInfo = realInfo;
+    }  
     
     /**
      * 获取活动集合

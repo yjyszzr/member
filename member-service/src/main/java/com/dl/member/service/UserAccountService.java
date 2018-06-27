@@ -433,15 +433,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * @return
 	 */
 	public BaseResult<UserAccountListAndCountDTO> getUserAccountListAndCountTotal(AmountTypeParam amountTypeParam){
-		UserAccountListAndCountDTO uDTO = new UserAccountListAndCountDTO();
-		UserAccountByTimeDTO userAccountByTimeDTO = new UserAccountByTimeDTO();
-		
 		Integer processType = Integer.valueOf(amountTypeParam.getAmountType());
 		Integer pageNum = Integer.valueOf(amountTypeParam.getPageNum());
 		Integer pageSize = Integer.valueOf(amountTypeParam.getPageSize());
 		String timeType = amountTypeParam.getTimeType();
-		List<UserAccountDTO> userAccountListDTO = new ArrayList<>();
 		Integer userId = SessionUtil.getUserId();
+		
+		UserAccountListAndCountDTO uDTO = new UserAccountListAndCountDTO();
+		UserAccountByTimeDTO userAccountByTimeDTO = new UserAccountByTimeDTO();
+		List<UserAccountDTO> userAccountListDTO = new ArrayList<>();
 		Integer startTime = 0;
 		Integer endTime = 0;
 		List<UserAccount> userAccountList = null;
@@ -495,7 +495,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
 			userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
 			userAccountDTO.setProcessTypeName(AccountEnum.getName(ua.getProcessType()));
-			userAccountDTO.setNote("");// 这个字段可以用数据库中的其他字段来拼，目前采用直接取的方式
+			userAccountDTO.setNote("");
 			String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1 ? "+" + ua.getAmount() + "元": String.valueOf(ua.getAmount() + "元");
 			userAccountDTO.setChangeAmount(changeAmount);
 			userAccountListDTO.add(userAccountDTO);

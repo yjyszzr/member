@@ -155,17 +155,20 @@ public class UserService extends AbstractService<User> {
 		if(user == null) {
 			return ResultGenerator.genFailResult("用户不存在");
 		}
+		
 		UserDTO userDTO = new UserDTO();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			log.error(e1.getMessage());
 		}
+		
 		if(StringUtils.isBlank(user.getPassword())) {
 			userDTO.setHasPass(0);
 		}else {
 			userDTO.setHasPass(1);
 		}
+		
 		BigDecimal userMoney = user.getUserMoney();
 		String userMoneyStr = userMoney==null?"0":userMoney.toString();
 		userDTO.setUserMoney(userMoneyStr);
@@ -175,7 +178,9 @@ public class UserService extends AbstractService<User> {
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		if (userRealDTO != null) {
 			realName = userRealDTO.getRealName();
+			userDTO.setRealInfo(realName.substring(0, 1)+"**"+"("+userRealDTO.getIdCode().substring(0, 6)+"****"+userRealDTO.getIdCode().substring(userRealDTO.getIdCode().length()-4)+")");
 		}
+		
 		String mobile = user.getMobile();
 		String strStar4 = RandomUtil.generateStarString(4);
 		String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);

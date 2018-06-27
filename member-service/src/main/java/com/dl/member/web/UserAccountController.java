@@ -108,7 +108,7 @@ public class UserAccountController {
 	}
 
 	/**
-	 * 查询用户账户明细列表
+	 * 查询用户账户明细列表和统计数据
 	 * 
 	 * @param UserBonusParam
 	 * @return
@@ -118,7 +118,6 @@ public class UserAccountController {
 	public BaseResult<UserAccountListAndCountDTO> getUserAccountListAndCountTotal(@RequestBody AmountTypeParam amountTypeParam) {
 		return userAccountService.getUserAccountListAndCountTotal(amountTypeParam);
 	}
-	
 	
 	/** 
 	 * 查询用户账户明细列表
