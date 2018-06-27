@@ -910,10 +910,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		Integer accountType = ProjectConstant.ACCOUNT_ROLLBACK;
 		log.info("===========更新用户流水表=======:" + accountType);
 		userAccountParamByType.setProcessType(accountType);
-		userAccountParamByType.setAmount(BigDecimal.ZERO.subtract(amt));
+		userAccountParamByType.setAmount(amt);
 		userAccountParamByType.setBonusPrice(BigDecimal.ZERO);// 暂无红包金额
 		userAccountParamByType.setOrderSn(orderSn);
-		userAccountParamByType.setThirdPartPaid(amt);
+		userAccountParamByType.setThirdPartPaid(BigDecimal.ZERO);
 		userAccountParamByType.setUserId(userId);
 		userAccountParamByType.setAddTime(DateUtil.getCurrentTimeLong());
 		userAccountParamByType.setLastTime(DateUtil.getCurrentTimeLong());
