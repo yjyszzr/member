@@ -51,7 +51,10 @@
   
     <select id="queryUserAccountByTime"  resultMap="BaseResultMap">
   		SELECT *  FROM dl_user_account where 
-  		user_id = #{userId}  AND process_type = #{processType} AND
+  		<if test="processType != null">
+		    process_type = #{processType} AND
+		</if>
+  		user_id = #{userId} AND
   		add_time BETWEEN  #{startTime} AND #{endTime}
   		ORDER BY add_time DESC
   </select>

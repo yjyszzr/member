@@ -18,8 +18,10 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.SysConfigDTO;
+import com.dl.member.dto.UserAccountByTimeDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
+import com.dl.member.dto.UserAccountListAndCountDTO;
 import com.dl.member.dto.UserIdAndRewardDTO;
 import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.MemRollParam;
@@ -111,11 +113,23 @@ public class UserAccountController {
 	 * @param UserBonusParam
 	 * @return
 	 */
-	@ApiOperation(value = "查询用户账户明细列表", notes = "查询用户账户明细列表", hidden = false)
-	@RequestMapping(path = "/getUserAccountList", method = RequestMethod.POST)
+	@ApiOperation(value = "查询用户账户明细列表和统计数据", notes = "查询用户账户明细列表和统计数据", hidden = false)
+	@RequestMapping(path = "/getUserAccountListAndCountTotal", method = RequestMethod.POST)
+	public BaseResult<UserAccountListAndCountDTO> getUserAccountListAndCountTotal(@RequestBody AmountTypeParam amountTypeParam) {
+		return userAccountService.getUserAccountListAndCountTotal(amountTypeParam);
+	}
+	
+	
+	/** 
+	 * 查询用户账户明细列表
+	 * @param UserBonusParam
+	 * @return
+	 */
+    @ApiOperation(value="查询用户账户明细列表", notes="查询用户账户明细列表",hidden=false)
+	@RequestMapping(path="/getUserAccountList", method=RequestMethod.POST)
 	public BaseResult<PageInfo<UserAccountDTO>> getUserAccountList(@RequestBody AmountTypeParam amountTypeParam) {
-		PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(amountTypeParam);
-		return ResultGenerator.genSuccessResult("查询用户账户明细列表", rst);
+    	PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(Integer.valueOf(amountTypeParam.getAmountType()),amountTypeParam.getPageNum(), amountTypeParam.getPageSize()); 
+    	return ResultGenerator.genSuccessResult("查询用户账户明细列表",rst);
 	}
 
 	// @ApiOperation(value="用户生成充值单", notes="用户生成充值单",hidden=false)
@@ -156,17 +170,11 @@ public class UserAccountController {
 		return userAccountService.updateUserAccount(updateUserAccountParam.getPayId(), updateUserAccountParam.getStatus(), updateUserAccountParam.getAccountSn());
 	}
 
-	@ApiOperation(value = "统计当月的各个用途的资金和", notes = "统计当月的各个用途的资金和", hidden = false)
-	@RequestMapping(path = "/countMoneyCurrentMonth", method = RequestMethod.POST)
-	public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody StrParam param) {
-		return userAccountService.countMoneyCurrentMonth();
-	}
-	
-	@ApiOperation(value = "按照时间统计各个用途的资金和", notes = "按照时间统计各个用途的资金和", hidden = false)
-	@RequestMapping(path = "/countMoneyCurrentByTime", method = RequestMethod.POST)
-	public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody TimeTypeParam typeTimeParam) {
-		return userAccountService.countMoneyByTime(typeTimeParam);
-	}
+    @ApiOperation(value="统计当月的各个用途的资金和", notes="统计当月的各个用途的资金和",hidden=false)
+	@RequestMapping(path="/countMoneyCurrentMonth", method=RequestMethod.POST)
+    public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(@RequestBody StrParam strParam){
+    	return userAccountService.countMoneyCurrentMonth();
+    }
 
 	/**
 	 * 批量更新用户账户,给派奖使用
