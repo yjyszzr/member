@@ -26,4 +26,7 @@ public interface UserAccountMapper extends Mapper<UserAccount> {
 
 	List<UserAccount> findByUserIdsAndType(@Param("list") List<String> userIds, @Param("data") String data, @Param("type") int type);
 
+	List<UserAccount> queryUserAccountByTime(@Param("userId") Integer userId,@Param("processType") Integer processType,@Param("startTime") Integer startTime,@Param("endTime") Integer endTime);
+
+	List<UserAccount> countUserAccountByTime(@Param("startTime") Integer startTime,@Param("endTime") Integer endTime);
 }

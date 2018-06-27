@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ import com.dl.member.model.DlMessage;
 import com.dl.member.model.LotteryWinningLogTemp;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
+import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.MemRollParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
@@ -286,11 +288,36 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * 
 	 * @return
 	 */
-	public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth() {
+	public BaseResult<UserAccountCurMonthDTO> countMoneyCurrentMonth(AmountTypeParam amountTypeParam) {
+		String timeType = amountTypeParam.getTimeType();
 		Integer userId = SessionUtil.getUserId();
 		UserAccountCurMonthDTO userAccountCurMonthDTO = new UserAccountCurMonthDTO();
 
-		List<UserAccount> userAccountList = userAccountMapper.queryUserAccountCurMonth(userId);
+		Integer startTime = 0;
+		Integer endTime = 0;
+		Date todayDate = new Date();
+		List<UserAccount> userAccountList = null;
+		if(StringUtils.isEmpty(timeType) || timeType.equals("0")) {
+			userAccountList = userAccountMapper.queryUserAccountCurMonth(userId);
+		}else if(timeType.equals("1")) {
+			startTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
+			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
+		}else if(timeType.equals("2")) {
+			startTime = DateUtil.getTimeAfterDays(todayDate, -6, 0, 0, 0);
+			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
+		}else if(timeType.equals("3")) {
+			startTime = DateUtil.getTimeAfterDays(todayDate, -29, 0, 0, 0);
+			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
+		}else if(timeType.equals("4")) {
+			startTime = DateUtil.getTimeAfterDays(todayDate, -89, 0,0,0);
+			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
+		}
+		
+		userAccountList = userAccountMapper.countUserAccountByTime(startTime, endTime);
+		if(userAccountList.size() == 0) {
+			return ResultGenerator.genSuccessResult("统计当月的各个用途的资金和成功", userAccountCurMonthDTO);
+		}
+		
 		List<UserAccount> buyList = new ArrayList<>();
 		List<UserAccount> rechargeList = new ArrayList<>();
 		List<UserAccount> withdrawList = new ArrayList<>();
@@ -1035,7 +1062,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 *
 	 * @return
 	 */
-	public PageInfo<UserAccountDTO> getUserAccountList(Integer processType, Integer pageNum, Integer pageSize) {
+	public PageInfo<UserAccountDTO> getUserAccountList(AmountTypeParam amountTypeParam) {
+		Integer processType = Integer.valueOf(amountTypeParam.getAmountType());
+		Integer pageNum = Integer.valueOf(amountTypeParam.getPageNum());
+		Integer pageSize = Integer.valueOf(amountTypeParam.getPageSize());
+		String timeType = amountTypeParam.getTimeType();
 		List<UserAccountDTO> userAccountListDTO = new ArrayList<>();
 		Integer userId = SessionUtil.getUserId();
 
@@ -1045,7 +1076,31 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccount.setProcessType(processType);
 		}
 		PageHelper.startPage(pageNum, pageSize);
-		List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
+		List<UserAccount> userAccountList = null;
+		if(StringUtils.isEmpty(timeType) ) {
+			userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
+		}else {
+			Integer startTime = 0;
+			Integer endTime = 0;
+			Date todayDate = new Date();
+			if(timeType.equals("0")) {
+				userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
+			}else if(timeType.equals("1")) {
+				startTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
+				endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
+			}else if(timeType.equals("2")) {
+				startTime = DateUtil.getTimeAfterDays(todayDate, -6, 0, 0, 0);
+				endTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
+			}else if(timeType.equals("3")) {
+				startTime = DateUtil.getTimeAfterDays(todayDate, -29, 0, 0, 0);
+				endTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
+			}else if(timeType.equals("4")) {
+				startTime = DateUtil.getTimeAfterDays(todayDate, -89, 0,0,0);
+				endTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
+			}
+			userAccountList = userAccountMapper.queryUserAccountByTime(userId, processType, startTime, endTime);
+		}
+		
 		if (userAccountList.size() == 0) {
 			return new PageInfo<UserAccountDTO>(userAccountListDTO);
 		}
@@ -1083,6 +1138,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		return result;
 	}
 
+	
 	/**
 	 * 保存账户流水
 	 * 
