@@ -89,6 +89,15 @@
 		 </trim>
   	WHERE user_id = #{userId}
   </update>
+    <update id="updateUserInfo" parameterType="com.dl.member.model.User" >
+  	UPDATE 
+  		dl_user  
+	SET
+  		 headimg = #{headImg},
+  		 nickname = #{nickName}
+  	WHERE 
+  		user_id = #{userId}
+  </update>
   
   <update id="reduceUserMoneyInDB" parameterType="com.dl.member.model.User" >
   	UPDATE dl_user set user_money = user_money - #{userMoney} 

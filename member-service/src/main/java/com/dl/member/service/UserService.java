@@ -6,11 +6,15 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import tk.mybatis.mapper.entity.Condition;
 
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
@@ -43,9 +47,6 @@ import com.dl.member.param.UserIdRealParam;
 import com.dl.member.param.UserParam;
 import com.dl.member.util.Encryption;
 
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-
 @Service
 @Transactional
 @Slf4j
@@ -71,7 +72,7 @@ public class UserService extends AbstractService<User> {
 
 	@Resource
 	private DlChannelConsumerService channelConsumerService;
-	
+
 	@Resource
 	private DlChannelDistributorMapper dlChannelDistributorMapper;
 
@@ -100,7 +101,7 @@ public class UserService extends AbstractService<User> {
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		if (userRealDTO != null) {
 			realName = userRealDTO.getRealName();
-			userDTO.setRealInfo(realName.substring(0, 1)+"**"+"("+userRealDTO.getIdCode().substring(0, 6)+"****"+userRealDTO.getIdCode().substring(userRealDTO.getIdCode().lastIndexOf(4))+")");
+			userDTO.setRealInfo(realName.substring(0, 1) + "**" + "(" + userRealDTO.getIdCode().substring(0, 6) + "****" + userRealDTO.getIdCode().substring(userRealDTO.getIdCode().lastIndexOf(4)) + ")");
 		}
 		String mobile = user.getMobile();
 		userDTO.setMobile(mobile);
@@ -119,8 +120,8 @@ public class UserService extends AbstractService<User> {
 		} else {
 			activityDTOList = activityDTORst.getData();
 		}
-		
-		//店员才推广展示
+
+		// 店员才推广展示
 		Condition condition = new Condition(DlChannelConsumer.class);
 		condition.createCriteria().andCondition("user_id = ", userId);
 		List<DlChannelDistributor> channelDistributor = dlChannelDistributorMapper.selectByCondition(condition);
@@ -153,25 +154,25 @@ public class UserService extends AbstractService<User> {
 		}
 
 		User user = userMapper.queryUserExceptPass(userId);
-		if(user == null) {
+		if (user == null) {
 			return ResultGenerator.genFailResult("用户不存在");
 		}
-		
+
 		UserDTO userDTO = new UserDTO();
 		try {
 			BeanUtils.copyProperties(userDTO, user);
 		} catch (Exception e1) {
 			log.error(e1.getMessage());
 		}
-		
-		if(StringUtils.isBlank(user.getPassword())) {
+
+		if (StringUtils.isBlank(user.getPassword())) {
 			userDTO.setHasPass(0);
-		}else {
+		} else {
 			userDTO.setHasPass(1);
 		}
-		
+
 		BigDecimal userMoney = user.getUserMoney();
-		String userMoneyStr = userMoney==null?"0":userMoney.toString();
+		String userMoneyStr = userMoney == null ? "0" : userMoney.toString();
 		userDTO.setUserMoney(userMoneyStr);
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
 		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
@@ -180,9 +181,9 @@ public class UserService extends AbstractService<User> {
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		if (userRealDTO != null) {
 			realName = userRealDTO.getRealName();
-			userDTO.setRealInfo(realName.substring(0, 1)+"**"+"("+userRealDTO.getIdCode().substring(0, 6)+"****"+userRealDTO.getIdCode().substring(userRealDTO.getIdCode().length()-4)+")");
+			userDTO.setRealInfo(realName.substring(0, 1) + "**" + "(" + userRealDTO.getIdCode().substring(0, 6) + "****" + userRealDTO.getIdCode().substring(userRealDTO.getIdCode().length() - 4) + ")");
 		}
-		
+
 		String mobile = user.getMobile();
 		String strStar4 = RandomUtil.generateStarString(4);
 		String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
@@ -190,7 +191,7 @@ public class UserService extends AbstractService<User> {
 		userDTO.setRealName(realName);
 		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 
-		//只有店员才展示推广链接
+		// 只有店员才展示推广链接
 		List<com.dl.member.dto.ActivityDTO> activityMemDTOList = new ArrayList<com.dl.member.dto.ActivityDTO>();
 		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
 		Condition condition = new Condition(DlChannelConsumer.class);
@@ -208,7 +209,7 @@ public class UserService extends AbstractService<User> {
 				activityDTOList = activityDTORst.getData();
 			}
 
-			if(null != activityDTOList && activityDTOList.size() > 0) {
+			if (null != activityDTOList && activityDTOList.size() > 0) {
 				activityDTOList.forEach(s -> {
 					try {
 						BeanUtils.copyProperties(memActivityDTO, s);
@@ -218,12 +219,12 @@ public class UserService extends AbstractService<User> {
 					activityMemDTOList.add(memActivityDTO);
 				});
 			}
-		}		
-		
+		}
+
 		// 查询推广活动集合
 		userDTO.setActivityDTOList(activityMemDTOList);
-		
-		//查询是否
+
+		// 查询是否
 
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
@@ -258,9 +259,9 @@ public class UserService extends AbstractService<User> {
 		user.setSalt(loginsalt);
 		String paysalt = Encryption.salt();
 		user.setPayPwdSalt(paysalt);
-		if(!StringUtils.isEmpty(userParam.getPassWord())) {
+		if (!StringUtils.isEmpty(userParam.getPassWord())) {
 			user.setPassword(Encryption.encryption(userParam.getPassWord(), loginsalt));
-		}else {
+		} else {
 			user.setPassword("");
 		}
 		user.setRankPoint(0);
@@ -268,7 +269,7 @@ public class UserService extends AbstractService<User> {
 		user.setIsReal(ProjectConstant.USER_IS_NOT_REAL);
 		user.setPushKey(userParam.getPushKey());
 		UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-		if(userDevice != null) {
+		if (userDevice != null) {
 			String channel = userDevice.getChannel();
 			user.setDeviceChannel(channel);
 		}
@@ -328,15 +329,17 @@ public class UserService extends AbstractService<User> {
 		stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.RESETPASS_TPLID + "_" + mobileNumber, "");
 		return ResultGenerator.genSuccessResult("更新用户登录密码成功");
 	}
+
 	/**
 	 * 设置密码
+	 * 
 	 * @param userLoginPass
 	 * @param mobileNumber
 	 * @param smsCode
 	 * @return
 	 */
 	public BaseResult<String> setUserLoginPass(SetLoginPassParam param, Integer userId) {
-		if(param.getType() ==1 && StringUtils.isBlank(param.getOldLoginPass()) ) {
+		if (param.getType() == 1 && StringUtils.isBlank(param.getOldLoginPass())) {
 			return ResultGenerator.genResult(MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getMsg());
 		}
 		String userLoginPass = param.getUserLoginPass();
@@ -347,9 +350,9 @@ public class UserService extends AbstractService<User> {
 		if (null == user) {
 			return ResultGenerator.genResult(MemberEnums.USER_NOT_FOUND_ERROR.getcode(), MemberEnums.USER_NOT_FOUND_ERROR.getMsg());
 		}
-		if(param.getType() ==1) {
+		if (param.getType() == 1) {
 			String oldPass = Encryption.encryption(param.getOldLoginPass(), user.getSalt());
-			if(!oldPass.equals(user.getPassword())) {
+			if (!oldPass.equals(user.getPassword())) {
 				return ResultGenerator.genResult(MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getMsg());
 			}
 		}
@@ -357,12 +360,13 @@ public class UserService extends AbstractService<User> {
 		updateUser.setUserId(user.getUserId());
 		updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
 		this.update(updateUser);
-		
+
 		return ResultGenerator.genSuccessResult("用户登录密码设置成功");
 	}
 
 	/***
 	 * 获取真实的UserDTO
+	 * 
 	 * @param params
 	 * @return
 	 */
@@ -383,7 +387,7 @@ public class UserService extends AbstractService<User> {
 		}
 		return userDTO;
 	}
-	
+
 	public UserDTO queryUserInfo(UserIdParam params) {
 		Integer userId = params.getUserId();
 		User user = this.findById(userId);
@@ -488,8 +492,12 @@ public class UserService extends AbstractService<User> {
 		}
 		return rst;
 	}
-	
-	public List<String> getClientIds(List<Integer> userIds){
+
+	public List<String> getClientIds(List<Integer> userIds) {
 		return userMapper.getClientIds(userIds);
+	}
+
+	public Integer updateUserInfo(User user) {
+		return userMapper.updateUserInfo(user);
 	}
 }
