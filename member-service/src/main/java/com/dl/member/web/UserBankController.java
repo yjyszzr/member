@@ -1,4 +1,5 @@
 package com.dl.member.web;
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -16,7 +17,11 @@ import com.dl.member.param.UserBankPurposeQueryParam;
 import com.dl.member.param.UserBankQueryParam;
 import com.dl.member.service.UserBankService;
 import com.gexin.fastjson.JSON;
+
+import ch.qos.logback.classic.Logger;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +35,7 @@ import java.util.List;
 */
 @RestController
 @RequestMapping("/user/bank")
+@Slf4j
 public class UserBankController {
     @Resource
     private UserBankService userBankService;
@@ -123,6 +129,14 @@ public class UserBankController {
     	if(jsonObj.containsKey("result")) {
     		JSONObject jsonData = jsonObj.getJSONObject("result");
     		BankDTO bankDTO = JSON.parseObject(jsonData.toString(),BankDTO.class);
+    		String bankName = bankDTO.getAbbreviation();
+    		String abbrNew = userBankService.getAbbrByMap(bankName);
+    		if(!StringUtils.isEmpty(abbrNew)) {
+    			bankDTO.setAbbreviation(abbrNew);
+    		}
+    		log.info("==========================");
+    		log.info("[queryUserBankType]" +" bankName:" + bankName +" abbrNew:" + abbrNew);
+    		log.info("==========================");
         	return ResultGenerator.genSuccessResult("查询成功",bankDTO);
     	}
     	return ResultGenerator.genFailResult("查询失败,result为空");

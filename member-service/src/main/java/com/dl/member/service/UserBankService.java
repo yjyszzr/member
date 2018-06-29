@@ -568,7 +568,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		return ResultGenerator.genSuccessResult("更改银行卡状态成功");
 	}
 	
-	private String getAbbrByMap(String bankName) {
+	public String getAbbrByMap(String bankName) {
 		if(mMap == null || mMap.size() <= 0) {
 			List<UserBankCode> mList = userBankCodeMapper.listAll();
 			if(mList != null && mList.size() > 0) {
