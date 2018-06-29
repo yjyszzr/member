@@ -129,7 +129,7 @@ public class UserBankController {
     	if(jsonObj.containsKey("result")) {
     		JSONObject jsonData = jsonObj.getJSONObject("result");
     		BankDTO bankDTO = JSON.parseObject(jsonData.toString(),BankDTO.class);
-    		String bankName = bankDTO.getAbbreviation();
+    		String bankName = bankDTO.getBankname();
     		String abbrNew = userBankService.getAbbrByMap(bankName);
     		if(!StringUtils.isEmpty(abbrNew)) {
     			bankDTO.setAbbreviation(abbrNew);
