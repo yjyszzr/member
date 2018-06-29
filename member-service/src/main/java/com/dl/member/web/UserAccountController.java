@@ -262,12 +262,12 @@ public class UserAccountController {
 	}
 
 	/***
-	 * 出票失败，回滚到可体现金额中
+	 * 出票失败，回滚到可提现金额中
 	 * 
 	 * @param memWithDrawSnParam
 	 * @return
 	 */
-	@ApiOperation(value = "提现失败回滚账户可提现余额", notes = "提现失败回滚账户可提现余额", hidden = false)
+	@ApiOperation(value = "出票失败，回滚到可提现金额中", notes = "出票失败，回滚到可提现金额中", hidden = false)
 	@RequestMapping(path = "/rollbackUserMoney", method = RequestMethod.POST)
 	public BaseResult<Object> rollbackUserMoneyOrderFailure(@Valid @RequestBody MemRollParam memRollParam) {
 		return userAccountService.rollbackUserMoneyOrderFailure(memRollParam);
