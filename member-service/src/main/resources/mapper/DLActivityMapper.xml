@@ -20,12 +20,12 @@
   </resultMap>
   
   <select id="queryActivityByType" parameterType="java.lang.Integer"  resultMap="BaseResultMap">
-  	select * from dl_activity where act_type = #{actType}
+  	SELECT * FROM dl_activity WHERE act_type = #{actType}
   </select>
   
   <select id="countRechargeActivity" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-  	select count(1) from dl_activity where act_type = 1 and status = 1 
-  	and is_finish = 0 and start_time &lt; #{now} and end_time &gt; #{now}
+  	SELECT count(1) FROM dl_activity WHERE act_type = 1 AND status = 1 
+  	AND is_finish = 0 AND start_time &lt; #{now} AND end_time &gt; #{now}
   </select>
   
 </mapper>
