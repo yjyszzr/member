@@ -442,6 +442,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		Integer startTime = 0;
 		Integer endTime = 0;
 		List<UserAccount> userAccountList = null;
+		List<UserAccount> userAccountAllTypeList = null;
 		Date todayDate = new Date();
 		List<UserAccount> buyList = new ArrayList<>();
 		List<UserAccount> rechargeList = new ArrayList<>();
@@ -476,47 +477,18 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountList = userAccountMapper.queryUserAccountByTime(userId, processType, startTime, endTime);
 		}
 
-		if (userAccountList.size() == 0) {
-			uDTO.setPageInfo(new PageInfo<UserAccountDTO>(userAccountListDTO));
-			uDTO.setUserAccountByTimeDTO(userAccountByTimeDTO);
-			return ResultGenerator.genSuccessResult("success", uDTO);
-		}
-		
-		PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
-		for (UserAccount ua : userAccountList) {
-			UserAccountDTO userAccountDTO = new UserAccountDTO();
-			userAccountDTO.setId(ua.getId());
-			userAccountDTO.setPayId(ua.getPayId());
-			userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.date_sdf));
-			userAccountDTO.setAccountSn(ua.getAccountSn());
-			userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
-			userAccountDTO.setStatus("");
-			userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
-			userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
-			userAccountDTO.setProcessTypeName(AccountEnum.getName(ua.getProcessType()));
-			userAccountDTO.setNote("");
-			String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1 ? "+" + ua.getAmount() + "元": String.valueOf(ua.getAmount() + "元");
-			userAccountDTO.setChangeAmount(changeAmount);
-			userAccountListDTO.add(userAccountDTO);
-			
-			if (ProjectConstant.BUY.equals(ua.getProcessType())) {
-				buyList.add(ua);
-			} else if (ProjectConstant.RECHARGE.equals(ua.getProcessType())) {
-				rechargeList.add(ua);
-			} else if (ProjectConstant.WITHDRAW.equals(ua.getProcessType())) {
-				withdrawList.add(ua);
-			} else if (ProjectConstant.REWARD.equals(ua.getProcessType())) {
-				rewardList.add(ua);
+		userAccountAllTypeList = userAccountMapper.queryUserAccountByTime(userId, null, startTime, endTime);
+		for (UserAccount allTypeUa : userAccountAllTypeList) {
+			if (ProjectConstant.BUY.equals(allTypeUa.getProcessType())) {
+				buyList.add(allTypeUa);
+			} else if (ProjectConstant.RECHARGE.equals(allTypeUa.getProcessType())) {
+				rechargeList.add(allTypeUa);
+			} else if (ProjectConstant.WITHDRAW.equals(allTypeUa.getProcessType())) {
+				withdrawList.add(allTypeUa);
+			} else if (ProjectConstant.REWARD.equals(allTypeUa.getProcessType())) {
+				rewardList.add(allTypeUa);
 			}
 		}
-
-		PageInfo<UserAccountDTO> result = new PageInfo<UserAccountDTO>();
-		try {
-			BeanUtils.copyProperties(result, pageInfo);
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
-		result.setList(userAccountListDTO);		
 		
 		// 抵消出票失败的退款 和 提现失败的退款
 		BigDecimal backBuyMoney = BigDecimal.ZERO;
@@ -546,6 +518,38 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccountByTimeDTO.setRechargeMoney(String.valueOf(df.format(rechargeMoney)));
 		userAccountByTimeDTO.setWithDrawMoney(String.valueOf(df.format(0 - totalWithDrawMoney)));
 		userAccountByTimeDTO.setRewardMoney(String.valueOf(df.format(rewardMoney)));
+		
+		if (userAccountList.size() == 0) {
+			uDTO.setPageInfo(new PageInfo<UserAccountDTO>(userAccountListDTO));
+			uDTO.setUserAccountByTimeDTO(userAccountByTimeDTO);
+			return ResultGenerator.genSuccessResult("success", uDTO);
+		}
+		
+		PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
+		for (UserAccount ua : userAccountList) {
+			UserAccountDTO userAccountDTO = new UserAccountDTO();
+			userAccountDTO.setId(ua.getId());
+			userAccountDTO.setPayId(ua.getPayId());
+			userAccountDTO.setAddTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.date_sdf));
+			userAccountDTO.setAccountSn(ua.getAccountSn());
+			userAccountDTO.setShotTime(DateUtil.getCurrentTimeString(Long.valueOf(ua.getAddTime()), DateUtil.short_time_sdf));
+			userAccountDTO.setStatus("");
+			userAccountDTO.setProcessType(String.valueOf(ua.getProcessType()));
+			userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
+			userAccountDTO.setProcessTypeName(AccountEnum.getName(ua.getProcessType()));
+			userAccountDTO.setNote("");
+			String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1 ? "+" + ua.getAmount() + "元": String.valueOf(ua.getAmount() + "元");
+			userAccountDTO.setChangeAmount(changeAmount);
+			userAccountListDTO.add(userAccountDTO);
+		}
+
+		PageInfo<UserAccountDTO> result = new PageInfo<UserAccountDTO>();
+		try {
+			BeanUtils.copyProperties(result, pageInfo);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
+		result.setList(userAccountListDTO);		
 		
 		uDTO.setPageInfo(result);
 		uDTO.setUserAccountByTimeDTO(userAccountByTimeDTO);
