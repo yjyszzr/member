@@ -47,8 +47,8 @@ public enum MemberEnums {
 	MESSAGE_60MIN_COUNT_ERROR(301054,"60分钟内不能发送超过5条，60分钟后重试"),
 	REAL_IDCARDNO_NOT18(301055,"很抱歉，根据法律规定未满18周岁的禁止购彩"),
 	REAL_IDCARDNO_EMPTY(301056,"请填写身份证号"),
-	REAL_IDCARDNO_NOTLEGAL(301057,"请输入正确的身份证号");
-
+	REAL_IDCARDNO_NOTLEGAL(301057,"请输入正确的身份证号"),
+	USER_BANK_NOT_SURPPORT(301058,"很抱歉,暂不支持此银行绑定");
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	
 //	NO_SHOP_MEM(301014,"用户不是店铺会员"),

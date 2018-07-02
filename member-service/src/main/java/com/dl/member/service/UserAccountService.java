@@ -466,15 +466,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountList = userAccountMapper.queryUserAccountByTime(userId, processType, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_6_DAY.equals(timeType)) {
-			startTime = DateUtil.getTimeAfterDays(todayDate, -6, 0, 0, 0);
+			startTime = DateUtil.getTimeAfterDays(todayDate, -5, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountList = userAccountMapper.queryUserAccountByTime(userId, processType, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_29_DAY.equals(timeType)) {
-			startTime = DateUtil.getTimeAfterDays(todayDate, -29, 0, 0, 0);
+			startTime = DateUtil.getTimeAfterDays(todayDate, -28, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1,23, 59, 59);
 			userAccountList = userAccountMapper.queryUserAccountByTime(userId, processType, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_89_DAY.equals(timeType)) {
-			startTime = DateUtil.getTimeAfterDays(todayDate, -89, 0, 0, 0);
+			startTime = DateUtil.getTimeAfterDays(todayDate, -88, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountList = userAccountMapper.queryUserAccountByTime(userId, processType, startTime, endTime);
 		}
@@ -533,15 +533,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountAllTypeList = userAccountMapper.queryUserAccountByTime(userId, null, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_6_DAY.equals(timeType)) {
-			startTime = DateUtil.getTimeAfterDays(todayDate, -6, 0, 0, 0);
+			startTime = DateUtil.getTimeAfterDays(todayDate, -5, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountAllTypeList = userAccountMapper.queryUserAccountByTime(userId, null, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_29_DAY.equals(timeType)) {
-			startTime = DateUtil.getTimeAfterDays(todayDate, -29, 0, 0, 0);
+			startTime = DateUtil.getTimeAfterDays(todayDate, -28, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1,23, 59, 59);
 			userAccountAllTypeList = userAccountMapper.queryUserAccountByTime(userId, null, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_89_DAY.equals(timeType)) {
-			startTime = DateUtil.getTimeAfterDays(todayDate, -89, 0, 0, 0);
+			startTime = DateUtil.getTimeAfterDays(todayDate, -88, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountAllTypeList = userAccountMapper.queryUserAccountByTime(userId, null, startTime, endTime);
 		}

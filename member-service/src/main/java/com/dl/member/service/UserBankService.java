@@ -171,6 +171,9 @@ public class UserBankService extends AbstractService<UserBank> {
 			log.info("bankname查询到该银行简码:" + abbr +" bankName:" + bankName);
 			log.info("=============================");
 			abbreviation = abbr;
+		}else {
+			log.info("先锋支付不支持此家银行，所以不支持该银行绑定:" +" bankName:" + bankName);
+			return ResultGenerator.genResult(MemberEnums.USER_BANK_NOT_SURPPORT.getcode(), MemberEnums.USER_BANK_NOT_SURPPORT.getMsg(),userBankDTO);
 		}
 		//三元素校验
 		String idCard = userRealDTO.getIdCode();
@@ -584,12 +587,12 @@ public class UserBankService extends AbstractService<UserBank> {
 			log.info("load userBankCode succ total size:" + mMap.size());
 			log.info("====================");
 		}
-		String result = null;
+		String result = "";
 		if(!StringUtils.isEmpty(bankName)) {
 			for(Map.Entry<String, String> entry : mMap.entrySet()) {
 				String key = entry.getKey();
 				String value = entry.getValue();
-				if(!StringUtils.isEmpty(key) && (key.contains(bankName) || bankName.contains(key))) {
+				if(key.contains(bankName) || bankName.contains(key)) {
 					result = value;
 					break;
 				}
