@@ -3,6 +3,7 @@ import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.BankDTO;
 import com.dl.member.dto.UserBankDTO;
 import com.dl.member.dto.WithDrawShowDTO;
@@ -58,7 +59,7 @@ public class UserBankController {
     @ApiOperation(value = "查询银行卡列表", notes = "查询银行卡列表")
     @PostMapping("/queryUserBankList")
     public BaseResult<LinkedList<UserBankDTO>> queryUserBankList(@RequestBody StrParam strParam){
-    	return userBankService.queryUserBankList(0);
+    	return userBankService.queryUserBankList(ProjectConstant.BANK_PURPOSE_WITHDRAW);
     }
     
     

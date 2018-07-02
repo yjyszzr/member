@@ -116,6 +116,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBankAlready.setCardNo(bankCardNo);
 		userBankAlready.setUserId(userId);
 		userBankAlready.setIsDelete(ProjectConstant.NOT_DELETE);
+		userBankAlready.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
 		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankAlready);
 		if(!CollectionUtils.isEmpty(userBankList)) {
 			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg(),userBankDTO);
@@ -205,7 +206,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBankDTO.setAbbreviation(abbreviation);
 		userBankDTO.setStatus(ProjectConstant.USER_BANK_DEFAULT);
 		userBankDTO.setType(0);
-		userBankDTO.setPurpose(0);
+		userBankDTO.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
 		this.saveUserBank(userBankDTO);
 		
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
@@ -221,6 +222,7 @@ public class UserBankService extends AbstractService<UserBank> {
     	userBankQuery.setUserId(userBankQueryParam.getUserId());
     	userBankQuery.setCardNo(userBankQueryParam.getBankCardCode());
     	userBankQuery.setIsDelete(ProjectConstant.NOT_DELETE);
+    	userBankQuery.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
     	List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankQuery);
     	if(CollectionUtils.isEmpty(userBankList)) {
     		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), MemberEnums.DBDATA_IS_NULL.getMsg());
@@ -523,7 +525,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBank.setStatus(ProjectConstant.USER_BANK_NO_DEFAULT);
 		userBank.setIsDelete(ProjectConstant.DELETE);
 		userBank.setLastTime(DateUtil.getCurrentTimeLong());
-		userBank.setPurpose(Integer.valueOf(0));
+		userBank.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
 		int rst = userBankMapper.updateUserBank(userBank);
 		if(1 != rst) {
 			log.error("删除银行卡失败");
@@ -542,6 +544,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		UserBank userBankParam = new UserBank();
 		userBankParam.setUserId(userId);
 		userBankParam.setIsDelete(ProjectConstant.NOT_DELETE);
+		userBankParam.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
 		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankParam);
 		
 		if(CollectionUtils.isEmpty(userBankList)) {

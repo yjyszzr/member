@@ -136,7 +136,7 @@ public class UserController {
 
 	@ApiOperation(value = "查询用户信息除了登录密码和支付密码", notes = "查询用户信息除了登录密码和支付密码")
 	@PostMapping("/userInfoExceptPassReal")
-	public BaseResult<UserDTO> queryUserByUserIdExceptPassReal(@RequestBody UserIdParam param) {
+	public BaseResult<UserDTO> queryUserByUserIdExceptPassReal(@RequestBody StrParam param) {
 		return userService.queryUserByUserIdExceptPassReal();
 	}
 

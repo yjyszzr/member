@@ -133,5 +133,9 @@ public class ProjectConstant {
 	public static final String BEFORE_29_DAY = "3";
 	public static final String BEFORE_89_DAY = "4";
 	
+	//银行卡用途
+	public static final Integer BANK_PURPOSE_WITHDRAW = 0;
+	public static final Integer BANK_PURPOSE_PAY = 1;
+	
 
 }

@@ -830,6 +830,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		List<String> rewardOrderSnList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
 		if (rewardOrderSnList.size() > 0) {
 			log.error("含有已派发过奖金的订单号，已被过滤,订单号包括：" + Joiner.on(",").join(rewardOrderSnList));
+			OrderSnListParam orderSnAlreadyRewardListParam = new OrderSnListParam();
+			orderSnAlreadyRewardListParam.setOrderSnlist(rewardOrderSnList);
+			BaseResult<Integer> orderRst = orderService.updateOrderStatusRewarded(orderSnAlreadyRewardListParam);
 			userIdAndRewardList.removeIf(s -> rewardOrderSnList.contains(s.getOrderSn()));
 		}
 
