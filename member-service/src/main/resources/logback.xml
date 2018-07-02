@@ -32,14 +32,14 @@
 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] - %msg %n</pattern>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>WARN</level>
+			<level>INFO</level>
 		</filter> 
 	</appender>
 
 	<logger name="com.dl.member" level="INFO" />
 	<logger name="org.springframework" level="INFO"/>
-	<logger name="com.dl.base.mapper" level="debug" />
-	<logger name="com.alibaba.druid" level="WARN" />
+	<logger name="com.dl.base.mapper" level="INFO" />
+	<logger name="com.alibaba.druid" level="INFO" />
 
 	<root level="ERROR">
 		<appender-ref ref="console" />
