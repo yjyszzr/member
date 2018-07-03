@@ -101,7 +101,7 @@ public class UserService extends AbstractService<User> {
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		if (userRealDTO != null) {
 			realName = userRealDTO.getRealName();
-			userDTO.setRealInfo(realName.substring(0, 1) + "**" + "(" + userRealDTO.getIdCode().substring(0, 6) + "****" + userRealDTO.getIdCode().substring(userRealDTO.getIdCode().lastIndexOf(4)) + ")");
+			userDTO.setRealInfo(realName.substring(0, 1) + "**" + "(" + userRealDTO.getIdCode().substring(0, 6) + "****" + userRealDTO.getIdCode().substring(userRealDTO.getIdCode().length() - 4) + ")");
 		}
 		String mobile = user.getMobile();
 		userDTO.setMobile(mobile);
