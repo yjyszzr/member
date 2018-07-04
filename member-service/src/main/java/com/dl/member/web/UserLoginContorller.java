@@ -10,6 +10,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.dto.UserLoginDTO;
+import com.dl.member.param.StrParam;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
 import com.dl.member.service.UserLoginService;
@@ -39,13 +40,13 @@ public class UserLoginContorller {
     
     @ApiOperation(value = "短信验证码登录", notes = "短信验证码登录")
     @PostMapping("/loginBySms")
-    public BaseResult<UserLoginDTO> loginBySms( @RequestBody UserLoginWithSmsParam userLoginMobileParam, HttpServletRequest request) {
+    public BaseResult<UserLoginDTO> loginBySms(@RequestBody UserLoginWithSmsParam userLoginMobileParam, HttpServletRequest request) {
     	return userLoginService.loginBySms(userLoginMobileParam, request);
     }
     
     @ApiOperation(value = "用户注销", notes = "用户注销")
     @PostMapping("/logout")
-    public BaseResult<String> logout() {
+    public BaseResult<String> logout(@RequestBody StrParam strPaaram) {
     	userLoginService.loginLogOut();
     	Integer userId = SessionUtil.getUserId();
         TokenUtil.invalidateUserToken(userId);
