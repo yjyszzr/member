@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.SessionUtil;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
@@ -46,7 +47,8 @@ public class UserLoginContorller {
     @PostMapping("/logout")
     public BaseResult<String> logout() {
     	userLoginService.loginLogOut();
-        TokenUtil.invalidateCurToken();
+    	Integer userId = SessionUtil.getUserId();
+        TokenUtil.invalidateUserToken(userId);
         return ResultGenerator.genSuccessResult("用户注销成功");
     }
     
