@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.SwitchConfigMapper;
+import com.dl.member.dao.UserAccountMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.enums.MemberEnums;
 import com.dl.base.result.BaseResult;
@@ -38,6 +39,9 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     @Resource
     private IpaymentService paymentService;
     
+    @Resource
+    private UserAccountMapper userAccountMapper;
+    
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;    
     
@@ -65,6 +69,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     	}
     	
     	Integer rst1 = this.userSwitch(userId);
+    	log.info("-----用户终极开关:"+rst1);
     	if(rst1 == 0) {
     		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
     	}else if(rst1 == 1) {
@@ -72,6 +77,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     	}else {
     		Integer rst2 = this.userDealAction(userId);
     		if(rst2 == 1) {
+    			log.info("-----用户交易行为开关:"+rst2);
     			switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
     		}else{
     			Integer rst3 = this.channelSwitch(platform, version, chanel);
@@ -101,29 +107,18 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
      * @return
      */
     public Integer userDealAction(Integer userId) {
-//		String paidUser = stringRedisTemplate.opsForValue().get("pay_valid_"+String.valueOf(userId));
-//		if(!StringUtils.isEmpty(paidUser)) {
-//			return ProjectConstant.BISINESS_APP_OPEN;
-//		}else {
-			com.dl.shop.payment.param.UserIdParam userIdParam = new com.dl.shop.payment.param.UserIdParam();
-			userIdParam.setUserId(userId);
-			BaseResult<ValidPayDTO> validPayDTORst = paymentService.validUserPay(userIdParam);
-			if(validPayDTORst.getCode() == 0) {
-				String hasPaid = validPayDTORst.getData().getHasPaid();
-				log.info("判断是否有过购彩行为："+hasPaid);
-				if(hasPaid.equals("1")) {
-					//stringRedisTemplate.opsForValue().set("pay_valid_"+String.valueOf(userId),"1");
-					return ProjectConstant.BISINESS_APP_OPEN;
-				}else {
-					return ProjectConstant.BISINESS_APP_CLOSE;
-				}
-			}else {
-				log.error("判断开关的时候，查询是否有关交易异常，开关返回交易版开");
-				return ProjectConstant.BISINESS_APP_OPEN;
-			}
-//		}
+		String paidUser = stringRedisTemplate.opsForValue().get("pay_valid_"+String.valueOf(userId));
+		if(!StringUtils.isEmpty(paidUser)) {
+			return ProjectConstant.BISINESS_APP_OPEN;
+		}
+		Integer rst = userAccountMapper.countValidUserAccountByUserId(userId);
+		if(rst > 0) {
+			stringRedisTemplate.opsForValue().set("pay_valid_"+String.valueOf(userId),"1");
+			return ProjectConstant.BISINESS_APP_OPEN;
+		}else {
+			return ProjectConstant.BISINESS_APP_CLOSE;
+		}
     }
-    
     /**
      * 渠道开关
      * @return

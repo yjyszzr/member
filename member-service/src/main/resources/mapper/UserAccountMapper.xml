@@ -27,6 +27,10 @@
     
   </resultMap>
   
+  <select id ="countValidUserAccountByUserId" resultType="java.lang.Integer">
+ 	 select count(1) from dl_user_account where user_id = #{userId}
+  </select>
+  
   <select id="queryUserAccountBySelective" parameterType="com.dl.member.model.UserAccount"  resultMap="BaseResultMap">
   		SELECT *  FROM dl_user_account 
 	  	<where>

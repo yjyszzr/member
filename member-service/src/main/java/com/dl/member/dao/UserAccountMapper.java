@@ -15,6 +15,8 @@ public interface UserAccountMapper extends Mapper<UserAccount> {
 	int insertUserAccount(UserAccount userAccount);
 
 	int updateUserAccountBySelective(UserAccount userAccount);
+	
+	int countValidUserAccountByUserId(@Param("userId") Integer userId);
 
 	List<UserAccount> queryUserAccountCurMonth(@Param("userId") Integer userId);
 
