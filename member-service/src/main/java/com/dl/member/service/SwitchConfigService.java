@@ -54,6 +54,16 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     public BaseResult<SwitchConfig> querySwitch(String platform,String version,String chanel){
     	SwitchConfig switchConfig = new SwitchConfig();
     	Integer userId = SessionUtil.getUserId();
+    	if(userId == null) {
+			Integer rst3 = this.channelSwitch(platform, version, chanel);
+			if(rst3 == 1) {
+				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+			}else {
+				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+			}
+			return ResultGenerator.genSuccessResult("success",switchConfig);
+    	}
+    	
     	Integer rst1 = this.userSwitch(userId);
     	if(rst1 == 0) {
     		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
