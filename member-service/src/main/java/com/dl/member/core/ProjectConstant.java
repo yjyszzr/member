@@ -137,5 +137,8 @@ public class ProjectConstant {
 	public static final Integer BANK_PURPOSE_WITHDRAW = 0;
 	public static final Integer BANK_PURPOSE_PAY = 1;
 	
+	//交易版开关
+	public static final Integer BISINESS_APP_CLOSE = 0;
+	public static final Integer BISINESS_APP_OPEN = 1;
 
 }

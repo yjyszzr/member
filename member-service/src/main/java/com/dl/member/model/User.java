@@ -15,8 +15,16 @@ public class User {
     /**
      * 用户名
      */
+    @Column(name = "is_business")
+    private Integer isBusiness;
+    
+    
+    /**
+     * 用户名
+     */
     @Column(name = "user_name")
     private String userName;
+    
 
     /**
      * 手机号码
@@ -179,8 +187,16 @@ public class User {
      */
     @Column(name = "user_remark")
     private String userRemark;
-    
-    /**
+  
+    public Integer getIsBusiness() {
+		return isBusiness;
+	}
+
+	public void setIsBusiness(Integer isBusiness) {
+		this.isBusiness = isBusiness;
+	}
+
+	/**
      * 消息推送key
      */
     @Column(name = "push_key")
