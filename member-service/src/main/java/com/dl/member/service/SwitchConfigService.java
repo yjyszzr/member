@@ -75,6 +75,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     			switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
     		}else{
     			Integer rst3 = this.channelSwitch(platform, version, chanel);
+    			log.info("-----渠道开关:"+rst3);
     			if(rst3 == 1) {
     				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
     			}else {
