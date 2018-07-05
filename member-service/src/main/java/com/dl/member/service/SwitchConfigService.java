@@ -100,17 +100,18 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
      * @return
      */
     public Integer userDealAction(Integer userId) {
-		String paidUser = stringRedisTemplate.opsForValue().get("pay_valid_"+String.valueOf(userId));
-		if(!StringUtils.isEmpty(paidUser)) {
-			return ProjectConstant.BISINESS_APP_OPEN;
-		}else {
+//		String paidUser = stringRedisTemplate.opsForValue().get("pay_valid_"+String.valueOf(userId));
+//		if(!StringUtils.isEmpty(paidUser)) {
+//			return ProjectConstant.BISINESS_APP_OPEN;
+//		}else {
 			com.dl.shop.payment.param.UserIdParam userIdParam = new com.dl.shop.payment.param.UserIdParam();
 			userIdParam.setUserId(userId);
 			BaseResult<ValidPayDTO> validPayDTORst = paymentService.validUserPay(userIdParam);
 			if(validPayDTORst.getCode() == 0) {
 				String hasPaid = validPayDTORst.getData().getHasPaid();
+				log.info("判断是否有过购彩行为："+hasPaid);
 				if(hasPaid.equals("1")) {
-					stringRedisTemplate.opsForValue().set("pay_valid_"+String.valueOf(userId),"1");
+					//stringRedisTemplate.opsForValue().set("pay_valid_"+String.valueOf(userId),"1");
 					return ProjectConstant.BISINESS_APP_OPEN;
 				}else {
 					return ProjectConstant.BISINESS_APP_CLOSE;
@@ -119,7 +120,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				log.error("判断开关的时候，查询是否有关交易异常，开关返回交易版开");
 				return ProjectConstant.BISINESS_APP_OPEN;
 			}
-		}
+//		}
     }
     
     /**
