@@ -58,6 +58,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     public BaseResult<SwitchConfig> querySwitch(String platform,String version,String chanel){
     	SwitchConfig switchConfig = new SwitchConfig();
     	Integer userId = SessionUtil.getUserId();
+    	log.info("开关传的登录的userId:"+userId);
     	if(userId == null) {
 			Integer rst3 = this.channelSwitch(platform, version, chanel);
 			if(rst3 == 1) {
@@ -107,13 +108,13 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
      * @return
      */
     public Integer userDealAction(Integer userId) {
-		String paidUser = stringRedisTemplate.opsForValue().get("pay_valid_"+String.valueOf(userId));
-		if(!StringUtils.isEmpty(paidUser)) {
-			return ProjectConstant.BISINESS_APP_OPEN;
-		}
+//		String paidUser = stringRedisTemplate.opsForValue().get("pay_valid_"+String.valueOf(userId));
+//		if(!StringUtils.isEmpty(paidUser)) {
+//			return ProjectConstant.BISINESS_APP_OPEN;
+//		}
 		Integer rst = userAccountMapper.countValidUserAccountByUserId(userId);
 		if(rst > 0) {
-			stringRedisTemplate.opsForValue().set("pay_valid_"+String.valueOf(userId),"1");
+			//stringRedisTemplate.opsForValue().set("pay_valid_"+String.valueOf(userId),"1");
 			return ProjectConstant.BISINESS_APP_OPEN;
 		}else {
 			return ProjectConstant.BISINESS_APP_CLOSE;
