@@ -58,9 +58,10 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     public BaseResult<SwitchConfig> querySwitch(String platform,String version,String chanel){
     	SwitchConfig switchConfig = new SwitchConfig();
     	Integer userId = SessionUtil.getUserId();
-    	log.info("开关传的登录的userId:"+userId);
+    	log.info("开关接口传的登录的userId:"+userId);
     	if(userId == null) {
 			Integer rst3 = this.channelSwitch(platform, version, chanel);
+			log.info("渠道开关:"+rst3);
 			if(rst3 == 1) {
 				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 			}else {
@@ -70,7 +71,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     	}
     	
     	Integer rst1 = this.userSwitch(userId);
-    	log.info("-----用户终极开关:"+rst1);
+    	log.info("用户终极开关:"+rst1);
     	if(rst1 == 0) {
     		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
     	}else if(rst1 == 1) {
@@ -78,11 +79,11 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     	}else {
     		Integer rst2 = this.userDealAction(userId);
     		if(rst2 == 1) {
-    			log.info("-----用户交易行为开关:"+rst2);
+    			log.info("用户交易行为开关:"+rst2);
     			switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
     		}else{
     			Integer rst3 = this.channelSwitch(platform, version, chanel);
-    			log.info("-----渠道开关:"+rst3);
+    			log.info("渠道开关:"+rst3);
     			if(rst3 == 1) {
     				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
     			}else {

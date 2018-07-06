@@ -1,7 +1,9 @@
 package com.dl.member.service;
 import com.dl.member.model.UserCollect;
+import com.dl.member.model.UserMatchCollect;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserCollectMapper;
+import com.dl.member.dao.UserMatchCollectMapper;
 import com.dl.member.enums.MemberEnums;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -21,6 +23,8 @@ import javax.annotation.Resource;
 public class UserCollectService extends AbstractService<UserCollect> {
     @Resource
     private UserCollectMapper userCollectMapper;
+    @Resource
+    private UserMatchCollectMapper userMatchCollectMapper;
     
     public List<UserCollect> queryMyCollectList(){
     	Integer userId = SessionUtil.getUserId();
@@ -29,6 +33,7 @@ public class UserCollectService extends AbstractService<UserCollect> {
     	List<UserCollect> userCollectList = userCollectMapper.queryUserCollectListBySelective(userCollect);
     	return userCollectList;
     }
+    
     
    public BaseResult<String> cancleCollect(Integer articleId) {
 	   	Integer userId = SessionUtil.getUserId();

@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.dl.member.dao.UserCollectMapper">
-  <resultMap id="BaseResultMap" type="com.dl.member.model.UserCollect">
+<mapper namespace="com.dl.member.dao.UserMatchCollectMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserMatchCollect">
     <!--
       WARNING - @mbg.generated
     -->
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="article_id" jdbcType="VARCHAR" property="articleId" />
-    <result column="add_time" jdbcType="VARCHAR" property="addTime" />
+    <result column="match_id" jdbcType="INTEGER" property="matchId" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="collect_from" jdbcType="VARCHAR" property="collectFrom" />
-    <result column="dl_user_collectcol" jdbcType="VARCHAR" property="dlUserCollectcol" />
     <result column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
-    
   </resultMap>
   
-  <select id="queryUserCollectListBySelective" parameterType="com.dl.member.model.UserCollect"  resultMap="BaseResultMap">
-	  	SELECT * FROM dl_user_collect
+  <select id="queryUserMatchCollectListBySelective" parameterType="com.dl.member.model.UserMatchCollect"  resultMap="java.lang.Integer">
+	  	SELECT match_id FROM dl_user_collect
 		<where>
 			<if test="id != null">
 		        AND id = #{id}
@@ -37,11 +35,8 @@
 	    order by add_time desc
   </select>
   
-  <update id="updateUserCollect"  parameterType="java.lang.Integer">
-        UPDATE dl_user_collect SET is_delete= #{isDelete}  where user_id = #{userId} and article_id = #{articleId}
-  </update>
+  <select id="queryUserMatchCollectMapper"  resultType="java.lang.Integer">
+	  	SELECT count(1) FROM dl_user_collect where user_id = #{userId} and match_id = #{matchId}
+  </select>  
   
-  <delete id="deleteUserCollect" parameterType="java.lang.Integer">
-  		DELETE FROM dl_user_collect WHERE user_id = #{userId} AND article_id = #{articleId}
-  </delete>
 </mapper>
