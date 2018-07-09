@@ -36,12 +36,12 @@ public class UserMatchCollectController {
     public BaseResult<Integer> collectMatchId(@RequestBody UserMatchCollectParam userMatchCollectParam) {
         Integer userId = SessionUtil.getUserId();
         Integer matchId = userMatchCollectParam.getMatchId();
-        List<UserMatchCollect> umcList = userMatchCollectService.queryMyCollectMatch(userId, matchId);
-        if(umcList.size() > 0) {
+        int rstCollect = userMatchCollectService.queryMyCollectMatch(userId, matchId);
+        if(rstCollect > 0) {
         	return  ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "该场比赛已收藏");
         }
         
-        int rst = userMatchCollectService.saveMyCollectMatch(userId, matchId);
-        return ResultGenerator.genSuccessResult("success",rst);
+        int rstSave = userMatchCollectService.saveMyCollectMatch(userId, matchId);
+        return ResultGenerator.genSuccessResult("success");
     }
 }

@@ -32,7 +32,18 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
     	umc.setUserId(userId);
     	umc.setMatchId(matchId);
     	umc.setAddTime(DateUtil.getCurrentTimeLong());
+    	umc.setIsDelete(0);
     	int rst = userMatchCollectMapper.insertUserCollectMatch(umc);
+    	return rst;
+    }
+    
+    /**
+     * 查询是否收藏过某场比赛
+     * @param userId
+     * @return
+     */
+    public int queryMyCollectMatch(Integer userId,Integer matchId){
+    	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId);
     	return rst;
     }
 

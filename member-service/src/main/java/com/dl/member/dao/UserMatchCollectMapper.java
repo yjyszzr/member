@@ -13,6 +13,6 @@ public interface UserMatchCollectMapper extends Mapper<UserMatchCollect> {
 	
 	int insertUserCollectMatch(UserMatchCollect umc);
 	
-	List<UserMatchCollect> queryUserMatchCollect(@Param("user_id") Integer userId,@Param("match_id") Integer matchId);
+	int queryUserMatchCollect(@Param("userId") Integer userId,@Param("matchId") Integer matchId);
 	
 }
