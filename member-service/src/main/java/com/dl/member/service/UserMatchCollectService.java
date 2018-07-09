@@ -35,18 +35,5 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
     	int rst = userMatchCollectMapper.insertUserCollectMatch(umc);
     	return rst;
     }
-    
-    /**
-     * 查询 收藏 的 比赛
-     * @param userId
-     * @return
-     */
-    public List<UserMatchCollect> queryMyCollectMatch(Integer userId,Integer matchId){
-    	UserMatchCollect umc = new UserMatchCollect();
-    	umc.setUserId(userId);
-    	umc.setMatchId(matchId);
-    	List<UserMatchCollect> umcList = userMatchCollectMapper.queryUserMatchCollectMapper(userId, matchId);
-    	return umcList;
-    }
 
 }

@@ -22,9 +22,6 @@
 		  	<if test="userId != null">
 		        AND user_id = #{userId}
 		    </if>
-		    <if test="articleId != null">
-		        AND article_id = #{articleId}
-		    </if>
 		    <if test="collectFrom != null">
 		        AND collect_from = #{collectFrom}
 		    </if>
@@ -35,7 +32,7 @@
 	    order by add_time desc
   </select>
   
-  <select id="queryUserMatchCollectMapper"  resultType="java.lang.Integer">
+  <select id="queryUserMatchCollect"  resultType="java.lang.Integer">
 	  	SELECT count(1) FROM dl_user_collect where user_id = #{userId} and match_id = #{matchId}
   </select>  
   
