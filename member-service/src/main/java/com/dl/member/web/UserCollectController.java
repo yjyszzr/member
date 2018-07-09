@@ -123,20 +123,20 @@ public class UserCollectController {
 		return ResultGenerator.genSuccessResult("success", myCollectArticlesRst.getData());
 	}
 	
-	@ApiOperation(value = "用户赛事收藏列表", notes = "用户赛事收藏列表")
-	@PostMapping("/userMatchList")
-	public BaseResult<String> userMatchList(@RequestBody PageParam pageParam) {
-		List<UserCollectDTO> userCollectDTOList = new ArrayList<>();
-		PageHelper.startPage(pageParam.getPageNum(), pageParam.getPageSize());
-		List<Integer> userCollectList = userCollectService.queryMyCollectMatchList();
-		if (CollectionUtils.isEmpty(userCollectList)) {
-			return ResultGenerator.genSuccessResult("success", new PageInfo<DLArticleDTO>());
-		}
-
-		return ResultGenerator.genSuccessResult("success", myCollectArticlesRst.getData());
-	}
-	
-	
+//	@ApiOperation(value = "用户赛事收藏列表", notes = "用户赛事收藏列表")
+//	@PostMapping("/userMatchList")
+//	public BaseResult<String> userMatchList(@RequestBody PageParam pageParam) {
+//		List<UserCollectDTO> userCollectDTOList = new ArrayList<>();
+//		PageHelper.startPage(pageParam.getPageNum(), pageParam.getPageSize());
+//		List<Integer> userCollectList = userCollectService.queryMyCollectMatchList();
+//		if (CollectionUtils.isEmpty(userCollectList)) {
+//			return ResultGenerator.genSuccessResult("success", new PageInfo<DLArticleDTO>());
+//		}
+//
+//		return ResultGenerator.genSuccessResult("success", myCollectArticlesRst.getData());
+//	}
+//	
+//	
 
 	/**
 	 * 查看用户是否收藏

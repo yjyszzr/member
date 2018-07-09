@@ -1211,8 +1211,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	@Transactional
 	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserMoneyWithDrawFailure(MemWithDrawSnParam memWithDrawSnParam) {
 		String inPrams = JSON.toJSONString(memWithDrawSnParam);
-		log.info(DateUtil.getCurrentDateTime() + "提现失败回滚账户可提现余额的参数:" + memWithDrawSnParam);
-
+		log.info(DateUtil.getCurrentDateTime() + "提现失败回滚账户可提现余额的参数:" + inPrams);
 		Integer userId = SessionUtil.getUserId();
 		if (null == userId) {
 			userId = memWithDrawSnParam.getUserId();
@@ -1227,7 +1226,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (withdrawAccountList.size() > 0) {
 			return ResultGenerator.genFailResult("提现单号" + memWithDrawSnParam.getWithDrawSn() + "已经进行了回滚，无法再次回滚");
 		}
-
 		WithDrawSnAndUserIdParam paywithDrawSnParam = new WithDrawSnAndUserIdParam();
 		paywithDrawSnParam.setWithDrawSn(memWithDrawSnParam.getWithDrawSn());
 		paywithDrawSnParam.setUserId(userId);
@@ -1252,7 +1250,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		updateUser.setUserId(userId);
 		updateUser.setUserMoney(userWithdrawDTO.getAmount());
 		userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
-
 		User userUpdated = userMapper.queryUserExceptPass(userId);
 		log.info("回滚后" + userId + "账户值：" + userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
 
