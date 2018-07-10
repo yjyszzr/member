@@ -126,7 +126,7 @@
         <if test="processType!=null">
             process_type,
         </if>
-        <if test="paymentName">
+        <if test="paymentName!=null">
             payment_name,
         </if>
         <if test="orderSn!=null">
@@ -135,13 +135,13 @@
         <if test="parentSn!=null">
             parent_sn,
         </if>
-        <if test="note">
+        <if test="note!=null">
             note,
         </if>
-        <if test="payId">
+        <if test="payId!=null">
             pay_id,
         </if>
-        <if test="thirdPartName">
+        <if test="thirdPartName!=null">
             third_part_name,
         </if>
         <if test="userSurplus!=null">
@@ -183,7 +183,7 @@
         <if test="processType!=null">
             #{processType},
         </if>
-        <if test="paymentName">
+        <if test="paymentName!=null">
             #{paymentName},
         </if>
         <if test="orderSn!=null">
@@ -192,13 +192,13 @@
         <if test="parentSn!=null">
             #{parentSn},
         </if>
-        <if test="note">
+        <if test="note!=null">
             #{note},
         </if>
-        <if test="payId">
+        <if test="payId!=null">
             #{payId},
         </if>
-        <if test="thirdPartName">
+        <if test="thirdPartName!=null">
             #{thirdPartName},
         </if>
         <if test="userSurplus!=null">
