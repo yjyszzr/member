@@ -15,4 +15,6 @@ public interface UserMatchCollectMapper extends Mapper<UserMatchCollect> {
 	
 	int queryUserMatchCollect(@Param("userId") Integer userId,@Param("matchId") Integer matchId);
 	
+	int deleteUserMatchCollect(@Param("userId") Integer userId,@Param("matchId") Integer matchId);
+	
 }

@@ -40,4 +40,7 @@
 	INSERT INTO dl_user_match_collect(match_id,add_time,user_id,is_delete) VALUES(#{matchId},#{addTime},#{userId},#{isDelete}) 
   </insert>  
   
+   <delete id="deleteUserMatchCollect" parameterType="java.lang.Integer">
+  		DELETE FROM dl_user_match_collect WHERE user_id = #{userId} AND match_id = #{matchId}
+  </delete>
 </mapper>

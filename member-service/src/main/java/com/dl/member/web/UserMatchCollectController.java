@@ -4,10 +4,12 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.enums.MemberEnums;
-import com.dl.member.model.UserMatchCollect;
-import com.dl.member.param.StrParam;
+import com.dl.member.param.IDParam;
 import com.dl.member.param.UserMatchCollectParam;
 import com.dl.member.service.UserMatchCollectService;
+
+import io.swagger.annotations.ApiOperation;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,4 +46,10 @@ public class UserMatchCollectController {
         int rstSave = userMatchCollectService.saveMyCollectMatch(userId, matchId);
         return ResultGenerator.genSuccessResult("success");
     }
+    
+	@ApiOperation(value = "取消收藏", notes = "取消收藏")
+	@PostMapping("/cancle")
+	public BaseResult<String> delete(@RequestBody IDParam idParam) {
+		return userMatchCollectService.cancleCollect(idParam.getId());
+	}
 }
