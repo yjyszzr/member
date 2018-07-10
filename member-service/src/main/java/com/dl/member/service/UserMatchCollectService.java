@@ -61,7 +61,7 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
     public BaseResult<String> cancleCollect(Integer matchId) {
 	   	Integer userId = SessionUtil.getUserId();
 	   	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId);
-	   	if(rst > 0) {
+	   	if(rst <= 0) {
 	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该该赛事");
 	   	}
 	   	

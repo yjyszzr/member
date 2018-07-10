@@ -49,7 +49,7 @@ public class UserMatchCollectController {
     
 	@ApiOperation(value = "取消收藏", notes = "取消收藏")
 	@PostMapping("/cancle")
-	public BaseResult<String> delete(@RequestBody IDParam idParam) {
+	public BaseResult<String> cancle(@RequestBody IDParam idParam) {
 		return userMatchCollectService.cancleCollect(idParam.getId());
 	}
 }
