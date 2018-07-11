@@ -69,6 +69,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	userReal.setCardPic2("");
     	userReal.setCardPic3("");
     	userReal.setReason("");
+    	userReal.setIsDelete(0);
     	userReal.setStatus(ProjectConstant.USER_IS_REAL);
     	this.save(userReal);
     }
@@ -87,6 +88,11 @@ public class UserRealService extends AbstractService<UserReal> {
     	if(null == user) {
     		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在");
     	}
+  
+    	int countUserReal = userRealMapper.countUserRealByIDCodeAndUserId(userId,iDCode);
+    	if(countUserReal > 0) {
+    		return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "已经进行了实名认证");
+    	}
     	
     	try {
 			realName = URLDecoder.decode(realName, "UTF-8");
@@ -99,8 +105,9 @@ public class UserRealService extends AbstractService<UserReal> {
     	Condition condition = new Condition(UserReal.class);
     	Criteria criteria = condition.createCriteria();
     	criteria.andCondition("id_code = ", iDCode);
+    	criteria.andCondition("id_delete = ", 0);
     	List<UserReal> userRealList = this.findByCondition(condition);
-    	if(userRealList.size() > 4) {
+    	if(userRealList.size() >= 4) {
 			return ResultGenerator.genResult(MemberEnums.USER_REAL_COUNTLIMIT.getcode(),MemberEnums.USER_REAL_COUNTLIMIT.getMsg());
     	}
     		
@@ -165,7 +172,7 @@ public class UserRealService extends AbstractService<UserReal> {
      */
     public UserRealDTO queryUserReal(){
     	Integer userId = SessionUtil.getUserId();
-    	UserReal userReal = this.findBy("userId", userId);
+    	UserReal userReal = userRealMapper.queryUserRealByUserId(userId);
     	log.info("[queryUserReal]" + " userId:" + userId + " userReal:" + userReal);
     	UserRealDTO userRealDTO = new UserRealDTO();
     	if(null == userReal) {
