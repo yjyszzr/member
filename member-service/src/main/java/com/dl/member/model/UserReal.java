@@ -71,11 +71,25 @@ public class UserReal {
     private Integer addTime;
 
     /**
+     * 删除
+     */
+    @Column(name = "is_delete")
+    private Integer isDelete;
+    
+    /**
      * 拒绝原因
      */
     private String reason;
+    
+    public Integer getIsDelete() {
+		return isDelete;
+	}
 
-    /**
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
+	}
+
+	/**
      * 获取主键ID
      *
      * @return real_id - 主键ID
