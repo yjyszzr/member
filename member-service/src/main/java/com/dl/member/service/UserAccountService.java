@@ -431,7 +431,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 */
 	public BaseResult<UserAccountListAndCountDTO> getUserAccountListAndCountTotal(AmountTypeParam amountTypeParam) {
 		UserAccountListAndCountDTO uDTO = new UserAccountListAndCountDTO();
-		UserAccountByTimeDTO userAccountByTimeDTO = this.createUserAccountTotal(amountTypeParam.getTimeType());
+		UserAccountByTimeDTO userAccountByTimeDTO = new UserAccountByTimeDTO();
+				//this.createUserAccountTotal(amountTypeParam.getTimeType());
 		PageInfo<UserAccountDTO> pageAccounts = this.queryUserAccountList(amountTypeParam);
 		uDTO.setPageInfo(pageAccounts);
 		uDTO.setUserAccountByTimeDTO(userAccountByTimeDTO);
