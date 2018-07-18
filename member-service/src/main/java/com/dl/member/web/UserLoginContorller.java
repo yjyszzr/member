@@ -35,21 +35,32 @@ public class UserLoginContorller {
     @ApiOperation(value = "密码登录", notes = "密码登录")
     @PostMapping("/loginByPass")
     public BaseResult<UserLoginDTO> loginByPass( @RequestBody UserLoginWithPassParam userLoginMobileParam, HttpServletRequest request) {
-    	return userLoginService.loginByPass(userLoginMobileParam);
+    	BaseResult<UserLoginDTO> loginByPass = userLoginService.loginByPass(userLoginMobileParam);
+    	if(loginByPass.getCode() == 0) {
+    		String token = loginByPass.getData().getToken();
+    		request.getSession().setAttribute("user_token", token);;
+    	}
+    	return loginByPass;
     }
     
     @ApiOperation(value = "短信验证码登录", notes = "短信验证码登录")
     @PostMapping("/loginBySms")
     public BaseResult<UserLoginDTO> loginBySms(@RequestBody UserLoginWithSmsParam userLoginMobileParam, HttpServletRequest request) {
-    	return userLoginService.loginBySms(userLoginMobileParam, request);
+    	BaseResult<UserLoginDTO> loginBySms = userLoginService.loginBySms(userLoginMobileParam, request);
+    	if(loginBySms.getCode() == 0) {
+    		String token = loginBySms.getData().getToken();
+    		request.getSession().setAttribute("user_token", token);;
+    	}
+    	return loginBySms;
     }
     
     @ApiOperation(value = "用户注销", notes = "用户注销")
     @PostMapping("/logout")
-    public BaseResult<String> logout(@RequestBody StrParam strPaaram) {
+    public BaseResult<String> logout(@RequestBody StrParam strPaaram, HttpServletRequest request) {
     	userLoginService.loginLogOut();
     	Integer userId = SessionUtil.getUserId();
         TokenUtil.invalidateUserToken(userId);
+        request.getSession().removeAttribute("user_token");
         return ResultGenerator.genSuccessResult("用户注销成功");
     }
     
