@@ -1,5 +1,4 @@
 package com.dl.member.service;
-import com.dl.member.model.UserCollect;
 import com.dl.member.model.UserMatchCollect;
 import com.dl.member.dao.UserMatchCollectMapper;
 import com.dl.member.enums.MemberEnums;
@@ -8,10 +7,10 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.annotation.Resource;
 
@@ -64,10 +63,22 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
 	   	}
 	   	
 	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, matchId);
+	   	Integer nowUserCollect = this.countUserCollectByDate(userId);
 	   	if(1 != delRst) {
-	   		return ResultGenerator.genFailResult("取消收藏失败");
+	   		return ResultGenerator.genFailResult("取消收藏失败",String.valueOf(nowUserCollect));
 	   	}
-	   	return ResultGenerator.genSuccessResult("取消收藏成功");
+	   	return ResultGenerator.genSuccessResult("取消收藏成功",String.valueOf(nowUserCollect));
    }
+    
+    /**
+     * 根据日期查询收藏的比赛数
+     * @param userId
+     * @return
+     */
+    public Integer countUserCollectByDate(Integer userId) {
+	   	String dateStr = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
+	   	Integer nowUserCollect = userMatchCollectMapper.countUserCollectMatch(userId, dateStr);
+	   	return nowUserCollect;
+    }
     
 }

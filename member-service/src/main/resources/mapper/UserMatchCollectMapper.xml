@@ -22,6 +22,10 @@
 	  	SELECT count(1) FROM dl_user_match_collect WHERE user_id = #{userId} AND match_id = #{matchId}
   </select>  
   
+  <select id="countUserCollectMatch"  resultType="java.lang.Integer">
+	  	SELECT count(1) FROM dl_user_match_collect WHERE user_id = #{userId} AND str_to_date(add_time,'%Y-%m-%d') = #{dateStr}
+  </select>
+  
   <insert id="insertUserCollectMatch"  parameterType="com.dl.member.model.UserMatchCollect">
 	INSERT INTO dl_user_match_collect(match_id,add_time,user_id,is_delete) VALUES(#{matchId},#{addTime},#{userId},#{isDelete}) 
   </insert>  
