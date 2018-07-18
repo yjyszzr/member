@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -57,6 +58,9 @@ public class UserBankService extends AbstractService<UserBank> {
     
 	@Resource
 	private RestTemplateConfig restTemplateConfig;
+
+	@Resource
+	private StringRedisTemplate stringRedisTemplate;
 	
 	@Resource
 	private RestTemplate restTemplate;
@@ -110,8 +114,15 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genResult(MemberEnums.NOT_REAL_AUTH.getcode(), MemberEnums.NOT_REAL_AUTH.NOT_REAL_AUTH.getMsg(),userBankDTO);
 		}
 
-		//已经添加过该银行卡
 		Integer userId = SessionUtil.getUserId();
+//		Boolean exits = stringRedisTemplate.opsForValue().setIfAbsent("user_bank_add_"+userId, "on");
+//		if(!exits) {
+//			return ResultGenerator.genResult(MemberEnums.USER_BANK_ADDING.getcode(), MemberEnums.USER_BANK_ADDING.getMsg(),userBankDTO);
+//		}else {
+//			log.info("添加银行卡extis:"+exits);
+//		}
+		
+		//已经添加过该银行卡
 		UserBank userBankAlready = new UserBank();
 		userBankAlready.setCardNo(bankCardNo);
 		userBankAlready.setUserId(userId);
@@ -209,6 +220,9 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBankDTO.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
 		this.saveUserBank(userBankDTO);
 		
+//		stringRedisTemplate.delete("user_bank_add_"+userId);
+//		String redisValue = stringRedisTemplate.opsForValue().get("user_bank_add_"+userId);
+//		log.info("删除redis中的key后再查询的值为:"+redisValue);
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
 

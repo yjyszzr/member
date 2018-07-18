@@ -17,5 +17,15 @@
     <result column="status" jdbcType="VARCHAR" property="status" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
   </resultMap>
+  
+  <select id = "queryUserRealByUserId" resultMap="BaseResultMap">
+    select * from dl_user_real where user_id = #{userId} and is_delete = 0
+  </select>
+  
+  <select id = "countUserRealByIDCodeAndUserId" resultType="java.lang.Integer">
+    select count(real_id) from dl_user_real where user_id = #{userId} and id_code = #{idCode} and is_delete = 0
+  </select>
+  
 </mapper>

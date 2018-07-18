@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +22,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
@@ -73,10 +78,6 @@ import com.dl.shop.payment.param.WithDrawSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Joiner;
-
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 @Slf4j
@@ -284,7 +285,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		return ResultGenerator.genSuccessResult("余额支付后余额扣减成功", "success");
 	}
 
-	
 	/**
 	 * 查询用户余额明细列表
 	 *
@@ -337,8 +337,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		result.setList(userAccountListDTO);
 		return result;
 	}
-	
-	
+
 	/**
 	 * 按照时间统计各个用途的资金和
 	 * 
@@ -355,27 +354,27 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		List<UserAccount> rechargeList = new ArrayList<>();
 		List<UserAccount> withdrawList = new ArrayList<>();
 		List<UserAccount> rewardList = new ArrayList<>();
-		
-		if(timeType.equals("0")) {
+
+		if (timeType.equals("0")) {
 			UserAccount userAccount = new UserAccount();
 			userAccount.setUserId(userId);
 			userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
-		}else if(timeType.equals("1")) {
+		} else if (timeType.equals("1")) {
 			startTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
-		}else if(timeType.equals("2")) {
+		} else if (timeType.equals("2")) {
 			startTime = DateUtil.getTimeAfterDays(todayDate, -6, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
-		}else if(timeType.equals("3")) {
+		} else if (timeType.equals("3")) {
 			startTime = DateUtil.getTimeAfterDays(todayDate, -29, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
-		}else if(timeType.equals("4")) {
-			startTime = DateUtil.getTimeAfterDays(todayDate, -89, 0,0,0);
+		} else if (timeType.equals("4")) {
+			startTime = DateUtil.getTimeAfterDays(todayDate, -89, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 0, 0, 0);
 		}
-		
+
 		userAccountList = userAccountMapper.countUserAccountByTime(startTime, endTime);
-		if(userAccountList.size() == 0) {
+		if (userAccountList.size() == 0) {
 			return ResultGenerator.genSuccessResult("按照时间统计各个用途的资金和", userAccountByTimeDTO);
 		}
 
@@ -426,20 +425,22 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 	/**
 	 * 查询账户列表和统计账户总和
+	 * 
 	 * @param amountTypeParam
 	 * @return
 	 */
-	public BaseResult<UserAccountListAndCountDTO> getUserAccountListAndCountTotal(AmountTypeParam amountTypeParam){
+	public BaseResult<UserAccountListAndCountDTO> getUserAccountListAndCountTotal(AmountTypeParam amountTypeParam) {
 		UserAccountListAndCountDTO uDTO = new UserAccountListAndCountDTO();
-		UserAccountByTimeDTO userAccountByTimeDTO = this.createUserAccountTotal(amountTypeParam.getTimeType());
+		UserAccountByTimeDTO userAccountByTimeDTO = new UserAccountByTimeDTO();
+				//this.createUserAccountTotal(amountTypeParam.getTimeType());
 		PageInfo<UserAccountDTO> pageAccounts = this.queryUserAccountList(amountTypeParam);
 		uDTO.setPageInfo(pageAccounts);
 		uDTO.setUserAccountByTimeDTO(userAccountByTimeDTO);
-		
+
 		return ResultGenerator.genSuccessResult("success", uDTO);
 	}
 
-	public PageInfo<UserAccountDTO> queryUserAccountList(AmountTypeParam amountTypeParam){
+	public PageInfo<UserAccountDTO> queryUserAccountList(AmountTypeParam amountTypeParam) {
 		Integer startTime = 0;
 		Integer endTime = 0;
 		Integer userId = SessionUtil.getUserId();
@@ -450,12 +451,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		Date todayDate = new Date();
 		List<UserAccount> userAccountList = null;
 		List<UserAccountDTO> userAccountListDTO = new ArrayList<>();
-		
+
 		UserAccount userAccount = new UserAccount();
 		userAccount.setUserId(userId);
 		if (0 != processType) {
 			userAccount.setProcessType(processType);
-		}else {
+		} else {
 			processType = null;
 		}
 		PageHelper.startPage(pageNum, pageSize);
@@ -471,14 +472,14 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountList = userAccountMapper.queryUserAccountByTime(userId, processType, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_29_DAY.equals(timeType)) {
 			startTime = DateUtil.getTimeAfterDays(todayDate, -28, 0, 0, 0);
-			endTime = DateUtil.getTimeAfterDays(todayDate, 1,23, 59, 59);
+			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountList = userAccountMapper.queryUserAccountByTime(userId, processType, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_89_DAY.equals(timeType)) {
 			startTime = DateUtil.getTimeAfterDays(todayDate, -88, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountList = userAccountMapper.queryUserAccountByTime(userId, processType, startTime, endTime);
 		}
-		
+
 		PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
 		for (UserAccount ua : userAccountList) {
 			UserAccountDTO userAccountDTO = new UserAccountDTO();
@@ -492,7 +493,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountDTO.setProcessTypeChar(AccountEnum.getShortStr(ua.getProcessType()));
 			userAccountDTO.setProcessTypeName(AccountEnum.getName(ua.getProcessType()));
 			userAccountDTO.setNote("");
-			String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1 ? "+" + ua.getAmount() + "元": String.valueOf(ua.getAmount() + "元");
+			String changeAmount = ua.getAmount().compareTo(BigDecimal.ZERO) == 1 ? "+" + ua.getAmount() + "元" : String.valueOf(ua.getAmount() + "元");
 			userAccountDTO.setChangeAmount(changeAmount);
 			userAccountListDTO.add(userAccountDTO);
 		}
@@ -503,12 +504,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
-		result.setList(userAccountListDTO);	
+		result.setList(userAccountListDTO);
 		return result;
 	}
-	
+
 	/**
 	 * 根据时间段 和 userId构造 账户明细统计
+	 * 
 	 * @param timeType
 	 * @return
 	 */
@@ -523,7 +525,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		Integer startTime = 0;
 		Integer endTime = 0;
 		Date todayDate = new Date();
-		
+
 		if (ProjectConstant.ALL_TIME.equals(timeType)) {
 			UserAccount userAccount = new UserAccount();
 			userAccount.setUserId(userId);
@@ -538,18 +540,18 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountAllTypeList = userAccountMapper.queryUserAccountByTime(userId, null, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_29_DAY.equals(timeType)) {
 			startTime = DateUtil.getTimeAfterDays(todayDate, -28, 0, 0, 0);
-			endTime = DateUtil.getTimeAfterDays(todayDate, 1,23, 59, 59);
+			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountAllTypeList = userAccountMapper.queryUserAccountByTime(userId, null, startTime, endTime);
 		} else if (ProjectConstant.BEFORE_89_DAY.equals(timeType)) {
 			startTime = DateUtil.getTimeAfterDays(todayDate, -88, 0, 0, 0);
 			endTime = DateUtil.getTimeAfterDays(todayDate, 1, 23, 59, 59);
 			userAccountAllTypeList = userAccountMapper.queryUserAccountByTime(userId, null, startTime, endTime);
 		}
-		
-		if(userAccountAllTypeList.size() == 0) {
+
+		if (userAccountAllTypeList.size() == 0) {
 			return userAccountByTimeDTO;
 		}
-		
+
 		for (UserAccount allTypeUa : userAccountAllTypeList) {
 			if (ProjectConstant.BUY.equals(allTypeUa.getProcessType())) {
 				buyList.add(allTypeUa);
@@ -588,10 +590,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccountByTimeDTO.setBuyMoney(String.valueOf(df.format(0 - totalBuyMoney)));
 		userAccountByTimeDTO.setRechargeMoney(String.valueOf(df.format(rechargeMoney)));
 		userAccountByTimeDTO.setWithDrawMoney(String.valueOf(df.format(0 - totalWithDrawMoney)));
-		userAccountByTimeDTO.setRewardMoney(String.valueOf(df.format(rewardMoney)));		
+		userAccountByTimeDTO.setRewardMoney(String.valueOf(df.format(rewardMoney)));
 		return userAccountByTimeDTO;
 	}
-	
+
 	/**
 	 * 账户公共计算服务
 	 * 
@@ -886,23 +888,23 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	/**
 	 * 把大额奖金设置为派奖审核中
 	 */
-	public void updateBigRewardChecking(List<UserIdAndRewardDTO> userIdAndRewardList,Double limitValueDouble) {
+	public void updateBigRewardChecking(List<UserIdAndRewardDTO> userIdAndRewardList, Double limitValueDouble) {
 		List<UserIdAndRewardDTO> userIdAndRewardDTOList = userIdAndRewardList.stream().filter(s -> s.getReward().doubleValue() >= limitValueDouble).collect(Collectors.toList());
-		if(userIdAndRewardDTOList.size() == 0) {
+		if (userIdAndRewardDTOList.size() == 0) {
 			return;
 		}
 
 		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s -> s.getOrderSn()).collect(Collectors.toList());
 		UpdateOrderStatusByAnotherStatusParam param = new UpdateOrderStatusByAnotherStatusParam();
 		param.setOrderSnlist(orderSnRewaredList);
-		param.setOrderStatusAfter("7");//派奖审核中
-		param.setOrderStatusBefore("6");//派奖中
+		param.setOrderStatusAfter("7");// 派奖审核中
+		param.setOrderStatusBefore("6");// 派奖中
 		BaseResult<Integer> orderRst = orderService.updateOrderStatusAnother(param);
-		if(orderRst.getCode() != 0) {
+		if (orderRst.getCode() != 0) {
 			log.error("大额奖金订单设置为派奖审核中异常");
-		}	
+		}
 	}
-	
+
 	/**
 	 * 针对单场竞猜答题用户中奖后批量更新到不可提现余额
 	 * 
@@ -936,6 +938,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountParam.setProcessType(ProjectConstant.REWARD);
 			userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
 			userAccountParam.setAddTime(accountTime);
+			userAccountParam.setNote(uDTO.getNote());
 			userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
 			int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
 			if (1 != insertRst) {
@@ -1280,7 +1283,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		return ResultGenerator.genSuccessResult("success", surplusPaymentCallbackDTO);
 	}
 
-	
 	/**
 	 * 统计当月的各个用途的资金和
 	 * 
@@ -1341,7 +1343,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 		return ResultGenerator.genSuccessResult("统计当月的各个用途的资金和成功", userAccountCurMonthDTO);
 	}
-	
+
 	/**
 	 * 保存账户流水
 	 * 
