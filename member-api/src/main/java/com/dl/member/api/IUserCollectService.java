@@ -6,10 +6,9 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import com.dl.base.param.EmptyParam;
 import com.dl.base.result.BaseResult;
 import com.dl.member.param.ArticleIdParam;
+import com.dl.member.param.DateStrParam;
 import com.dl.member.param.UserMatchCollectParam;
 
 
@@ -35,7 +34,7 @@ public interface IUserCollectService {
 	 * @return
 	 */
 	@RequestMapping(path="/user/matchCollect/myCollectMatchIdlist", method=RequestMethod.POST)
-    public BaseResult<List<Integer>> matchIdlist(@RequestBody EmptyParam emptyParam);
+    public BaseResult<List<Integer>> matchIdlist(@RequestBody DateStrParam dateStrParam);
 	
 	/**
 	 * 收藏比赛

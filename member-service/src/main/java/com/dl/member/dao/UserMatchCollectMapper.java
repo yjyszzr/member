@@ -9,7 +9,7 @@ import com.dl.member.model.UserMatchCollect;
 
 public interface UserMatchCollectMapper extends Mapper<UserMatchCollect> {
 	
-	List<Integer> queryUserMatchCollectListBySelective(UserMatchCollect umc);
+	List<Integer> queryUserMatchCollectListBySelective(@Param("userId")Integer userId,@Param("dateStr")String dateStr);
 	
 	int insertUserCollectMatch(UserMatchCollect umc);
 	

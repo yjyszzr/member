@@ -21,10 +21,8 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
     @Resource
     private UserMatchCollectMapper userMatchCollectMapper;
     
-    public List<Integer> queryMyCollectMatchIdList(Integer userId){
-    	UserMatchCollect umc = new UserMatchCollect();
-    	umc.setUserId(userId);
-    	List<Integer> userMatchIdList = userMatchCollectMapper.queryUserMatchCollectListBySelective(umc);
+    public List<Integer> queryMyCollectMatchIdList(Integer userId,String dateStr){
+    	List<Integer> userMatchIdList = userMatchCollectMapper.queryUserMatchCollectListBySelective(userId,dateStr);
     	return userMatchIdList;
     }
     

@@ -4,6 +4,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.param.DateStrParam;
 import com.dl.member.param.IDParam;
 import com.dl.member.param.UserMatchCollectParam;
 import com.dl.member.service.UserMatchCollectService;
@@ -28,9 +29,9 @@ public class UserMatchCollectController {
     private UserMatchCollectService userMatchCollectService;
 
     @PostMapping("/myCollectMatchIdlist")
-    public BaseResult<List<Integer>> list(@RequestBody EmptyParam emptyParam) {
+    public BaseResult<List<Integer>> list(@RequestBody DateStrParam dateStrParam) {
         Integer userId = SessionUtil.getUserId();
-        List<Integer> myCollectMatchIdlist = userMatchCollectService.queryMyCollectMatchIdList(userId);
+        List<Integer> myCollectMatchIdlist = userMatchCollectService.queryMyCollectMatchIdList(userId,dateStrParam.getDateStr());
         return ResultGenerator.genSuccessResult("success",myCollectMatchIdlist);
     }
     

@@ -13,22 +13,8 @@
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
   </resultMap>
   
-  <select id="queryUserMatchCollectListBySelective" parameterType="com.dl.member.model.UserMatchCollect"  resultType="java.lang.Integer">
-	  	SELECT match_id FROM dl_user_match_collect
-		<where>
-			<if test="id != null">
-		        AND id = #{id}
-		    </if>
-		  	<if test="userId != null">
-		        AND user_id = #{userId}
-		    </if>
-		    <if test="collectFrom != null">
-		        AND collect_from = #{collectFrom}
-		    </if>
-		    <if test="isDelete != null">
-		        AND is_delete = #{isDelete}
-		    </if>
-	    </where>
+  <select id="queryUserMatchCollectListBySelective"  resultType="java.lang.Integer">
+	  	SELECT match_id FROM dl_user_match_collect where user_id = #{userId} and str_to_date(add_time,'%Y-%m-%d') = #{dateStr}
 	    order by add_time desc
   </select>
   
