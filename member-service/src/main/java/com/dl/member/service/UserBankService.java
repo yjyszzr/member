@@ -43,7 +43,6 @@ import com.dl.member.model.UserBankCode;
 import com.dl.member.param.DeleteBankCardParam;
 import com.dl.member.param.UserBankQueryParam;
 
-import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -115,12 +114,12 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 
 		Integer userId = SessionUtil.getUserId();
-//		Boolean exits = stringRedisTemplate.opsForValue().setIfAbsent("user_bank_add_"+userId, "on");
-//		if(!exits) {
-//			return ResultGenerator.genResult(MemberEnums.USER_BANK_ADDING.getcode(), MemberEnums.USER_BANK_ADDING.getMsg(),userBankDTO);
-//		}else {
-//			log.info("添加银行卡extis:"+exits);
-//		}
+		Boolean exits = stringRedisTemplate.opsForValue().setIfAbsent("user_bank_add_"+userId, "on");
+		if(!exits) {
+			return ResultGenerator.genResult(MemberEnums.USER_BANK_ADDING.getcode(), MemberEnums.USER_BANK_ADDING.getMsg(),userBankDTO);
+		}else {
+			log.info("添加银行卡extis:"+exits);
+		}
 		
 		//已经添加过该银行卡
 		UserBank userBankAlready = new UserBank();
@@ -220,9 +219,9 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBankDTO.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
 		this.saveUserBank(userBankDTO);
 		
-//		stringRedisTemplate.delete("user_bank_add_"+userId);
-//		String redisValue = stringRedisTemplate.opsForValue().get("user_bank_add_"+userId);
-//		log.info("删除redis中的key后再查询的值为:"+redisValue);
+		stringRedisTemplate.delete("user_bank_add_"+userId);
+		String redisValue = stringRedisTemplate.opsForValue().get("user_bank_add_"+userId);
+		log.info("删除redis中的key后再查询的值为:"+redisValue);
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
 
