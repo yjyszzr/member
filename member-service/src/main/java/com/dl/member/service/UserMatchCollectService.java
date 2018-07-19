@@ -1,8 +1,10 @@
 package com.dl.member.service;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,7 +69,11 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
 	   	}
 	   	
 	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, userMatchCollectParam.getMatchId());
-	   	Integer nowUserCollect = this.countUserCollectByDate(userId,userMatchCollectParam.getDateStr());
+        String strDate = userMatchCollectParam.getDateStr();
+        if(StringUtils.isEmpty(strDate)) {
+        	strDate = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
+        }
+	   	Integer nowUserCollect = this.countUserCollectByDate(userId,strDate);
 	   	matchCollectSomedayCountDTO.setMatchCollectCount(String.valueOf(nowUserCollect));
 	   	return ResultGenerator.genSuccessResult("取消收藏成功",matchCollectSomedayCountDTO);
    }

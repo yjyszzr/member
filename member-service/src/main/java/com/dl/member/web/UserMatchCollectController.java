@@ -13,6 +13,7 @@ import com.dl.member.service.UserMatchCollectService;
 
 import io.swagger.annotations.ApiOperation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +51,11 @@ public class UserMatchCollectController {
         	return  ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "该场比赛已收藏",matchCollectSomedayCountDTO);
         }
         int rstSave = userMatchCollectService.saveMyCollectMatch(userId, matchId);
-        Integer nowUserCollect = userMatchCollectService.countUserCollectByDate(userId,userMatchCollectParam.getDateStr());
+        String strDate = userMatchCollectParam.getDateStr();
+        if(StringUtils.isEmpty(strDate)) {
+        	strDate = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
+        }
+        Integer nowUserCollect = userMatchCollectService.countUserCollectByDate(userId,strDate);
         matchCollectSomedayCountDTO.setMatchCollectCount(String.valueOf(nowUserCollect));
 	   	return ResultGenerator.genSuccessResult("success",matchCollectSomedayCountDTO);
     }

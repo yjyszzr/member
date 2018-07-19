@@ -14,7 +14,7 @@
   </resultMap>
   
   <select id="queryUserMatchCollectListBySelective"  resultType="java.lang.Integer">
-	  	SELECT match_id FROM dl_user_match_collect where user_id = #{userId} and str_to_date(add_time,'%Y-%m-%d') = #{dateStr}
+	  	SELECT match_id FROM dl_user_match_collect where user_id = #{userId} and FROM_UNIXTIME(add_time,'%Y-%m-%d') = #{dateStr}
 	    order by add_time desc
   </select>
   
