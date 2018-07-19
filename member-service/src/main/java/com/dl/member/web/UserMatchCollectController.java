@@ -4,6 +4,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
+import com.dl.member.dto.MatchCollectSomedayCountDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.param.DateStrParam;
 import com.dl.member.param.IDParam;
@@ -40,24 +41,23 @@ public class UserMatchCollectController {
     
     @ApiOperation(value = "添加收藏", notes = "添加收藏")
     @PostMapping("/collectMatchId")
-    public BaseResult<String> collectMatchId(@RequestBody UserMatchCollectParam userMatchCollectParam) {
+    public BaseResult<MatchCollectSomedayCountDTO> collectMatchId(@RequestBody UserMatchCollectParam userMatchCollectParam) {
         Integer userId = SessionUtil.getUserId();
+        MatchCollectSomedayCountDTO matchCollectSomedayCountDTO = new MatchCollectSomedayCountDTO();
         Integer matchId = userMatchCollectParam.getMatchId();
         int rstCollect = userMatchCollectService.queryMyCollectMatch(userId, matchId);
         if(rstCollect > 0) {
-        	return  ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "该场比赛已收藏");
+        	return  ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "该场比赛已收藏",matchCollectSomedayCountDTO);
         }
         int rstSave = userMatchCollectService.saveMyCollectMatch(userId, matchId);
-        
-	   	String dateStr = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
-	   	Integer nowUserCollect = userMatchCollectService.countUserCollectByDate(userId);
-	   	
-        return ResultGenerator.genSuccessResult("success",String.valueOf(nowUserCollect));
+        Integer nowUserCollect = userMatchCollectService.countUserCollectByDate(userId,userMatchCollectParam.getDateStr());
+        matchCollectSomedayCountDTO.setMatchCollectCount(String.valueOf(nowUserCollect));
+	   	return ResultGenerator.genSuccessResult("success",matchCollectSomedayCountDTO);
     }
     
 	@ApiOperation(value = "取消收藏", notes = "取消收藏")
 	@PostMapping("/cancle")
-	public BaseResult<String> cancle(@RequestBody IDParam idParam) {
-		return userMatchCollectService.cancleCollect(idParam.getId());
+	public BaseResult<MatchCollectSomedayCountDTO> cancle(@RequestBody UserMatchCollectParam userMatchCollectParam) {
+		return userMatchCollectService.cancleCollect(userMatchCollectParam);
 	}
 }

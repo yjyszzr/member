@@ -1,18 +1,21 @@
 package com.dl.member.service;
-import com.dl.member.model.UserMatchCollect;
-import com.dl.member.dao.UserMatchCollectMapper;
-import com.dl.member.enums.MemberEnums;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import javax.annotation.Resource;
+import com.dl.member.dao.UserMatchCollectMapper;
+import com.dl.member.dto.MatchCollectSomedayCountDTO;
+import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.UserMatchCollect;
+import com.dl.member.param.UserMatchCollectParam;
 
 @Service
 @Transactional
@@ -55,19 +58,18 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
      * @param matchId
      * @return
      */
-    public BaseResult<String> cancleCollect(Integer matchId) {
+    public BaseResult<MatchCollectSomedayCountDTO> cancleCollect(UserMatchCollectParam userMatchCollectParam) {
 	   	Integer userId = SessionUtil.getUserId();
-	   	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId);
+	   	MatchCollectSomedayCountDTO matchCollectSomedayCountDTO = new MatchCollectSomedayCountDTO();
+	   	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, userMatchCollectParam.getMatchId());
 	   	if(rst <= 0) {
-	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该该赛事");
+	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该该赛事",matchCollectSomedayCountDTO);
 	   	}
 	   	
-	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, matchId);
-	   	Integer nowUserCollect = this.countUserCollectByDate(userId);
-	   	if(1 != delRst) {
-	   		return ResultGenerator.genFailResult("取消收藏失败",String.valueOf(nowUserCollect));
-	   	}
-	   	return ResultGenerator.genSuccessResult("取消收藏成功",String.valueOf(nowUserCollect));
+	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, userMatchCollectParam.getMatchId());
+	   	Integer nowUserCollect = this.countUserCollectByDate(userId,userMatchCollectParam.getDateStr());
+	   	matchCollectSomedayCountDTO.setMatchCollectCount(String.valueOf(nowUserCollect));
+	   	return ResultGenerator.genSuccessResult("取消收藏成功",matchCollectSomedayCountDTO);
    }
     
     /**
@@ -75,8 +77,7 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
      * @param userId
      * @return
      */
-    public Integer countUserCollectByDate(Integer userId) {
-	   	String dateStr = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
+    public Integer countUserCollectByDate(Integer userId,String dateStr) {
 	   	Integer nowUserCollect = userMatchCollectMapper.countUserCollectMatch(userId, dateStr);
 	   	return nowUserCollect;
     }

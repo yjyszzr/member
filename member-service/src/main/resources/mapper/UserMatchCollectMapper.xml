@@ -23,7 +23,7 @@
   </select>  
   
   <select id="countUserCollectMatch"  resultType="java.lang.Integer">
-	  	SELECT count(1) FROM dl_user_match_collect WHERE user_id = #{userId} AND str_to_date(add_time,'%Y-%m-%d') = #{dateStr}
+	  	SELECT count(1) FROM dl_user_match_collect WHERE user_id = #{userId} AND FROM_UNIXTIME(add_time,'%Y-%m-%d') = #{dateStr}
   </select>
   
   <insert id="insertUserCollectMatch"  parameterType="com.dl.member.model.UserMatchCollect">
