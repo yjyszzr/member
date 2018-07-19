@@ -9,7 +9,7 @@ import lombok.Data;
  * @author zhangzirong
  *
  */
-@ApiModel("真实用户信息")
+@ApiModel("某天收藏的比赛信息")
 @Data
 public class MatchCollectSomedayCountDTO {
 	@ApiModelProperty("某天收藏的比赛数量")
