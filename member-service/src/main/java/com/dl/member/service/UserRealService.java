@@ -112,11 +112,13 @@ public class UserRealService extends AbstractService<UserReal> {
     	}
     		
     	JSONObject json = this.realNameAuth2(realName, iDCode);
+    	log.info("认证后返回的信息:"+json.toJSONString());
     	String reason = json.getString("reason");
 		Integer errorCode =  (Integer) json.get("error_code");
 		if(0 == errorCode) {
 			JSONObject result = (JSONObject) json.get("result");
 			String res = result.getString("res");
+			log.info("");
 			if("2".equals(res)) {
 				return ResultGenerator.genResult(MemberEnums.NOT_REAL_AUTH.getcode(),MemberEnums.NOT_REAL_AUTH.getMsg());
 			}
