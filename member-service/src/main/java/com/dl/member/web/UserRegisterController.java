@@ -70,7 +70,7 @@ public class UserRegisterController {
     	}
     	
     	Integer userId = regRst.getData();
-    	userBonusService.receiveUserBonus(ProjectConstant.REGISTER,userId);
+    	//userBonusService.receiveUserBonus(ProjectConstant.REGISTER,userId);
     	
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
