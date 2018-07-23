@@ -224,7 +224,10 @@ public class UserBankService extends AbstractService<UserBank> {
 //		stringRedisTemplate.delete("user_bank_add_"+userId);
 //		String redisValue = stringRedisTemplate.opsForValue().get("user_bank_add_"+userId);
 //		log.info("添加银行卡后删除redis的key后的value"+redisValue);
-		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
+		log.info("添加银行卡完毕 cardNo={}",bankCardNo);
+		BaseResult<UserBankDTO> result = ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
+		log.info("添加银行卡完毕 cardNo={},Code={},",bankCardNo,result.getCode());
+		return result;
 	}
 
     /**
