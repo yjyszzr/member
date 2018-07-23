@@ -107,6 +107,7 @@ public class UserBankService extends AbstractService<UserBank> {
      */
     @Transactional
 	public BaseResult<UserBankDTO> addBankCard(String bankCardNo){
+    	log.info("addBankcardNo={}",bankCardNo);
 		//未实名认证
     	UserBankDTO userBankDTO = new UserBankDTO();
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
@@ -115,12 +116,12 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 
 		Integer userId = SessionUtil.getUserId();
-		Boolean exits = stringRedisTemplate.opsForValue().setIfAbsent("user_bank_add_"+userId, "on");
-		if(!exits) {
-			return ResultGenerator.genResult(MemberEnums.USER_BANK_ADDING.getcode(), MemberEnums.USER_BANK_ADDING.getMsg(),userBankDTO);
-		}else {
-			log.info("添加银行卡extis:"+exits);
-		}
+//		Boolean exits = stringRedisTemplate.opsForValue().setIfAbsent("user_bank_add_"+userId, "on");
+//		if(!exits) {
+//			return ResultGenerator.genResult(MemberEnums.USER_BANK_ADDING.getcode(), MemberEnums.USER_BANK_ADDING.getMsg(),userBankDTO);
+//		}else {
+//			log.info("添加银行卡extis:"+exits);
+//		}
 		
 		//已经添加过该银行卡
 		UserBank userBankAlready = new UserBank();
@@ -220,9 +221,9 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBankDTO.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
 		this.saveUserBank(userBankDTO);
 		
-		stringRedisTemplate.delete("user_bank_add_"+userId);
-		String redisValue = stringRedisTemplate.opsForValue().get("user_bank_add_"+userId);
-		log.info("添加银行卡后删除redis的key后的value"+redisValue);
+//		stringRedisTemplate.delete("user_bank_add_"+userId);
+//		String redisValue = stringRedisTemplate.opsForValue().get("user_bank_add_"+userId);
+//		log.info("添加银行卡后删除redis的key后的value"+redisValue);
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
 
@@ -336,11 +337,13 @@ public class UserBankService extends AbstractService<UserBank> {
 		url.append("&bankcard=" + cardNo);
 		url.append("&idcard=" + idcard);
 		url.append("&sign=" + memberConfig.getBankAuth3Sign());
+		log.info("bankCardAuth3 url={}",url);
 		String rst = rest.getForObject(url.toString(), String.class);
 
 		JSONObject json = null;
 		try {
 			json = JSON.parseObject(rst);
+			log.info("bankCardAuth3 response={}",json);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
@@ -394,11 +397,13 @@ public class UserBankService extends AbstractService<UserBank> {
 		StringBuffer url = new StringBuffer(memberConfig.getBankTypeUrl());
 		url.append("?bankcard=" + cardNo);
 		url.append("&key=" + memberConfig.getBankTypeKey());
+		log.info("cardNum={},queryUserBankType url={}",cardNo,url);
 		String rst = rest.getForObject(url.toString(), String.class);
 
 		JSONObject json = null;
 		try {
 			json = JSON.parseObject(rst);
+			log.info("queryUserBankType response={}",json);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
