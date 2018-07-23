@@ -1,10 +1,13 @@
 package com.dl.member.web;
+import com.dl.base.enums.ActivityEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.DLActivity;
 import com.dl.member.param.UserRegisterParam;
+import com.dl.member.service.DLActivityService;
 import com.dl.member.service.UserBonusService;
 import com.dl.member.service.UserLoginService;
 import com.dl.member.service.UserRegisterService;
@@ -43,6 +46,9 @@ public class UserRegisterController {
     
     @Resource
     private UserBonusService userBonusService;
+    
+    @Resource
+    private DLActivityService dLActivityService;
 
     /**
      * 新用户注册:
@@ -68,9 +74,12 @@ public class UserRegisterController {
     	if(regRst.getCode() != 0) {
     		return ResultGenerator.genResult(regRst.getCode(),regRst.getMsg());
     	}
-    	
     	Integer userId = regRst.getData();
-    	//userBonusService.receiveUserBonus(ProjectConstant.REGISTER,userId);
+    	
+    	DLActivity act = dLActivityService.queryActivityByType(ActivityEnum.RechargeAct.getCode());
+    	if(0 == act.getIsFinish()) {//有效
+    		userBonusService.receiveUserBonus(ProjectConstant.REGISTER,userId);
+    	}
     	
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
