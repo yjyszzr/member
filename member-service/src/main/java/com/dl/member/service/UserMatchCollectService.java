@@ -69,7 +69,7 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
 	   	MatchCollectSomedayCountDTO matchCollectSomedayCountDTO = new MatchCollectSomedayCountDTO();
 	   	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, userMatchCollectParam.getMatchId(),strDate);
 	   	if(rst <= 0) {
-	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该该赛事");
+	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该赛事");
 	   	}
 	   	
 	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, userMatchCollectParam.getMatchId(),strDate);
