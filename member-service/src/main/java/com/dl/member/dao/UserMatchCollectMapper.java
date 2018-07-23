@@ -13,10 +13,10 @@ public interface UserMatchCollectMapper extends Mapper<UserMatchCollect> {
 	
 	int insertUserCollectMatch(UserMatchCollect umc);
 	
-	int queryUserMatchCollect(@Param("userId") Integer userId,@Param("matchId") Integer matchId);
+	int queryUserMatchCollect(@Param("userId") Integer userId,@Param("matchId") Integer matchId,@Param("addTime") Integer addTime);
 	
 	int countUserCollectMatch(@Param("userId") Integer userId,@Param("dateStr")String dateStr);
 	
-	int deleteUserMatchCollect(@Param("userId") Integer userId,@Param("matchId") Integer matchId);
+	int deleteUserMatchCollect(@Param("userId") Integer userId,@Param("matchId") Integer matchId,@Param("addTime") Integer addTime);
 	
 }

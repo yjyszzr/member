@@ -44,17 +44,19 @@ public class UserMatchCollectController {
     @PostMapping("/collectMatchId")
     public BaseResult<MatchCollectSomedayCountDTO> collectMatchId(@RequestBody UserMatchCollectParam userMatchCollectParam) {
         Integer userId = SessionUtil.getUserId();
-        MatchCollectSomedayCountDTO matchCollectSomedayCountDTO = new MatchCollectSomedayCountDTO();
-        Integer matchId = userMatchCollectParam.getMatchId();
-        int rstCollect = userMatchCollectService.queryMyCollectMatch(userId, matchId);
-        if(rstCollect > 0) {
-        	return  ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "该场比赛已收藏",matchCollectSomedayCountDTO);
-        }
-        int rstSave = userMatchCollectService.saveMyCollectMatch(userId, matchId);
         String strDate = userMatchCollectParam.getDateStr();
         if(StringUtils.isEmpty(strDate)) {
         	strDate = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
         }
+        
+        MatchCollectSomedayCountDTO matchCollectSomedayCountDTO = new MatchCollectSomedayCountDTO();
+        Integer matchId = userMatchCollectParam.getMatchId();
+        int rstCollect = userMatchCollectService.queryMyCollectMatch(userId, matchId,strDate);
+        if(rstCollect > 0) {
+        	return  ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "该场比赛已收藏",matchCollectSomedayCountDTO);
+        }
+        int rstSave = userMatchCollectService.saveMyCollectMatch(userId, matchId,strDate);
+
         Integer nowUserCollect = userMatchCollectService.countUserCollectByDate(userId,strDate);
         matchCollectSomedayCountDTO.setMatchCollectCount(String.valueOf(nowUserCollect));
 	   	return ResultGenerator.genSuccessResult("success",matchCollectSomedayCountDTO);

@@ -35,11 +35,11 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
      * @param userId
      * @return
      */
-    public int saveMyCollectMatch(Integer userId,Integer matchId){
+    public int saveMyCollectMatch(Integer userId,Integer matchId,String dateStr){
     	UserMatchCollect umc = new UserMatchCollect();
     	umc.setUserId(userId);
     	umc.setMatchId(matchId);
-    	umc.setAddTime(DateUtil.getCurrentTimeLong());
+    	umc.setAddTime(DateUtil.getSomeTimeLong(dateStr, DateUtil.date_sdf));
     	umc.setIsDelete(0);
     	int rst = userMatchCollectMapper.insertUserCollectMatch(umc);
     	return rst;
@@ -50,8 +50,8 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
      * @param userId
      * @return
      */
-    public int queryMyCollectMatch(Integer userId,Integer matchId){
-    	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId);
+    public int queryMyCollectMatch(Integer userId,Integer matchId,String dateStr){
+    	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId,DateUtil.getSomeTimeLong(dateStr, DateUtil.date_sdf));
     	return rst;
     }
     
@@ -62,17 +62,17 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
      */
     public BaseResult<MatchCollectSomedayCountDTO> cancleCollect(UserMatchCollectParam userMatchCollectParam) {
 	   	Integer userId = SessionUtil.getUserId();
-	   	MatchCollectSomedayCountDTO matchCollectSomedayCountDTO = new MatchCollectSomedayCountDTO();
-	   	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, userMatchCollectParam.getMatchId());
-	   	if(rst <= 0) {
-	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该该赛事",matchCollectSomedayCountDTO);
-	   	}
-	   	
-	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, userMatchCollectParam.getMatchId());
         String strDate = userMatchCollectParam.getDateStr();
         if(StringUtils.isEmpty(strDate)) {
         	strDate = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
         }
+	   	MatchCollectSomedayCountDTO matchCollectSomedayCountDTO = new MatchCollectSomedayCountDTO();
+	   	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, userMatchCollectParam.getMatchId(),DateUtil.getSomeTimeLong(strDate, DateUtil.date_sdf));
+	   	if(rst <= 0) {
+	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该该赛事",matchCollectSomedayCountDTO);
+	   	}
+	   	
+	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, userMatchCollectParam.getMatchId(),DateUtil.getSomeTimeLong(strDate, DateUtil.date_sdf));
 	   	Integer nowUserCollect = this.countUserCollectByDate(userId,strDate);
 	   	matchCollectSomedayCountDTO.setMatchCollectCount(String.valueOf(nowUserCollect));
 	   	return ResultGenerator.genSuccessResult("取消收藏成功",matchCollectSomedayCountDTO);
