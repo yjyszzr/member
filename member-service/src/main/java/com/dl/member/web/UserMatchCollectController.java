@@ -53,7 +53,7 @@ public class UserMatchCollectController {
         Integer matchId = userMatchCollectParam.getMatchId();
         int rstCollect = userMatchCollectService.queryMyCollectMatch(userId, matchId,strDate);
         if(rstCollect > 0) {
-        	return  ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "该场比赛已收藏",matchCollectSomedayCountDTO);
+        	return  ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "该场比赛已收藏");
         }
         int rstSave = userMatchCollectService.saveMyCollectMatch(userId, matchId,strDate);
 

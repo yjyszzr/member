@@ -39,7 +39,7 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
     	UserMatchCollect umc = new UserMatchCollect();
     	umc.setUserId(userId);
     	umc.setMatchId(matchId);
-    	umc.setAddTime(DateUtil.getSomeTimeLong(dateStr, DateUtil.date_sdf));
+    	umc.setAddTime(DateUtil.getTimeSomeDate(DateUtil.strToDate(dateStr)));
     	umc.setIsDelete(0);
     	int rst = userMatchCollectMapper.insertUserCollectMatch(umc);
     	return rst;
@@ -51,7 +51,7 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
      * @return
      */
     public int queryMyCollectMatch(Integer userId,Integer matchId,String dateStr){
-    	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId,DateUtil.getSomeTimeLong(dateStr, DateUtil.date_sdf));
+    	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId,dateStr);
     	return rst;
     }
     
@@ -67,12 +67,12 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
         	strDate = DateUtil.getCurrentDateTime(LocalDateTime.now(), DateUtil.date_sdf);
         }
 	   	MatchCollectSomedayCountDTO matchCollectSomedayCountDTO = new MatchCollectSomedayCountDTO();
-	   	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, userMatchCollectParam.getMatchId(),DateUtil.getSomeTimeLong(strDate, DateUtil.date_sdf));
+	   	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, userMatchCollectParam.getMatchId(),strDate);
 	   	if(rst <= 0) {
-	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该该赛事",matchCollectSomedayCountDTO);
+	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该该赛事");
 	   	}
 	   	
-	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, userMatchCollectParam.getMatchId(),DateUtil.getSomeTimeLong(strDate, DateUtil.date_sdf));
+	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, userMatchCollectParam.getMatchId(),strDate);
 	   	Integer nowUserCollect = this.countUserCollectByDate(userId,strDate);
 	   	matchCollectSomedayCountDTO.setMatchCollectCount(String.valueOf(nowUserCollect));
 	   	return ResultGenerator.genSuccessResult("取消收藏成功",matchCollectSomedayCountDTO);

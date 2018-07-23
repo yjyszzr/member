@@ -19,7 +19,7 @@
   </select>
   
   <select id="queryUserMatchCollect"  resultType="java.lang.Integer">
-	  	SELECT count(1) FROM dl_user_match_collect WHERE user_id = #{userId} AND match_id = #{matchId}
+	  	SELECT count(1) FROM dl_user_match_collect WHERE user_id = #{userId} AND match_id = #{matchId} AND FROM_UNIXTIME(add_time,'%Y-%m-%d') = #{dateStr}
   </select>  
   
   <select id="countUserCollectMatch"  resultType="java.lang.Integer">
@@ -30,7 +30,7 @@
 	INSERT INTO dl_user_match_collect(match_id,add_time,user_id,is_delete) VALUES(#{matchId},#{addTime},#{userId},#{isDelete}) 
   </insert>  
   
-   <delete id="deleteUserMatchCollect" parameterType="java.lang.Integer">
-  		DELETE FROM dl_user_match_collect WHERE user_id = #{userId} AND match_id = #{matchId} AND add_time = #{addTime}
+   <delete id="deleteUserMatchCollect">
+  		DELETE FROM dl_user_match_collect WHERE user_id = #{userId} AND match_id = #{matchId} AND FROM_UNIXTIME(add_time,'%Y-%m-%d') = #{dateStr}
   </delete>
 </mapper>
