@@ -105,6 +105,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	Condition condition = new Condition(UserReal.class);
     	Criteria criteria = condition.createCriteria();
     	criteria.andCondition("id_code = ", iDCode);
+    	criteria.andCondition("user_id = ", userId);
     	List<UserReal> userRealList = this.findByCondition(condition);
     	if(userRealList.size() >= 2) {
 			return ResultGenerator.genResult(MemberEnums.USER_REAL_COUNTLIMIT.getcode(),MemberEnums.USER_REAL_COUNTLIMIT.getMsg());

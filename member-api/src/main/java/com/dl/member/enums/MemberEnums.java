@@ -36,7 +36,7 @@ public enum MemberEnums {
 	COMPLAIN_CONTENT_NULL(301043,"投诉内容不能为空"),
 	COMMON_ERROR(301044,"提示消息自定义"),
 	MESSAGE_COUNT_ERROR(301045,"您今天已发送10条验证码，请明天再试"),
-	USER_REAL_COUNTLIMIT(301046,"一张身份证最多绑定4个用户"),
+	USER_REAL_COUNTLIMIT(301046,"一张身份证最多绑定2个用户"),
 	MESSAGE_SENDLOT_ERROR(301047,"验证码60秒内仅可发送一次,请稍后重试！"),
 	USER_NOT_FOUND_ERROR(301048,"用户获取失败或不存在！"),
 	NO_OLD_LOGIN_PASS_ERROR(301049,"请提供原始密码！"),
