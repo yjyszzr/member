@@ -48,11 +48,8 @@ public class UserBankController {
      */
     @ApiOperation(value = "添加银行卡", notes = "添加银行卡")
     @PostMapping("/addBankCard")
-    public BaseResult<String> addBankCard(@RequestBody BankCardParam bankCardParam){
-    	for(int i = 0 ; i <= 1; i++ ) {
-    		userBankService.addBankCard(bankCardParam.getBankCardNo());
-    	}
-		return null; 
+    public BaseResult<UserBankDTO> addBankCard(@RequestBody BankCardParam bankCardParam){
+    	return userBankService.addBankCard(bankCardParam.getBankCardNo());
     }
 
     /**
