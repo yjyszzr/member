@@ -101,12 +101,12 @@ public class UserRealService extends AbstractService<UserReal> {
 			return ResultGenerator.genResult(MemberEnums.COMMON_ERROR.getcode(), "实名认证的名字包含特殊符号");
 		}
     	
-    	//一个身份证最多绑定4个用户
+    	//一个身份证最多绑定2个用户
     	Condition condition = new Condition(UserReal.class);
     	Criteria criteria = condition.createCriteria();
     	criteria.andCondition("id_code = ", iDCode);
     	List<UserReal> userRealList = this.findByCondition(condition);
-    	if(userRealList.size() >= 4) {
+    	if(userRealList.size() >= 2) {
 			return ResultGenerator.genResult(MemberEnums.USER_REAL_COUNTLIMIT.getcode(),MemberEnums.USER_REAL_COUNTLIMIT.getMsg());
     	}
     		
