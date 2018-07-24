@@ -102,7 +102,7 @@ public class UserService extends AbstractService<User> {
 		userDTO.setRealInfo(this.createRealInfo(userRealDTO));
 		String mobile = user.getMobile();
 		userDTO.setMobile(mobile);
-		userDTO.setRealName(userRealDTO.getRealName());
+		userDTO.setRealName(userRealDTO != null?userRealDTO.getRealName():"");
 		userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setActivityDTOList(this.queryAppPromotion(userId));
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
@@ -143,7 +143,7 @@ public class UserService extends AbstractService<User> {
 		String strStar4 = RandomUtil.generateStarString(4);
 		String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
 		userDTO.setMobile(mobileStr);
-		userDTO.setRealName(userRealDTO.getRealName());
+		userDTO.setRealName(userRealDTO != null?userRealDTO.getRealName():"");
 		userDTO.setUserMoney(userMoneyStr);
 		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
