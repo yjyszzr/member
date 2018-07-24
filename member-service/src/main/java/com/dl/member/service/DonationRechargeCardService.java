@@ -53,7 +53,7 @@ public class DonationRechargeCardService extends AbstractService<DonationRecharg
         
     	DLActivity dLActivity = dLActivityMapper.queryActivityByType(ProjectConstant.RECHARGE_ACT);
         RechargeActivityDTO rechargeActivityDTO = new RechargeActivityDTO();
-        if(dLActivity.getIsFinish() == true) {//活动失效 
+        if(dLActivity.getIsFinish() == 1) {//活动失效 
             rechargeActivityDTO.setStartTime(1514736000);
             rechargeActivityDTO.setEndTime(1514822400);
         }else {//活动有效

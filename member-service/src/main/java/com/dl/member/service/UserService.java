@@ -145,7 +145,7 @@ public class UserService extends AbstractService<User> {
 		String strStar4 = RandomUtil.generateStarString(4);
 		String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
 		userDTO.setMobile(mobileStr);
-		userDTO.setRealName(userRealDTO.getRealName());
+		userDTO.setRealName(userRealDTO != null?userRealDTO.getRealName():"");
 		userDTO.setUserMoney(userMoneyStr);
 		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
