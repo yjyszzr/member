@@ -76,7 +76,7 @@ public class UserRegisterController {
     	}
     	Integer userId = regRst.getData();
     	
-    	DLActivity act = dLActivityService.queryActivityByType(ActivityEnum.RechargeAct.getCode());
+    	DLActivity act = dLActivityService.queryActivityByType(ActivityEnum.RegisterAct.getCode());
     	if(0 == act.getIsFinish()) {//有效
     		userBonusService.receiveUserBonus(ProjectConstant.REGISTER,userId);
     	}
