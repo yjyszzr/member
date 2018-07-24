@@ -21,7 +21,7 @@ public class DLActivityService extends AbstractService<DLActivity> {
     }
     
     /**
-     * 插叙是否有有效的充值活动
+     * 查询是否有有效的充值活动
      * @return
      */
     public Integer queryValidActivity() {

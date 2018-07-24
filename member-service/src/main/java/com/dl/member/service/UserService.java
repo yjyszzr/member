@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tk.mybatis.mapper.entity.Condition;
 
+import com.dl.base.enums.ActivityEnum;
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.model.UserDeviceInfo;
@@ -152,7 +153,7 @@ public class UserService extends AbstractService<User> {
 		if (null == userId) {
 			return ResultGenerator.genNeedLoginResult("请登录");
 		}
-
+		
 		User user = userMapper.queryUserExceptPass(userId);
 		if (user == null) {
 			return ResultGenerator.genFailResult("用户不存在");
@@ -162,36 +163,47 @@ public class UserService extends AbstractService<User> {
 		try {
 			BeanUtils.copyProperties(userDTO, user);
 		} catch (Exception e1) {
-			log.error(e1.getMessage());
+			log.error("个人信息接口的DTO转换异常");
+			return ResultGenerator.genFailResult("个人信息接口的DTO转换异常");
 		}
-
-		if (StringUtils.isBlank(user.getPassword())) {
-			userDTO.setHasPass(0);
-		} else {
-			userDTO.setHasPass(1);
-		}
-
+		
+		UserRealDTO userRealDTO = userRealService.queryUserReal();
+		userDTO.setHasPass(StringUtils.isBlank(user.getPassword())?0:1);
+		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
+		userDTO.setRealInfo(this.createRealInfo(userRealDTO));
 		BigDecimal userMoney = user.getUserMoney();
 		String userMoneyStr = userMoney == null ? "0" : userMoney.toString();
-		userDTO.setUserMoney(userMoneyStr);
-		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
-		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
-		userDTO.setRealInfo("");
-		String realName = "";
-		UserRealDTO userRealDTO = userRealService.queryUserReal();
-		if (userRealDTO != null) {
-			realName = userRealDTO.getRealName();
-			userDTO.setRealInfo(realName.substring(0, 1) + "**" + "(" + userRealDTO.getIdCode().substring(0, 6) + "****" + userRealDTO.getIdCode().substring(userRealDTO.getIdCode().length() - 4) + ")");
-		}
-
 		String mobile = user.getMobile();
 		String strStar4 = RandomUtil.generateStarString(4);
 		String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
 		userDTO.setMobile(mobileStr);
-		userDTO.setRealName(realName);
+		userDTO.setRealName(userRealDTO.getRealName());
+		userDTO.setUserMoney(userMoneyStr);
+		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
+		userDTO.setActivityDTOList(this.queryAppPromotion(userId));
+		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
+	}
 
-		// 只有店员才展示推广链接
+	/**
+	 * 构造实名认证信息:包含了部分身份证号
+	 * @return
+	 */
+	public String createRealInfo(UserRealDTO userRealDTO){
+		String realInfo = "";
+		if (userRealDTO != null) {
+			String realName = userRealDTO.getRealName();
+			realInfo = realName.substring(0, 1) + "**" + "(" + userRealDTO.getIdCode().substring(0, 6) + "****" + userRealDTO.getIdCode().substring(userRealDTO.getIdCode().length() - 4) + ")";
+		}
+		return realInfo;
+	}
+	
+	/**
+	 *  只有店员才展示有效的推广链接
+	 * @param userId
+	 * @return
+	 */
+	public List<com.dl.member.dto.ActivityDTO> queryAppPromotion(Integer userId) {
 		List<com.dl.member.dto.ActivityDTO> activityMemDTOList = new ArrayList<com.dl.member.dto.ActivityDTO>();
 		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
 		Condition condition = new Condition(DlChannelConsumer.class);
@@ -200,35 +212,29 @@ public class UserService extends AbstractService<User> {
 		if (channelDistributor.size() > 0) {
 			com.dl.member.dto.ActivityDTO memActivityDTO = new com.dl.member.dto.ActivityDTO();
 			ActTypeParam actTypeParam = new ActTypeParam();
-			actTypeParam.setActType(2);
+			actTypeParam.setActType(ActivityEnum.AppPromotion.getCode());
 			BaseResult<List<ActivityDTO>> activityDTORst = lotteryActivityService.queryActivityByActType(actTypeParam);
 			if (activityDTORst.getCode() != 0) {
 				log.error("查询推广活动异常：" + activityDTORst.getMsg());
-				activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
 			} else {
 				activityDTOList = activityDTORst.getData();
 			}
-
 			if (null != activityDTOList && activityDTOList.size() > 0) {
 				activityDTOList.forEach(s -> {
 					try {
 						BeanUtils.copyProperties(memActivityDTO, s);
 					} catch (Exception e) {
-						e.printStackTrace();
+						log.error("个人信息接口的DTO转换异常");
 					}
-					activityMemDTOList.add(memActivityDTO);
+					if(0 == s.getIsFinish()) {//有效
+						activityMemDTOList.add(memActivityDTO);
+					}
 				});
 			}
-		}
-
-		// 查询推广活动集合
-		userDTO.setActivityDTOList(activityMemDTOList);
-
-		// 查询是否
-
-		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
+		}	
+		return activityMemDTOList;
 	}
-
+	
 	/**
 	 * 保存用户
 	 * 

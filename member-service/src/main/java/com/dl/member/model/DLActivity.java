@@ -54,7 +54,7 @@ public class DLActivity {
      * 活动状态 0-有效 1-无效
      */
     @Column(name = "is_finish")
-    private Boolean isFinish;
+    private Integer isFinish;
 
     /**
      * 限购数量
@@ -218,7 +218,7 @@ public class DLActivity {
      *
      * @return is_finish - 活动状态 0-有效 1-无效
      */
-    public Boolean getIsFinish() {
+    public Integer getIsFinish() {
         return isFinish;
     }
 
@@ -227,7 +227,7 @@ public class DLActivity {
      *
      * @param isFinish 活动状态 0-有效 1-无效
      */
-    public void setIsFinish(Boolean isFinish) {
+    public void setIsFinish(Integer isFinish) {
         this.isFinish = isFinish;
     }
 

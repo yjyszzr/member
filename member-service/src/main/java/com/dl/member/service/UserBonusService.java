@@ -376,9 +376,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			return false;
 		}
 		List<ActivityBonus> activityBonusList = new ArrayList<ActivityBonus>();
-		// if(ProjectConstant.REGISTER.equals(type)) {
 		activityBonusList = activityBonusService.queryActivityBonusList(type);
-		// }
 		if (activityBonusList.size() == 0) {
 			return false;
 		}
