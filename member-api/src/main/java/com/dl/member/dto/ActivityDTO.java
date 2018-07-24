@@ -14,5 +14,7 @@ public class ActivityDTO {
 	private String icon;
 	@ApiModelProperty(value="活动跳转链接")
 	private String actUrl;
+	@ApiModelProperty(value="活动是否有效：0-有效 1-无效")
+	private Integer isFinish;
 	
 }

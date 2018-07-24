@@ -27,14 +27,12 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
 import com.dl.base.util.SessionUtil;
-import com.dl.lottery.api.ILotteryActivityService;
-import com.dl.lottery.dto.ActivityDTO;
-import com.dl.lottery.param.ActTypeParam;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
+import com.dl.member.dto.ActivityDTO;
 import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserNoticeDTO;
 import com.dl.member.dto.UserRealDTO;
@@ -69,7 +67,7 @@ public class UserService extends AbstractService<User> {
 	private StringRedisTemplate stringRedisTemplate;
 
 	@Resource
-	private ILotteryActivityService lotteryActivityService;
+	private DLActivityService dlActivityService;
 
 	@Resource
 	private DlChannelConsumerService channelConsumerService;
@@ -93,52 +91,20 @@ public class UserService extends AbstractService<User> {
 		try {
 			BeanUtils.copyProperties(userDTO, user);
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			log.error("个人信息接口的DTO转换异常");
+			return ResultGenerator.genFailResult("个人信息接口的DTO转换异常");
 		}
+		
 		userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
 		userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
-		String realName = "";
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
-		if (userRealDTO != null) {
-			realName = userRealDTO.getRealName();
-			userDTO.setRealInfo(realName.substring(0, 1) + "**" + "(" + userRealDTO.getIdCode().substring(0, 6) + "****" + userRealDTO.getIdCode().substring(userRealDTO.getIdCode().length() - 4) + ")");
-		}
+		userDTO.setRealInfo(this.createRealInfo(userRealDTO));
 		String mobile = user.getMobile();
 		userDTO.setMobile(mobile);
-		userDTO.setRealName(realName);
+		userDTO.setRealName(userRealDTO.getRealName());
 		userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
-
-		// 查询推广活动集合
-		List<com.dl.member.dto.ActivityDTO> activityMemDTOList = new ArrayList<com.dl.member.dto.ActivityDTO>();
-		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
-		ActTypeParam actTypeParam = new ActTypeParam();
-		actTypeParam.setActType(2);
-		BaseResult<List<ActivityDTO>> activityDTORst = lotteryActivityService.queryActivityByActType(actTypeParam);
-		if (activityDTORst.getCode() != 0) {
-			log.error("查询推广活动异常：" + activityDTORst.getMsg());
-			activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
-		} else {
-			activityDTOList = activityDTORst.getData();
-		}
-
-		// 店员才推广展示
-		Condition condition = new Condition(DlChannelConsumer.class);
-		condition.createCriteria().andCondition("user_id = ", userId);
-		List<DlChannelDistributor> channelDistributor = dlChannelDistributorMapper.selectByCondition(condition);
-		if (channelDistributor.size() > 0) {
-			com.dl.member.dto.ActivityDTO memActivityDTO = new com.dl.member.dto.ActivityDTO();
-			activityDTOList.forEach(s -> {
-				try {
-					BeanUtils.copyProperties(memActivityDTO, s);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				activityMemDTOList.add(memActivityDTO);
-			});
-		}
-
-		userDTO.setActivityDTOList(activityMemDTOList);
+		userDTO.setActivityDTOList(this.queryAppPromotion(userId));
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
 
@@ -205,20 +171,12 @@ public class UserService extends AbstractService<User> {
 	 */
 	public List<com.dl.member.dto.ActivityDTO> queryAppPromotion(Integer userId) {
 		List<com.dl.member.dto.ActivityDTO> activityMemDTOList = new ArrayList<com.dl.member.dto.ActivityDTO>();
-		List<com.dl.lottery.dto.ActivityDTO> activityDTOList = new ArrayList<com.dl.lottery.dto.ActivityDTO>();
 		Condition condition = new Condition(DlChannelConsumer.class);
 		condition.createCriteria().andCondition("user_id = ", userId);
 		List<DlChannelDistributor> channelDistributor = dlChannelDistributorMapper.selectByCondition(condition);
 		if (channelDistributor.size() > 0) {
 			com.dl.member.dto.ActivityDTO memActivityDTO = new com.dl.member.dto.ActivityDTO();
-			ActTypeParam actTypeParam = new ActTypeParam();
-			actTypeParam.setActType(ActivityEnum.AppPromotion.getCode());
-			BaseResult<List<ActivityDTO>> activityDTORst = lotteryActivityService.queryActivityByActType(actTypeParam);
-			if (activityDTORst.getCode() != 0) {
-				log.error("查询推广活动异常：" + activityDTORst.getMsg());
-			} else {
-				activityDTOList = activityDTORst.getData();
-			}
+			List<ActivityDTO> activityDTOList = dlActivityService.queryActivityByActType(ActivityEnum.AppPromotion.getCode());
 			if (null != activityDTOList && activityDTOList.size() > 0) {
 				activityDTOList.forEach(s -> {
 					try {

@@ -100,7 +100,6 @@ public class UserController {
 	@ApiOperation(value = "查询用户信息除了登录密码和支付密码", notes = "查询用户信息除了登录密码和支付密码")
 	@PostMapping("/userInfoExceptPass")
 	public BaseResult<UserDTO> queryUserInfo(@RequestBody StrParam strParam) {
-		// 测试prod1.0.0 修改
 		return userService.queryUserByUserIdExceptPass();
 	}
 
