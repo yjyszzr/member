@@ -56,9 +56,6 @@ public class UserMatchCollectController {
         	return  ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), "该场比赛已收藏");
         }
         int rstSave = userMatchCollectService.saveMyCollectMatch(userId, matchId,strDate);
-
-        Integer nowUserCollect = userMatchCollectService.countUserCollectByDate(userId,strDate);
-        matchCollectSomedayCountDTO.setMatchCollectCount(String.valueOf(nowUserCollect));
 	   	return ResultGenerator.genSuccessResult("success",matchCollectSomedayCountDTO);
     }
     

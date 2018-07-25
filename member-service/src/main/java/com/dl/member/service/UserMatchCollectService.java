@@ -71,10 +71,7 @@ public class UserMatchCollectService extends AbstractService<UserMatchCollect> {
 	   	if(rst <= 0) {
 	   		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"用户没有收藏该赛事");
 	   	}
-	   	
 	   	int delRst = userMatchCollectMapper.deleteUserMatchCollect(userId, userMatchCollectParam.getMatchId(),strDate);
-	   	Integer nowUserCollect = this.countUserCollectByDate(userId,strDate);
-	   	matchCollectSomedayCountDTO.setMatchCollectCount(String.valueOf(nowUserCollect));
 	   	return ResultGenerator.genSuccessResult("取消收藏成功",matchCollectSomedayCountDTO);
    }
     
