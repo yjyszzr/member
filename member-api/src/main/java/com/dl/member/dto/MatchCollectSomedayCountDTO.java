@@ -13,5 +13,5 @@ import lombok.Data;
 @Data
 public class MatchCollectSomedayCountDTO {
 	@ApiModelProperty("某天收藏的比赛数量")
-    private String matchCollectCount = "0";
+    private String matchCollectCount = "";
 }
