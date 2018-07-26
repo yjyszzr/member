@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -126,12 +127,10 @@ public class UserRealService extends AbstractService<UserReal> {
 			return ResultGenerator.genResult(MemberEnums.VERIFY_IDCARD_EROOR.getcode(),reason);
 		}
     	
-    	this.saveUserReal(realName,iDCode);
-    	
-    	User updateUser = new User();
-    	updateUser.setUserId(userId);
-    	updateUser.setIsReal(ProjectConstant.USER_IS_REAL);
-    	userService.update(updateUser);
+		int updateRst = userMapper.updateIsReal0to1(userId);
+		if(1 == updateRst) {
+			this.saveUserReal(realName,iDCode);
+		}
     	return ResultGenerator.genSuccessResult("实名认证成功");
     }
 

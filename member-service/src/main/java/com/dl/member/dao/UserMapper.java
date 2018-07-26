@@ -50,4 +50,7 @@ public interface UserMapper extends Mapper<User> {
 	List<String> getClientIds(@Param("userIds") List<Integer> userIds);
 
 	Integer updateUserInfo(User user);
+	
+	int updateIsReal0to1(@Param("userId")Integer userId);
+	
 }

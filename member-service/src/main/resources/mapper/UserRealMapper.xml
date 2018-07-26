@@ -27,5 +27,4 @@
   <select id = "countUserRealByIDCodeAndUserId" resultType="java.lang.Integer">
     select count(real_id) from dl_user_real where user_id = #{userId} and id_code = #{idCode} and is_delete = 0
   </select>
-  
 </mapper>

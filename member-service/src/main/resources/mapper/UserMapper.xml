@@ -142,4 +142,8 @@
 	</foreach>
   </select>
   
+  <update id="updateIsReal0to1">
+  	update dl_user set is_real = 1 where  user_id = #{userId} and is_real = 0
+  </update>
+  
 </mapper>
