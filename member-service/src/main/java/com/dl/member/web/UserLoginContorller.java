@@ -58,8 +58,7 @@ public class UserLoginContorller {
     @PostMapping("/logout")
     public BaseResult<String> logout(@RequestBody StrParam strPaaram, HttpServletRequest request) {
     	userLoginService.loginLogOut();
-    	Integer userId = SessionUtil.getUserId();
-        TokenUtil.invalidateUserToken(userId);
+        TokenUtil.invalidateCurToken();
         request.getSession().removeAttribute("user_token");
         return ResultGenerator.genSuccessResult("用户注销成功");
     }
