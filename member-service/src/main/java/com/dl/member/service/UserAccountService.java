@@ -131,26 +131,51 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	public BaseResult<SurplusPaymentCallbackDTO> addUserAccountByPay(SurplusPayParam surplusPayParam) {
 		String inPrams = JSON.toJSONString(surplusPayParam);
 		log.info(DateUtil.getCurrentDateTime() + "使用到了部分或全部余额时候支付传递的参数:" + inPrams);
-
 		Integer userId = SessionUtil.getUserId();
-		User user = userService.findById(userId);
+		User user = userMapper.selectUserFoUpdateByUserId(userId);//锁用户信息
 		if (null == user) {
 			return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在，不能使用余额付款");
 		}
-
 		// 用户余额
 		BigDecimal yue = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney());
 		BigDecimal surplus = surplusPayParam.getSurplus();
 		if (yue.compareTo(surplus) == -1) {
 			return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
 		}
-
 		if (surplus.compareTo(BigDecimal.ZERO) < 0) {
 			return ResultGenerator.genResult(MemberEnums.MONEY_PAID_NOTLESS_ZERO.getcode(), MemberEnums.MONEY_PAID_NOTLESS_ZERO.getMsg());
 		}
-
-		SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = this.commonCalculateMoney(surplusPayParam.getSurplus(), ProjectConstant.BUY);
-
+        BigDecimal money = BigDecimal.ZERO;
+        BigDecimal user_money = BigDecimal.ZERO; // 用户账户变动后的可提现余额
+        BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
+        BigDecimal usedUserMoney = null;// 使用的可提现余额
+        BigDecimal usedUserMoneyLimit = null;// 使用的不可提现余额
+        BigDecimal curBalance = BigDecimal.ZERO;// 当前变动后的总余额
+        BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
+        User updateUser = new User();
+        updateUser.setUserId(user.getUserId());
+        money = user.getUserMoneyLimit().subtract(surplus);
+        if (money.compareTo(BigDecimal.ZERO) >= 0) {// 不可提现余额 够
+            user_money = user.getUserMoney();
+            user_money_limit = money;
+            usedUserMoney = BigDecimal.ZERO;
+            usedUserMoneyLimit = surplus;
+        } else {// 不可提现余额 不够
+        	usedUserMoneyLimit = user.getUserMoneyLimit();
+        	usedUserMoney = surplus.subtract(usedUserMoneyLimit);
+        	user_money_limit = BigDecimal.ZERO;
+            user_money = user.getUserMoney().subtract(usedUserMoney);
+            updateUser.setUserMoney(user_money);
+        }
+        curBalance = user_money_limit.add(user_money);
+        updateUser.setUserMoneyLimit(user_money_limit);
+        userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
+        SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
+        surplusPaymentCallbackDTO.setSurplus(surplus);
+        surplusPaymentCallbackDTO.setUserSurplus(usedUserMoney);
+        surplusPaymentCallbackDTO.setUserSurplusLimit(usedUserMoneyLimit);
+        surplusPaymentCallbackDTO.setCurBalance(curBalance);
+        surplusPaymentCallbackDTO.setFrozenMoney(frozenMoney);
 		UserAccount userAccountParam = new UserAccount();
 		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
 		userAccountParam.setAccountSn(accountSn);
@@ -173,6 +198,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (1 == insertRst) {
 			surplusPaymentCallbackDTO.setAccountSn(accountSn);
 		} else {
+			log.error("插入流水信息报错，未插入 流水信息={}",JSON.toJSONString(userAccountParam));
 			surplusPaymentCallbackDTO.setAccountSn("");
 		}
 
@@ -592,98 +618,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccountByTimeDTO.setWithDrawMoney(String.valueOf(df.format(0 - totalWithDrawMoney)));
 		userAccountByTimeDTO.setRewardMoney(String.valueOf(df.format(rewardMoney)));
 		return userAccountByTimeDTO;
-	}
-
-	/**
-	 * 账户公共计算服务
-	 * 
-	 * @param inOrOutMoney
-	 *            非0
-	 * @param type
-	 *            :1-下单付款 2-充值 3-提现 4-退款
-	 * @return
-	 */
-	public SurplusPaymentCallbackDTO commonCalculateMoney(BigDecimal inOrOutMoney, Integer type) {
-		if (inOrOutMoney.compareTo(BigDecimal.ZERO) == -1) {
-			throw new ServiceException(MemberEnums.PARAM_WRONG.getcode(), MemberEnums.PARAM_WRONG.getMsg());
-		}
-
-		BigDecimal money = BigDecimal.ZERO;
-		BigDecimal user_money = BigDecimal.ZERO; // 用户账户变动后的可提现余额
-		BigDecimal user_money_limit = BigDecimal.ZERO;// 用户账户变动后的不可提现余额
-		BigDecimal usedUserMoney = null;// 使用的可提现余额
-		BigDecimal usedUserMoneyLimit = null;// 使用的不可提现余额
-		BigDecimal curBalance = BigDecimal.ZERO;// 当前变动后的总余额
-
-		Integer userId = SessionUtil.getUserId();
-		User user = userService.findById(userId);
-		BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
-
-		User updateUser = new User();
-		updateUser.setUserId(SessionUtil.getUserId());
-
-		if (ProjectConstant.BUY == type) {
-			money = user.getUserMoneyLimit().subtract(inOrOutMoney);
-			if (money.compareTo(BigDecimal.ZERO) >= 0) {// 不可提现余额 够
-				user_money = user.getUserMoney();
-				user_money_limit = money;
-				usedUserMoney = BigDecimal.ZERO;
-				usedUserMoneyLimit = inOrOutMoney;
-			} else {// 不可提现余额 不够
-				user_money = user.getUserMoney().add(money);
-				user_money_limit = BigDecimal.ZERO;
-				usedUserMoneyLimit = user.getUserMoneyLimit();
-				usedUserMoney = inOrOutMoney.subtract(usedUserMoneyLimit);
-			}
-			curBalance = user_money_limit.add(user_money);
-
-			updateUser.setUserMoney(user_money);
-			updateUser.setUserMoneyLimit(user_money_limit);
-
-		}
-		// else if(ProjectConstant.RECHARGE == type) {
-		//
-		// user_money = user.getUserMoney();
-		// user_money_limit = user.getUserMoneyLimit().add(inOrOutMoney);
-		// curBalance = user_money_limit.add(user_money);
-		//
-		// updateUser.setUserMoneyLimit(user_money_limit);
-		//
-		// }else if(ProjectConstant.WITHDRAW == type) {
-		// BigDecimal curMoney =
-		// user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney());
-		// if(inOrOutMoney.compareTo(curMoney) == 1) {
-		// throw new ServiceException(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(),
-		// "当前提现的余额大于账户余额");
-		// }
-		//
-		// user_money = user.getUserMoney().subtract(inOrOutMoney);
-		// user_money_limit = user.getUserMoneyLimit();
-		// curBalance = user_money_limit.add(user_money);
-		// frozenMoney = BigDecimal.ZERO.subtract(inOrOutMoney);
-		//
-		// updateUser.setUserMoney(user_money);
-		// updateUser.setFrozenMoney(frozenMoney);
-		//
-		// }else if(ProjectConstant.REWARD == type) {
-		//
-		// user_money = user.getUserMoney().add(inOrOutMoney);
-		// user_money_limit = user.getUserMoneyLimit();
-		// curBalance = user_money_limit.add(user_money);
-		//
-		// updateUser.setUserMoney(user_money);
-		// }
-		int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
-
-		SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
-		surplusPaymentCallbackDTO.setSurplus(inOrOutMoney);
-		surplusPaymentCallbackDTO.setUserSurplus(usedUserMoney);
-		surplusPaymentCallbackDTO.setUserSurplusLimit(usedUserMoneyLimit);
-		surplusPaymentCallbackDTO.setCurBalance(curBalance);
-		surplusPaymentCallbackDTO.setFrozenMoney(frozenMoney);
-
-		return surplusPaymentCallbackDTO;
-
 	}
 
 	/**
