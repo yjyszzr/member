@@ -154,7 +154,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
         BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
         User updateUser = new User();
         updateUser.setUserId(user.getUserId());
-        if("400328".equals(user.getUserId())){
+        if(Integer.valueOf(400328).equals(user.getUserId())){
         	try {
         		log.info("进入胡贺东用户测试看是否进行了锁住用户操作 begain");
 				Thread.sleep(15000);
