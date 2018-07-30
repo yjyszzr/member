@@ -154,15 +154,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
         BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
         User updateUser = new User();
         updateUser.setUserId(user.getUserId());
-        if(Integer.valueOf(400328).equals(user.getUserId())){
-        	try {
-        		log.info("进入胡贺东用户测试看是否进行了锁住用户操作 begain");
-				Thread.sleep(15000);
-				log.info("进入胡贺东用户测试看是否进行了锁住用户操作 end");
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-        }
+//        经测试锁生效了
+//        if(Integer.valueOf(400328).equals(user.getUserId())){
+//        	try {
+//        		log.info("进入胡贺东用户测试看是否进行了锁住用户操作 begain");
+//				Thread.sleep(15000);
+//				log.info("进入胡贺东用户测试看是否进行了锁住用户操作 end");
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//        }
         money = user.getUserMoneyLimit().subtract(surplus);
         if (money.compareTo(BigDecimal.ZERO) >= 0) {// 不可提现余额 够
             user_money = user.getUserMoney();
