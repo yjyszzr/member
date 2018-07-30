@@ -50,7 +50,7 @@
 	#{regTime},#{regIp},#{lastTime},#{lastIp},#{mobileSupplier},#{mobileProvince},#{mobileCity},#{regFrom},
 	#{surplusPassword},#{payPwdSalt},#{userStatus},#{passWrongCount},#{userType},#{isReal},#{userRemark},#{lastTime},#{pushKey},#{deviceChannel})
   </insert>
-  <select id="selectUserFoUpdateByUserId">
+  <select id="selectUserFoUpdateByUserId" resultMap="BaseResultMap">
   select * from dl_user where user_id=#{userId} for update
   </select>
   <update id="updateUserBySelective" parameterType="com.dl.member.model.User">
