@@ -40,6 +40,7 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
+import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.SetLoginPassParam;
 import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserIdRealParam;
@@ -75,6 +76,8 @@ public class UserService extends AbstractService<User> {
 	@Resource
 	private DlChannelDistributorMapper dlChannelDistributorMapper;
 
+    @Resource
+   	private IDFAService iDFAService;
 	/**
 	 * real真实信息
 	 * 
@@ -243,6 +246,15 @@ public class UserService extends AbstractService<User> {
 			return null;
 		}
 		Integer userId = user.getUserId();
+		
+    	if(userDevice.getPlat().equals("iphone")) {
+    		//idfa 回调、存储  （lidelin）
+    		IDFACallBackParam idfaParam = new IDFACallBackParam();
+    		idfaParam.setUserid(userId);
+    		idfaParam.setIdfa(userDevice.getIDFA());
+    		iDFAService.callBackIdfa(idfaParam);
+    	}
+    	
 		return userId;
 	}
 
