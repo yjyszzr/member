@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.IDFACallBackMapper">
+	<resultMap id="BaseResultMap" type="com.dl.member.model.IDFACallBack">
+		<!-- WARNING - @mbg.generated -->
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="appid" jdbcType="INTEGER" property="appid" />
+		<result column="idfa" jdbcType="VARCHAR" property="idfa" />
+		<result column="source" jdbcType="VARCHAR" property="source" />
+		<result column="callback" jdbcType="VARCHAR" property="callback" />
+		<result column="back_status" jdbcType="INTEGER" property="back_status" />
+		<result column="creat_time" jdbcType="INTEGER" property="creat_time" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="update_time" />
+	</resultMap>
+
+	<!--表名 -->
+	<sql id="tableName">
+		dl_idfa_callback_info
+	</sql> 
+	 
+	<select id="queryByIdfa" resultType="com.dl.member.model.IDFACallBack">
+		SELECT * from dl_idfa_callback_info where idfa =#{idfa };
+	</select>
+	<insert id="save">
+		insert into
+		<include refid="tableName"></include>
+		(
+		appid,
+		idfa,
+		source,
+		callback,
+		creat_time
+		) values (
+		#{appid},
+		#{idfa},
+		#{source},
+		#{callback},
+		#{creat_time}
+		)
+	</insert>
+	
+	<update id="updateByIdfa" parameterType="com.dl.member.param.IDFAClickParam">
+		update
+		<include refid="tableName"></include>
+		set callback = #{callback},
+			appid = #{appid},
+			source = #{source}
+		where idfa = #{idfa}
+	</update>
+	<update id="updateBackStatusByIdfa" >
+		update
+		<include refid="tableName"></include>
+		set back_status = #{back_status} 
+		where idfa = #{idfa}
+	</update>
+</mapper>

@@ -8,8 +8,10 @@ import com.dl.base.util.SessionUtil;
 import com.dl.member.model.SwitchConfig;
 import com.dl.member.param.DeviceKeyParam;
 import com.dl.member.param.DeviceParam;
+import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.SwitchConfigParam;
+import com.dl.member.service.IDFAService;
 import com.dl.member.service.SwitchConfigService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +32,9 @@ import java.util.List;
 public class SwitchConfigController {
     @Resource
     private SwitchConfigService switchConfigService;
-
+    @Resource
+	private IDFAService iDFAService;
+    
     @ApiOperation(value = "根据平台和业务版本查询当前版本是否开启", notes = "根据平台和业务版本查询当前版本是否开启")
     @PostMapping("/query")
     public BaseResult<SwitchConfig> add(@RequestBody StrParam strparam) {
@@ -42,6 +46,11 @@ public class SwitchConfigController {
     		plat = "1";
     	}else if(userDevice.getPlat().equals("iphone")) {
     		plat = "0";
+    		//idfa 回调、存储  （lidelin）
+    		IDFACallBackParam idfaParam = new IDFACallBackParam();
+    		idfaParam.setUserid(-1);
+    		idfaParam.setIdfa(userDevice.getIDFA());
+    		iDFAService.callBackIdfa(idfaParam);
     	}else if(userDevice.getPlat().equals("h5")) {
     		plat = "2";
     	}else {

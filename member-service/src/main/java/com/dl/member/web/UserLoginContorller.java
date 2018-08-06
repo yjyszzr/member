@@ -6,13 +6,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.dto.UserLoginDTO;
+import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
+import com.dl.member.service.IDFAService;
 import com.dl.member.service.UserLoginService;
 import com.dl.member.util.TokenUtil;
 
@@ -31,7 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 public class UserLoginContorller {
     @Resource
     private UserLoginService userLoginService;
-
+    @Resource
+   	private IDFAService iDFAService;
+    
     @ApiOperation(value = "密码登录", notes = "密码登录")
     @PostMapping("/loginByPass")
     public BaseResult<UserLoginDTO> loginByPass( @RequestBody UserLoginWithPassParam userLoginMobileParam, HttpServletRequest request) {
@@ -39,6 +45,15 @@ public class UserLoginContorller {
     	if(loginByPass.getCode() == 0) {
     		String token = loginByPass.getData().getToken();
     		request.getSession().setAttribute("user_token", token);;
+    	}
+
+    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+    	if(userDevice.getPlat().equals("iphone")) {
+    		//idfa 回调、存储  （lidelin）
+    		IDFACallBackParam idfaParam = new IDFACallBackParam();
+    		idfaParam.setUserid(-1);
+    		idfaParam.setIdfa(userDevice.getIDFA());
+    		iDFAService.callBackIdfa(idfaParam);
     	}
     	return loginByPass;
     }
@@ -50,6 +65,15 @@ public class UserLoginContorller {
     	if(loginBySms.getCode() == 0) {
     		String token = loginBySms.getData().getToken();
     		request.getSession().setAttribute("user_token", token);;
+    	}
+
+    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+    	if(userDevice.getPlat().equals("iphone")) {
+    		//idfa 回调、存储  （lidelin）
+    		IDFACallBackParam idfaParam = new IDFACallBackParam();
+    		idfaParam.setUserid(-1);
+    		idfaParam.setIdfa(userDevice.getIDFA());
+    		iDFAService.callBackIdfa(idfaParam);
     	}
     	return loginBySms;
     }

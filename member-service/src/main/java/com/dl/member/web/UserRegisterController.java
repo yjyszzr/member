@@ -1,13 +1,17 @@
 package com.dl.member.web;
 import com.dl.base.enums.ActivityEnum;
+import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DLActivity;
+import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.UserRegisterParam;
 import com.dl.member.service.DLActivityService;
+import com.dl.member.service.IDFAService;
 import com.dl.member.service.UserBonusService;
 import com.dl.member.service.UserLoginService;
 import com.dl.member.service.UserRegisterService;
@@ -50,6 +54,8 @@ public class UserRegisterController {
     @Resource
     private DLActivityService dLActivityService;
 
+    @Resource
+   	private IDFAService iDFAService;
     /**
      * 新用户注册:
      * @param userRegisterParam
@@ -85,7 +91,15 @@ public class UserRegisterController {
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
 		
     	stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.REGISTER_TPLID + "_" + userRegisterParam.getMobile());
-		
+    	
+    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+    	if(userDevice.getPlat().equals("iphone")) {
+    		//idfa 回调、存储  （lidelin）
+    		IDFACallBackParam idfaParam = new IDFACallBackParam();
+    		idfaParam.setUserid(-1);
+    		idfaParam.setIdfa(userDevice.getIDFA());
+    		iDFAService.callBackIdfa(idfaParam);
+    	}
     	return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
     }
     

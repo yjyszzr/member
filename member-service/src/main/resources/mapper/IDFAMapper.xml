@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.IDFAMapper">
+	<resultMap id="BaseResultMap" type="com.dl.member.model.IDFA">
+		<!-- WARNING - @mbg.generated -->
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="user_id" jdbcType="INTEGER" property="user_id" />
+		<result column="idfa" jdbcType="VARCHAR" property="idfa" />
+		<result column="idfa_from" jdbcType="INTEGER" property="idfa_from" />
+		<result column="callback" jdbcType="VARCHAR" property="callback" />
+		<result column="back_status" jdbcType="INTEGER" property="back_status" />
+		<result column="creat_time" jdbcType="INTEGER" property="creat_time" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="update_time" />
+	</resultMap>
+	<select id="queryIDFAByIdfa" resultType="com.dl.member.model.IDFA">
+		 SELECT * from dl_idfa_info where idfa =#{idfa };
+	</select>
+	
+	<update id="updateUserIdByIdfa" >
+		update
+		dl_idfa_info
+		set user_id = #{user_id} 
+		where idfa = #{idfa}
+	</update>
+	
+	<insert id="save">
+		insert into
+		dl_idfa_info
+		(
+		user_id,
+		idfa,
+		idfa_from,
+		creat_time
+		) values (
+		#{user_id},
+		#{idfa},
+		#{idfa_from},
+		#{creat_time}
+		)
+	</insert>
+</mapper>
