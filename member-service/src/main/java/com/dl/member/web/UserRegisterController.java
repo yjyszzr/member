@@ -96,7 +96,7 @@ public class UserRegisterController {
     	if(userDevice.getPlat().equals("iphone")) {
     		//idfa 回调、存储  （lidelin）
     		IDFACallBackParam idfaParam = new IDFACallBackParam();
-    		idfaParam.setUserid(-1);
+    		idfaParam.setUserid(userId);
     		idfaParam.setIdfa(userDevice.getIDFA());
     		iDFAService.callBackIdfa(idfaParam);
     	}
