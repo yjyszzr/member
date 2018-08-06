@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.DlPhoneChannelMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.DlPhoneChannel">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="channel" jdbcType="VARCHAR" property="channel" />
+    <result column="channel_name" jdbcType="VARCHAR" property="channelName" />
+    <result column="app_code_name" jdbcType="INTEGER" property="appCodeName" />
+  </resultMap>
+  
+  <select id="queryPhoneChannelByChannel" resultMap="BaseResultMap">
+	  	select * from dl_phone_channel where channel = #{channel}
+  </select>
+  
+</mapper>

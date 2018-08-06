@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.DLAppUpdateLogMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.DLAppUpdateLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="app_code_name" jdbcType="INTEGER" property="appCodeName" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="download_url" jdbcType="VARCHAR" property="downloadUrl" />
+    <result column="update_log" jdbcType="VARCHAR" property="updateLog" />
+    <result column="update_time" jdbcType="INTEGER" property="updateTime" />
+    <result column="update_install" jdbcType="INTEGER" property="updateInstall" />
+  </resultMap>
+  
+  <select id = "queryUpdateAppLog" resultMap = "BaseResultMap">
+	select * from dl_app_update_log where app_code_name = #{appCodeName} order by update_time desc limit 1
+  </select>
+</mapper>

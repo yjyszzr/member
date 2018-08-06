@@ -49,7 +49,8 @@ public enum MemberEnums {
 	REAL_IDCARDNO_EMPTY(301056,"请填写身份证号"),
 	REAL_IDCARDNO_NOTLEGAL(301057,"请输入正确的身份证号"),
 	USER_BANK_NOT_SURPPORT(301058,"很抱歉,暂不支持此银行绑定"),
-	USER_BANK_ADDING(301059,"银行卡添加中");
+	USER_BANK_ADDING(301059,"银行卡添加中"),
+	NO_UPDATE(301060,"无最新版本");
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	
 //	NO_SHOP_MEM(301014,"用户不是店铺会员"),
