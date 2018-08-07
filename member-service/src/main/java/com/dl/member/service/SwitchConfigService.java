@@ -1,20 +1,7 @@
 package com.dl.member.service;
-import com.dl.member.model.SwitchConfig;
-import com.dl.member.model.User;
-import com.dl.shop.payment.api.IpaymentService;
-import com.dl.shop.payment.dto.ValidPayDTO;
+import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
-import com.dl.member.core.ProjectConstant;
-import com.dl.member.dao.SwitchConfigMapper;
-import com.dl.member.dao.UserAccountMapper;
-import com.dl.member.dao.UserMapper;
-import com.dl.member.enums.MemberEnums;
-import com.dl.base.result.BaseResult;
-import com.dl.base.result.ResultGenerator;
-import com.dl.base.service.AbstractService;
-import com.dl.base.util.SessionUtil;
+import javax.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,9 +9,22 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.dl.base.model.UserDeviceInfo;
+import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
+import com.dl.base.service.AbstractService;
+import com.dl.base.util.SessionUtil;
+import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.SwitchConfigMapper;
+import com.dl.member.dao.UserAccountMapper;
+import com.dl.member.dao.UserMapper;
+import com.dl.member.dto.SwitchConfigDTO;
+import com.dl.member.model.SwitchConfig;
+import com.dl.member.model.User;
+import com.dl.member.util.IpAdrressUtil;
+import com.dl.shop.payment.api.IpaymentService;
 
-import javax.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
@@ -55,8 +55,8 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	 * @param chanel
 	 * @return
 	 */
-    public BaseResult<SwitchConfig> querySwitch(String platform,String version,String chanel){
-    	SwitchConfig switchConfig = new SwitchConfig();
+    public BaseResult<SwitchConfigDTO> querySwitch(String platform,String version,String chanel){
+    	SwitchConfigDTO switchConfig = new SwitchConfigDTO();
     	Integer userId = SessionUtil.getUserId();
     	log.info("开关接口传的登录的userId:"+userId);
     	if(userId == null) {
@@ -133,6 +133,23 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     	SwitchConfig switchConfig = switchConfigList.get(0);
     	Integer turnOn = switchConfig.getTurnOn();
     	return turnOn;
+    }
+    
+    /**
+     * 通过用户ip判断是否打开开关
+     * @return
+     */
+    public Integer userSwitchByIp() {
+    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+    	String userIp = userDevice.getUserIp();
+    	if(StringUtils.isBlank(userIp)) {
+    		return ProjectConstant.BISINESS_APP_OPEN;
+    	}
+    	boolean chinaIp = IpAdrressUtil.isChinaIp(userIp);
+    	if(chinaIp) {
+    		return ProjectConstant.BISINESS_APP_OPEN;
+    	}
+    	return ProjectConstant.BISINESS_APP_CLOSE;
     }
     
 }

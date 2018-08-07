@@ -11,15 +11,18 @@ public class SwitchConfigDTO {
     private Integer id;
 
     @ApiModelProperty("1- 关 2- 开")
-    private String turnOn;
+    private Integer turnOn;
 
     @ApiModelProperty("1-交易版 2-资讯版")
-    private String businessType;
+    private Integer businessType;
 
     @ApiModelProperty("0-ios 1-android")
-    private String platform;
+    private Integer platform;
 
     @ApiModelProperty("版本号")
     private String version;
+    
+    @ApiModelProperty("渠道号")
+    private String channel;
 
 }
