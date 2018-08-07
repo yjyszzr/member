@@ -7,6 +7,7 @@
     -->
     <result column="id" jdbcType="INTEGER" property="id" />
     <result column="app_code_name" jdbcType="INTEGER" property="appCodeName" />
+    <result column="channel" jdbcType="VARCHAR" property="channel" />
     <result column="version" jdbcType="VARCHAR" property="version" />
     <result column="download_url" jdbcType="VARCHAR" property="downloadUrl" />
     <result column="update_log" jdbcType="VARCHAR" property="updateLog" />
@@ -15,6 +16,6 @@
   </resultMap>
   
   <select id = "queryUpdateAppLog" resultMap = "BaseResultMap">
-	select * from dl_app_update_log where app_code_name = #{appCodeName} order by update_time desc limit 1
+	select * from dl_app_update_log where channel = #{channel} order by update_time desc limit 1
   </select>
 </mapper>

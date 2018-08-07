@@ -13,8 +13,8 @@ public class DLAppUpdateLogService extends AbstractService<DLAppUpdateLog> {
     @Resource
     private DLAppUpdateLogMapper dLAppUpdateLogMapper;
     
-    public DLAppUpdateLog queryUpdateAppLog(Integer codeAppName,String version) {
-    	DLAppUpdateLog appUpdateLog = dLAppUpdateLogMapper.queryUpdateAppLog(codeAppName, version);
+    public DLAppUpdateLog queryUpdateAppLog(String channel,String version) {
+    	DLAppUpdateLog appUpdateLog = dLAppUpdateLogMapper.queryUpdateAppLog(channel, version);
 		return appUpdateLog;
     }
 
