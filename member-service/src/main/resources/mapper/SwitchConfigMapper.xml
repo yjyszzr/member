@@ -16,4 +16,9 @@
   <select id="querySwitchConfigTurnOff" parameterType="java.lang.String" resultMap="BaseResultMap">
   	   select *  from dl_switch_config where  platform = #{platform} and version = #{version} and channel = #{channel}
   </select>
+  
+  <select id="checkUserIp" resultType="int">
+  	select count(1) from dl_ip 
+  	where contry != 'c_CN' and INET_ATON(#{userIp}) &gt;= start_ip and INET_ATON(#{userIp}) &lt;= end_ip
+  </select>
 </mapper>

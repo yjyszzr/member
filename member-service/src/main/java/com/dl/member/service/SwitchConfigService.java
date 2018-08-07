@@ -145,8 +145,9 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     	if(StringUtils.isBlank(userIp)) {
     		return ProjectConstant.BISINESS_APP_OPEN;
     	}
-    	boolean chinaIp = IpAdrressUtil.isChinaIp(userIp);
-    	if(chinaIp) {
+    	int num = switchConfigMapper.checkUserIp(userIp);
+//    	boolean chinaIp = IpAdrressUtil.isChinaIp(userIp);
+    	if(num <= 0) {
     		return ProjectConstant.BISINESS_APP_OPEN;
     	}
     	return ProjectConstant.BISINESS_APP_CLOSE;
