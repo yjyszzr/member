@@ -7,5 +7,5 @@ import com.dl.member.model.DLAppUpdateLog;
 
 public interface DLAppUpdateLogMapper extends Mapper<DLAppUpdateLog> {
 	
-	DLAppUpdateLog queryUpdateAppLog(@Param("appCodeName") Integer appCodeName,@Param("version") String version);
+	DLAppUpdateLog queryUpdateAppLog(@Param("channel") String channel,@Param("version") String version);
 }

@@ -12,7 +12,10 @@ public class DLAppUpdateLog {
     private Integer appCodeName;
 
     private String version;
-
+    
+    @Column(name = "channel")
+    private String channel;
+    
     @Column(name = "download_url")
     private String downloadUrl;
 
@@ -87,8 +90,16 @@ public class DLAppUpdateLog {
     public String getUpdateLog() {
         return updateLog;
     }
+    
+    public String getChannel() {
+		return channel;
+	}
 
-    /**
+	public void setChannel(String channel) {
+		this.channel = channel;
+	}
+
+	/**
      * @param updateLog
      */
     public void setUpdateLog(String updateLog) {
