@@ -60,6 +60,8 @@ public class DLAppService extends AbstractService<DLApp> {
     	UpdateAppDTO updateAppDTO = new UpdateAppDTO();
     	updateAppDTO.setType(String.valueOf(dLAppUpdateLog.getUpdateInstall()));
     	updateAppDTO.setUrl(dLAppUpdateLog.getDownloadUrl());
+    	updateAppDTO.setVersion(dLAppUpdateLog.getVersion());
+    	updateAppDTO.setChannel(dLAppUpdateLog.getChannel());
     	String updateLog = dLAppUpdateLog.getUpdateLog();
     	if(!StringUtils.isEmpty(updateLog)) {
     		updateLogList =  Arrays.asList(updateLog.split(";"));
