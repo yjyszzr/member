@@ -76,8 +76,8 @@ public class UserService extends AbstractService<User> {
 	@Resource
 	private DlChannelDistributorMapper dlChannelDistributorMapper;
 
-//    @Resource
-//   	private IDFAService iDFAService;
+    @Resource
+   	private IDFAService iDFAService;
 	/**
 	 * real真实信息
 	 * 
@@ -247,13 +247,13 @@ public class UserService extends AbstractService<User> {
 		}
 		Integer userId = user.getUserId();
 		
-//    	if(userDevice.getPlat().equals("iphone")) {
-//    		//idfa 回调、存储  （lidelin）
-//    		IDFACallBackParam idfaParam = new IDFACallBackParam();
-//    		idfaParam.setUserid(userId);
-//    		idfaParam.setIdfa(userDevice.getIDFA());
-//    		iDFAService.callBackIdfa(idfaParam);
-//    	}
+    	if(userDevice.getPlat().equals("iphone")) {
+    		//idfa 回调、存储  （lidelin）
+    		IDFACallBackParam idfaParam = new IDFACallBackParam();
+    		idfaParam.setUserid(userId);
+    		idfaParam.setIdfa(userDevice.getIDFA());
+    		iDFAService.callBackIdfa(idfaParam);
+    	}
     	
 		return userId;
 	}
