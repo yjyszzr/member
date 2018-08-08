@@ -11,7 +11,6 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
-import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.SwitchConfigDTO;
 import com.dl.member.param.StrParam;
 import com.dl.member.service.SwitchConfigService;
@@ -37,14 +36,14 @@ public class SwitchConfigController {
     	String inPrams = JSON.toJSONString(userDevice);
     	String logId = DateUtil.getCurrentDateTime();
     	log.info(logId + "====================================版本参数:"+inPrams);
-    	Integer userSwitchByIp = switchConfigService.userSwitchByIp();
-    	log.info(logId + "===========判断用户ip所属区域是否打开交易返回：" + userSwitchByIp);
-    	if(userSwitchByIp.equals(ProjectConstant.BISINESS_APP_CLOSE)) {
-    		SwitchConfigDTO switchConfig = new SwitchConfigDTO();
-    		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-    		log.info(logId + "====非国内IP或别的区域=======判断用户ip为非需要打开交易,现执行关闭交易版返回");
-    		return ResultGenerator.genSuccessResult("success",switchConfig);
-    	}
+//    	Integer userSwitchByIp = switchConfigService.userSwitchByIp();
+//    	log.info(logId + "===========判断用户ip所属区域是否打开交易返回：" + userSwitchByIp);
+//    	if(userSwitchByIp.equals(ProjectConstant.BISINESS_APP_CLOSE)) {
+//    		SwitchConfigDTO switchConfig = new SwitchConfigDTO();
+//    		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+//    		log.info(logId + "====非国内IP或别的区域=======判断用户ip为非需要打开交易,现执行关闭交易版返回");
+//    		return ResultGenerator.genSuccessResult("success",switchConfig);
+//    	}
     	String plat = "";
     	if(userDevice.getPlat().equals("android")) {
     		plat = "1";
