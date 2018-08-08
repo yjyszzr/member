@@ -66,8 +66,8 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	@Resource
 	private DlChannelOptionLogService dlChannelOptionLogService;
 
-    @Resource
-   	private IDFAService iDFAService;
+//    @Resource
+//   	private IDFAService iDFAService;
 	/**
 	 * 密码登录
 	 *
@@ -116,13 +116,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 			
 	    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-	    	if(userDevice.getPlat().equals("iphone")) {
-	    		//idfa 回调、存储  （lidelin）
-	    		IDFACallBackParam idfaParam = new IDFACallBackParam();
-	    		idfaParam.setUserid(user.getUserId());
-	    		idfaParam.setIdfa(userDevice.getIDFA());
-	    		iDFAService.callBackIdfa(idfaParam);
-	    	}
+//	    	if(userDevice.getPlat().equals("iphone")) {
+//	    		//idfa 回调、存储  （lidelin）
+//	    		IDFACallBackParam idfaParam = new IDFACallBackParam();
+//	    		idfaParam.setUserid(user.getUserId());
+//	    		idfaParam.setIdfa(userDevice.getIDFA());
+//	    		iDFAService.callBackIdfa(idfaParam);
+//	    	}
 			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 
 		} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
@@ -220,13 +220,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			 this.loginLog(regRst.getData(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 			 
 			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-			if (userDevice.getPlat().equals("iphone")) {
-				// idfa 回调、存储 （lidelin）
-				IDFACallBackParam idfaParam = new IDFACallBackParam();
-				idfaParam.setUserid(user.getUserId());
-				idfaParam.setIdfa(userDevice.getIDFA());
-				iDFAService.callBackIdfa(idfaParam);
-			}
+//			if (userDevice.getPlat().equals("iphone")) {
+//				// idfa 回调、存储 （lidelin）
+//				IDFACallBackParam idfaParam = new IDFACallBackParam();
+//				idfaParam.setUserid(user.getUserId());
+//				idfaParam.setIdfa(userDevice.getIDFA());
+//				iDFAService.callBackIdfa(idfaParam);
+//			}
 			 return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 		} else {
 			Integer userStatus = user.getUserStatus();
@@ -252,13 +252,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 				
 		    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-		    	if(userDevice.getPlat().equals("iphone")) {
-		    		//idfa 回调、存储  （lidelin）
-		    		IDFACallBackParam idfaParam = new IDFACallBackParam();
-		    		idfaParam.setUserid(user.getUserId());
-		    		idfaParam.setIdfa(userDevice.getIDFA());
-		    		iDFAService.callBackIdfa(idfaParam);
-		    	}
+//		    	if(userDevice.getPlat().equals("iphone")) {
+//		    		//idfa 回调、存储  （lidelin）
+//		    		IDFACallBackParam idfaParam = new IDFACallBackParam();
+//		    		idfaParam.setUserid(user.getUserId());
+//		    		idfaParam.setIdfa(userDevice.getIDFA());
+//		    		iDFAService.callBackIdfa(idfaParam);
+//		    	}
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
 				boolean beyond1h = DateUtil.getCurrentTimeLong() - user.getLastTime() > 60  ? true : false;

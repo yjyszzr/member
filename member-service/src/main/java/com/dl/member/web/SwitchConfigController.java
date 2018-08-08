@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.alibaba.fastjson.JSON;
 import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
@@ -14,11 +13,8 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.SwitchConfigDTO;
-import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.StrParam;
-import com.dl.member.service.IDFAService;
 import com.dl.member.service.SwitchConfigService;
-
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SwitchConfigController {
     @Resource
     private SwitchConfigService switchConfigService;
-    @Resource
-	private IDFAService iDFAService;
+//    @Resource
+//	private IDFAService iDFAService;
     
     @ApiOperation(value = "根据平台和业务版本查询当前版本是否开启", notes = "根据平台和业务版本查询当前版本是否开启")
     @PostMapping("/query")
@@ -55,10 +51,10 @@ public class SwitchConfigController {
     	}else if(userDevice.getPlat().equals("iphone")) {
     		plat = "0";
     		//idfa 回调、存储  （lidelin）
-    		IDFACallBackParam idfaParam = new IDFACallBackParam();
-    		idfaParam.setUserid(-1);
-    		idfaParam.setIdfa(userDevice.getIDFA());
-    		iDFAService.callBackIdfa(idfaParam);
+//    		IDFACallBackParam idfaParam = new IDFACallBackParam();
+//    		idfaParam.setUserid(-1);
+//    		idfaParam.setIdfa(userDevice.getIDFA());
+//    		iDFAService.callBackIdfa(idfaParam);
     	}else if(userDevice.getPlat().equals("h5")) {
     		plat = "2";
     	}else {

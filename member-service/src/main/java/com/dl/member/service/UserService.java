@@ -76,8 +76,8 @@ public class UserService extends AbstractService<User> {
 	@Resource
 	private DlChannelDistributorMapper dlChannelDistributorMapper;
 
-    @Resource
-   	private IDFAService iDFAService;
+//    @Resource
+//   	private IDFAService iDFAService;
 	/**
 	 * real真实信息
 	 * 
