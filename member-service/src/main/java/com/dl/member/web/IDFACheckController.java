@@ -43,17 +43,19 @@ public class IDFACheckController {
 	public Map<String, String> checkDataByIdfa(IDFACheckParam idfaCheckParam) {
 		String ip = IpAdrressUtil.getIpAdrress(request);
 		List<String> ipList = Arrays.asList(advertiserIP.split("##"));
-//		if(ipList.contains(ip)) {
+		if(ipList.contains(ip)) {
 			return iDFAService.checkDataByIdfa(idfaCheckParam);
-//		}
-//		return null;
+		}
+		return null;
 	}
 
 	//点击接口
 	@PostMapping("/clickIDFA")
 	public Map<String, String> clickIDFA(IDFAClickParam idfaClickParam) {
 		String ip = IpAdrressUtil.getIpAdrress(request);
+		String ip2 = request.getRemoteAddr();
 		List<String> ipList = Arrays.asList(advertiserIP.split("##"));
+		idfaClickParam.setCallback(ip+"|"+ip2);
 //		if(ipList.contains(ip)) {
 			return iDFAService.saveOrUpdateClickData(idfaClickParam);
 //		}
