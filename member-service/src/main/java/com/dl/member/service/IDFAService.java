@@ -7,8 +7,10 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import com.dl.member.dao.IDFACallBackMapper;
 import com.dl.member.dao.IDFAMapper;
+import com.dl.member.dao.SysConfigMapper;
+import com.dl.member.dto.SysConfigDTO;
 import com.dl.member.model.IDFA;
 import com.dl.member.model.IDFACallBack;
 import com.dl.member.param.IDFACallBackParam;
@@ -31,7 +35,8 @@ public class IDFAService {
 	private IDFAMapper idfaMapper;
 	@Resource
 	private IDFACallBackMapper idfaCallBackMapper;
-
+	@Resource
+    private SysConfigService sysConfigService;
 	/**
 	 * 排重接口
 	 * 
@@ -103,16 +108,22 @@ public class IDFAService {
 			idfaMapper.save(idfa);
 			// 回调
 			if (idfaB != null && idfaB.getBack_status() == null) {
-				String callBack = idfaB.getCallback();
-				URL url;
-				try {
-					url = new URL(callBack);
-					HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-					if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-						backStatus = 0;
+				int id = idfaB.getId()%10;
+				SysConfigDTO sysConfig = sysConfigService.querySysConfig(105);
+				String idSTR = sysConfig.getValue()+"";
+				if(idSTR.contains(id+"") && id!=0) {
+					backStatus = 3;
+				}else {
+					try {
+						String callBack = idfaB.getCallback();
+						URL url = new URL(callBack);
+						HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+						if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+							backStatus = 0;
+						}
+					} catch (IOException e) {
+						backStatus = 2;
 					}
-				} catch (IOException e) {
-					backStatus = 0;
 				}
 				idfaB.setBack_status(backStatus);
 				idfaCallBackMapper.updateBackStatusByIdfa(idfaB);
