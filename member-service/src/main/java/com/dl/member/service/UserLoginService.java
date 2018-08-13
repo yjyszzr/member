@@ -128,18 +128,18 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
 			Integer time = DateUtil.getCurrentTimeLong() - user.getLastTime();
 			if (time > 60) {
+				User normalUser = new User();
+				normalUser.setUserId(user.getUserId());
+				normalUser.setUserStatus(0);
+				normalUser.setPassWrongCount(0);
+				userService.saveUserAndUpdateConsumer(normalUser);
+				
 				BaseResult<UserLoginDTO> userLoginRst = this.verifyUserPass(password, user, userLoginMobileParam);
 				if (userLoginRst.getCode() != 0) {
 					this.loginLog(user.getUserId(), 0, 1, loginParams, userLoginRst.getMsg());
 					return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
 				}
 				userLoginDTO = userLoginRst.getData();
-
-				User normalUser = new User();
-				normalUser.setUserId(user.getUserId());
-				normalUser.setUserStatus(0);
-				normalUser.setPassWrongCount(0);
-				userService.saveUserAndUpdateConsumer(normalUser);
 
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 					if(null == userLoginMobileParam.getPushKey()) {
@@ -316,12 +316,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 
 		} else {
 			int nowWrongPassCount = user.getPassWrongCount();
-			if (nowWrongPassCount < 5) {
+			if (nowWrongPassCount < 4) {
 				User updatePassWrongCountUser = new User();
 				updatePassWrongCountUser.setUserId(user.getUserId());
-				updatePassWrongCountUser.setPassWrongCount(++nowWrongPassCount);
+				int passWrongCount = nowWrongPassCount + 1;
+				updatePassWrongCountUser.setPassWrongCount(passWrongCount);
 				userService.update(updatePassWrongCountUser);
-				return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "您输入的密码错误，还有" + (5 - nowWrongPassCount) + "次机会");
+				return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "密码错误，您还有" + (nowWrongPassCount == 0?4:4 - nowWrongPassCount) + "次机会");
 			} else {// 输入错误密码超过5次，锁定用户
 				User lockUser = new User();
 				lockUser.setUserId(user.getUserId());

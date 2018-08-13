@@ -3,7 +3,7 @@ package com.dl.member.enums;
 public enum MemberEnums {
     ALREADY_REGISTER(301010,"该手机号已经注册，请直接登录"),
     WRONG_IDENTITY(301011,"用户名或密码错误"),
-    PASS_WRONG_BEYOND_5(301012,"您的密码错误次数过多，账号已经被锁定，请过1分钟之后再试！"),
+    PASS_WRONG_BEYOND_5(301012,"密码多次错误，账号已冻结，请1分钟后再次尝试登录"),
 	USER_ACCOUNT_FROZEN(301013,"您的账号已经被冻结，请联系客服"),
 	NO_REGISTER(301014,"该手机号还未注册，请先注册"),
 	VERIFY_BANKCARD_EROOR(301015,"银行卡验证失败"),
