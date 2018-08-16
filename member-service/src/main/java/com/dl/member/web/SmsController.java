@@ -67,25 +67,27 @@ public class SmsController {
 		
 		int num = 0;
 		String sendNumKey = "num_send_"+smsParam.getMobile();
+		String sendNum3Key = sendNumKey+"_3";
+		String sendNum4Key = sendNumKey+"_4";
+		
 		try {
 			String sendNumValue = stringRedisTemplate.opsForValue().get(sendNumKey);
 			if(StringUtils.isNotBlank(sendNumValue)) {
 				num = Integer.parseInt(sendNumValue);
 			}
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			log.error("发送短信获取redis中短信发送的数量异常");
+			return ResultGenerator.genFailResult("获取短信发送数量异常");
 		}
 		
-		Long expireTimeLimit5 = stringRedisTemplate.getExpire(sendNumKey+"_3");
-		if(num == 3 && expireTimeLimit5 < 600 && expireTimeLimit5 > 0) {//聚合规定：10min 内不能超过3条
+		Long expireTimeLimit10 = stringRedisTemplate.getExpire(sendNum3Key);
+		if(num == 3 && expireTimeLimit10 < 600 && expireTimeLimit10 > 0) {//聚合规定：10min 内不能超过3条
 			return ResultGenerator.genResult(MemberEnums.MESSAGE_5MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_5MIN_COUNT_ERROR.getMsg());
 		}
-		
-		Long expireTimeLimit60 = stringRedisTemplate.getExpire(sendNumKey+"_5");
+		Long expireTimeLimit60 = stringRedisTemplate.getExpire(sendNum4Key);
 		if(num == 4 && expireTimeLimit60 < 3600 && expireTimeLimit60 > 0) {//聚合规定：60min 内不能超过4条
 			return ResultGenerator.genResult(MemberEnums.MESSAGE_60MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_60MIN_COUNT_ERROR.getMsg());
 		}
-		
 		if(num >= 10) {
 			return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_ERROR.getMsg());
 		}
@@ -133,8 +135,8 @@ public class SmsController {
 		stringRedisTemplate.opsForValue().set(key, strRandom4, defineExpiredTime, TimeUnit.SECONDS);
 		int sendNumExpire = this.todayEndTime();
 		stringRedisTemplate.opsForValue().set(sendNumKey, num+"", sendNumExpire, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(sendNumKey+"_3", num+"", 600, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(sendNumKey+"_4", num+"", 3600, TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(sendNum3Key, num+"", 600, TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(sendNum4Key, num+"", 3600, TimeUnit.SECONDS);
 
 		return ResultGenerator.genSuccessResult("发送短信验证码成功");
 	}
