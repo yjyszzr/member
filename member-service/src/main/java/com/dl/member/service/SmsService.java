@@ -81,6 +81,7 @@ public class SmsService {
 		if(0 == errorCode) {
 			return ResultGenerator.genSuccessResult("发送短信成功");
 		}else {
+			log.error("手机号:"+mobile+"发送短信失败，原因:"+json.toString());
 			return ResultGenerator.genBadRequestResult("调用第三方发送短信失败",String.valueOf(errorCode));
 		}
 		
