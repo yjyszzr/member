@@ -75,7 +75,7 @@ public class SmsController {
 				num = Integer.parseInt(sendNumValue);
 			}
 		} catch (NumberFormatException e) {
-			log.error("发送短信获取redis中短信发送的数量异常");
+			log.error("发送短信获取redis中短信发送的数量异常",e);
 			return ResultGenerator.genFailResult("获取短信发送数量异常");
 		}
 		
