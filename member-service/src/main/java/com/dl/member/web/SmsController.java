@@ -82,7 +82,7 @@ public class SmsController {
 		
 		Long expireTimeLimit10 = stringRedisTemplate.getExpire(sendNum3Key);
 		if(num == 3 && expireTimeLimit10 < 600 && expireTimeLimit10 > 0) {//聚合规定：10min 内不能超过3条
-			return ResultGenerator.genResult(MemberEnums.MESSAGE_5MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_5MIN_COUNT_ERROR.getMsg());
+			return ResultGenerator.genResult(MemberEnums.MESSAGE_10MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_10MIN_COUNT_ERROR.getMsg());
 		}
 		Long expireTimeLimit60 = stringRedisTemplate.getExpire(sendNum4Key);
 		if(num == 4 && expireTimeLimit60 < 3600 && expireTimeLimit60 > 0) {//聚合规定：60min 内不能超过4条
