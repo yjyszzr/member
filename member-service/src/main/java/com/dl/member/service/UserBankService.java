@@ -26,6 +26,7 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
+import com.dl.base.util.RedisLockUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
@@ -114,12 +115,6 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 
 		Integer userId = SessionUtil.getUserId();
-//		Boolean exits = stringRedisTemplate.opsForValue().setIfAbsent("user_bank_add_"+userId, "on");
-//		if(!exits) {
-//			return ResultGenerator.genResult(MemberEnums.USER_BANK_ADDING.getcode(), MemberEnums.USER_BANK_ADDING.getMsg(),userBankDTO);
-//		}else {
-//			log.info("添加银行卡extis:"+exits);
-//		}
 		
 		//已经添加过该银行卡
 		UserBank userBankAlready = new UserBank();
@@ -132,29 +127,10 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg(),userBankDTO);
 		}
 		
-		//删除过银行卡，再添加，不再验证银行卡，直接把已删除的银行卡置为未删除和默认状态
-//		UserBank userBankDelete = new UserBank();
-//		userBankDelete.setCardNo(bankCardNo);
-//		userBankDelete.setUserId(userId);
-//		userBankDelete.setIsDelete(ProjectConstant.DELETE);
-//		List<UserBank> userBankDeleteList = userBankMapper.queryUserBankBySelective(userBankDelete);
-//		if(userBankDeleteList.size() > 0) {
-//			UserBank userBankUpdate = new UserBank();
-//			userBankUpdate.setId(userBankDeleteList.get(0).getId());
-//			userBankUpdate.setStatus(ProjectConstant.USER_BANK_DEFAULT);
-//			userBankUpdate.setIsDelete(ProjectConstant.NOT_DELETE);
-//			int rst = userBankMapper.updateByPrimaryKeySelective(userBankUpdate);
-//			if(1 == rst) {
-//				UserBank userBank = userBankDeleteList.get(0);
-//				try {
-//					BeanUtils.copyProperties(userBankDTO, userBank);
-//				} catch (Exception e) {
-//					log.error("银行卡数据转换异常");
-//					return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg(),userBankDTO);
-//				}
-//			}
-//			return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
-//		}
+		Boolean absent = RedisLockUtil.lockRedisThread(stringRedisTemplate,"user_bank_add_"+userId);
+		if(!absent) {
+			return ResultGenerator.genResult(MemberEnums.USER_BANK_ADDING.getcode(), MemberEnums.USER_BANK_ADDING.getMsg(),userBankDTO);
+		}
 
 		//查询银行卡具体信息，并过滤信用卡
 		JSONObject jsonNew =this.queryUserBankType(bankCardNo);
@@ -219,9 +195,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBankDTO.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
 		this.saveUserBank(userBankDTO);
 		
-//		stringRedisTemplate.delete("user_bank_add_"+userId);
-//		String redisValue = stringRedisTemplate.opsForValue().get("user_bank_add_"+userId);
-//		log.info("删除redis中的key后再查询的值为:"+redisValue);
+		RedisLockUtil.unlockRedisThread(stringRedisTemplate,"user_bank_add_"+userId);
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
 
