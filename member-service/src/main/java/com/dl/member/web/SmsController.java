@@ -59,17 +59,10 @@ public class SmsController {
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
 
-		String sameMobileKey = ProjectConstant.SMS_PREFIX + smsParam.getMobile();
-		Long expireTime = stringRedisTemplate.getExpire(sameMobileKey);
-		if(null != expireTime && expireTime < 54 && expireTime > 0) {
-			return ResultGenerator.genResult(MemberEnums.MESSAGE_SENDLOT_ERROR.getcode(), MemberEnums.MESSAGE_SENDLOT_ERROR.getMsg());
-		}
-		
 		int num = 0;
 		String sendNumKey = "num_send_"+smsParam.getMobile();
 		String sendNum3Key = sendNumKey+"_3";
 		String sendNum4Key = sendNumKey+"_4";
-		
 		try {
 			String sendNumValue = stringRedisTemplate.opsForValue().get(sendNumKey);
 			if(StringUtils.isNotBlank(sendNumValue)) {
@@ -91,7 +84,12 @@ public class SmsController {
 		if(num >= 10) {
 			return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_ERROR.getMsg());
 		}
-		num++;
+		
+		String sameMobileKey = ProjectConstant.SMS_PREFIX + smsParam.getMobile();
+		Long expireTime = stringRedisTemplate.getExpire(sameMobileKey);
+		if(null != expireTime && expireTime < 60 && expireTime > 0) {
+			return ResultGenerator.genResult(MemberEnums.MESSAGE_SENDLOT_ERROR.getcode(), MemberEnums.MESSAGE_SENDLOT_ERROR.getMsg());
+		}
 		
 		String smsType = smsParam.getSmsType();
 		String tplId = "";
@@ -132,6 +130,7 @@ public class SmsController {
 			return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
 		}
 		
+		num++;
 		stringRedisTemplate.opsForValue().set(key, strRandom4, defineExpiredTime, TimeUnit.SECONDS);
 		int sendNumExpire = this.todayEndTime();
 		stringRedisTemplate.opsForValue().set(sendNumKey, num+"", sendNumExpire, TimeUnit.SECONDS);
