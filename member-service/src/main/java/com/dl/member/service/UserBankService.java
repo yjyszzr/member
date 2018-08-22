@@ -436,6 +436,9 @@ public class UserBankService extends AbstractService<UserBank> {
 				BeanUtils.copyProperties(userBankDTO, userBank);
 				userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
 				userBankDTO.setCardNo(this.hiddenBankCardNo(userBank.getCardNo()));
+				if(!StringUtils.isEmpty(userBank.getAbbreviation())) {
+					userBankDTO.setBankLogo(memberConfig.getImgUrl()+"/bank_ico/"+userBank.getAbbreviation()+".png");
+				}
 			} catch (Exception e) {
 				log.error(e.getMessage());
 				return ResultGenerator.genFailResult(RespStatusEnum.SERVER_ERROR.getMsg(),userBankDTOList);

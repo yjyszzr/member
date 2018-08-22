@@ -68,6 +68,12 @@ public class UserBonusController {
     	return userBonusService.receiveRechargeUserBonus(Integer.valueOf(payLogIdParam.getPayLogId()));
     }
     
+    @ApiOperation(value="领取充值送随机红包20180822新增", notes="充值成功后领取充值送随机红包20180822新增",hidden=false)
+    @PostMapping("/reiceiveBonusAfterRechargeNew")
+    public BaseResult<DonationPriceDTO> reiceiveBonusAfterRechargeNew(@RequestBody PayLogIdParam payLogIdParam) {
+    	return userBonusService.receiveRechargeUserBonusNew(Integer.valueOf(payLogIdParam.getPayLogId()));
+    }
+    
     @ApiOperation(value="更新红包的过期状态", notes="更新红包的过期状态",hidden=false)
 	@RequestMapping(path="/updateBonusExpire", method=RequestMethod.POST)
 	public BaseResult<String> updateBonusExpire(@RequestBody EmptyParam emptyParam) {
