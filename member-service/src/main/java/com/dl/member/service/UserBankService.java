@@ -127,7 +127,7 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg(),userBankDTO);
 		}
 		
-		Boolean absent = RedisLockUtil.lockRedisThread(stringRedisTemplate,"user_bank_add_"+userId);
+		Boolean absent = RedisLockUtil.lockRedisThread(stringRedisTemplate,"user_bank_add_"+bankCardNo);
 		if(!absent) {
 			return ResultGenerator.genResult(MemberEnums.USER_BANK_ADDING.getcode(), MemberEnums.USER_BANK_ADDING.getMsg(),userBankDTO);
 		}
@@ -139,12 +139,15 @@ public class UserBankService extends AbstractService<UserBank> {
 		if(0 == errorCodeNew) {
 			String cardtype = json_tmp.getString("cardtype");
 			if(!"借记卡".equals(cardtype)) {
+				stringRedisTemplate.delete("user_bank_add_"+bankCardNo);
 				return ResultGenerator.genResult(MemberEnums.NOT_DEBIT_CARD.getcode(), MemberEnums.NOT_DEBIT_CARD.getMsg());
 			}
 		}else if(230502 == errorCodeNew){
+			stringRedisTemplate.delete("user_bank_add_"+bankCardNo);
 			return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(), MemberEnums.BANKCARD_NOT_MATCH.getMsg());
 		}else {
 			log.error("判断银行卡类型异常："+jsonNew.toJSONString());
+			stringRedisTemplate.delete("user_bank_add_"+bankCardNo);
 			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), MemberEnums.VERIFY_BANKCARD_EROOR.getMsg(),userBankDTO);
 		}
 		
@@ -160,6 +163,7 @@ public class UserBankService extends AbstractService<UserBank> {
 			abbreviation = abbr;
 		}else {
 			log.info("先锋支付不支持此家银行，所以不支持该银行绑定:" +" bankName:" + bankName);
+			stringRedisTemplate.delete("user_bank_add_"+bankCardNo);
 			return ResultGenerator.genResult(MemberEnums.USER_BANK_NOT_SURPPORT.getcode(), MemberEnums.USER_BANK_NOT_SURPPORT.getMsg(),userBankDTO);
 		}
 		//三元素校验
@@ -172,9 +176,11 @@ public class UserBankService extends AbstractService<UserBank> {
 			JSONObject result = (JSONObject) json.get("result");
 			String res = result.getString("res");
 			if("2".equals(res)) {//不匹配
+				stringRedisTemplate.delete("user_bank_add_"+bankCardNo);
 				return ResultGenerator.genResult(MemberEnums.BANKCARD_NOT_MATCH.getcode(), MemberEnums.BANKCARD_NOT_MATCH.getMsg(),userBankDTO);
 			}
 		}else {
+			stringRedisTemplate.delete("user_bank_add_"+bankCardNo);
 			return ResultGenerator.genResult(MemberEnums.VERIFY_BANKCARD_EROOR.getcode(), reason,userBankDTO);
 		}
 
@@ -195,7 +201,7 @@ public class UserBankService extends AbstractService<UserBank> {
 		userBankDTO.setPurpose(ProjectConstant.BANK_PURPOSE_WITHDRAW);
 		this.saveUserBank(userBankDTO);
 		
-		RedisLockUtil.unlockRedisThread(stringRedisTemplate,"user_bank_add_"+userId);
+		stringRedisTemplate.delete("user_bank_add_"+bankCardNo);
 		return ResultGenerator.genSuccessResult("银行卡添加成功",userBankDTO);
 	}
 
@@ -422,20 +428,25 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * @return
 	 */
 	public BaseResult<LinkedList<UserBankDTO>> queryUserBankList(Integer purpose){
-		Integer userId = SessionUtil.getUserId();		
+		LinkedList<UserBankDTO> userBankDTOList = new LinkedList<UserBankDTO>();
+		Integer userId = SessionUtil.getUserId();
+		if( null == userId) {
+			return  ResultGenerator.genFailResult("用户id为空",userBankDTOList);
+		}
+		
 		UserBank userBankParam = new UserBank();
 		userBankParam.setUserId(userId);
 		userBankParam.setIsDelete(ProjectConstant.NOT_DELETE);
 		userBankParam.setPurpose(purpose);
 		List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankParam);
 		
-		LinkedList<UserBankDTO> userBankDTOList = new LinkedList<UserBankDTO>();
 		for(UserBank userBank:userBankList) {
 			UserBankDTO userBankDTO = new UserBankDTO();
 			try {
 				BeanUtils.copyProperties(userBankDTO, userBank);
 				userBankDTO.setUserBankId(String.valueOf(userBank.getId()));
 				userBankDTO.setCardNo(this.hiddenBankCardNo(userBank.getCardNo()));
+				userBankDTO.setCardType("储蓄卡");
 				if(!StringUtils.isEmpty(userBank.getAbbreviation())) {
 					userBankDTO.setBankLogo(memberConfig.getImgUrl()+"/bank_ico/"+userBank.getAbbreviation()+".png");
 				}
