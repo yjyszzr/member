@@ -97,6 +97,18 @@ public class ActivityBonus {
     private Integer addTime;
 
     /**
+     * 充值赠送概率
+     */
+    @Column(name = "recharge_chance")
+    private BigDecimal rechargeChance;
+ 
+    /**
+     * 充值卡id
+     */
+    @Column(name = "recharge_card_id")
+    private Integer rechargeCardId;
+    
+    /**
      * 兑换所需积分
      */
     @Column(name = "exchange_points")
@@ -108,7 +120,24 @@ public class ActivityBonus {
     @Column(name = "exchange_goods_number")
     private Integer exchangeGoodsNumber;
 
-    /**
+    public Integer getRechargeCardId() {
+		return rechargeCardId;
+		
+	}
+
+	public void setRechargeCardId(Integer rechargeCardId) {
+		this.rechargeCardId = rechargeCardId;
+	}
+    
+    public BigDecimal getRechargeChance() {
+		return rechargeChance;
+	}
+
+	public void setRechargeChance(BigDecimal rechargeChance) {
+		this.rechargeChance = rechargeChance;
+	}
+
+	/**
      * 获取红包编号
      *
      * @return bonus_id - 红包编号
