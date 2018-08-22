@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -115,7 +117,6 @@ public class UserBankService extends AbstractService<UserBank> {
 		}
 
 		Integer userId = SessionUtil.getUserId();
-		
 		//已经添加过该银行卡
 		UserBank userBankAlready = new UserBank();
 		userBankAlready.setCardNo(bankCardNo);
@@ -127,7 +128,8 @@ public class UserBankService extends AbstractService<UserBank> {
 			return ResultGenerator.genResult(MemberEnums.BANKCARD_ALREADY_AUTH.getcode(), MemberEnums.BANKCARD_ALREADY_AUTH.getMsg(),userBankDTO);
 		}
 		
-		Boolean absent = RedisLockUtil.lockRedisThread(stringRedisTemplate,"user_bank_add_"+bankCardNo);
+		Boolean absent = stringRedisTemplate.opsForValue().setIfAbsent("user_bank_add_"+bankCardNo, "on");
+		stringRedisTemplate.expire("user_bank_add_"+bankCardNo, 10, TimeUnit.SECONDS);
 		if(!absent) {
 			return ResultGenerator.genResult(MemberEnums.USER_BANK_ADDING.getcode(), MemberEnums.USER_BANK_ADDING.getMsg(),userBankDTO);
 		}
