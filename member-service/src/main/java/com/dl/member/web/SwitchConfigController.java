@@ -14,7 +14,9 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.SwitchConfigDTO;
+import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.QuerySwitchParam;
+import com.dl.member.service.IDFAService;
 import com.dl.member.service.SwitchConfigService;
 
 import io.swagger.annotations.ApiOperation;
@@ -29,8 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SwitchConfigController {
     @Resource
     private SwitchConfigService switchConfigService;
-//    @Resource
-//	private IDFAService iDFAService;
+    @Resource
+	private IDFAService iDFAService;
     
     @ApiOperation(value = "根据平台和业务版本查询当前版本是否开启", notes = "根据平台和业务版本查询当前版本是否开启")
     @PostMapping("/query")
@@ -53,10 +55,10 @@ public class SwitchConfigController {
         		return ResultGenerator.genSuccessResult("success",switchConfig);
         	}
     		//idfa 回调、存储  （lidelin）
-//    		IDFACallBackParam idfaParam = new IDFACallBackParam();
-//    		idfaParam.setUserid(-1);
-//    		idfaParam.setIdfa(userDevice.getIDFA());
-//    		iDFAService.callBackIdfa(idfaParam);
+    		/*IDFACallBackParam idfaParam = new IDFACallBackParam();
+    		idfaParam.setUserid(-1);
+    		idfaParam.setIdfa(userDevice.getIDFA());
+    		iDFAService.callBackIdfa(idfaParam);*/
     	}else if(userDevice.getPlat().equals("h5")) {
     		plat = "2";
     	}else {

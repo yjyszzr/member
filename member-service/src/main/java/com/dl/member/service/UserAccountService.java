@@ -917,6 +917,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		for (UserIdAndRewardDTO u : list) {
+			String gameDesc = u.getLotteryName();
+			if(StringUtils.isEmpty(gameDesc)){
+				log.error("订单orderSn={},发送消息lotteryId ={},lotteryName is null",u.getOrderSn(),u.getLotteryClassifyId());
+				gameDesc = "竞彩足球";
+			}
 			DlMessage messageAddParam = new DlMessage();
 			messageAddParam.setTitle(CommonConstants.FORMAT_REWARD_TITLE);
 			messageAddParam.setContent(MessageFormat.format(CommonConstants.FORMAT_REWARD_CONTENT, u.getReward()));
@@ -936,11 +941,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			messageAddParam.setObjectType(1);
 			messageAddParam.setMsgUrl("");// 通知暂时不需要
 			messageAddParam.setSendTime(accountTime);
-			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
+			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, gameDesc,u.getBetMoney(), u.getBetTime()));
 			userMessageService.save(messageAddParam);
 			// push
 			if (StringUtils.isNotBlank(clientId)) {
-				String content = MessageFormat.format(CommonConstants.FORMAT_REWARD_PUSH_DESC, u.getReward());
+				String content = MessageFormat.format(CommonConstants.FORMAT_REWARD_PUSH_DESC,gameDesc, u.getReward());
 				GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_REWARD_PUSH_TITLE, content, DateUtil.getCurrentTimeLong());
 				geTuiUtil.pushMessage(clientId, getuiMessage);
 			}

@@ -3,7 +3,7 @@ package com.dl.member.enums;
 public enum MemberEnums {
     ALREADY_REGISTER(301010,"该手机号已经注册，请直接登录"),
     WRONG_IDENTITY(301011,"用户名或密码错误"),
-    PASS_WRONG_BEYOND_5(301012,"您的密码错误次数过多，账号已经被锁定，请过1分钟之后再试！"),
+    PASS_WRONG_BEYOND_5(301012,"密码多次错误，账号已冻结，请1分钟后再次尝试登录"),
 	USER_ACCOUNT_FROZEN(301013,"您的账号已经被冻结，请联系客服"),
 	NO_REGISTER(301014,"该手机号还未注册，请先注册"),
 	VERIFY_BANKCARD_EROOR(301015,"银行卡验证失败"),
@@ -43,7 +43,7 @@ public enum MemberEnums {
 	ERR_OLD_LOGIN_PASS_ERROR(301050,"原始密码输入有误！"),
 	ACTIVITY_NOT_VALID(301051,"活动已过期"),
 	RECHARGE_ACT_MIN_LIMIT(301052,"不符合充值赠送的最低充值金额"),
-	MESSAGE_5MIN_COUNT_ERROR(301053,"10分钟内不能发送超过3条，5分钟后重试"),
+	MESSAGE_10MIN_COUNT_ERROR(301053,"10分钟内不能发送超过3条，10分钟后重试"),
 	MESSAGE_60MIN_COUNT_ERROR(301054,"60分钟内不能发送超过4条，60分钟后重试"),
 	REAL_IDCARDNO_NOT18(301055,"很抱歉，根据法律规定未满18周岁的禁止购彩"),
 	REAL_IDCARDNO_EMPTY(301056,"请填写身份证号"),

@@ -64,5 +64,8 @@ public class MemberConfig {
 	
 	@Value("${juhe.sms.resetpass.tplid}")
 	private String RESETPASS_TPLID;
+	
+	@Value("${imgUrl}")
+	private String imgUrl;
 		
 }

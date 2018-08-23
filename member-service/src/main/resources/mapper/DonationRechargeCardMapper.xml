@@ -16,4 +16,8 @@
     <result column="real_value" jdbcType="DECIMAL" property="realValue" />
     <result column="type" jdbcType="INTEGER" property="type" />
   </resultMap>
+  
+  <select id="queryRechargeCardList" resultMap="BaseResultMap">
+	  	select * from dl_donation_recharge_card
+  </select>
 </mapper>

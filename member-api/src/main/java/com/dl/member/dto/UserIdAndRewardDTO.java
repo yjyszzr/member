@@ -29,5 +29,9 @@ public class UserIdAndRewardDTO {
 
 	@ApiModelProperty(value = "不需要传递：当前用户的可提现余额")
 	private BigDecimal userMoney;
+	@ApiModelProperty(value = "彩种类型")
+	private Integer lotteryClassifyId;
+	@ApiModelProperty(value = "彩种名称")
+	private String lotteryName;
 
 }

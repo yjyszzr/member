@@ -16,11 +16,11 @@ public class UpdateAppDTO {
 //	@ApiModelProperty("appName:android每个app的名称编码：彩小秘,必中彩,足球咨询,天天体育,天空体育,渠道推广分别为1,2,3,4,5,6")
 //    private String appNameCode;
 //	
-//	@ApiModelProperty("渠道")
-//    private String channel;	
-//	
-//	@ApiModelProperty("版本")
-//    private String version;
+	@ApiModelProperty("渠道")
+    private String channel;	
+	
+	@ApiModelProperty("版本")
+    private String version;
 	
 	@ApiModelProperty("下载url")
     private String url;

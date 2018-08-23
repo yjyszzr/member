@@ -22,6 +22,8 @@
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="exchange_points" jdbcType="INTEGER" property="exchangePoints" />
     <result column="exchange_goods_number" jdbcType="INTEGER" property="exchangeGoodsNumber" />
+    <result column="recharge_chance" jdbcType="DECIMAL" property="rechargeChance" />
+    <result column="recharge_card_id" jdbcType="INTEGER" property="rechargeCardId" />
   </resultMap>
   
   <select id ="queryActivityBonusListBySelective" parameterType="com.dl.member.model.ActivityBonus" resultMap="BaseResultMap">
@@ -46,5 +48,8 @@
      order by add_time
   </select>
   
+  <select id = "queryActivityBonusListByRechargeCardId" resultMap="BaseResultMap">
+  	select * from dl_activity_bonus where recharge_card_id = #{rechargeCardId} order by recharge_chance asc
+  </select>
   
 </mapper>

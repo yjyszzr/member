@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.UserQualificationMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserQualification">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="act_id" jdbcType="INTEGER" property="actId" />
+    <result column="act_type" jdbcType="INTEGER" property="actType" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="qualification" jdbcType="INTEGER" property="qualification" />
+    <result column="receive_time" jdbcType="INTEGER" property="receiveTime" />
+  </resultMap>
+  
+  <insert id="insertUserQualification" parameterType="com.dl.member.model.UserQualification">
+  	INSERT INTO dl_user_qualification(act_id,act_type,user_id,qualification,receive_time) VALUES(#{actId},#{actType},#{userId},#{qualification},#{receiveTime})
+  </insert>
+  
+  <select id="queryQualificationByUserId"  resultMap="BaseResultMap">
+  	select * from dl_user_qualification where user_id = #{userId} and act_id = #{actId} and act_type = #{actType} and qualification = 1
+  </select>
+</mapper>
