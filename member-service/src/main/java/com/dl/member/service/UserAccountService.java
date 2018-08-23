@@ -917,9 +917,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		for (UserIdAndRewardDTO u : list) {
-			String gameDesc = "竞彩足球";
-			if(Integer.valueOf(2).equals(u.getLotteryClassifyId())){
-				gameDesc = "大乐透";
+			String gameDesc = u.getLotteryName();
+			if(StringUtils.isEmpty(gameDesc)){
+				log.error("订单orderSn={},发送消息lotteryId ={},lotteryName is null",u.getOrderSn(),u.getLotteryClassifyId());
+				gameDesc = "竞彩足球";
 			}
 			DlMessage messageAddParam = new DlMessage();
 			messageAddParam.setTitle(CommonConstants.FORMAT_REWARD_TITLE);

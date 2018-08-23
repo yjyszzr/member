@@ -31,5 +31,7 @@ public class UserIdAndRewardDTO {
 	private BigDecimal userMoney;
 	@ApiModelProperty(value = "彩种类型")
 	private Integer lotteryClassifyId;
+	@ApiModelProperty(value = "彩种名称")
+	private String lotteryName;
 
 }
