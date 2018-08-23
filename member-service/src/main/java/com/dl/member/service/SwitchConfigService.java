@@ -136,6 +136,30 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     }
     
     /**
+     * 渠道城市是否打开开关
+     * @return
+     */
+    public boolean channelSwitch(String chanel,QuerySwitchParam param) {
+    	String provinceCode = param.getProvinceCode();
+    	String cityCode = param.getCityCode();
+    	if(StringUtils.isBlank(provinceCode) && StringUtils.isBlank(cityCode)) {
+    		return true;
+    	}
+    	String closeCitys = switchConfigMapper.queryChannelCloseCitys(chanel);
+    	if(StringUtils.isBlank(closeCitys)) {
+    		return true;
+    	}
+    	List<String> closeCityList = Arrays.asList(closeCitys.split(","));
+    	if(StringUtils.isNotBlank(provinceCode) && closeCityList.contains(provinceCode)) {
+    		return false;
+    	}
+    	if(StringUtils.isNotBlank(cityCode) && closeCityList.contains(cityCode)) {
+    		return false;
+    	}
+    	return true;
+    }
+    
+    /**
      * 通过用户ip判断是否打开开关
      * @return
      */
