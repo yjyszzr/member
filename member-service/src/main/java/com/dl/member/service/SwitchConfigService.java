@@ -65,7 +65,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				log.info("渠道开关:"+rst3);
 				if(rst3 == 1) {
 					//判断该城市是否需要关闭
-					boolean channelSwitch = this.channelSwitch(chanel, param);
+					boolean channelSwitch = this.channelCitySwitch(chanel, param);
 					if(channelSwitch) {
 						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 					}else {
@@ -74,6 +74,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				}else {
 					switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 				}
+				log.info("channel="+chanel + "  turnOn="+switchConfig.getTurnOn());
 				return ResultGenerator.genSuccessResult("success",switchConfig);
 	    	}
 	    	
@@ -93,7 +94,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	    			log.info("渠道开关:"+rst3);
 	    			if(rst3 == 1) {
 	    				//判断该城市是否需要关闭
-	    				boolean channelSwitch = this.channelSwitch(chanel, param);
+	    				boolean channelSwitch = this.channelCitySwitch(chanel, param);
 	    				if(channelSwitch) {
 	    					switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 	    				}else {
@@ -104,6 +105,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	    			}
 	    		}
 	    	}
+	    	log.info("channel="+chanel + "  turnOn="+switchConfig.getTurnOn());
 	    	return ResultGenerator.genSuccessResult("success",switchConfig);
 	    }
 
@@ -152,13 +154,15 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
      * 渠道城市是否打开开关
      * @return
      */
-    public boolean channelSwitch(String chanel,QuerySwitchParam param) {
+    public boolean channelCitySwitch(String chanel,QuerySwitchParam param) {
     	String provinceCode = param.getProvinceCode();
     	String cityCode = param.getCityCode();
+    	log.info("chanel="+chanel+"渠道城市是否打开开关provinceCode:"+provinceCode+" , cityCode:"+cityCode);
     	if(StringUtils.isBlank(provinceCode) && StringUtils.isBlank(cityCode)) {
     		return true;
     	}
     	String closeCitys = switchConfigMapper.queryChannelCloseCitys(chanel);
+    	log.info("chanel="+chanel+"渠道城市是否打开开关provinceCode:"+provinceCode+" , cityCode:"+cityCode+" , closeCitys:"+closeCitys);
     	if(StringUtils.isBlank(closeCitys)) {
     		return true;
     	}
