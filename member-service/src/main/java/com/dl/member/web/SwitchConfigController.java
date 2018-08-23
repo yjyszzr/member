@@ -16,6 +16,7 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.SwitchConfigDTO;
 import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.QuerySwitchParam;
+import com.dl.member.param.StrParam;
 import com.dl.member.service.IDFAService;
 import com.dl.member.service.SwitchConfigService;
 
@@ -36,7 +37,7 @@ public class SwitchConfigController {
     
     @ApiOperation(value = "根据平台和业务版本查询当前版本是否开启", notes = "根据平台和业务版本查询当前版本是否开启")
     @PostMapping("/query")
-    public BaseResult<SwitchConfigDTO> querySwitch(@RequestBody QuerySwitchParam param) {
+    public BaseResult<SwitchConfigDTO> querySwitch(@RequestBody StrParam param) {
     	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
     	String inPrams = JSON.toJSONString(userDevice);
     	String logId = DateUtil.getCurrentDateTime();
@@ -65,7 +66,7 @@ public class SwitchConfigController {
     		return ResultGenerator.genFailResult("设备信息中的plat参数错误");
     	}
     	
-    	return switchConfigService.querySwitch(plat, userDevice.getAppv(),userDevice.getChannel(), param);
+    	return switchConfigService.querySwitch(plat, userDevice.getAppv(),userDevice.getChannel());
     }
 
 }

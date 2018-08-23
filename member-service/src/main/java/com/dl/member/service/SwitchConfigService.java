@@ -56,7 +56,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	 * @param chanel
 	 * @return
 	 */
-	 public BaseResult<SwitchConfigDTO> querySwitch(String platform,String version,String chanel, QuerySwitchParam param){
+	 public BaseResult<SwitchConfigDTO> querySwitch(String platform,String version,String chanel){
 	    	SwitchConfigDTO switchConfig = new SwitchConfigDTO();
 	    	Integer userId = SessionUtil.getUserId();
 	    	log.info("开关接口传的登录的userId:"+userId);
@@ -65,7 +65,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				log.info("渠道开关:"+rst3);
 				if(rst3 == 1) {
 					//判断该城市是否需要关闭
-					boolean channelSwitch = this.channelCitySwitch(chanel, param);
+					boolean channelSwitch = this.channelSwitchByIp(chanel);
 					if(channelSwitch) {
 						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 					}else {
@@ -94,7 +94,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	    			log.info("渠道开关:"+rst3);
 	    			if(rst3 == 1) {
 	    				//判断该城市是否需要关闭
-	    				boolean channelSwitch = this.channelCitySwitch(chanel, param);
+	    				boolean channelSwitch = this.channelSwitchByIp(chanel);
 	    				if(channelSwitch) {
 	    					switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 	    				}else {
@@ -154,7 +154,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
      * 渠道城市是否打开开关
      * @return
      */
-    public boolean channelCitySwitch(String chanel,QuerySwitchParam param) {
+   /* public boolean channelCitySwitch(String chanel,QuerySwitchParam param) {
     	String provinceCode = param.getProvinceCode();
     	String cityCode = param.getCityCode();
     	log.info("chanel="+chanel+"渠道城市是否打开开关provinceCode:"+provinceCode+" , cityCode:"+cityCode);
@@ -174,6 +174,25 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     		return false;
     	}
     	return true;
+    }*/
+    
+    public boolean channelSwitchByIp(String chanel) {
+    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+    	String userIp = userDevice.getUserIp();
+    	if(StringUtils.isBlank(userIp)) {
+    		return true;
+    	}
+    	String closeCitys = switchConfigMapper.queryChannelCloseCitys(chanel);
+    	log.info("chanel="+chanel+" , closeCitys:"+closeCitys);
+    	if(StringUtils.isBlank(closeCitys)) {
+    		return true;
+    	}
+    	String[] closeCityArr = closeCitys.split(",");
+    	int num = switchConfigMapper.checkChannelUserIp(userIp, closeCityArr);
+    	if(num <= 0) {
+    		return true;
+    	}
+    	return false;
     }
     
     /**

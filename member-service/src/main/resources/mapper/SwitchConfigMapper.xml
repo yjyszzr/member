@@ -22,6 +22,20 @@
   	where contry != 'c_CN' and INET_ATON(#{userIp}) &gt;= start_ip and INET_ATON(#{userIp}) &lt;= end_ip
   </select>
   
+  <select id="checkChannelUserIp" resultType="int">
+  	select count(1) from dl_china_ip 
+  	where (province_code in
+  	<foreach collection="citys" index="index" item="item" open="(" separator="," close=")">  
+         #{item}  
+    </foreach>
+    or  city_code in
+  	<foreach collection="citys" index="index" item="item" open="(" separator="," close=")">  
+         #{item}  
+    </foreach>
+    )
+  	and INET_ATON(#{userIp}) &gt;= start_ip and INET_ATON(#{userIp}) &lt;= end_ip
+  </select>
+  
    <select id="queryChannelCloseCitys" resultType="string">
   	select close_citys from dl_phone_channel where channel=#{channel}
   </select>
