@@ -1,4 +1,5 @@
 package com.dl.member.service;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -21,7 +22,7 @@ import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.SwitchConfigDTO;
 import com.dl.member.model.SwitchConfig;
 import com.dl.member.model.User;
-import com.dl.member.util.IpAdrressUtil;
+import com.dl.member.param.QuerySwitchParam;
 import com.dl.shop.payment.api.IpaymentService;
 
 import lombok.extern.slf4j.Slf4j;
