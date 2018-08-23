@@ -55,44 +55,56 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	 * @param chanel
 	 * @return
 	 */
-    public BaseResult<SwitchConfigDTO> querySwitch(String platform,String version,String chanel){
-    	SwitchConfigDTO switchConfig = new SwitchConfigDTO();
-    	Integer userId = SessionUtil.getUserId();
-    	log.info("开关接口传的登录的userId:"+userId);
-    	if(userId == null) {
-			Integer rst3 = this.channelSwitch(platform, version, chanel);
-			log.info("渠道开关:"+rst3);
-			if(rst3 == 1) {
-				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-			}else {
-				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-			}
-			return ResultGenerator.genSuccessResult("success",switchConfig);
-    	}
-    	
-    	Integer rst1 = this.userSwitch(userId);
-    	log.info("用户终极开关:"+rst1);
-    	if(rst1 == 0) {
-    		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-    	}else if(rst1 == 1) {
-    		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-    	}else {
-    		Integer rst2 = this.userDealAction(userId);
-    		if(rst2 == 1) {
-    			log.info("用户交易行为开关:"+rst2);
-    			switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-    		}else{
-    			Integer rst3 = this.channelSwitch(platform, version, chanel);
-    			log.info("渠道开关:"+rst3);
-    			if(rst3 == 1) {
-    				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-    			}else {
-    				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-    			}
-    		}
-    	}
-    	return ResultGenerator.genSuccessResult("success",switchConfig);
-    }
+	 public BaseResult<SwitchConfigDTO> querySwitch(String platform,String version,String chanel, QuerySwitchParam param){
+	    	SwitchConfigDTO switchConfig = new SwitchConfigDTO();
+	    	Integer userId = SessionUtil.getUserId();
+	    	log.info("开关接口传的登录的userId:"+userId);
+	    	if(userId == null) {
+				Integer rst3 = this.channelSwitch(platform, version, chanel);
+				log.info("渠道开关:"+rst3);
+				if(rst3 == 1) {
+					//判断该城市是否需要关闭
+					boolean channelSwitch = this.channelSwitch(chanel, param);
+					if(channelSwitch) {
+						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+					}else {
+						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+					}
+				}else {
+					switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+				}
+				return ResultGenerator.genSuccessResult("success",switchConfig);
+	    	}
+	    	
+	    	Integer rst1 = this.userSwitch(userId);
+	    	log.info("用户终极开关:"+rst1);
+	    	if(rst1 == 0) {
+	    		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+	    	}else if(rst1 == 1) {
+	    		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+	    	}else {
+	    		Integer rst2 = this.userDealAction(userId);
+	    		if(rst2 == 1) {
+	    			log.info("用户交易行为开关:"+rst2);
+	    			switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+	    		}else{
+	    			Integer rst3 = this.channelSwitch(platform, version, chanel);
+	    			log.info("渠道开关:"+rst3);
+	    			if(rst3 == 1) {
+	    				//判断该城市是否需要关闭
+	    				boolean channelSwitch = this.channelSwitch(chanel, param);
+	    				if(channelSwitch) {
+	    					switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+	    				}else {
+	    					switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+	    				}
+	    			}else {
+	    				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+	    			}
+	    		}
+	    	}
+	    	return ResultGenerator.genSuccessResult("success",switchConfig);
+	    }
 
     /**
      * 用户超级开关
