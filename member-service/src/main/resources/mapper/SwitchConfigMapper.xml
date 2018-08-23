@@ -21,4 +21,8 @@
   	select count(1) from dl_ip 
   	where contry != 'c_CN' and INET_ATON(#{userIp}) &gt;= start_ip and INET_ATON(#{userIp}) &lt;= end_ip
   </select>
+  
+   <select id="queryChannelCloseCitys" resultType="string">
+  	select close_citys from dl_phone_channel where channel=#{channel}
+  </select>
 </mapper>

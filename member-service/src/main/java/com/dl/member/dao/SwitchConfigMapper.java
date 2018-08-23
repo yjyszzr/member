@@ -12,4 +12,6 @@ public interface SwitchConfigMapper extends Mapper<SwitchConfig> {
 	List<SwitchConfig> querySwitchConfigTurnOff(@Param("platform") String platform,@Param("version") String businessType,@Param("channel") String channel);
 
 	int checkUserIp(@Param("userIp")String userIp);
+	
+	String queryChannelCloseCitys(@Param("channel") String channel);
 }
