@@ -189,6 +189,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     	}
     	String[] closeCityArr = closeCitys.split(",");
     	int num = switchConfigMapper.checkChannelUserIp(userIp, closeCityArr);
+    	log.info("chanel="+chanel+" , closeCitys:"+closeCitys+ " , userIp="+userIp + "  ,rst="+num);
     	if(num <= 0) {
     		return true;
     	}
