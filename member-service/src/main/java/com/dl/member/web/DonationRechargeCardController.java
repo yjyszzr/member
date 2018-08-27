@@ -34,6 +34,6 @@ public class DonationRechargeCardController {
 
     @PostMapping("/list")
     public BaseResult<RechargeActivityDTO> list(@RequestBody PageParam pageParam) {
-    	return donationRechargeCardService.queryAllRechargeCards(pageParam);
+    	return donationRechargeCardService.queryAllRechargeCardsNew(pageParam);
     }
 }

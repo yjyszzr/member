@@ -63,4 +63,35 @@ public class DonationRechargeCardService extends AbstractService<DonationRecharg
         rechargeActivityDTO.setRechargeCardList(donationRechargeCardDTOList);
         return ResultGenerator.genSuccessResult("success",rechargeActivityDTO);
 	}
+	
+	/**
+	 * 充值卡列表新接口
+	 * @param pageParam
+	 * @return
+	 */
+	public BaseResult<RechargeActivityDTO> queryAllRechargeCardsNew(PageParam pageParam) {
+        PageHelper.startPage(pageParam.getPageNum(), pageParam.getPageSize());
+        List<DonationRechargeCard> list = this.findAll();
+        
+        List<DonationRechargeCardDTO> donationRechargeCardDTOList = new ArrayList<>();
+        list.forEach(s->{
+        	DonationRechargeCardDTO donationRechargeCardDTO = new DonationRechargeCardDTO();
+        	donationRechargeCardDTO.setRechargeCardId(String.valueOf(s.getRechargeCardId()));
+        	donationRechargeCardDTO.setDescription(s.getDescription());
+        	donationRechargeCardDTO.setType(String.valueOf(s.getType()));
+        	donationRechargeCardDTO.setTypeLabel("单笔充值");
+        	donationRechargeCardDTO.setName(s.getName());
+        	donationRechargeCardDTO.setRealValue(String.valueOf(s.getRealValue().intValue()));
+        	donationRechargeCardDTOList.add(donationRechargeCardDTO);
+        });
+        
+    	DLActivity dLActivity = dLActivityMapper.queryActivityByType(ProjectConstant.RECHARGE_ACT);
+        RechargeActivityDTO rechargeActivityDTO = new RechargeActivityDTO();
+        rechargeActivityDTO.setIsFinish(String.valueOf(dLActivity.getIsFinish()));
+        rechargeActivityDTO.setStartTime(dLActivity.getStartTime());
+        rechargeActivityDTO.setEndTime(dLActivity.getEndTime());
+        rechargeActivityDTO.setRechargeCardList(donationRechargeCardDTOList);
+        return ResultGenerator.genSuccessResult("success",rechargeActivityDTO);
+	}
+	
 }
