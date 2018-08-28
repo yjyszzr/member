@@ -134,15 +134,18 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		Integer userId = SessionUtil.getUserId();
 		User user = userMapper.selectUserFoUpdateByUserId(userId);//锁用户信息
 		if (null == user) {
+			log.error("扣减用户余额，未查到用户orderSn={},user_id={}",surplusPayParam.getOrderSn(),userId);
 			return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在，不能使用余额付款");
 		}
 		// 用户余额
 		BigDecimal yue = user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney());
 		BigDecimal surplus = surplusPayParam.getSurplus();
 		if (yue.compareTo(surplus) == -1) {
+			log.error("扣减用户余额，余额不足orderSn={},user_id={}",surplusPayParam.getOrderSn(),userId);
 			return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
 		}
 		if (surplus.compareTo(BigDecimal.ZERO) < 0) {
+			log.error("扣减用户余额，扣除余额小于0,orderSn={},user_id={},surplus={}",surplusPayParam.getOrderSn(),userId,surplus);
 			return ResultGenerator.genResult(MemberEnums.MONEY_PAID_NOTLESS_ZERO.getcode(), MemberEnums.MONEY_PAID_NOTLESS_ZERO.getMsg());
 		}
         BigDecimal money = BigDecimal.ZERO;
