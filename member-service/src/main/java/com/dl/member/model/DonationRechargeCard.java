@@ -29,7 +29,7 @@ public class DonationRechargeCard {
     private Integer status;
 
     @Column(name = "add_user")
-    private Integer addUser;
+    private String addUser;
 
     /**
      * 创建时间
@@ -142,14 +142,14 @@ public class DonationRechargeCard {
     /**
      * @return add_user
      */
-    public Integer getAddUser() {
+    public String getAddUser() {
         return addUser;
     }
 
     /**
      * @param addUser
      */
-    public void setAddUser(Integer addUser) {
+    public void setAddUser(String  addUser) {
         this.addUser = addUser;
     }
 
