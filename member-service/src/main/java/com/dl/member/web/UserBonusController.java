@@ -57,11 +57,11 @@ public class UserBonusController {
     }
     
     //20180831 由于充值成功的时间是有些缓慢的，前端并不知道该显示多少钱的奖杯，所以去掉
-/*    @ApiOperation(value="领取充值后 弹出的赠送金额", notes="领取充值后 弹出的赠送金额",hidden=false)
+    @ApiOperation(value="领取充值后 弹出的赠送金额", notes="领取充值后 弹出的赠送金额",hidden=false)
     @PostMapping("/rechargeSucReiceiveBonus")
     public BaseResult<DonationPriceDTO> rechargeSucReiceiveBonus(@RequestBody PayLogIdParam payLogIdParam) {
     	return userBonusService.receiveRechargeUserBonusStr(Integer.valueOf(payLogIdParam.getPayLogId()));
-    }*/
+    }
     
     @ApiOperation(value="领取充值送随机红包", notes="充值成功后领取充值送随机红包",hidden=false)
     @PostMapping("/reiceiveBonusAfterRecharge")

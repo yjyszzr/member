@@ -427,17 +427,17 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * 
 	 * @return
 	 */
-//	public BaseResult<DonationPriceDTO> receiveRechargeUserBonusStr(Integer payLogId) {
-//		PayLogIdParam payLogIdParam = new PayLogIdParam();
-//		payLogIdParam.setPayLogId(payLogId);
-//		BaseResult<PriceDTO> priceRst = payMentService.queryMoneyInRedis(payLogIdParam);
-//		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
-//		if(priceRst.getCode() == 0) {
-//			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
-//		}
-//        
-//		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
-//	}
+	public BaseResult<DonationPriceDTO> receiveRechargeUserBonusStr(Integer payLogId) {
+		PayLogIdParam payLogIdParam = new PayLogIdParam();
+		payLogIdParam.setPayLogId(payLogId);
+		BaseResult<PriceDTO> priceRst = payMentService.queryMoneyInRedis(payLogIdParam);
+		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
+		if(priceRst.getCode() == 0) {
+			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
+		}
+        
+		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
+	}
 	
 	
 	
