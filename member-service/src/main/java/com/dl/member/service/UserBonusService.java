@@ -427,25 +427,17 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * 
 	 * @return
 	 */
-	public BaseResult<DonationPriceDTO> receiveRechargeUserBonusStr(Integer payLogId) {
-		PayLogIdParam payLogIdParam = new PayLogIdParam();
-		payLogIdParam.setPayLogId(payLogId);
-		BaseResult<PriceDTO> priceRst = payMentService.queryMoneyInRedis(payLogIdParam);
-		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
-		if(priceRst.getCode() == 0) {
-			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
-		}
-		
-		JedisConnectionFactory  jedisConnectionFactory  = (JedisConnectionFactory) stringRedisTemplate.getConnectionFactory();
-		jedisConnectionFactory.setDatabase(5);
-        stringRedisTemplate.setConnectionFactory(jedisConnectionFactory);
-        ValueOperations valueOperations = stringRedisTemplate.opsForValue();
-        String donationPrice = (String) valueOperations.get(String.valueOf(payLogIdParam.getPayLogId()));
-        
-        log.info("远程访问的donationPrice："+priceRst.getData().getPrice() +"----"+ "切换redis访问的donationPrice："+donationPrice);
-        
-		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
-	}
+//	public BaseResult<DonationPriceDTO> receiveRechargeUserBonusStr(Integer payLogId) {
+//		PayLogIdParam payLogIdParam = new PayLogIdParam();
+//		payLogIdParam.setPayLogId(payLogId);
+//		BaseResult<PriceDTO> priceRst = payMentService.queryMoneyInRedis(payLogIdParam);
+//		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
+//		if(priceRst.getCode() == 0) {
+//			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
+//		}
+//        
+//		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
+//	}
 	
 	
 	
