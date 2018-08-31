@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.StringHelper;
 import com.dl.member.dto.AppDocDTO;
 import com.dl.member.model.AppDoc;
 import com.dl.member.param.DocClassifyParam;
@@ -28,7 +30,9 @@ public class AppDocController {
     	AppDoc appDoc = appDocService.queryAppDocByType(Integer.valueOf(docClassifyParam.getDocClassify()));
     	if(null != appDoc) {
     		appDocDTO.setClassfify(String.valueOf(appDoc.getClassify()));
-    		appDocDTO.setContent(appDoc.getContent());
+    		String htmlContent = appDoc.getContent();
+    		String content = StringHelper.stripHtml(htmlContent);
+    		appDocDTO.setContent(content);
     	}
         return ResultGenerator.genSuccessResult(null,appDocDTO);
     }
