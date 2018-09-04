@@ -571,15 +571,16 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		
 		List<UserBonus> userBonusList = new ArrayList<>();
 		UserBonus userBonus = this.createRechargeUserBonus(payLogDto.getOrderAmount(), payLogDto.getUserId(), payLogDto.getLogId());
-		userBonusList.add(userBonus);
-		try {
-			userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
-		} catch (Exception e) {
-			log.error("用户" + userId + "领取红包异常,已回滚");
-			throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "用户" + userId + "领取红包异常,已回滚");
+		if(null != userBonus) {
+			userBonusList.add(userBonus);
+			try {
+				userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
+			} catch (Exception e) {
+				log.error("用户" + userId + "领取红包异常,已回滚");
+				throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "用户" + userId + "领取红包异常,已回滚");
+			}	
+			donationPriceDTO.setDonationPrice(String.valueOf(userBonus.getBonusPrice().intValue()));
 		}
-		
-		donationPriceDTO.setDonationPrice(String.valueOf(userBonus.getBonusPrice().intValue()));
 		return 	ResultGenerator.genSuccessResult("success", donationPriceDTO);
 	}
 	
@@ -604,6 +605,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 					activityFocusBonus = activityBonus;
 					break;
 				}
+			}
+			if(null == activityFocusBonus) {
+				return null;
 			}
 			Integer now = DateUtil.getCurrentTimeLong();
 			Date currentTime = new Date();
