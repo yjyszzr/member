@@ -292,7 +292,7 @@ public class UserService extends AbstractService<User> {
 			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 		}
 
-		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.RESETPASS_TPLID + "_" + mobileNumber);
+		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_RESETPASS + "_" + mobileNumber);
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(smsCode)) {
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
@@ -302,7 +302,7 @@ public class UserService extends AbstractService<User> {
 		updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
 		this.update(updateUser);
 
-		stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.RESETPASS_TPLID + "_" + mobileNumber, "");
+		stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_RESETPASS + "_" + mobileNumber, "");
 		return ResultGenerator.genSuccessResult("更新用户登录密码成功");
 	}
 

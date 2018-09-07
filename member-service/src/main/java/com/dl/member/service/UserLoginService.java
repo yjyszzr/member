@@ -195,7 +195,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 
 		String mobile = userLoginMobileParam.getMobile();
 		// UserDeviceParam device = userLoginMobileParam.getDevice();
-		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
+		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
 			this.loginLog(-1, 0, 1, loginParams, MemberEnums.SMSCODE_WRONG.getMsg());
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
@@ -215,7 +215,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			
 			 UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 			 
-			 stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
+			 stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
 
 			 this.loginLog(regRst.getData(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 			 
@@ -232,7 +232,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			Integer userStatus = user.getUserStatus();
 			if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
-				stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
+				stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 					if(null == userLoginMobileParam.getPushKey()) {
 						this.updatePushKey("", user);
@@ -269,7 +269,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					userService.saveUserAndUpdateConsumer(normalUser);
 
 					UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
-					stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.LOGIN_TPLID + "_" + userLoginMobileParam.getMobile());
+					stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
 
 					if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 						if(null == userLoginMobileParam.getPushKey()) {

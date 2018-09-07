@@ -1,5 +1,7 @@
 package com.dl.member.web;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
@@ -13,17 +15,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
+import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.SmsTemplate;
 import com.dl.member.model.User;
 import com.dl.member.param.SmsParam;
 import com.dl.member.param.SmsParamService;
+import com.dl.member.service.DlPhoneChannelService;
 import com.dl.member.service.SmsService;
+import com.dl.member.service.SmsTemplateService;
 import com.dl.member.service.UserService;
 
 import io.swagger.annotations.ApiOperation;
@@ -45,6 +52,12 @@ public class SmsController {
 	
 	@Resource
 	private MemberConfig memberConfig;
+	
+	@Resource
+	private SmsTemplateService smsTemplateService;
+	
+	@Resource
+	private DlPhoneChannelService dlPhoneChannelService;
 
 	/**
 	 * 发送短信验证码
@@ -58,7 +71,18 @@ public class SmsController {
 		if (!RegexUtil.checkMobile(smsParam.getMobile())) {
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
-
+		String smsType = smsParam.getSmsType();
+		User user = userService.findBy("mobile", smsParam.getMobile());
+		if (ProjectConstant.VERIFY_TYPE_LOGIN.equals(smsType) || ProjectConstant.VERIFY_TYPE_FORGET.equals(smsType)) {//登录，忘记密码
+			if (null == user) {
+				return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+			}
+		} else if (ProjectConstant.VERIFY_TYPE_REG.equals(smsType)) {// 注册
+			if (null != user) {
+				return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
+			}
+		}
+		
 		int num = 0;
 		String sendNumKey = "num_send_"+smsParam.getMobile();
 		String sendNum3Key = sendNumKey + "_3";
@@ -85,45 +109,33 @@ public class SmsController {
 		if(num >= 10) {
 			return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_ERROR.getMsg());
 		}
-		
 		String sameMobileKey = ProjectConstant.SMS_PREFIX + smsParam.getMobile();
 		Long expireTime = stringRedisTemplate.getExpire(sameMobileKey);
 		if(null != expireTime && expireTime < 60 && expireTime > 0) {
 			return ResultGenerator.genResult(MemberEnums.MESSAGE_SENDLOT_ERROR.getcode(), MemberEnums.MESSAGE_SENDLOT_ERROR.getMsg());
 		}
 		
-		String smsType = smsParam.getSmsType();
 		String tplId = "";
 		String tplValue = "";
 		String strRandom4 = RandomUtil.getRandNum(4);
-		User user = userService.findBy("mobile", smsParam.getMobile());
-		if (ProjectConstant.VERIFY_TYPE_LOGIN.equals(smsType)) {// 登录
-			if (null == user) {
-				return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
-			}
-			tplId = memberConfig.getLOGIN_TPLID();
-			strRandom4 = RandomUtil.getRandNum(4);
-			tplValue = "#code#=" + strRandom4;
-		} else if (ProjectConstant.VERIFY_TYPE_REG.equals(smsType)) {// 注册
-			if (null != user) {
-				return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
-			}
-			tplId = memberConfig.getREGISTER_TPLID();
-			strRandom4 = RandomUtil.getRandNum(4);
-			tplValue = "#code#=" + strRandom4;
-		} else if (ProjectConstant.VERIFY_TYPE_FORGET.equals(smsType)) {// 忘记密码
-			if (null == user) {
-				return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
-			}
-			tplId = memberConfig.getRESETPASS_TPLID();
-			strRandom4 = RandomUtil.getRandNum(4);
-			tplValue = "#code#=" + strRandom4;
+		UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+		String channel = userDevice.getChannel();
+		Integer appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
+		if(null == appCodeName) {
+			appCodeName = 1;//给默认值
 		}
-
+		Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(Integer.valueOf(smsType),appCodeName);
+		if(null ==  smsTemplateId) {
+			log.warn("未查询到短信模板id的配置，请检查数据库");
+			return ResultGenerator.genFailResult("短信发送异常,请联系管理员");
+		}
+		tplId = String.valueOf(smsTemplateId);
+		tplValue = "#code#=" + strRandom4 +"&#m#=" + 5;
+		
 		// 缓存验证码
 		int defineExpiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
-		String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
-		stringRedisTemplate.opsForValue().set(sameMobileKey, strRandom4, 60, TimeUnit.SECONDS);
+		String key = ProjectConstant.SMS_PREFIX + smsType + "_" + smsParam.getMobile();
+		stringRedisTemplate.opsForValue().set(sameMobileKey, strRandom4, 300, TimeUnit.SECONDS);
 		
 		BaseResult<String> smsRst = smsService.sendSms(smsParam.getMobile(), tplId, tplValue);
 		if (smsRst.getCode() != 0) {
@@ -180,7 +192,7 @@ public class SmsController {
 			}
 			// 缓存验证码
 			int expiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
-			String key = ProjectConstant.SMS_PREFIX + tplId + "_" + smsParam.getMobile();
+			String key = ProjectConstant.SMS_PREFIX + smsType + "_" + smsParam.getMobile();
 			Long expireTime = stringRedisTemplate.getExpire(key);
 			if(null != expireTime && expireTime < 54 && expireTime > 0) {
 				return ResultGenerator.genResult(MemberEnums.MESSAGE_SENDLOT_ERROR.getcode(), MemberEnums.MESSAGE_SENDLOT_ERROR.getMsg());

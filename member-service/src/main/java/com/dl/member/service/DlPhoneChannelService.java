@@ -12,5 +12,16 @@ import javax.annotation.Resource;
 public class DlPhoneChannelService extends AbstractService<DlPhoneChannel> {
     @Resource
     private DlPhoneChannelMapper dlPhoneChannelMapper;
+    
+    /**
+     * 根据channel反查appCodeName
+     * @param channel
+     * @return
+     */
+    public Integer  queryAppCodeName(String channel) {
+    	DlPhoneChannel phoneChannel = dlPhoneChannelMapper.queryPhoneChannelByChannel(channel);
+    	Integer appCodeName = phoneChannel.getAppCodeName();
+    	return appCodeName;
+    }
 
 }
