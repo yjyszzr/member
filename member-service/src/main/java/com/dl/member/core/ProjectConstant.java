@@ -13,9 +13,11 @@ public class ProjectConstant {
 	public static final String MAPPER_INTERFACE_REFERENCE = BASE_PACKAGE + ".mapper.Mapper";
 	public static final String MAPPER_BASE = "com.dl.base.mapper.Mapper";
 
-	public static final String REGISTER_CAPTCHA_ = "register_captcha_";
 	public static final String SMS_PREFIX = "sms_";
-	public static final String REGISTER_CAPTCHA = "register_captcha";
+	public static final String SMS_TYPE_LOGIN = "0";
+	public static final String SMS_TYPE_REGISTER = "1";
+	public static final String SMS_TYPE_RESETPASS = "2";
+	public static final String SMS_TYPE_VERIFY = "3";
 
 	public static final String REGISTER_TPLID = "76179";
 	public static final String LOGIN_TPLID = "76180";
