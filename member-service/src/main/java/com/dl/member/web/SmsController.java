@@ -175,15 +175,27 @@ public class SmsController {
 		String tplValue = "";
 		String verifyCode = smsParam.getVerifyCode();
 		int needVerifyReg = smsParam.getNeedVerifyReg();
+		String channel = "";
 		if (ProjectConstant.VERIFY_TYPE_SERVICE.equals(smsType)) {
 			if (needVerifyReg == 1) {
 				User user = userService.findBy("mobile", smsParam.getMobile());
 				if (user == null) {
 					return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 				}
+				channel = user.getDeviceChannel();
 			}
-			tplId = memberConfig.getSERVICE_TPLID();
-			tplValue = "#code#=" + verifyCode;
+			
+			Integer appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
+			if(null == appCodeName) {
+				appCodeName = 1;//给默认值
+			}
+			Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
+			if(null ==  smsTemplateId) {
+				log.warn("未查询到短信模板id的配置，请检查数据库");
+				return ResultGenerator.genFailResult("短信发送异常,请联系管理员");
+			}
+			tplId = String.valueOf(smsTemplateId);
+			tplValue = "#code#=" + verifyCode +"&#m#=" + 5;
 		}
 		
 		if (!TextUtils.isEmpty(tplValue)) {
@@ -192,14 +204,13 @@ public class SmsController {
 				return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
 			}
 			// 缓存验证码
-			int expiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
 			String key = ProjectConstant.SMS_PREFIX + smsType + "_" + smsParam.getMobile();
 			Long expireTime = stringRedisTemplate.getExpire(key);
-			if(null != expireTime && expireTime < 54 && expireTime > 0) {
+			if(null != expireTime && expireTime < 59 && expireTime > 0) {
 				return ResultGenerator.genResult(MemberEnums.MESSAGE_SENDLOT_ERROR.getcode(), MemberEnums.MESSAGE_SENDLOT_ERROR.getMsg());
 			}
 			
-			stringRedisTemplate.opsForValue().set(key, verifyCode, expiredTime, TimeUnit.SECONDS);
+			stringRedisTemplate.opsForValue().set(key, verifyCode, 300, TimeUnit.SECONDS);
 			return ResultGenerator.genSuccessResult("发送短信验证码成功");
 		} else {
 			return ResultGenerator.genFailResult("参数异常");
