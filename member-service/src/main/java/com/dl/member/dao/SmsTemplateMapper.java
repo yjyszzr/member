@@ -7,5 +7,5 @@ import com.dl.member.model.SmsTemplate;
 
 public interface SmsTemplateMapper extends Mapper<SmsTemplate> {
 	
-	SmsTemplate querySmsByAppCode(@Param("type") Integer type,@Param("appCodeName") Integer appCodeName);
+	SmsTemplate querySmsByAppCode(@Param("appCodeName") Integer appCodeName);
 }

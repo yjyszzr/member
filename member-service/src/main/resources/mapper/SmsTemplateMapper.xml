@@ -12,7 +12,7 @@
   </resultMap>
   
   <select id="querySmsByAppCode" resultMap = "BaseResultMap">
-  	select * from dl_sms_template where type = #{type} and app_code_name = #{appCodeName}
+  	select * from dl_sms_template where app_code_name = #{appCodeName}
   </select>
   
 </mapper>

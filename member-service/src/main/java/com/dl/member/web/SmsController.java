@@ -124,7 +124,7 @@ public class SmsController {
 		if(null == appCodeName) {
 			appCodeName = 1;//给默认值
 		}
-		Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(Integer.valueOf(smsType),appCodeName);
+		Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
 		if(null ==  smsTemplateId) {
 			log.warn("未查询到短信模板id的配置，请检查数据库");
 			return ResultGenerator.genFailResult("短信发送异常,请联系管理员");
@@ -185,6 +185,7 @@ public class SmsController {
 			tplId = memberConfig.getSERVICE_TPLID();
 			tplValue = "#code#=" + verifyCode;
 		}
+		
 		if (!TextUtils.isEmpty(tplValue)) {
 			BaseResult<String> smsRst = smsService.sendSms(smsParam.getMobile(), tplId, tplValue);
 			if (smsRst.getCode() != 0) {

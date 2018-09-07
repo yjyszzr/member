@@ -13,8 +13,8 @@ public class SmsTemplateService extends AbstractService<SmsTemplate> {
     @Resource
     private SmsTemplateMapper smsTemplateMapper;
     
-    public Integer querySmsByAppCodeName(Integer type,Integer appCodeName) {
-    	SmsTemplate sms = smsTemplateMapper.querySmsByAppCode(type,appCodeName);
+    public Integer querySmsByAppCodeName(Integer appCodeName) {
+    	SmsTemplate sms = smsTemplateMapper.querySmsByAppCode(appCodeName);
 		return sms.getSmsTemplateId();
     }
 
