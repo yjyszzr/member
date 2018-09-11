@@ -10,10 +10,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
+import com.dl.base.util.DateUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.SwitchConfigMapper;
@@ -51,17 +53,47 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	 * 1.用户的超级开关
 	 * 2.用户交易行为
 	 * 3.渠道开关
-	 * @param platform
+	 * @param plat
 	 * @param version
 	 * @param chanel
-	 * @return
+	 * @return 目前返回对象只用到了trunon字段
 	 */
-	 public BaseResult<SwitchConfigDTO> querySwitch(String platform,String version,String chanel){
+	 public BaseResult<SwitchConfigDTO> querySwitch(){
+		 UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+	    	String inPrams = JSON.toJSONString(userDevice);
+	    	String logId = DateUtil.getCurrentDateTime();
+	    	log.info(logId + "====================================版本参数:"+inPrams);
+	    	String plat = "";
+	    	if(userDevice.getPlat().equals("android")) {
+	    		plat = "1";
+	    	}else if(userDevice.getPlat().equals("iphone")) {
+	    		plat = "0";
+	    		Integer userSwitchByIp = this.userSwitchByIp();
+	        	log.info(logId + "===========判断用户ip所属区域是否打开交易返回：" + userSwitchByIp);
+	        	if(userSwitchByIp.equals(ProjectConstant.BISINESS_APP_CLOSE)) {
+	        		SwitchConfigDTO switchConfig = new SwitchConfigDTO();
+	        		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+	        		log.info(logId + "====非国内IP或别的区域=======判断用户ip为非需要打开交易,现执行关闭交易版返回");
+	        		return ResultGenerator.genSuccessResult("success",switchConfig);
+	        	}
+	    		//idfa 回调、存储  （lidelin）
+	    		/*IDFACallBackParam idfaParam = new IDFACallBackParam();
+	    		idfaParam.setUserid(-1);
+	    		idfaParam.setIdfa(userDevice.getIDFA());
+	    		iDFAService.callBackIdfa(idfaParam);*/
+	    	}else if(userDevice.getPlat().equals("h5")) {
+	    		plat = "2";
+	    	}else {
+	    		return ResultGenerator.genFailResult("设备信息中的plat参数错误");
+	    	}
+		 
+	    	String version = userDevice.getAppv();
+	    	String chanel = userDevice.getChannel();
 	    	SwitchConfigDTO switchConfig = new SwitchConfigDTO();
 	    	Integer userId = SessionUtil.getUserId();
 	    	log.info("开关接口传的登录的userId:"+userId);
 	    	if(userId == null) {
-				Integer rst3 = this.channelSwitch(platform, version, chanel);
+				Integer rst3 = this.channelSwitch(plat, version, chanel);
 				log.info("渠道开关:"+rst3);
 				if(rst3 == 1) {
 					//判断该城市是否需要关闭
@@ -90,7 +122,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	    			log.info("用户交易行为开关:"+rst2);
 	    			switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 	    		}else{
-	    			Integer rst3 = this.channelSwitch(platform, version, chanel);
+	    			Integer rst3 = this.channelSwitch(plat, version, chanel);
 	    			log.info("渠道开关:"+rst3);
 	    			if(rst3 == 1) {
 	    				//判断该城市是否需要关闭
