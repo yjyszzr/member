@@ -137,7 +137,7 @@ public class DlChannelConsumerController {
 		if (!TextUtils.isEmpty(tplValue)) {
 			DlChannelDistributor distributor = dlChannelDistributorService.findByUserId(smsParam.getUserId());
 			if (null != distributor && distributor.getChannelDistributorId() != null) {
-				BaseResult<String> smsRst = smsService.sendSms(smsParam.getMobile(), tplId, tplValue);
+				BaseResult<String> smsRst = smsService.sendJuheSms(smsParam.getMobile(), tplId, tplValue);
 				if (smsRst.getCode() != 0) {
 					return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
 				}
@@ -227,7 +227,7 @@ public class DlChannelConsumerController {
 			tplValue = "#code#=" + strRandom4;
 		}
 		if (!TextUtils.isEmpty(tplValue)) {
-			BaseResult<String> smsRst = smsService.sendSms(smsParam.getMobile(), tplId, tplValue);
+			BaseResult<String> smsRst = smsService.sendJuheSms(smsParam.getMobile(), tplId, tplValue);
 			if (smsRst.getCode() != 0) {
 				return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
 			}

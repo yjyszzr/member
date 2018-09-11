@@ -9,7 +9,7 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
     <result column="status" jdbcType="INTEGER" property="status" />
-    <result column="add_user" jdbcType="INTEGER" property="addUser" />
+    <result column="add_user" jdbcType="VARCHAR" property="addUser" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />

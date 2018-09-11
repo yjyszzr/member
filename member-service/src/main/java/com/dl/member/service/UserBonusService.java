@@ -432,18 +432,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		payLogIdParam.setPayLogId(payLogId);
 		BaseResult<PriceDTO> priceRst = payMentService.queryMoneyInRedis(payLogIdParam);
 		DonationPriceDTO donationPriceDTO = new DonationPriceDTO();
-		donationPriceDTO.setDonationPrice("0.00");
 		if(priceRst.getCode() == 0) {
 			donationPriceDTO.setDonationPrice(priceRst.getData().getPrice());
 		}
-		
-		JedisConnectionFactory  jedisConnectionFactory  = (JedisConnectionFactory) stringRedisTemplate.getConnectionFactory();
-		jedisConnectionFactory.setDatabase(5);
-        stringRedisTemplate.setConnectionFactory(jedisConnectionFactory);
-        ValueOperations valueOperations = stringRedisTemplate.opsForValue();
-        String donationPrice = (String) valueOperations.get(String.valueOf(payLogIdParam.getPayLogId()));
-        
-        log.info("远程访问的donationPrice："+priceRst.getData().getPrice() +"----"+ "切换redis访问的donationPrice："+donationPrice);
         
 		return ResultGenerator.genSuccessResult("success", donationPriceDTO);
 	}
@@ -580,15 +571,16 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		
 		List<UserBonus> userBonusList = new ArrayList<>();
 		UserBonus userBonus = this.createRechargeUserBonus(payLogDto.getOrderAmount(), payLogDto.getUserId(), payLogDto.getLogId());
-		userBonusList.add(userBonus);
-		try {
-			userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
-		} catch (Exception e) {
-			log.error("用户" + userId + "领取红包异常,已回滚");
-			throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "用户" + userId + "领取红包异常,已回滚");
+		if(null != userBonus) {
+			userBonusList.add(userBonus);
+			try {
+				userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
+			} catch (Exception e) {
+				log.error("用户" + userId + "领取红包异常,已回滚");
+				throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "用户" + userId + "领取红包异常,已回滚");
+			}	
+			donationPriceDTO.setDonationPrice(String.valueOf(userBonus.getBonusPrice().intValue()));
 		}
-		
-		donationPriceDTO.setDonationPrice(String.valueOf(userBonus.getBonusPrice().intValue()));
 		return 	ResultGenerator.genSuccessResult("success", donationPriceDTO);
 	}
 	
@@ -613,6 +605,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 					activityFocusBonus = activityBonus;
 					break;
 				}
+			}
+			if(null == activityFocusBonus) {
+				return null;
 			}
 			Integer now = DateUtil.getCurrentTimeLong();
 			Date currentTime = new Date();

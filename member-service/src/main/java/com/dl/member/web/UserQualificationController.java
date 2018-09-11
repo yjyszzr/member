@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.SessionUtil;
 import com.dl.member.dto.QFDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.param.QFParam;
@@ -42,6 +43,10 @@ public class UserQualificationController {
     @ApiOperation(value = "查询活动资格", notes = "查询活动资格")
     @PostMapping("/queryActQF")
     public BaseResult<QFDTO> queryActQF(@RequestBody QFParam qfParam) {
+    	Integer userId = SessionUtil.getUserId();
+    	if(null == userId) {
+    		return ResultGenerator.genNeedLoginResult("请先登录");
+    	}
      	int qfRst = userQualificationService.queryActQF(Integer.valueOf(qfParam.getAct_id()), Integer.valueOf(qfParam.getAct_type()));
      	QFDTO qfDto = new QFDTO();
      	qfDto.setQfRst(qfRst);
