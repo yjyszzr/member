@@ -68,13 +68,18 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	    		plat = "1";
 	    	}else if(userDevice.getPlat().equals("iphone")) {
 	    		plat = "0";
+	    		//黑名单判断
 	    		Integer userSwitchByIp = this.userSwitchByIp();
 	        	log.info(logId + "===========判断用户ip所属区域是否打开交易返回：" + userSwitchByIp);
 	        	if(userSwitchByIp.equals(ProjectConstant.BISINESS_APP_CLOSE)) {
-	        		SwitchConfigDTO switchConfig = new SwitchConfigDTO();
-	        		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-	        		log.info(logId + "====非国内IP或别的区域=======判断用户ip为非需要打开交易,现执行关闭交易版返回");
-	        		return ResultGenerator.genSuccessResult("success",switchConfig);
+	        		//判决是否需要回捞
+	        		boolean isHuiLao = false;
+	        		if(!isHuiLao) {//不需要，返回资讯
+	        			SwitchConfigDTO switchConfig = new SwitchConfigDTO();
+	        			switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+	        			log.info(logId + "====非国内IP或别的区域=======判断用户ip为非需要打开交易,现执行关闭交易版返回");
+	        			return ResultGenerator.genSuccessResult("success",switchConfig);
+	        		}
 	        	}
 	    		//idfa 回调、存储  （lidelin）
 	    		/*IDFACallBackParam idfaParam = new IDFACallBackParam();
@@ -92,10 +97,11 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	    	SwitchConfigDTO switchConfig = new SwitchConfigDTO();
 	    	Integer userId = SessionUtil.getUserId();
 	    	log.info("开关接口传的登录的userId:"+userId);
+	    	//非登录用户
 	    	if(userId == null) {
 				Integer rst3 = this.channelSwitch(plat, version, chanel);
 				log.info("渠道开关:"+rst3);
-				if(rst3 == 1) {
+				if(rst3 == 1) {//渠道开
 					//判断该城市是否需要关闭
 					boolean channelSwitch = this.channelSwitchByIp(chanel);
 					if(channelSwitch) {
@@ -103,36 +109,38 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 					}else {
 						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 					}
-				}else {
+				}else {//渠道关
 					switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 				}
 				log.info("channel="+chanel + "  turnOn="+switchConfig.getTurnOn());
 				return ResultGenerator.genSuccessResult("success",switchConfig);
 	    	}
-	    	
+	    	//登录用户判断
 	    	Integer rst1 = this.userSwitch(userId);
 	    	log.info("用户终极开关:"+rst1);
-	    	if(rst1 == 0) {
+	    	if(rst1 == 0) {//用户终极开关关闭
 	    		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-	    	}else if(rst1 == 1) {
+	    	}else if(rst1 == 1) {//用户终极开关打开
 	    		switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-	    	}else {
+	    	}else {//用户终极开关取消，不起作用
+	    		//判断用户交易行为
 	    		Integer rst2 = this.userDealAction(userId);
-	    		if(rst2 == 1) {
+	    		if(rst2 == 1) {//有交易
 	    			log.info("用户交易行为开关:"+rst2);
 	    			switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-	    		}else{
+	    		}else{//无交易
 	    			Integer rst3 = this.channelSwitch(plat, version, chanel);
 	    			log.info("渠道开关:"+rst3);
-	    			if(rst3 == 1) {
+	    			//渠道开关判断
+	    			if(rst3 == 1) {//渠道开关打开
 	    				//判断该城市是否需要关闭
 	    				boolean channelSwitch = this.channelSwitchByIp(chanel);
-	    				if(channelSwitch) {
+	    				if(channelSwitch) {//不需要关闭
 	    					switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-	    				}else {
+	    				}else {//需要关闭
 	    					switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 	    				}
-	    			}else {
+	    			}else {//渠道开关关闭
 	    				switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 	    			}
 	    		}
@@ -140,6 +148,88 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	    	log.info("channel="+chanel + "  turnOn="+switchConfig.getTurnOn());
 	    	return ResultGenerator.genSuccessResult("success",switchConfig);
 	    }
+	 public BaseResult<SwitchConfigDTO> querySwitchOld(){
+		 UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+		 String inPrams = JSON.toJSONString(userDevice);
+		 String logId = DateUtil.getCurrentDateTime();
+		 log.info(logId + "====================================版本参数:"+inPrams);
+		 String plat = "";
+		 if(userDevice.getPlat().equals("android")) {
+			 plat = "1";
+		 }else if(userDevice.getPlat().equals("iphone")) {
+			 plat = "0";
+			 Integer userSwitchByIp = this.userSwitchByIp();
+			 log.info(logId + "===========判断用户ip所属区域是否打开交易返回：" + userSwitchByIp);
+			 if(userSwitchByIp.equals(ProjectConstant.BISINESS_APP_CLOSE)) {
+				 SwitchConfigDTO switchConfig = new SwitchConfigDTO();
+				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+				 log.info(logId + "====非国内IP或别的区域=======判断用户ip为非需要打开交易,现执行关闭交易版返回");
+				 return ResultGenerator.genSuccessResult("success",switchConfig);
+			 }
+			 //idfa 回调、存储  （lidelin）
+			 /*IDFACallBackParam idfaParam = new IDFACallBackParam();
+	    		idfaParam.setUserid(-1);
+	    		idfaParam.setIdfa(userDevice.getIDFA());
+	    		iDFAService.callBackIdfa(idfaParam);*/
+		 }else if(userDevice.getPlat().equals("h5")) {
+			 plat = "2";
+		 }else {
+			 return ResultGenerator.genFailResult("设备信息中的plat参数错误");
+		 }
+		 
+		 String version = userDevice.getAppv();
+		 String chanel = userDevice.getChannel();
+		 SwitchConfigDTO switchConfig = new SwitchConfigDTO();
+		 Integer userId = SessionUtil.getUserId();
+		 log.info("开关接口传的登录的userId:"+userId);
+		 if(userId == null) {
+			 Integer rst3 = this.channelSwitch(plat, version, chanel);
+			 log.info("渠道开关:"+rst3);
+			 if(rst3 == 1) {
+				 //判断该城市是否需要关闭
+				 boolean channelSwitch = this.channelSwitchByIp(chanel);
+				 if(channelSwitch) {
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+				 }else {
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+				 }
+			 }else {
+				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+			 }
+			 log.info("channel="+chanel + "  turnOn="+switchConfig.getTurnOn());
+			 return ResultGenerator.genSuccessResult("success",switchConfig);
+		 }
+		 
+		 Integer rst1 = this.userSwitch(userId);
+		 log.info("用户终极开关:"+rst1);
+		 if(rst1 == 0) {
+			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+		 }else if(rst1 == 1) {
+			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+		 }else {
+			 Integer rst2 = this.userDealAction(userId);
+			 if(rst2 == 1) {
+				 log.info("用户交易行为开关:"+rst2);
+				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+			 }else{
+				 Integer rst3 = this.channelSwitch(plat, version, chanel);
+				 log.info("渠道开关:"+rst3);
+				 if(rst3 == 1) {
+					 //判断该城市是否需要关闭
+					 boolean channelSwitch = this.channelSwitchByIp(chanel);
+					 if(channelSwitch) {
+						 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+					 }else {
+						 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+					 }
+				 }else {
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+				 }
+			 }
+		 }
+		 log.info("channel="+chanel + "  turnOn="+switchConfig.getTurnOn());
+		 return ResultGenerator.genSuccessResult("success",switchConfig);
+	 }
 
     /**
      * 用户超级开关
@@ -160,6 +250,9 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 //		if(!StringUtils.isEmpty(paidUser)) {
 //			return ProjectConstant.BISINESS_APP_OPEN;
 //		}
+    	if(null == userId) {
+    		return  ProjectConstant.BISINESS_APP_OPEN;
+    	}
 		Integer rst = userAccountMapper.countValidUserAccountByUserId(userId);
 		if(rst > 0) {
 			//stringRedisTemplate.opsForValue().set("pay_valid_"+String.valueOf(userId),"1");
