@@ -10,7 +10,7 @@ public class SwitchConfigDTO {
 	@ApiModelProperty("id")
     private Integer id;
 
-    @ApiModelProperty("1- 关 2- 开")
+    @ApiModelProperty("0- 关  1- 开")
     private Integer turnOn;
 
     @ApiModelProperty("1-交易版 2-资讯版")
