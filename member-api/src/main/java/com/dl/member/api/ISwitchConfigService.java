@@ -38,7 +38,7 @@ public interface ISwitchConfigService {
 	 * @param UserBonusParam
 	 * @return
 	 */
-	@RequestMapping(path="/user/switch/config/userDealAciton", method=RequestMethod.POST)
+	@RequestMapping(path="/switch/config/userDealAciton", method=RequestMethod.POST)
 	 public BaseResult<Integer> userDealAction( UserDealActionParam param) ;
 	
 	
