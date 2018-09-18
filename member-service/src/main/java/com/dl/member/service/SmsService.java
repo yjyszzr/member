@@ -131,6 +131,7 @@ public class SmsService {
 		UserDeviceInfo userDevice = SessionUtil.getUserDevice();
 		String platform = userDevice.getPlat();
 		Integer appCodeName = 1;//给默认值
+		log.info("platform-------------:"+platform);
 		if("h5" != platform) {//h5 短信模板都用彩小秘
 			String channel = userDevice.getChannel();
 			appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
