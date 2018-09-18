@@ -23,8 +23,7 @@ public class UserQualificationService extends AbstractService<UserQualification>
      * @param actType
      * @return 0-代表无资格 1-代表有资格
      */
-    public int queryActQF(Integer actId,Integer actType) {
-    	Integer userId = SessionUtil.getUserId();
+    public int queryActQF(Integer actId,Integer actType,Integer userId) {
     	UserQualification uqf = userQualificationMapper.queryQualificationByUserId(userId, actId, actType);
     	if(null == uqf) {
     		return 0;
