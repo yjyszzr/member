@@ -129,10 +129,12 @@ public class SmsService {
 		String tplValue = "";
 		String strRandom4 = RandomUtil.getRandNum(4);
 		UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-		String channel = userDevice.getChannel();
-		Integer appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
-		if(null == appCodeName) {
-			appCodeName = 1;//给默认值
+		String platform = userDevice.getPlat();
+		Integer appCodeName = 1;//给默认值
+		log.info("platform-------------:"+platform);
+		if(!"h5".equals(platform)) {//h5 短信模板都用彩小秘
+			String channel = userDevice.getChannel();
+			appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
 		}
 		Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
 		if(null ==  smsTemplateId) {

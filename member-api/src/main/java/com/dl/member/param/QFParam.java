@@ -14,4 +14,7 @@ public class QFParam {
 	@ApiModelProperty("活动id:充值活动 -3")
     private String act_id;
 	
+	@ApiModelProperty("用户id:前端调用的时候不传")
+    private String user_id;
+	
 }

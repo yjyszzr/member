@@ -45,9 +45,13 @@ public class UserQualificationController {
     public BaseResult<QFDTO> queryActQF(@RequestBody QFParam qfParam) {
     	Integer userId = SessionUtil.getUserId();
     	if(null == userId) {
-    		return ResultGenerator.genNeedLoginResult("请先登录");
+    		if(null == qfParam.getUser_id()) {
+    			return ResultGenerator.genNeedLoginResult("请先登录");
+    		}else {
+    			userId = Integer.valueOf(qfParam.getUser_id());
+    		}
     	}
-     	int qfRst = userQualificationService.queryActQF(Integer.valueOf(qfParam.getAct_id()), Integer.valueOf(qfParam.getAct_type()));
+     	int qfRst = userQualificationService.queryActQF(Integer.valueOf(qfParam.getAct_id()), Integer.valueOf(qfParam.getAct_type()),userId);
      	QFDTO qfDto = new QFDTO();
      	qfDto.setQfRst(qfRst);
      	if(1 != qfRst) {
