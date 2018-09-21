@@ -39,4 +39,10 @@
    <select id="queryChannelCloseCitys" resultType="string">
   	select close_citys from dl_phone_channel where channel=#{channel}
   </select>
+  
+  <select id="queryChannelCloseCitys" resultType="java.lang.Integer">
+  	select is_white from dl_white_black_user_list where mobile=#{mobile}
+  </select>
+  
+  
 </mapper>

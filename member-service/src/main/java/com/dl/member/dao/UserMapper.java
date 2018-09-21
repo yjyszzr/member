@@ -54,5 +54,7 @@ public interface UserMapper extends Mapper<User> {
 	int updateIsReal0to1(@Param("userId")Integer userId);
 
 	User selectUserFoUpdateByUserId(@Param("userId")Integer userId);
+
+	String getMobileById(@Param("userId") Integer userId);
 	
 }

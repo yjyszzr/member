@@ -16,4 +16,7 @@ public interface SwitchConfigMapper extends Mapper<SwitchConfig> {
 	String queryChannelCloseCitys(@Param("channel") String channel);
 
 	int checkChannelUserIp(@Param("userIp")String userIp, @Param("citys")String[] closeCityArr);
+	
+	Integer checkUserWhiteValue(@Param("mobile") String mobile);
+	
 }

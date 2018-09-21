@@ -148,4 +148,7 @@
   	update dl_user set is_real = 1 where  user_id = #{userId} and is_real = 0
   </update>
   
+  <select id="getMobileById" resultType="string">
+  	select mobile from dl_user where user_id =#{userId}
+  </select>
 </mapper>
