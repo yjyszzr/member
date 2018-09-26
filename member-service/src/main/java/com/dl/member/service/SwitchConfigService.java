@@ -260,8 +260,9 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 		Integer rst = userAccountMapper.countValidUserAccountByUserId(userId);
 		if(rst > 0) {
 			String mobile = userMapper.getMobileById(userId);
-			boolean isBlack = this.checkUserBlackList(mobile);
-			if(isBlack) {
+			//非白名单都记为黑名单(2018-09-26)
+			boolean isWhite = this.checkUserWhiteList(mobile);
+			if(!isWhite) {
 				return ProjectConstant.BISINESS_APP_CLOSE;
 			}
 			return ProjectConstant.BISINESS_APP_OPEN;
