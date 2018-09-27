@@ -38,7 +38,7 @@
 
 	<logger name="com.dl.member" level="INFO" />
 	<logger name="org.springframework" level="INFO"/>
-	<logger name="com.dl.base.mapper" level="debug" />
+	<logger name="com.dl.base.mapper" level="INFO" />
 	<logger name="com.alibaba.druid" level="WARN" />
 
 	<root level="ERROR">
