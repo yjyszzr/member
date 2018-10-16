@@ -24,9 +24,11 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.configurer.URLConfig;
+import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.ChannelCustomerBindDTO;
 import com.dl.member.dto.ImgShowDTO;
 import com.dl.member.dto.UserDTO;
+import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.dto.UserNoticeDTO;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
@@ -224,5 +226,19 @@ public class UserController {
 		user.setUserId(userId);
 		Integer result = userService.updateUserInfo(user);
 		return ResultGenerator.genSuccessResult("更新成功", result);
+	}
+
+	@ApiOperation(value = "根据电话查询", notes = "根据电话查询")
+	@PostMapping("/findByMobile")
+	public BaseResult<UserLoginDTO> findByMobile(@RequestBody String mobile) {
+		User userInfo = userService.findByMobile(mobile);
+		UserLoginDTO userLoginDTO = new UserLoginDTO();
+		if (userInfo != null) {
+			userLoginDTO.setMobile(userInfo.getUserId().toString());
+			userLoginDTO.setHeadImg(userInfo.getHeadImg());
+			userLoginDTO.setNickName(userInfo.getNickname());
+			userLoginDTO.setIsReal(userInfo.getIsReal().equals(ProjectConstant.USER_IS_REAL) ? "1" : "0");
+		}
+		return ResultGenerator.genSuccessResult("查询成功", userLoginDTO);
 	}
 }

@@ -76,8 +76,9 @@ public class UserService extends AbstractService<User> {
 	@Resource
 	private DlChannelDistributorMapper dlChannelDistributorMapper;
 
-    @Resource
-   	private IDFAService iDFAService;
+	@Resource
+	private IDFAService iDFAService;
+
 	/**
 	 * real真实信息
 	 * 
@@ -97,7 +98,7 @@ public class UserService extends AbstractService<User> {
 			log.error("个人信息接口的DTO转换异常");
 			return ResultGenerator.genFailResult("个人信息接口的DTO转换异常");
 		}
-		
+
 		userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
 		userDTO.setBalance(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
@@ -105,7 +106,7 @@ public class UserService extends AbstractService<User> {
 		userDTO.setRealInfo(this.createRealInfo(userRealDTO));
 		String mobile = user.getMobile();
 		userDTO.setMobile(mobile);
-		userDTO.setRealName(userRealDTO != null?userRealDTO.getRealName():"");
+		userDTO.setRealName(userRealDTO != null ? userRealDTO.getRealName() : "");
 		userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setActivityDTOList(this.queryAppPromotion(userId));
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
@@ -122,7 +123,7 @@ public class UserService extends AbstractService<User> {
 		if (null == userId) {
 			return ResultGenerator.genNeedLoginResult("请登录");
 		}
-		
+
 		User user = userMapper.queryUserExceptPass(userId);
 		if (user == null) {
 			return ResultGenerator.genFailResult("用户不存在");
@@ -135,9 +136,9 @@ public class UserService extends AbstractService<User> {
 			log.error("个人信息接口的DTO转换异常");
 			return ResultGenerator.genFailResult("个人信息接口的DTO转换异常");
 		}
-		
+
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
-		userDTO.setHasPass(StringUtils.isBlank(user.getPassword())?0:1);
+		userDTO.setHasPass(StringUtils.isBlank(user.getPassword()) ? 0 : 1);
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
 		userDTO.setRealInfo(this.createRealInfo(userRealDTO));
 		BigDecimal userMoney = user.getUserMoney();
@@ -146,7 +147,7 @@ public class UserService extends AbstractService<User> {
 		String strStar4 = RandomUtil.generateStarString(4);
 		String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
 		userDTO.setMobile(mobileStr);
-		userDTO.setRealName(userRealDTO != null?userRealDTO.getRealName():"");
+		userDTO.setRealName(userRealDTO != null ? userRealDTO.getRealName() : "");
 		userDTO.setUserMoney(userMoneyStr);
 		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
@@ -156,9 +157,10 @@ public class UserService extends AbstractService<User> {
 
 	/**
 	 * 构造实名认证信息:包含了部分身份证号
+	 * 
 	 * @return
 	 */
-	public String createRealInfo(UserRealDTO userRealDTO){
+	public String createRealInfo(UserRealDTO userRealDTO) {
 		String realInfo = "";
 		if (userRealDTO != null) {
 			String realName = userRealDTO.getRealName();
@@ -166,9 +168,10 @@ public class UserService extends AbstractService<User> {
 		}
 		return realInfo;
 	}
-	
+
 	/**
-	 *  只有店员才展示有效的推广链接
+	 * 只有店员才展示有效的推广链接
+	 * 
 	 * @param userId
 	 * @return
 	 */
@@ -187,15 +190,15 @@ public class UserService extends AbstractService<User> {
 					} catch (Exception e) {
 						log.error("个人信息接口的DTO转换异常");
 					}
-					if(0 == s.getIsFinish()) {//有效
-						activityMemDTOList.add(memActivityDTO);
-					}
-				});
+					if (0 == s.getIsFinish()) {// 有效
+							activityMemDTOList.add(memActivityDTO);
+						}
+					});
 			}
-		}	
+		}
 		return activityMemDTOList;
 	}
-	
+
 	/**
 	 * 保存用户
 	 * 
@@ -246,15 +249,15 @@ public class UserService extends AbstractService<User> {
 			return null;
 		}
 		Integer userId = user.getUserId();
-		
-    	if(userDevice.getPlat().equals("iphone")) {
-    		//idfa 回调、存储  （lidelin）
-    		IDFACallBackParam idfaParam = new IDFACallBackParam();
-    		idfaParam.setUserid(userId);
-    		idfaParam.setIdfa(userDevice.getIDFA());
-    		iDFAService.callBackIdfa(idfaParam);
-    	}
-    	
+
+		if (userDevice.getPlat().equals("iphone")) {
+			// idfa 回调、存储 （lidelin）
+			IDFACallBackParam idfaParam = new IDFACallBackParam();
+			idfaParam.setUserid(userId);
+			idfaParam.setIdfa(userDevice.getIDFA());
+			iDFAService.callBackIdfa(idfaParam);
+		}
+
 		return userId;
 	}
 
@@ -475,5 +478,16 @@ public class UserService extends AbstractService<User> {
 
 	public Integer updateUserInfo(User user) {
 		return userMapper.updateUserInfo(user);
+	}
+
+	public User findByMobile(String mobile) {
+		Condition condition = new Condition(User.class);
+		condition.createCriteria().andCondition("mobile = ", mobile);
+		List<User> userList = userMapper.selectByCondition(condition);
+		if (userList.size() > 0) {
+			return new User();
+		} else {
+			return userList.get(0);
+		}
 	}
 }
