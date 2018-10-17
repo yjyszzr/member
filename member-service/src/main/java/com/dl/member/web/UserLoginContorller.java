@@ -53,7 +53,6 @@ public class UserLoginContorller {
 		if (loginBySms.getCode() == 0) {
 			String token = loginBySms.getData().getToken();
 			request.getSession().setAttribute("user_token", token);
-			;
 		}
 		return loginBySms;
 	}

@@ -133,8 +133,8 @@ public class SmsService {
 		String tplValue = "";
 		String strRandom4 = RandomUtil.getRandNum(4);
 		UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-		String platform = userDevice.getPlat();
-		// String platform = "h5";
+		// String platform = userDevice.getPlat();
+		String platform = "h5";
 		Integer appCodeName = 1;// 给默认值
 		log.info("platform-------------:" + platform);
 		if (!"h5".equals(platform)) {// h5 短信模板都用彩小秘

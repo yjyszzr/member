@@ -1,5 +1,7 @@
 package com.dl.member.api;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.param.LoginLogParam;
+import com.dl.member.param.UserLoginWithSmsParam;
 
 /**
  * 用户登录
@@ -26,6 +29,14 @@ public interface IUserLoginService {
 	 */
 	@RequestMapping(path = "/login/loginLog", method = RequestMethod.POST)
 	public void loginLog(@RequestBody LoginLogParam loginLog);
+
+	/**
+	 * 用户登录调用member的登录接口
+	 * 
+	 * @param loginBySms
+	 */
+	@RequestMapping(path = "/login/loginBySms", method = RequestMethod.POST)
+	public UserLoginDTO loginBySms(@RequestBody UserLoginWithSmsParam userLoginMobileParam, HttpServletRequest request);
 
 	/**
 	 * 登录日志添加
