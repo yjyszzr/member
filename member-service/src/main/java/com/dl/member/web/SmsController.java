@@ -117,6 +117,7 @@ public class SmsController {
 	public String getRedisSmsCode(@RequestBody String mobile) {
 		logger.info("获取redis里的验证码所需的key:==============={}", ProjectConstant.SMS_PREFIX + "0_" + mobile);
 		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + "0_" + mobile);
+		logger.info("redis里的验证码:==============={}", cacheSmsCode);
 		return cacheSmsCode;
 	}
 
