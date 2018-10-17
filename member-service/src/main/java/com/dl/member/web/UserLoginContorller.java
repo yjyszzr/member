@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +33,7 @@ import com.dl.member.util.TokenUtil;
 @RequestMapping("/login")
 @Slf4j
 public class UserLoginContorller {
+	private final static Logger logger = LoggerFactory.getLogger(UserLoginContorller.class);
 	@Resource
 	private UserLoginService userLoginService;
 
@@ -61,7 +64,7 @@ public class UserLoginContorller {
 	@PostMapping("/loginBySmsForXN")
 	public BaseResult<UserLoginDTO> loginBySmsForXN(@RequestBody UserLoginWithSmsParam userLoginMobileParam) {
 		BaseResult<UserLoginDTO> loginBySms = userLoginService.loginBySmsForXN(userLoginMobileParam);
-
+		logger.info("loginBySmsForXN返回值==========================={}", loginBySms);
 		return loginBySms;
 	}
 

@@ -312,6 +312,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		// 手机号合法性校验
 		String loginParams = JSONHelper.bean2json(userLoginMobileParam);
 		if (!RegexUtil.checkMobile(userLoginMobileParam.getMobile())) {
+			logger.info("手机号合法性校验:请输入合法的手机号");
 			this.loginLog(-1, 0, 1, loginParams, MemberEnums.MOBILE_VALID_ERROR.getMsg());
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
@@ -319,13 +320,17 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		String mobile = userLoginMobileParam.getMobile();
 		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
+			logger.info("验证码校验:请输入正确的验证码");
 			this.loginLog(-1, 0, 1, loginParams, MemberEnums.SMSCODE_WRONG.getMsg());
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
 		User user = userService.findBy("mobile", mobile);
 		Integer userStatus = user.getUserStatus();
+		logger.info("userStatus:============={}", userStatus);
 		if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
+			logger.info(" 账号正常");
 			UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
+			logger.info("queryUserLoginDTOByMobile返回值:userLoginDTO================={}", userLoginDTO);
 			stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
 			if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 				if (null == userLoginMobileParam.getPushKey()) {
@@ -337,6 +342,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 		}
+		logger.info("账号不正常!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		return null;
 	}
 
@@ -393,6 +399,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		userLoginDTO.setNickName(userInfo.getNickname());
 		userLoginDTO.setIsReal(userInfo.getIsReal().equals(ProjectConstant.USER_IS_REAL) ? "1" : "0");
 		userLoginDTO.setToken(TokenUtil.genToken(userInfo.getUserId(), Integer.valueOf(loginSource)));
+		logger.info("queryUserLoginDTOByMobile方法,根据手机号查询用户登录信息======", userLoginDTO);
 		return userLoginDTO;
 	}
 
