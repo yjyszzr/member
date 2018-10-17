@@ -36,7 +36,7 @@ public interface IUserLoginService {
 	 * @param loginBySms
 	 */
 	@RequestMapping(path = "/login/loginBySms", method = RequestMethod.POST)
-	public UserLoginDTO loginBySms(@RequestBody UserLoginWithSmsParam userLoginMobileParam, HttpServletRequest request);
+	public UserLoginDTO loginBySms(@RequestBody UserLoginWithSmsParam userLoginMobileParam);
 
 	/**
 	 * 登录日志添加
