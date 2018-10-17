@@ -5,10 +5,14 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import tk.mybatis.mapper.entity.Condition;
 
 import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
@@ -33,9 +37,6 @@ import com.dl.member.param.UserRegisterParam;
 import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
 
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-
 /**
  * 用户登录服务
  *
@@ -47,7 +48,7 @@ import tk.mybatis.mapper.entity.Condition;
 public class UserLoginService extends AbstractService<UserLoginLog> {
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
-	
+
 	@Resource
 	private UserLoginLogMapper userLoginMapper;
 
@@ -66,8 +67,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	@Resource
 	private DlChannelOptionLogService dlChannelOptionLogService;
 
-    @Resource
-   	private IDFAService iDFAService;
+	@Resource
+	private IDFAService iDFAService;
+
 	/**
 	 * 密码登录
 	 *
@@ -96,9 +98,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			userLoginDTO = userLoginRst.getData();
 
 			if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-				if(null == userLoginMobileParam.getPushKey()) {
+				if (null == userLoginMobileParam.getPushKey()) {
 					this.updatePushKey("", user);
-				}else {
+				} else {
 					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 				}
 			}
@@ -112,17 +114,17 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					channelConsumerService.updateByUserId(user.getUserId());
 				}
 			}
-			
+
 			this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
-			
-	    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-	    	if(userDevice.getPlat().equals("iphone")) {
-	    		//idfa 回调、存储  （lidelin）
-	    		IDFACallBackParam idfaParam = new IDFACallBackParam();
-	    		idfaParam.setUserid(user.getUserId());
-	    		idfaParam.setIdfa(userDevice.getIDFA());
-	    		iDFAService.callBackIdfa(idfaParam);
-	    	}
+
+			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+			if (userDevice.getPlat().equals("iphone")) {
+				// idfa 回调、存储 （lidelin）
+				IDFACallBackParam idfaParam = new IDFACallBackParam();
+				idfaParam.setUserid(user.getUserId());
+				idfaParam.setIdfa(userDevice.getIDFA());
+				iDFAService.callBackIdfa(idfaParam);
+			}
 			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 
 		} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
@@ -133,7 +135,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				normalUser.setUserStatus(0);
 				normalUser.setPassWrongCount(0);
 				userService.saveUserAndUpdateConsumer(normalUser);
-				
+
 				BaseResult<UserLoginDTO> userLoginRst = this.verifyUserPass(password, user, userLoginMobileParam);
 				if (userLoginRst.getCode() != 0) {
 					this.loginLog(user.getUserId(), 0, 1, loginParams, userLoginRst.getMsg());
@@ -142,9 +144,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				userLoginDTO = userLoginRst.getData();
 
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-					if(null == userLoginMobileParam.getPushKey()) {
+					if (null == userLoginMobileParam.getPushKey()) {
 						this.updatePushKey("", user);
-					}else {
+					} else {
 						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 					}
 				}
@@ -155,7 +157,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				return ResultGenerator.genResult(MemberEnums.PASS_WRONG_BEYOND_5.getcode(), MemberEnums.PASS_WRONG_BEYOND_5.getMsg());
 			}
 		} else if (userStatus.equals(ProjectConstant.USER_STATUS_FROZEN)) {// 账户被冻结
-			this.loginLog(user.getUserId(), 0, 1, loginParams,  MemberEnums.USER_ACCOUNT_FROZEN.getMsg());
+			this.loginLog(user.getUserId(), 0, 1, loginParams, MemberEnums.USER_ACCOUNT_FROZEN.getMsg());
 			return ResultGenerator.genResult(MemberEnums.USER_ACCOUNT_FROZEN.getcode(), MemberEnums.USER_ACCOUNT_FROZEN.getMsg());
 		}
 
@@ -202,23 +204,25 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		}
 		User user = userService.findBy("mobile", mobile);
 		if (null == user) {// 新用户注册并登录
-//			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
-			 UserRegisterParam userRegisterParam = new UserRegisterParam();
-			 userRegisterParam.setMobile(userLoginMobileParam.getMobile());
-			 userRegisterParam.setPassWord("");
-			 userRegisterParam.setLoginSource(userLoginMobileParam.getLoginSource());
-			 BaseResult<Integer> regRst =  userRegisterService.registerUser(userRegisterParam, request);
-			 if(regRst.getCode() != 0) {
-				 this.loginLog(-1, 0, 1, loginParams, "注册失败");
-				 return ResultGenerator.genFailResult(regRst.getMsg());
-			 }
-			
-			 UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
-			 
-			 stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
+			// return
+			// ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(),
+			// MemberEnums.NO_REGISTER.getMsg());
+			UserRegisterParam userRegisterParam = new UserRegisterParam();
+			userRegisterParam.setMobile(userLoginMobileParam.getMobile());
+			userRegisterParam.setPassWord("");
+			userRegisterParam.setLoginSource(userLoginMobileParam.getLoginSource());
+			BaseResult<Integer> regRst = userRegisterService.registerUser(userRegisterParam, request);
+			if (regRst.getCode() != 0) {
+				this.loginLog(-1, 0, 1, loginParams, "注册失败");
+				return ResultGenerator.genFailResult(regRst.getMsg());
+			}
 
-			 this.loginLog(regRst.getData(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
-			 
+			UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
+
+			stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
+
+			this.loginLog(regRst.getData(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
+
 			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
 			if (userDevice.getPlat().equals("iphone")) {
 				// idfa 回调、存储 （lidelin）
@@ -227,16 +231,16 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				idfaParam.setIdfa(userDevice.getIDFA());
 				iDFAService.callBackIdfa(idfaParam);
 			}
-			 return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
+			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 		} else {
 			Integer userStatus = user.getUserStatus();
 			if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
 				UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
 				stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-					if(null == userLoginMobileParam.getPushKey()) {
+					if (null == userLoginMobileParam.getPushKey()) {
 						this.updatePushKey("", user);
-					}else {
+					} else {
 						this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 					}
 				}
@@ -250,18 +254,18 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					}
 				}
 				this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
-				
-		    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-		    	if(userDevice.getPlat().equals("iphone")) {
-		    		//idfa 回调、存储  （lidelin）
-		    		IDFACallBackParam idfaParam = new IDFACallBackParam();
-		    		idfaParam.setUserid(user.getUserId());
-		    		idfaParam.setIdfa(userDevice.getIDFA());
-		    		iDFAService.callBackIdfa(idfaParam);
-		    	}
+
+				UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+				if (userDevice.getPlat().equals("iphone")) {
+					// idfa 回调、存储 （lidelin）
+					IDFACallBackParam idfaParam = new IDFACallBackParam();
+					idfaParam.setUserid(user.getUserId());
+					idfaParam.setIdfa(userDevice.getIDFA());
+					iDFAService.callBackIdfa(idfaParam);
+				}
 				return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 			} else if (userStatus.equals(ProjectConstant.USER_STATUS_LOCK)) {// 账号处于被锁状态
-				boolean beyond1h = DateUtil.getCurrentTimeLong() - user.getLastTime() > 60  ? true : false;
+				boolean beyond1h = DateUtil.getCurrentTimeLong() - user.getLastTime() > 60 ? true : false;
 				if (beyond1h) {
 					User normalUser = new User();
 					normalUser.setUserId(user.getUserId());
@@ -272,13 +276,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
 
 					if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
-						if(null == userLoginMobileParam.getPushKey()) {
+						if (null == userLoginMobileParam.getPushKey()) {
 							this.updatePushKey("", user);
-						}else {
+						} else {
 							this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 						}
 					}
-					
+
 					this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 					return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 				} else {
@@ -295,6 +299,44 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	}
 
 	/**
+	 * 短信验证码登录（西安出票）
+	 *
+	 * @param userLoginMobileParam
+	 * @return
+	 */
+	public BaseResult<UserLoginDTO> loginBySmsForXN(UserLoginWithSmsParam userLoginMobileParam) {
+		// 手机号合法性校验
+		String loginParams = JSONHelper.bean2json(userLoginMobileParam);
+		if (!RegexUtil.checkMobile(userLoginMobileParam.getMobile())) {
+			this.loginLog(-1, 0, 1, loginParams, MemberEnums.MOBILE_VALID_ERROR.getMsg());
+			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
+		}
+		// 验证码校验
+		String mobile = userLoginMobileParam.getMobile();
+		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
+		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userLoginMobileParam.getSmsCode())) {
+			this.loginLog(-1, 0, 1, loginParams, MemberEnums.SMSCODE_WRONG.getMsg());
+			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+		}
+		User user = userService.findBy("mobile", mobile);
+		Integer userStatus = user.getUserStatus();
+		if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
+			UserLoginDTO userLoginDTO = queryUserLoginDTOByMobile(userLoginMobileParam.getMobile(), userLoginMobileParam.getLoginSource());
+			stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_LOGIN + "_" + userLoginMobileParam.getMobile());
+			if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
+				if (null == userLoginMobileParam.getPushKey()) {
+					this.updatePushKey("", user);
+				} else {
+					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
+				}
+			}
+			this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
+			return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
+		}
+		return null;
+	}
+
+	/**
 	 * 按照规则校验用户登录密码
 	 * 
 	 * @param password
@@ -304,7 +346,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 */
 	public BaseResult<UserLoginDTO> verifyUserPass(String password, User user, UserLoginWithPassParam userLoginMobileParam) {
 		if (user.getPassword().equals(Encryption.encryption(password, user.getSalt()))) {// 密码正确
-			if(user.getPassWrongCount() > 0) {
+			if (user.getPassWrongCount() > 0) {
 				User updatePassWrongCountUser = new User();
 				updatePassWrongCountUser.setUserId(user.getUserId());
 				updatePassWrongCountUser.setPassWrongCount(0);
@@ -322,7 +364,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				int passWrongCount = nowWrongPassCount + 1;
 				updatePassWrongCountUser.setPassWrongCount(passWrongCount);
 				userService.update(updatePassWrongCountUser);
-				return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "密码错误，您还有" + (nowWrongPassCount == 0?4:4 - nowWrongPassCount) + "次机会");
+				return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "密码错误，您还有" + (nowWrongPassCount == 0 ? 4 : 4 - nowWrongPassCount) + "次机会");
 			} else {// 输入错误密码超过5次，锁定用户
 				User lockUser = new User();
 				lockUser.setUserId(user.getUserId());
@@ -361,12 +403,12 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 *            登录类型
 	 */
 	@Transactional
-	public void loginLog(Integer userId, Integer loginType,	int loginSstatus, String loginParams, String loginResult) {
+	public void loginLog(Integer userId, Integer loginType, int loginSstatus, String loginParams, String loginResult) {
 		UserDeviceInfo device = SessionUtil.getUserDevice();
-		if(device == null) {
+		if (device == null) {
 			device = new UserDeviceInfo();
 		}
-		//登录日志添加
+		// 登录日志添加
 		UserLoginLog ull = new UserLoginLog();
 		ull.setUserId(userId);
 		ull.setLoginType(loginType);
@@ -375,7 +417,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		int time = DateUtil.getCurrentTimeLong();
 		ull.setLoginTime(time);
 		ull.setPlat(StringUtils.isBlank(device.getPlat()) ? "" : device.getPlat());
-		ull.setBrand(StringUtils.isBlank(device.getBrand()) ? "" :	device.getBrand());
+		ull.setBrand(StringUtils.isBlank(device.getBrand()) ? "" : device.getBrand());
 		ull.setMid(StringUtils.isBlank(device.getMid()) ? "" : device.getMid());
 		ull.setOs(StringUtils.isBlank(device.getOs()) ? "" : device.getOs());
 		ull.setW(StringUtils.isBlank(device.getW()) ? "" : device.getW());
@@ -394,9 +436,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 
 	public void loginLogOut() {
 		Integer userId = SessionUtil.getUserId();
-		if(userId != null) {
+		if (userId != null) {
 			UserLoginLog ull = userLoginMapper.getLastLog(userId);
-			if(ull != null) {
+			if (ull != null) {
 				ull.setLogoutTime(DateUtil.getCurrentTimeLong());
 				userLoginMapper.updateLogOutTime(ull);
 			}

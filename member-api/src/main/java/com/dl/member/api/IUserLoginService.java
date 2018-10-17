@@ -1,7 +1,5 @@
 package com.dl.member.api;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +33,7 @@ public interface IUserLoginService {
 	 * 
 	 * @param loginBySms
 	 */
-	@RequestMapping(path = "/login/loginBySms", method = RequestMethod.POST)
+	@RequestMapping(path = "/login/loginBySmsForXN", method = RequestMethod.POST)
 	public UserLoginDTO loginBySms(@RequestBody UserLoginWithSmsParam userLoginMobileParam);
 
 	/**

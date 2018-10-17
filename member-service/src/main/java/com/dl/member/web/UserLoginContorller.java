@@ -57,6 +57,14 @@ public class UserLoginContorller {
 		return loginBySms;
 	}
 
+	@ApiOperation(value = "西安短信验证码登录", notes = "西安短信验证码登录")
+	@PostMapping("/loginBySmsForXN")
+	public BaseResult<UserLoginDTO> loginBySmsForXN(@RequestBody UserLoginWithSmsParam userLoginMobileParam) {
+		BaseResult<UserLoginDTO> loginBySms = userLoginService.loginBySmsForXN(userLoginMobileParam);
+
+		return loginBySms;
+	}
+
 	@ApiOperation(value = "用户注销", notes = "用户注销")
 	@PostMapping("/logout")
 	public BaseResult<String> logout(@RequestBody StrParam strPaaram, HttpServletRequest request) {
