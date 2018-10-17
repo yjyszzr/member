@@ -9,6 +9,8 @@ import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.util.TextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,8 @@ import com.dl.member.service.UserService;
 @RequestMapping("/sms")
 @Slf4j
 public class SmsController {
+
+	private final static Logger logger = LoggerFactory.getLogger(SmsController.class);
 
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
@@ -111,6 +115,7 @@ public class SmsController {
 	@ApiOperation(value = "获取redis里的验证码", notes = "获取redis里的验证码")
 	@PostMapping("/getRedisSmsCode")
 	public String getRedisSmsCode(String mobile) {
+		logger.info("获取redis里的验证码所需的key:==============={}", ProjectConstant.SMS_PREFIX + "0_" + mobile);
 		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + "0_" + mobile);
 		return cacheSmsCode;
 	}
