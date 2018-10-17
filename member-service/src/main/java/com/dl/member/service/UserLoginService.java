@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,7 @@ import com.dl.member.util.TokenUtil;
 @Service
 @Slf4j
 public class UserLoginService extends AbstractService<UserLoginLog> {
+	private final static Logger logger = LoggerFactory.getLogger(UserLoginService.class);
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
 
@@ -305,6 +308,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 * @return
 	 */
 	public BaseResult<UserLoginDTO> loginBySmsForXN(UserLoginWithSmsParam userLoginMobileParam) {
+		logger.info("登录参数:====={}", userLoginMobileParam);
 		// 手机号合法性校验
 		String loginParams = JSONHelper.bean2json(userLoginMobileParam);
 		if (!RegexUtil.checkMobile(userLoginMobileParam.getMobile())) {

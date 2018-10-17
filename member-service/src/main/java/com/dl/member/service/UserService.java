@@ -485,9 +485,9 @@ public class UserService extends AbstractService<User> {
 		condition.createCriteria().andCondition("mobile = ", mobile);
 		List<User> userList = userMapper.selectByCondition(condition);
 		if (userList.size() > 0) {
-			return new User();
-		} else {
 			return userList.get(0);
+		} else {
+			return null;
 		}
 	}
 }

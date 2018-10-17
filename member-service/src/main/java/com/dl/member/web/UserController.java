@@ -33,6 +33,7 @@ import com.dl.member.dto.UserNoticeDTO;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
+import com.dl.member.param.MobileInfoParam;
 import com.dl.member.param.MobileNumberParam;
 import com.dl.member.param.QueryUserNoticeParam;
 import com.dl.member.param.SetLoginPassParam;
@@ -230,15 +231,16 @@ public class UserController {
 
 	@ApiOperation(value = "根据电话查询", notes = "根据电话查询")
 	@PostMapping("/findByMobile")
-	public BaseResult<UserLoginDTO> findByMobile(@RequestBody String mobile) {
-		User userInfo = userService.findByMobile(mobile);
+	public BaseResult<UserLoginDTO> findByMobile(@RequestBody MobileInfoParam mobile) {
+		User userInfo = userService.findByMobile(mobile.getMobile());
 		UserLoginDTO userLoginDTO = new UserLoginDTO();
 		if (userInfo != null) {
 			userLoginDTO.setMobile(userInfo.getUserId().toString());
 			userLoginDTO.setHeadImg(userInfo.getHeadImg());
 			userLoginDTO.setNickName(userInfo.getNickname());
 			userLoginDTO.setIsReal(userInfo.getIsReal().equals(ProjectConstant.USER_IS_REAL) ? "1" : "0");
+			return ResultGenerator.genSuccessResult("查询成功", userLoginDTO);
 		}
-		return ResultGenerator.genSuccessResult("查询成功", userLoginDTO);
+		return ResultGenerator.genSuccessResult("结果为空", null);
 	}
 }

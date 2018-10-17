@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.param.LoginLogParam;
+import com.dl.member.param.MobileInfoParam;
 import com.dl.member.param.UserLoginWithSmsParam;
 
 /**
@@ -44,6 +45,6 @@ public interface IUserLoginService {
 	 * @return
 	 */
 	@RequestMapping(path = "/user/findByMobile", method = RequestMethod.POST)
-	public UserLoginDTO findByMobile(@RequestBody String mobile);
+	public UserLoginDTO findByMobile(@RequestBody MobileInfoParam mobile);
 
 }
