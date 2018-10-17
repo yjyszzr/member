@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.dl.base.result.BaseResult;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.param.LoginLogParam;
 import com.dl.member.param.MobileInfoParam;
@@ -35,7 +36,7 @@ public interface IUserLoginService {
 	 * @param loginBySms
 	 */
 	@RequestMapping(path = "/login/loginBySmsForXN", method = RequestMethod.POST)
-	public UserLoginDTO loginBySms(@RequestBody UserLoginWithSmsParam userLoginMobileParam);
+	public BaseResult<UserLoginDTO> loginBySms(@RequestBody UserLoginWithSmsParam userLoginMobileParam);
 
 	/**
 	 * 登录日志添加
@@ -45,6 +46,6 @@ public interface IUserLoginService {
 	 * @return
 	 */
 	@RequestMapping(path = "/user/findByMobile", method = RequestMethod.POST)
-	public UserLoginDTO findByMobile(@RequestBody MobileInfoParam mobile);
+	public BaseResult<UserLoginDTO> findByMobile(@RequestBody MobileInfoParam mobile);
 
 }

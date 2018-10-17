@@ -399,7 +399,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		userLoginDTO.setNickName(userInfo.getNickname());
 		userLoginDTO.setIsReal(userInfo.getIsReal().equals(ProjectConstant.USER_IS_REAL) ? "1" : "0");
 		userLoginDTO.setToken(TokenUtil.genToken(userInfo.getUserId(), Integer.valueOf(loginSource)));
-		logger.info("queryUserLoginDTOByMobile方法,根据手机号查询用户登录信息======", userLoginDTO);
+		logger.info("queryUserLoginDTOByMobile方法,根据手机号查询用户登录信息======{}", userLoginDTO);
 		return userLoginDTO;
 	}
 
