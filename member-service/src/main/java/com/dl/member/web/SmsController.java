@@ -114,7 +114,7 @@ public class SmsController {
 
 	@ApiOperation(value = "获取redis里的验证码", notes = "获取redis里的验证码")
 	@PostMapping("/getRedisSmsCode")
-	public String getRedisSmsCode(String mobile) {
+	public String getRedisSmsCode(@RequestBody String mobile) {
 		logger.info("获取redis里的验证码所需的key:==============={}", ProjectConstant.SMS_PREFIX + "0_" + mobile);
 		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + "0_" + mobile);
 		return cacheSmsCode;
@@ -122,7 +122,7 @@ public class SmsController {
 
 	@ApiOperation(value = "删除redis里的短信验证码", notes = "删除redis里的短信验证码")
 	@PostMapping("/deleteRedisSmsCode")
-	public void deleteRedisSmsCode(String mobile) {
+	public void deleteRedisSmsCode(@RequestBody String mobile) {
 		stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + "0_" + mobile);
 	}
 }
