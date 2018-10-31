@@ -17,7 +17,7 @@ public class SysConfigDTO {
     private BigDecimal value;
 	
 	@ApiModelProperty("业务描述")
-    private String desc;
+    private String describtion;
 
 	
 }
