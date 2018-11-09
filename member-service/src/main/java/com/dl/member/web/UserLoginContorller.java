@@ -2,19 +2,15 @@ package com.dl.member.web;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.UserLoginDTO;
@@ -22,7 +18,9 @@ import com.dl.member.param.LoginLogParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
+import com.dl.member.param.UserParam;
 import com.dl.member.service.UserLoginService;
+import com.dl.member.service.UserService;
 import com.dl.member.util.TokenUtil;
 
 /**
@@ -36,7 +34,9 @@ public class UserLoginContorller {
 	private final static Logger logger = LoggerFactory.getLogger(UserLoginContorller.class);
 	@Resource
 	private UserLoginService userLoginService;
-
+	@Resource 
+	private UserService userService;
+	
 	@ApiOperation(value = "密码登录", notes = "密码登录")
 	@PostMapping("/loginByPass")
 	public BaseResult<UserLoginDTO> loginByPass(@RequestBody UserLoginWithPassParam userLoginMobileParam, HttpServletRequest request) {
@@ -74,6 +74,25 @@ public class UserLoginContorller {
 		logger.info("[loginByPwdForXN]");
 		BaseResult<UserLoginDTO> loginByPass = userLoginService.loginByPass(userLoginMobileParam);
 		return loginByPass;
+	}
+	
+	@ApiOperation(value = "西安人工出票系统用户创建", notes = "西安人工出票系统用户创建")
+	@PostMapping("/onCreateUser")
+	public BaseResult<UserLoginDTO> onCreateUser(@RequestBody UserLoginWithPassParam params) {
+		logger.info("[onCreateUser]" + " mobile:" + params.getMobile() + " pwd:" + params.getPassword() + " loginSrc:" + params.getLoginSource());
+		UserParam userParams = new UserParam();
+		userParams.setMobile(params.getMobile());
+		userParams.setPassWord(params.getPassword());
+		userParams.setRegIp("0.0.0.1");
+		userParams.setLoginSource(params.getLoginSource());
+		int cnt = userService.saveUser(userParams);
+		if(cnt > 0) {
+			logger.info("[onCreateUser]" + " succ");
+			return ResultGenerator.genSuccessResult("创建成功");
+		}else {
+			logger.info("[onCreateUser]" + " fail");
+			return ResultGenerator.genFailResult("创建失败");
+		}
 	}
 	
 	@ApiOperation(value = "用户注销", notes = "用户注销")

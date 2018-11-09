@@ -55,7 +55,7 @@ public interface IUserLoginService {
 	 * @param mobile
 	 * @return
 	 */
-	@RequestMapping(path = "/user/onCreateUser", method = RequestMethod.POST)
+	@RequestMapping(path = "/login/onCreateUser", method = RequestMethod.POST)
 	public BaseResult<UserLoginDTO> onCreateUser(@RequestBody MobilePwdCreateParam mobile);
 	
 	/**
