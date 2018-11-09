@@ -84,7 +84,7 @@ public class UserLoginContorller {
 		userParams.setMobile(params.getMobile());
 		userParams.setPassWord(params.getPassword());
 		userParams.setRegIp("0.0.0.1");
-		userParams.setLoginSource(params.getLoginSource());
+		userParams.setLoginSource("人工出票");
 		int cnt = userService.saveUser(userParams);
 		if(cnt > 0) {
 			logger.info("[onCreateUser]" + " succ");
