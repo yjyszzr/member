@@ -68,6 +68,14 @@ public class UserLoginContorller {
 		return loginBySms;
 	}
 
+	@ApiOperation(value = "西安人工出票系统密码登录", notes = "西安人工出票系统密码登录")
+	@PostMapping("/loginByPwdForXN")
+	public BaseResult<UserLoginDTO> loginByPwdForXN(@RequestBody UserLoginWithPassParam userLoginMobileParam) {
+		logger.info("[loginByPwdForXN]");
+		BaseResult<UserLoginDTO> loginByPass = userLoginService.loginByPass(userLoginMobileParam);
+		return loginByPass;
+	}
+	
 	@ApiOperation(value = "用户注销", notes = "用户注销")
 	@PostMapping("/logout")
 	public BaseResult<String> logout(@RequestBody StrParam strPaaram, HttpServletRequest request) {

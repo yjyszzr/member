@@ -9,6 +9,8 @@ import com.dl.base.result.BaseResult;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.param.LoginLogParam;
 import com.dl.member.param.MobileInfoParam;
+import com.dl.member.param.MobilePwdCreateParam;
+import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
 
 /**
@@ -47,5 +49,20 @@ public interface IUserLoginService {
 	 */
 	@RequestMapping(path = "/user/findByMobile", method = RequestMethod.POST)
 	public BaseResult<UserLoginDTO> findByMobile(@RequestBody MobileInfoParam mobile);
-
+	
+	/***
+	 * 如果无该用户，直接创建该用户
+	 * @param mobile
+	 * @return
+	 */
+	@RequestMapping(path = "/user/onCreateUser", method = RequestMethod.POST)
+	public BaseResult<UserLoginDTO> onCreateUser(@RequestBody MobilePwdCreateParam mobile);
+	
+	/**
+	 * 手机号密码登录
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(path = "/login/loginByPwdForXN", method = RequestMethod.POST)
+	public BaseResult<UserLoginDTO> loginWithPwd(@RequestBody UserLoginWithPassParam params);
 }
