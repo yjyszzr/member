@@ -84,7 +84,7 @@ public class UserLoginContorller {
 	}
 	
 	@ApiOperation(value = "西安人工出票系统用户创建", notes = "西安人工出票系统用户创建")
-	@PostMapping("/onCreateUser")
+	@PostMapping("/onCreateUserXN")
 	public BaseResult<UserLoginDTO> onCreateUser(@RequestBody MobilePwdCreateParam params) {
 		logger.info("[onCreateUser]" + " mobile:" + params.getMobile() + " pwd:" + params.getPassword() + " loginSrc:" + params.getLoginSource());
 		UserParam userParams = new UserParam();
@@ -103,7 +103,7 @@ public class UserLoginContorller {
 	}
 	
 	@ApiOperation(value = "西安人工出票系统重置密码", notes = "西安人工出票系统重置密码")
-	@PostMapping("/repwd")
+	@PostMapping("/repwdXN")
 	public BaseResult<?> rePwd(@RequestBody UserRePwdParam params) {
 		String mobile = params.getMobile();
 		String pwd = params.getPassword();
@@ -116,7 +116,7 @@ public class UserLoginContorller {
 		}
 		String strPwd = user.getPassword();
 		logger.info("[rePwd]" + " strPwd:" + strPwd);
-		String loginsalt = Encryption.salt();
+		String loginsalt = user.getSalt();
 		String strPwd1 = Encryption.encryption(pwd,loginsalt);
 		logger.info("[rePwd]" + " strPwd1:" + strPwd1);
 		return ResultGenerator.genSuccessResult();
