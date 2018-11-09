@@ -12,6 +12,7 @@ import com.dl.member.param.MobileInfoParam;
 import com.dl.member.param.MobilePwdCreateParam;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
+import com.dl.member.param.UserRePwdParam;
 
 /**
  * 用户登录
@@ -65,4 +66,13 @@ public interface IUserLoginService {
 	 */
 	@RequestMapping(path = "/login/loginByPwdForXN", method = RequestMethod.POST)
 	public BaseResult<UserLoginDTO> loginWithPwd(@RequestBody UserLoginWithPassParam params);
+	
+	
+	/**
+	 * 修改密码
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(path = "/login/repwd", method = RequestMethod.POST)
+	public BaseResult<?> rePwd(@RequestBody UserRePwdParam params);
 }

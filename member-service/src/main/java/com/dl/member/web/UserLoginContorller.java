@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiOperation;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.UserLoginDTO;
+import com.dl.member.model.User;
 import com.dl.member.param.LoginLogParam;
 import com.dl.member.param.MobilePwdCreateParam;
 import com.dl.member.param.StrParam;
+import com.dl.member.param.UserIdRealParam;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
 import com.dl.member.param.UserParam;
+import com.dl.member.param.UserRePwdParam;
 import com.dl.member.service.UserLoginService;
 import com.dl.member.service.UserService;
+import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
 
 /**
@@ -95,6 +101,27 @@ public class UserLoginContorller {
 			return ResultGenerator.genFailResult("创建失败");
 		}
 	}
+	
+	@ApiOperation(value = "西安人工出票系统重置密码", notes = "西安人工出票系统重置密码")
+	@PostMapping("/repwd")
+	public BaseResult<?> rePwd(@RequestBody UserRePwdParam params) {
+		String mobile = params.getMobile();
+		String pwd = params.getPassword();
+		String newPwd = params.getNewPwd();
+		logger.info("[rePwd]" + " mobile:" + mobile + " pwd:" + pwd + " newPwd:" + newPwd);
+		User user = userService.findByMobile(mobile);
+		if(user == null) {
+			logger.info("[rePwd]" + "未注册~");
+			return ResultGenerator.genFailResult("未注册");
+		}
+		String strPwd = user.getPassword();
+		logger.info("[rePwd]" + " strPwd:" + strPwd);
+		String loginsalt = Encryption.salt();
+		String strPwd1 = Encryption.encryption(pwd,loginsalt);
+		logger.info("[rePwd]" + " strPwd1:" + strPwd1);
+		return ResultGenerator.genSuccessResult();
+	}
+	
 	
 	@ApiOperation(value = "用户注销", notes = "用户注销")
 	@PostMapping("/logout")
