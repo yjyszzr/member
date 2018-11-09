@@ -121,7 +121,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 
 			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-			if (userDevice.getPlat().equals("iphone")) {
+			if (userDevice != null && userDevice.getPlat() != null && userDevice.getPlat().equals("iphone")) {
 				// idfa 回调、存储 （lidelin）
 				IDFACallBackParam idfaParam = new IDFACallBackParam();
 				idfaParam.setUserid(user.getUserId());
