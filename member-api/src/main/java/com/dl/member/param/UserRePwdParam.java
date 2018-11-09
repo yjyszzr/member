@@ -17,7 +17,7 @@ public class UserRePwdParam implements Serializable{
 	
 	@NotBlank(message = "请填写密码")
 	@ApiModelProperty(value = "密码", required = true)
-	private String password;
+	private String password; 
 	
 	@NotBlank(message = "新密码")
 	private String newPwd;
