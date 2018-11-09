@@ -15,6 +15,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.param.LoginLogParam;
+import com.dl.member.param.MobilePwdCreateParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
@@ -78,7 +79,7 @@ public class UserLoginContorller {
 	
 	@ApiOperation(value = "西安人工出票系统用户创建", notes = "西安人工出票系统用户创建")
 	@PostMapping("/onCreateUser")
-	public BaseResult<UserLoginDTO> onCreateUser(@RequestBody UserLoginWithPassParam params) {
+	public BaseResult<UserLoginDTO> onCreateUser(@RequestBody MobilePwdCreateParam params) {
 		logger.info("[onCreateUser]" + " mobile:" + params.getMobile() + " pwd:" + params.getPassword() + " loginSrc:" + params.getLoginSource());
 		UserParam userParams = new UserParam();
 		userParams.setMobile(params.getMobile());
