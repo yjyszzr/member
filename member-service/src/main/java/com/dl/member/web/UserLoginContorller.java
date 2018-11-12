@@ -81,15 +81,6 @@ public class UserLoginContorller {
 	public BaseResult<UserLoginDTO> loginByPwdForXN(@RequestBody UserLoginWithPassParam userLoginMobileParam) {
 		logger.info("[loginByPwdForXN]");
 		BaseResult<UserLoginDTO> loginByPass = userLoginService.loginByPass(userLoginMobileParam);
-		if(loginByPass == null || loginByPass.getCode() != 0){
-			String tips = "登录失败";
-			if(loginByPass != null) {
-				if(!StringUtils.isEmpty(loginByPass.getMsg())) {
-					tips = loginByPass.getMsg();
-				}
-			}
-			loginByPass = ResultGenerator.genFailResult(tips);
-		}
 		return loginByPass;
 	}
 	
