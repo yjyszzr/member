@@ -80,6 +80,9 @@ public class UserLoginContorller {
 	public BaseResult<UserLoginDTO> loginByPwdForXN(@RequestBody UserLoginWithPassParam userLoginMobileParam) {
 		logger.info("[loginByPwdForXN]");
 		BaseResult<UserLoginDTO> loginByPass = userLoginService.loginByPass(userLoginMobileParam);
+		if(loginByPass == null) {
+			loginByPass = ResultGenerator.genFailResult("登录失败");
+		}
 		return loginByPass;
 	}
 	
@@ -131,7 +134,7 @@ public class UserLoginContorller {
 		updateUser.setPassword(Encryption.encryption(newPwd,loginsalt));
 		userService.update(updateUser);
 		logger.info("[rePwd]" + "更新密码成功..newPwd:" + newPwd);
-		return ResultGenerator.genSuccessResult();
+		return ResultGenerator.genSuccessResult("密码更新成功");
 	}
 	
 	
