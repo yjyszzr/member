@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.UserLoginDTO;
+import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.param.LoginLogParam;
 import com.dl.member.param.MobilePwdCreateParam;
@@ -121,11 +122,11 @@ public class UserLoginContorller {
 		User user = userService.findByMobile(mobile);
 		if(user == null) {
 			logger.info("[rePwd]" + "未注册~");
-			return ResultGenerator.genFailResult("未注册");
+			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(),MemberEnums.NO_REGISTER.getMsg());
 		}
 		if(StringUtils.isEmpty(pwd) || StringUtils.isEmpty(newPwd)) {
 			logger.info("[rePwd]" + " pwd:" + pwd + " newPwd:" + newPwd);
-			return ResultGenerator.genFailResult("密码参数错误");
+			return ResultGenerator.genResult(MemberEnums.PARAMS_NOT_NULL.getcode(),"密码参数错误");
 		}
 		String oldPwd = user.getPassword();
 		logger.info("[rePwd]" + " oldPwd:" + oldPwd);
@@ -133,7 +134,7 @@ public class UserLoginContorller {
 		String pass = Encryption.encryption(pwd,loginsalt);
 		logger.info("[rePwd]" + " pass:" + pass);
 		if(!oldPwd.equals(pass)) {
-			return ResultGenerator.genFailResult("旧密码不匹配~");
+			return ResultGenerator.genResult(MemberEnums.OLD_PWD_WRONG.getcode(),MemberEnums.OLD_PWD_WRONG.getMsg());
 		}
 		User updateUser = new User();
 		updateUser.setUserId(user.getUserId());
