@@ -147,7 +147,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
 				}
 				userLoginDTO = userLoginRst.getData();
-
+				logger.info("[loginByPass]" + " userLoginDTO:" + userLoginDTO);
 				if (!userLoginMobileParam.getLoginSource().equals(ProjectConstant.LOGIN_SOURCE_H5)) {
 					if (null == userLoginMobileParam.getPushKey()) {
 						this.updatePushKey("", user);
