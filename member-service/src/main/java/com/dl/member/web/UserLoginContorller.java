@@ -114,11 +114,23 @@ public class UserLoginContorller {
 			logger.info("[rePwd]" + "未注册~");
 			return ResultGenerator.genFailResult("未注册");
 		}
-		String strPwd = user.getPassword();
-		logger.info("[rePwd]" + " strPwd:" + strPwd);
+		if(StringUtils.isEmpty(pwd) || StringUtils.isEmpty(newPwd)) {
+			logger.info("[rePwd]" + " pwd:" + pwd + " newPwd:" + newPwd);
+			return ResultGenerator.genFailResult("密码参数错误");
+		}
+		String oldPwd = user.getPassword();
+		logger.info("[rePwd]" + " oldPwd:" + oldPwd);
 		String loginsalt = user.getSalt();
-		String strPwd1 = Encryption.encryption(pwd,loginsalt);
-		logger.info("[rePwd]" + " strPwd1:" + strPwd1);
+		String pass = Encryption.encryption(pwd,loginsalt);
+		logger.info("[rePwd]" + " pass:" + pass);
+		if(!oldPwd.equals(pass)) {
+			return ResultGenerator.genFailResult("旧密码不匹配~");
+		}
+		User updateUser = new User();
+		updateUser.setUserId(user.getUserId());
+		updateUser.setPassword(Encryption.encryption(newPwd,loginsalt));
+		userService.update(updateUser);
+		logger.info("[rePwd]" + "更新密码成功..newPwd:" + newPwd);
 		return ResultGenerator.genSuccessResult();
 	}
 	
