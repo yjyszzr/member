@@ -92,9 +92,11 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		}
 
 		Integer userStatus = user.getUserStatus();
+		logger.info("[loginByPass]" + " mobile:" + mobile + " userStatus:" + userStatus);
 		if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
 			BaseResult<UserLoginDTO> userLoginRst = this.verifyUserPass(password, user, userLoginMobileParam);
 			if (userLoginRst.getCode() != 0) {
+				logger.info("[loginByPass]" + " mobile:" + mobile + " code:" + userLoginRst.getCode());
 				this.loginLog(user.getUserId(), 0, 1, loginParams, userLoginRst.getMsg());
 				return ResultGenerator.genResult(userLoginRst.getCode(), userLoginRst.getMsg());
 			}
