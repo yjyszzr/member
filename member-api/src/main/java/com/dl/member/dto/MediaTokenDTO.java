@@ -16,6 +16,8 @@ public class MediaTokenDTO {
 	private String bucketName;
 	@ApiModelProperty(value = "bucketName")
 	private String fileName;
+	@ApiModelProperty(value="url")
+	private String url;
 	
 	public synchronized static MediaTokenDTO getEntity(int type){
 		MediaTokenDTO entity = new MediaTokenDTO();
@@ -31,6 +33,7 @@ public class MediaTokenDTO {
 			entity.bucketName = "szcq-pic";	
 		}
 		entity.fileName = MD5Util.crypt(System.currentTimeMillis()+"") + ".png";
+		entity.url = "http://oss-cn-beijing.aliyuncs.com";
 		return entity;
 	}
 }
