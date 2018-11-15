@@ -18,11 +18,19 @@ public class MediaTokenDTO {
 	private String fileName;
 
 	
-	public static MediaTokenDTO getEntity() {
+	public static MediaTokenDTO getEntity(int type){
 		MediaTokenDTO entity = new MediaTokenDTO();
 		entity.accKeyId = "LTAIQ2LG8kd1IU1k";
 		entity.accKeySecret = "Fu8InPLKtEgKSXJ6tJztj5BKnaj6DN";
-		entity.bucketName = "szcq-pic";
+		if(type == 0) {
+			entity.bucketName = "szcq-pic";	
+		}else if(type == 1) {
+			entity.bucketName = "szcq-music";	
+		}else if(type == 2) {
+			entity.bucketName = "szcq-video";	
+		}else {
+			entity.bucketName = "szcq-pic";	
+		}
 		entity.fileName = MD5Util.crypt(System.currentTimeMillis()+"");
 		return entity;
 	}
