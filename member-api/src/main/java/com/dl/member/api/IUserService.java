@@ -4,9 +4,12 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.ChannelCustomerBindDTO;
+import com.dl.member.dto.MediaTokenDTO;
 import com.dl.member.dto.UserDTO;
+import com.dl.member.param.MediaTokenParam;
 import com.dl.member.param.StrParam;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
 //import com.pgt.shop.member.param.CancelChangeParam;
@@ -70,4 +73,12 @@ public interface IUserService {
 	 */
 	@RequestMapping(path="/user/queryUserInfoReal", method=RequestMethod.POST)
 	public BaseResult<UserDTO> queryUserInfoReal(@RequestBody UserIdRealParam params);
+	
+	/**
+	 * 获取MediaToken接口
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(path="/media/getToken", method=RequestMethod.POST)
+	public BaseResult<MediaTokenDTO> getMediaTokenInfo(@RequestBody MediaTokenParam params);
 }

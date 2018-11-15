@@ -16,9 +16,8 @@ public class MediaTokenDTO {
 	private String bucketName;
 	@ApiModelProperty(value = "bucketName")
 	private String fileName;
-
 	
-	public static MediaTokenDTO getEntity(int type){
+	public synchronized static MediaTokenDTO getEntity(int type){
 		MediaTokenDTO entity = new MediaTokenDTO();
 		entity.accKeyId = "LTAIQ2LG8kd1IU1k";
 		entity.accKeySecret = "Fu8InPLKtEgKSXJ6tJztj5BKnaj6DN";
