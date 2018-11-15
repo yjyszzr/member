@@ -99,6 +99,11 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 		 log.info("开关接口传的登录的userId:"+userId);
 		 //非登录用户
 		 if(userId == null) {
+			 //h5 的plat,version 和 channel 写死，分别为2和1.0.0和h5
+			 if(userDevice.getPlat().equals("h5")) {
+				 version = "1.0.0";
+				 chanel = "h5";
+			 }
 			 Integer rst3 = this.channelSwitch(plat, version, chanel);
 			 log.info("渠道开关:"+rst3);
 			 if(rst3 == 1) {//渠道开
@@ -124,12 +129,13 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 		 }else {//用户终极开关取消，不起作用
 			 String mobile = userMapper.getMobileById(userId);
-			 //白名单判断
-			 boolean isIn = this.checkUserWhiteList(mobile);
+			 //黑名单判断
+			 boolean isIn = this.checkUserBlackList(mobile);
 			 if(isIn) {
-				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 			 } else {
-				 //判断用户交易行为
+				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+/*				 //判断用户交易行为
 				 Integer rst2 = this.userDealAction(userId);
 				 if(rst2 == 1) {//有交易
 					 log.info("用户交易行为开关:"+rst2);
@@ -149,10 +155,10 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 					 }else {//渠道开关关闭
 						 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 					 }
-				 }
+				 }*/
 			 }
 		 }
-		 log.info("channel="+chanel + "  turnOn="+switchConfig.getTurnOn());
+		 log.info("channel="+chanel + " turnOn="+switchConfig.getTurnOn());
 		 return ResultGenerator.genSuccessResult("success",switchConfig);
 	 }
 	
@@ -283,6 +289,8 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     	}
 		return false;
 	}
+    
+    
     /**
      * 判断用户黑名单
      * @param mobile
@@ -290,7 +298,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
      */
     private boolean checkUserBlackList(String mobile) {
     	Integer isBlack = switchConfigMapper.checkUserWhiteValue(mobile);
-    	if(null != isBlack && isBlack == 0) {
+    	if(isBlack == 0) {
     		return true;
     	}
     	return false;
