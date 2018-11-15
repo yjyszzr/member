@@ -108,12 +108,13 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 			 log.info("渠道开关:"+rst3);
 			 if(rst3 == 1) {//渠道开
 				 //判断该城市是否需要关闭
-				 boolean channelSwitch = this.channelSwitchByIp(chanel);
-				 if(channelSwitch) {
-					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-				 }else {
-					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-				 }
+//				 boolean channelSwitch = this.channelSwitchByIp(chanel);
+//				 if(channelSwitch) {
+//					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+//				 }else {
+//					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+//				 }
+				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 			 }else {//渠道关
 				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 			 }
@@ -229,13 +230,14 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				 Integer rst3 = this.channelSwitch(plat, version, chanel);
 				 log.info("渠道开关:"+rst3);
 				 if(rst3 == 1) {
-					 //判断该城市是否需要关闭
-					 boolean channelSwitch = this.channelSwitchByIp(chanel);
-					 if(channelSwitch) {
-						 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-					 }else {
-						 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-					 }
+//					 //判断该城市是否需要关闭
+//					 boolean channelSwitch = this.channelSwitchByIp(chanel);
+//					 if(channelSwitch) {
+//						 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+//					 }else {
+//						 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+//					 }
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 				 }else {
 					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 				 }
