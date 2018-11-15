@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import com.dl.member.model.User;
 import com.dl.member.param.LoginLogParam;
 import com.dl.member.param.MobilePwdCreateParam;
 import com.dl.member.param.StrParam;
-import com.dl.member.param.UserIdRealParam;
 import com.dl.member.param.UserLoginWithPassParam;
 import com.dl.member.param.UserLoginWithSmsParam;
 import com.dl.member.param.UserParam;
