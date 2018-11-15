@@ -31,7 +31,7 @@ public class MediaTokenDTO {
 		}else {
 			entity.bucketName = "szcq-pic";	
 		}
-		entity.fileName = MD5Util.crypt(System.currentTimeMillis()+".png");
+		entity.fileName = MD5Util.crypt(System.currentTimeMillis()) + ".png";
 		return entity;
 	}
 }
