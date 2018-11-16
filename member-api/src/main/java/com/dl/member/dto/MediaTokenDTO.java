@@ -15,7 +15,7 @@ public class MediaTokenDTO {
 	@ApiModelProperty(value = "bucketName")
 	private String bucketName;
 	@ApiModelProperty(value = "fileName")
-	private String fileName;
+	public String fileName;
 	@ApiModelProperty(value="url")
 	private String url;
 	
@@ -38,7 +38,7 @@ public class MediaTokenDTO {
 	}
 
 	public static synchronized String buildFileName() {
-		String fileName = MD5Util.crypt(System.currentTimeMillis()+"") + ".png";
-		return fileName;
+		String name = MD5Util.crypt(System.currentTimeMillis()+"") + ".png";
+		return name;
 	}
 }
