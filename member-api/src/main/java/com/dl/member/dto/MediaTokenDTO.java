@@ -1,7 +1,5 @@
 package com.dl.member.dto;
 
-import java.awt.datatransfer.FlavorListener;
-
 import com.dl.base.util.MD5Util;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,7 +14,7 @@ public class MediaTokenDTO {
 	private String accKeySecret;
 	@ApiModelProperty(value = "bucketName")
 	private String bucketName;
-	@ApiModelProperty(value = "bucketName")
+	@ApiModelProperty(value = "fileName")
 	private String fileName;
 	@ApiModelProperty(value="url")
 	private String url;
