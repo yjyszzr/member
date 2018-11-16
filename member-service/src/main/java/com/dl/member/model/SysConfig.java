@@ -25,8 +25,22 @@ public class SysConfig {
      * 描述
      */
     private String describtion;
-
+    
     /**
+     * 数值文本
+     */
+    private String valueTxt;
+
+    
+    public String getValueTxt() {
+		return valueTxt;
+	}
+
+	public void setValueTxt(String valueTxt) {
+		this.valueTxt = valueTxt;
+	}
+
+	/**
      * @return id
      */
     public Integer getId() {
