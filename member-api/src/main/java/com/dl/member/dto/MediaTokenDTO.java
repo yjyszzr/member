@@ -1,5 +1,7 @@
 package com.dl.member.dto;
 
+import java.awt.datatransfer.FlavorListener;
+
 import com.dl.base.util.MD5Util;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,5 +37,10 @@ public class MediaTokenDTO {
 		entity.fileName = MD5Util.crypt(System.currentTimeMillis()+"") + ".png";
 		entity.url = "http://oss-cn-beijing.aliyuncs.com";
 		return entity;
+	}
+
+	public static synchronized String getFileName() {
+		String fileName = MD5Util.crypt(System.currentTimeMillis()+"") + ".png";
+		return fileName;
 	}
 }

@@ -19,5 +19,7 @@ public class SysConfigDTO {
 	@ApiModelProperty("业务描述")
     private String describtion;
 
+	@ApiModelProperty("文本信息")
+	private String valueTxt;
 	
 }

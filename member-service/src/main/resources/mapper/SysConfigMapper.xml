@@ -9,5 +9,6 @@
     <result column="business_id" jdbcType="INTEGER" property="businessId" />
     <result column="value" jdbcType="VARCHAR" property="value" />
     <result column="describtion" jdbcType="VARCHAR" property="describtion" />
+    <result column="value_txt" jdbcType="TEXT" property="valueTxt" />
   </resultMap>
 </mapper>
