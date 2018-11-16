@@ -57,9 +57,9 @@ public class MediaController {
 		}
 		String valueTxt = sysDTO.getValueTxt();
 		MediaTokenDTO tokenEntity = JSON.parseObject(valueTxt,MediaTokenDTO.class);
-		String fileName = MediaTokenDTO.getFileName();
+		String fileName = MediaTokenDTO.buildFileName();
 		tokenEntity.setFileName(fileName);
-		logger.info("[getMediaToken]" + " valueTxt:" + valueTxt + " fileName:" + fileName);
+		logger.info("[getMediaToken]" + " valueTxt:" + valueTxt + " fileName:" + tokenEntity.getFileName());
 		return ResultGenerator.genSuccessResult("succ",tokenEntity);
 	}
 }

@@ -37,7 +37,7 @@ public class MediaTokenDTO {
 		return entity;
 	}
 
-	public static synchronized String getFileName() {
+	public static synchronized String buildFileName() {
 		String fileName = MD5Util.crypt(System.currentTimeMillis()+"") + ".png";
 		return fileName;
 	}
