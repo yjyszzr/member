@@ -107,6 +107,7 @@ public class UserLoginContorller {
 		String mobile = params.getMobile();
 		String pwd = params.getPassword();
 		String newPwd = params.getNewPwd();
+		String loginSource = params.getLoginSource();
 		logger.info("[rePwd]" + " mobile:" + mobile + " pwd:" + pwd + " newPwd:" + newPwd);
 		User user = userService.findByMobile(mobile);
 		if(user == null) {
@@ -129,8 +130,18 @@ public class UserLoginContorller {
 		updateUser.setUserId(user.getUserId());
 		updateUser.setPassword(Encryption.encryption(newPwd,loginsalt));
 		userService.update(updateUser);
-		logger.info("[rePwd]" + "更新密码成功..newPwd:" + newPwd);
-		return ResultGenerator.genSuccessResult("密码更新成功");
+		logger.info("[rePwd]" + "更新密码成功..newPwd:" + newPwd + " oldPwd:" + oldPwd);
+		//调用用户登录接口
+		UserLoginWithPassParam passParams = new UserLoginWithPassParam();
+		passParams.setMobile(mobile);
+		passParams.setPassword(newPwd);
+		passParams.setLoginSource(loginSource);
+		BaseResult<UserLoginDTO> baseRLoginByPwd = userLoginService.loginByPass(passParams);
+		UserLoginDTO userLoginDTO = null;
+		if(baseRLoginByPwd != null && baseRLoginByPwd.isSuccess() && baseRLoginByPwd.getData() != null) {
+			userLoginDTO = baseRLoginByPwd.getData();
+		}
+		return ResultGenerator.genSuccessResult("密码更新成功",userLoginDTO);
 	}
 	
 	
