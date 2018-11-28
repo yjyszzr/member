@@ -12,4 +12,11 @@ import lombok.Data;
 public class StrParam {
     @ApiModelProperty(value = "空字符串")
     private String str;
+
+    public StrParam(){
+    }
+
+    public StrParam(String str){
+        this.str = str;
+    }
 }
