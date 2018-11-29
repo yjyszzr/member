@@ -300,7 +300,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
      */
     private boolean checkUserBlackList(String mobile) {
     	Integer isBlack = switchConfigMapper.checkUserWhiteValue(mobile);
-    	if(isBlack == 0) {
+    	if(isBlack !=null && isBlack == 0) {
     		return true;
     	}
     	return false;
