@@ -163,7 +163,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 			 }
 
 			 //地理位置开关
-			 SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
+			 SwitchConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
 			 if(sysConfigDTO.getValue() != null && sysConfigDTO.getValue().equals(0)){
 				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 			 }else{
