@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.dl.member.dto.SysConfigDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -163,7 +164,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 			 }
 
 			 //地理位置开关
-			 SwitchConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
+			 SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
 			 if(sysConfigDTO.getValue() != null && sysConfigDTO.getValue().equals(0)){
 				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 			 }else{
