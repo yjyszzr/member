@@ -438,6 +438,10 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		ull.setImei("");
 		ull.setLoginSource("");
 		ull.setDeviceChannel(device.getChannel());
+		ull.setLon(device.getLon());
+		ull.setLat(device.getLat());
+		ull.setCity(device.getCity());
+		ull.setProvince(device.getProvince() != null?device.getProvince():"");
 		ull.setLoginParams(loginParams);
 		ull.setLoginResult(loginResult);
 

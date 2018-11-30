@@ -23,6 +23,10 @@
     <result column="login_params" jdbcType="VARCHAR" property="loginParams" />
     <result column="login_result" jdbcType="VARCHAR" property="loginResult" />
     <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel"/>
+    <result column="lon" jdbcType="DOUBLE" property="lon"/>
+    <result column="lat" jdbcType="DOUBLE" property="lat"/>
+    <result column="city" jdbcType="VARCHAR" property="city"/>
+    <result column="province" jdbcType="VARCHAR" property="province"/>
   </resultMap>
   
   <select id="getLastLog" resultMap="BaseResultMap">
@@ -32,5 +36,6 @@
   <update id="updateLogOutTime">
   	update dl_user_login_log set logout_time=#{logoutTime} where id=#{id}
   </update>
+
   
 </mapper>

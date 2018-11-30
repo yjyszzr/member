@@ -84,10 +84,10 @@ public class UserRegisterController {
     	}
     	Integer userId = regRst.getData();
     	
-    	DLActivity act = dLActivityService.queryActivityByType(ActivityEnum.RegisterAct.getCode());
-    	if(0 == act.getIsFinish()) {//有效
-    		userBonusService.receiveUserBonus(ProjectConstant.REGISTER,userId);
-    	}
+//    	DLActivity act = dLActivityService.queryActivityByType(ActivityEnum.RegisterAct.getCode());
+//    	if(0 == act.getIsFinish()) {//有效
+//    		userBonusService.receiveUserBonus(ProjectConstant.REGISTER,userId);
+//    	}
     	
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());

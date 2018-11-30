@@ -46,7 +46,10 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     private UserAccountMapper userAccountMapper;
     
 	@Resource
-	private StringRedisTemplate stringRedisTemplate;    
+	private StringRedisTemplate stringRedisTemplate;
+
+	@Resource
+	private SysConfigService sysConfigService;
     
 	/**
 	 * 交易版开关的优先级：一级比一级弱
@@ -158,6 +161,15 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 					 }
 				 }*/
 			 }
+
+			 //地理位置开关
+			 SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
+			 if(sysConfigDTO.getValue() != null && sysConfigDTO.getValue().equals(0)){
+				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+			 }else{
+				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+			 }
+
 		 }
 		 log.info("channel="+chanel + " turnOn="+switchConfig.getTurnOn());
 		 return ResultGenerator.genSuccessResult("success",switchConfig);

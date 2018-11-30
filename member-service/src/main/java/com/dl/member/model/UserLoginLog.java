@@ -99,7 +99,63 @@ public class UserLoginLog {
 
     @Column(name = "device_channel")
     private String deviceChannel;
-    
+
+    /**
+     * 定位经度
+     */
+    @Column(name = "lon")
+    private Double lon;
+
+    /**
+     * 定位纬度
+     */
+    @Column(name = "lat")
+    private Double lat;
+
+    /**
+     * 定位城市
+     */
+    @Column(name = "city")
+    private String city;
+
+    /**
+     * 定位省
+     */
+    @Column(name = "province")
+    private String province;
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public Double getLon() {
+        return lon;
+    }
+
+    public void setLon(Double lon) {
+        this.lon = lon;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     public String getLoginResult() {
 		return loginResult;
 	}
