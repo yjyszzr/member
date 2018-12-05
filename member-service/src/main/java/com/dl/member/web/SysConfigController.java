@@ -40,9 +40,9 @@ public class SysConfigController {
     	return ResultGenerator.genSuccessResult("success", sysConfigDTO);
     }
 
-    @ApiOperation(value = "根据业务id查询某个功能是否开启", notes = "根据业务id查询某个功能是否开启i")
+    @ApiOperation(value = "根据业务id查询某个功能是否开启", notes = "根据业务id查询某个功能是否开启")
     @PostMapping("/queryFuncByBusiId")
-    public BaseResult<ServiceSwitchDTO> queryFuncByBusiId(@Valid @RequestBody SysConfigParam sysConfigParam) {
+    public BaseResult<ServiceSwitchDTO> queryFuncByBusiId(@RequestBody SysConfigParam sysConfigParam) {
         SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(sysConfigParam.getBusinessId());
         ServiceSwitchDTO serviceSwitchDTO = new ServiceSwitchDTO();
         serviceSwitchDTO.setBusinessId(sysConfigDTO.getBusinessId());
