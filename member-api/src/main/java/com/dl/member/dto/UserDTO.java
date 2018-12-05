@@ -59,6 +59,17 @@ public class UserDTO {
     private Integer birthday;
 
     /**
+     * 充值开关
+     */
+    private String recharegeTurnOn;
+
+
+    /**
+     *提现开关
+     */
+    private String withdrawTurnOn;
+
+    /**
      * 详细地址
      */
     @Column(name = "detail_address")
@@ -229,7 +240,9 @@ public class UserDTO {
     public void setActivityDTOList(List<com.dl.member.dto.ActivityDTO> activityDTOList) {
         this.activityDTOList = activityDTOList;
     }
-    
+
+
+
     /**
      * 获取用户名
      *
@@ -237,6 +250,22 @@ public class UserDTO {
      */
     public String getUserName() {
         return userName;
+    }
+
+    public String getRecharegeTurnOn() {
+        return recharegeTurnOn;
+    }
+
+    public void setRecharegeTurnOn(String recharegeTurnOn) {
+        this.recharegeTurnOn = recharegeTurnOn;
+    }
+
+    public String getWithdrawTurnOn() {
+        return withdrawTurnOn;
+    }
+
+    public void setWithdrawTurnOn(String withdrawTurnOn) {
+        this.withdrawTurnOn = withdrawTurnOn;
     }
 
     /**

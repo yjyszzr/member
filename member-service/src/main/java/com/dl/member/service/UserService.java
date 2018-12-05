@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.dl.member.dto.*;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -32,10 +33,6 @@ import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.ActivityDTO;
-import com.dl.member.dto.UserDTO;
-import com.dl.member.dto.UserNoticeDTO;
-import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
@@ -78,6 +75,9 @@ public class UserService extends AbstractService<User> {
 
 	@Resource
 	private IDFAService iDFAService;
+
+	@Resource
+	private SysConfigService sysConfigService;
 
 	/**
 	 * real真实信息
@@ -152,6 +152,13 @@ public class UserService extends AbstractService<User> {
 		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setActivityDTOList(this.queryAppPromotion(userId));
+
+		Integer businessIdForwithdraw = 27;
+		Integer businessIdForrecharge = 28;
+		SysConfigDTO wDTO = sysConfigService.querySysConfig(27);
+		SysConfigDTO rDTO = sysConfigService.querySysConfig(28);
+		userDTO.setRecharegeTurnOn(rDTO.getValue().compareTo(BigDecimal.ZERO) == 0?"0":"1");
+		userDTO.setWithdrawTurnOn(wDTO.getValue().compareTo(BigDecimal.ZERO) == 0?"0":"1");
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
 
