@@ -8,4 +8,6 @@ public interface DlDeviceActionControlMapper extends Mapper<DlDeviceActionContro
 
     DlDeviceActionControl queryDeviceByIMEI(@Param("mac") String mac);
 
+    int updateDeviceUpdateTime(@Param("updateTime") Integer updateTime,@Param("mac") String mac);
+
 }

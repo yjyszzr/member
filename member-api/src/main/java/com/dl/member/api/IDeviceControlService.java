@@ -22,6 +22,9 @@ public interface IDeviceControlService {
 	public BaseResult<String> add(@RequestBody DlDeviceActionControlParam param);
 
 	@RequestMapping(path="/dl/deviceActionControl/queryDeviceByIMEI", method=RequestMethod.POST)
-	public BaseResult<DlDeviceActionControlDTO> queryDeviceByIMEI(@RequestBody MacParam imeiParam);
+	public BaseResult<DlDeviceActionControlDTO> queryDeviceByIMEI(@RequestBody MacParam macParam);
+
+	@RequestMapping(path="/dl/deviceActionControl/updateDeviceControlUpdteTime", method=RequestMethod.POST)
+	public BaseResult<String> updateDeviceControlUpdteTime(@RequestBody MacParam macParam);
 
 }

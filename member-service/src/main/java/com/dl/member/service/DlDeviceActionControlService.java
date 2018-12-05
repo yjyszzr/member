@@ -17,4 +17,8 @@ public class DlDeviceActionControlService extends AbstractService<DlDeviceAction
        return dlDeviceActionControlMapper.queryDeviceByIMEI(mac);
     }
 
+    public Integer updateDeviceCtrlUpdteTime(Integer updateTime,String mac){
+        return dlDeviceActionControlMapper.updateDeviceUpdateTime(updateTime,mac);
+    }
+
 }

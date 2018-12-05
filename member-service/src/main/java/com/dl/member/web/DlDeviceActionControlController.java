@@ -1,6 +1,7 @@
 package com.dl.member.web;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.DateUtil;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlDeviceActionControl;
 import com.dl.member.param.DlDeviceActionControlParam;
@@ -35,11 +36,18 @@ public class DlDeviceActionControlController {
         return ResultGenerator.genSuccessResult();
     }
 
+    @PostMapping("/update")
+    public BaseResult<String> updateDeviceControlUpdteTime(@RequestBody MacParam param) {
+        DlDeviceActionControl dctrl = new DlDeviceActionControl();
+        dlDeviceActionControlService.updateDeviceCtrlUpdteTime(DateUtil.getCurrentTimeLong(),param.getMac());
+        return ResultGenerator.genSuccessResult();
+    }
+
     @PostMapping("queryDeviceByIMEI")
     public BaseResult<DlDeviceActionControlDTO> queryDeviceByIMEI(@RequestBody MacParam macParam){
         DlDeviceActionControlDTO deviceCtrlDto = new DlDeviceActionControlDTO();
         DlDeviceActionControl deviveCtrl = dlDeviceActionControlService.queryDeviceByIMEI(macParam.getMac());
-        if(deviveCtrl != null && deviveCtrl.getAddTime() != null){
+        if(deviveCtrl != null && deviveCtrl.getUpdateTime() != null){
             try {
                 BeanUtils.copyProperties(deviceCtrlDto,deviveCtrl);
             } catch (Exception e) {

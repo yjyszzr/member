@@ -17,4 +17,8 @@
     select * from dl_device_action_control where mac = #{mac}
   </select>
 
+  <update id="updateDeviceUpdateTime">
+    update dl_device_action_control set update_time = #{updateTime} where mac = #{mac}
+  </update>
+
 </mapper>
