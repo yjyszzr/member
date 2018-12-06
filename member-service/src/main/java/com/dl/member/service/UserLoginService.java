@@ -419,7 +419,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 *            登录类型
 	 */
 	@Transactional
-	public void loginLog(Integer userId, Integer loginType, int loginSstatus, String loginParams, String loginResult) throws UnsupportedEncodingException {
+	public void loginLog(Integer userId, Integer loginType, int loginSstatus, String loginParams, String loginResult) {
 		UserDeviceInfo device = SessionUtil.getUserDevice();
 		if (device == null) {
 			device = new UserDeviceInfo();
@@ -443,9 +443,13 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		ull.setDeviceChannel(device.getChannel());
 		ull.setLon(device.getLon());
 		ull.setLat(device.getLat());
-		logger.info("登陆日志的信息："+ URLDecoder.decode(device.getCity(), "UTF-8")+ "," + URLDecoder.decode(device.getProvince(), "UTF-8"));
-		ull.setCity(URLDecoder.decode(device.getCity(), "UTF-8"));
-		ull.setProvince(URLDecoder.decode(device.getProvince(), "UTF-8"));
+		try {
+			logger.info("登陆日志的信息："+ URLDecoder.decode(device.getCity(), "UTF-8")+ "," + URLDecoder.decode(device.getProvince(), "UTF-8"));
+			ull.setCity(URLDecoder.decode(device.getCity(), "UTF-8"));
+			ull.setProvince(URLDecoder.decode(device.getProvince(), "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		ull.setLoginParams(loginParams);
 		ull.setLoginResult(loginResult);
 
