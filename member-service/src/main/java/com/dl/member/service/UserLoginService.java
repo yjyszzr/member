@@ -443,6 +443,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		ull.setDeviceChannel(device.getChannel());
 		ull.setLon(device.getLon());
 		ull.setLat(device.getLat());
+		log.info(JSON.toJSONString(device));
 		if(!StringUtils.isEmpty(device.getCity())  && !StringUtils.isEmpty(device.getProvince())){
 			ull.setCity(device.getCity());
 			ull.setProvince(device.getProvince());
