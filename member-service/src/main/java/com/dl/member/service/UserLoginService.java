@@ -443,13 +443,17 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		ull.setDeviceChannel(device.getChannel());
 		ull.setLon(device.getLon());
 		ull.setLat(device.getLat());
-		try {
-			logger.info("登陆日志的信息："+ URLDecoder.decode(device.getCity(), "UTF-8")+ "," + URLDecoder.decode(device.getProvince(), "UTF-8"));
-			ull.setCity(URLDecoder.decode(device.getCity(), "UTF-8"));
-			ull.setProvince(URLDecoder.decode(device.getProvince(), "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+
+		if(!StringUtils.isEmpty(device.getCity())  && !StringUtils.isEmpty(device.getProvince())){
+			try {
+				logger.info("登陆日志的信息："+ URLDecoder.decode(device.getCity(), "UTF-8")+ "," + URLDecoder.decode(device.getProvince(), "UTF-8"));
+				ull.setCity(URLDecoder.decode(device.getCity(), "UTF-8"));
+				ull.setProvince(URLDecoder.decode(device.getProvince(), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
+
 		ull.setLoginParams(loginParams);
 		ull.setLoginResult(loginResult);
 
