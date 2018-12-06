@@ -1,5 +1,7 @@
 package com.dl.member.service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -417,9 +419,8 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 *            登录类型
 	 */
 	@Transactional
-	public void loginLog(Integer userId, Integer loginType, int loginSstatus, String loginParams, String loginResult) {
+	public void loginLog(Integer userId, Integer loginType, int loginSstatus, String loginParams, String loginResult) throws UnsupportedEncodingException {
 		UserDeviceInfo device = SessionUtil.getUserDevice();
-		log.info(JSON.toJSONString(device));
 		if (device == null) {
 			device = new UserDeviceInfo();
 		}
@@ -442,9 +443,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		ull.setDeviceChannel(device.getChannel());
 		ull.setLon(device.getLon());
 		ull.setLat(device.getLat());
-		logger.info("登陆日志的信息："+device.getCity()+ "," +device.getProvince());
-		ull.setCity(device.getCity());
-		ull.setProvince(device.getProvince() != null?device.getProvince():"");
+		logger.info("登陆日志的信息："+ URLDecoder.decode(device.getCity(), "UTF-8")+ "," + URLDecoder.decode(device.getProvince(), "UTF-8"));
+		ull.setCity(URLDecoder.decode(device.getCity(), "UTF-8"));
+		ull.setProvince(URLDecoder.decode(device.getProvince(), "UTF-8"));
 		ull.setLoginParams(loginParams);
 		ull.setLoginResult(loginResult);
 
