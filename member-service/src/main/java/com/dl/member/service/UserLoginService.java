@@ -419,6 +419,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	@Transactional
 	public void loginLog(Integer userId, Integer loginType, int loginSstatus, String loginParams, String loginResult) {
 		UserDeviceInfo device = SessionUtil.getUserDevice();
+		log.info(JSON.toJSONString(device));
 		if (device == null) {
 			device = new UserDeviceInfo();
 		}
@@ -441,7 +442,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		ull.setDeviceChannel(device.getChannel());
 		ull.setLon(device.getLon());
 		ull.setLat(device.getLat());
-		logger.info("登陆日志的信息："+JSON.toJSONString(device));
+		logger.info("登陆日志的信息："+device.getCity()+ "," +device.getProvince());
 		ull.setCity(device.getCity());
 		ull.setProvince(device.getProvince() != null?device.getProvince():"");
 		ull.setLoginParams(loginParams);
