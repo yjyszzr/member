@@ -3,8 +3,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.websocket.Session;
 
 import com.dl.member.dto.SysConfigDTO;
+import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -166,6 +168,11 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 			 //地理位置开关
 			 SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
 			 if(sysConfigDTO.getValue() != null && sysConfigDTO.getValue().equals(0)){
+			 	 UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+				 String province = userDeviceInfo.getProvince();
+				 if(province.equals("陕西")&&province.equals("陕西省")){
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+				 }
 				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 			 }else{
 				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
