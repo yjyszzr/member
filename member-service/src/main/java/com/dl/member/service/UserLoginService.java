@@ -446,7 +446,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		log.info(JSON.toJSONString(device));
 		if(!StringUtils.isEmpty(device.getCity())  && !StringUtils.isEmpty(device.getProvince())){
 			try {
-				log.info("city:"+URLDecoder.decode(device.getCity(),"UTF-8");
+				log.info("city:"+URLDecoder.decode(device.getCity(),"UTF-8"));
 				ull.setCity(URLDecoder.decode(device.getCity(),"UTF-8"));
 				ull.setProvince(URLDecoder.decode(device.getProvince(),"UTF-8"));
 			} catch (UnsupportedEncodingException e) {
