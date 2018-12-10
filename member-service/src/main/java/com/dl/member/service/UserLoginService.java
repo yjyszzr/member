@@ -441,8 +441,8 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		ull.setImei("");
 		ull.setLoginSource("");
 		ull.setDeviceChannel(device.getChannel());
-		ull.setLon(device.getLon());
-		ull.setLat(device.getLat());
+		ull.setLon(device.getLon() != null?0:device.getLon());
+		ull.setLat(device.getLat() != null?0:device.getLat());
 		log.info(JSON.toJSONString(device));
 		if(!StringUtils.isEmpty(device.getCity())  && !StringUtils.isEmpty(device.getProvince())){
 			try {
