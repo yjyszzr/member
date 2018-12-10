@@ -36,7 +36,7 @@ public class DlDeviceActionControlController {
         return ResultGenerator.genSuccessResult();
     }
 
-    @PostMapping("/update")
+    @PostMapping("/updateDeviceControlUpdteTime")
     public BaseResult<String> updateDeviceControlUpdteTime(@RequestBody MacParam param) {
         DlDeviceActionControl dctrl = new DlDeviceActionControl();
         dlDeviceActionControlService.updateDeviceCtrlUpdteTime(DateUtil.getCurrentTimeLong(),param.getMac());
