@@ -148,7 +148,6 @@ public class UserService extends AbstractService<User> {
 
 		userDTO.setHasPass(StringUtils.isBlank(user.getPassword()) ? 0 : 1);
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
-		userDTO.setRealInfo(this.createRealInfo(userRealDTO));
 		BigDecimal userMoney = user.getUserMoney();
 		String userMoneyStr = userMoney == null ? "0" : userMoney.toString();
 		String mobile = user.getMobile();
