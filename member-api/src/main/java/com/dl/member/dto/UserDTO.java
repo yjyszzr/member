@@ -28,6 +28,11 @@ public class UserDTO {
     /**
      * 手机号码
      */
+    private Integer userId;
+
+    /**
+     * 手机号码
+     */
     private String mobile;
 
     private String email;
@@ -192,6 +197,14 @@ public class UserDTO {
      */
     @Column(name = "pass_wrong_count")
     private Integer passWrongCount;
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
     /**
      * 用户类型

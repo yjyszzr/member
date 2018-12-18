@@ -7,6 +7,9 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import com.dl.member.dto.*;
+import com.dl.member.param.*;
+import com.dl.shop.auth.api.IAuthService;
+import com.dl.shop.auth.dto.InvalidateTokenDTO;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -37,11 +40,6 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
-import com.dl.member.param.IDFACallBackParam;
-import com.dl.member.param.SetLoginPassParam;
-import com.dl.member.param.UserIdParam;
-import com.dl.member.param.UserIdRealParam;
-import com.dl.member.param.UserParam;
 import com.dl.member.util.Encryption;
 
 @Service
@@ -79,6 +77,9 @@ public class UserService extends AbstractService<User> {
 	@Resource
 	private SysConfigService sysConfigService;
 
+    @Resource
+    private IAuthService iAuthService;
+
 	/**
 	 * real真实信息
 	 * 
@@ -111,6 +112,56 @@ public class UserService extends AbstractService<User> {
 		userDTO.setActivityDTOList(this.queryAppPromotion(userId));
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
+
+	/**
+	 * 根据token查询用户的所有信息
+	 *
+	 * @param userId
+	 * @return
+	 */
+	public BaseResult<UserDTO> queryUserByToken(TokenParam param) {
+        InvalidateTokenDTO tokenDTO = new InvalidateTokenDTO();
+        tokenDTO.setToken(param.getUserToken());
+        BaseResult<Integer> authRst = iAuthService.getUserIdByToken(tokenDTO);
+        if(authRst.getCode() != 0){
+            log.error("iAuthService.getUserIdByToken 接口异常");
+            return ResultGenerator.genFailResult("iAuthService.getUserIdByToken 接口异常");
+        }
+
+		Integer userId = authRst.getData();
+		if (null == userId) {
+			return ResultGenerator.genNeedLoginResult("请登录");
+		}
+
+		User user = userMapper.queryUserExceptPass(userId);
+		if (user == null) {
+			return ResultGenerator.genFailResult("用户不存在");
+		}
+
+		UserDTO userDTO = new UserDTO();
+		try {
+			BeanUtils.copyProperties(userDTO, user);
+		} catch (Exception e1) {
+			log.error("个人信息接口的DTO转换异常");
+			return ResultGenerator.genFailResult("个人信息接口的DTO转换异常");
+		}
+
+		userDTO.setHasPass(StringUtils.isBlank(user.getPassword()) ? 0 : 1);
+		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
+		userDTO.setRealInfo(this.createRealInfo(userRealDTO));
+		BigDecimal userMoney = user.getUserMoney();
+		String userMoneyStr = userMoney == null ? "0" : userMoney.toString();
+		String mobile = user.getMobile();
+		String strStar4 = RandomUtil.generateStarString(4);
+		String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
+		userDTO.setMobile(mobileStr);
+		userDTO.setUserMoney(userMoneyStr);
+		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
+		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
+
+		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
+	}
+
 
 	/**
 	 * 查询用户信息 （除了密码）
@@ -266,6 +317,33 @@ public class UserService extends AbstractService<User> {
 		}
 
 		return userId;
+	}
+
+	public BaseResult<UserDTO> queryUserByMobileAndPass(String mobile,String pass) {
+		UserDTO uDto = new UserDTO();
+		if (!RegexUtil.checkMobile(mobile)) {
+			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
+		}
+
+		User user = this.findBy("mobile", mobile);
+		if (null == user) {
+			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+		}
+
+		if(!mobile.equals(user.getMobile())){
+			return ResultGenerator.genResult(MemberEnums.SAME_MOBILE_WRONG.getcode(), MemberEnums.SAME_MOBILE_WRONG.getMsg());
+		}
+
+		if (!user.getPassword().equals(Encryption.encryption(pass, user.getSalt()))) {
+			return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), MemberEnums.WRONG_IDENTITY.getMsg());
+		}
+
+		uDto.setMobile(user.getMobile());
+		uDto.setPassword(user.getPassword());
+		uDto.setSalt(user.getSalt());
+		uDto.setUserId(user.getUserId());
+
+		return ResultGenerator.genSuccessResult("success",uDto);
 	}
 
 	/**

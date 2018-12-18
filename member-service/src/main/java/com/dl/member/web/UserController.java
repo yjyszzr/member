@@ -1,5 +1,6 @@
 package com.dl.member.web;
 
+import com.dl.member.param.*;
 import io.swagger.annotations.ApiOperation;
 
 import java.io.ByteArrayInputStream;
@@ -33,17 +34,6 @@ import com.dl.member.dto.UserNoticeDTO;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
-import com.dl.member.param.MobileInfoParam;
-import com.dl.member.param.MobileNumberParam;
-import com.dl.member.param.QueryUserNoticeParam;
-import com.dl.member.param.SetLoginPassParam;
-import com.dl.member.param.StrParam;
-import com.dl.member.param.UpdateImgParam;
-import com.dl.member.param.UpdateUnReadNoticeParam;
-import com.dl.member.param.UserHeadInfoParam;
-import com.dl.member.param.UserIdParam;
-import com.dl.member.param.UserIdRealParam;
-import com.dl.member.param.UserLoginPassParam;
 import com.dl.member.service.DlChannelConsumerService;
 import com.dl.member.service.UserService;
 import com.dl.member.util.FileUpload;
@@ -62,6 +52,18 @@ public class UserController {
 
 	@Resource
 	public URLConfig urlConfig;
+
+	@ApiOperation(value = "根据token查询用户信息", notes = "根据token查询用户信息")
+	@PostMapping("/queryUserInfoByToken")
+	public BaseResult<UserDTO> queryUserInfoByToken(@RequestBody TokenParam param) {
+		return userService.queryUserByToken(param);
+	}
+
+	@ApiOperation(value = "根据手机号和密码查询用户信息", notes = "根据手机号和密码查询用户信息")
+	@PostMapping("/queryUserByMobileAndPass")
+	public BaseResult<UserDTO> queryUserByMobileAndPass(@RequestBody MobileAndPassParam param) {
+		return userService.queryUserByMobileAndPass(param.getMobile(),param.getPass());
+	}
 
 	/**
 	 * 校验手机号
