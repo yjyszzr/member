@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import com.dl.member.dto.*;
 import com.dl.member.param.*;
+import com.dl.member.util.TokenUtil;
 import com.dl.shop.auth.api.IAuthService;
 import com.dl.shop.auth.dto.InvalidateTokenDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -120,15 +121,8 @@ public class UserService extends AbstractService<User> {
 	 * @return
 	 */
 	public BaseResult<UserDTO> queryUserByToken(TokenParam param) {
-        InvalidateTokenDTO tokenDTO = new InvalidateTokenDTO();
-        tokenDTO.setToken(param.getUserToken());
-        BaseResult<Integer> authRst = iAuthService.getUserIdByToken(tokenDTO);
-        if(authRst.getCode() != 0){
-            log.error("iAuthService.getUserIdByToken 接口异常");
-            return ResultGenerator.genFailResult("iAuthService.getUserIdByToken 接口异常");
-        }
+		Integer userId = TokenUtil.getUserIdByToken(param.getUserToken());
 
-		Integer userId = authRst.getData();
 		if (null == userId) {
 			return ResultGenerator.genNeedLoginResult("请登录");
 		}
@@ -146,6 +140,7 @@ public class UserService extends AbstractService<User> {
 			return ResultGenerator.genFailResult("个人信息接口的DTO转换异常");
 		}
 
+		userDTO.setUserId(userId);
 		userDTO.setHasPass(StringUtils.isBlank(user.getPassword()) ? 0 : 1);
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
 		BigDecimal userMoney = user.getUserMoney();

@@ -3,6 +3,7 @@ package com.dl.member.util;
 import com.dl.base.context.BaseContextHandler;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
 import com.dl.shop.auth.api.IAuthService;
 import com.dl.shop.auth.dto.AuthInfoDTO;
 import com.dl.shop.auth.dto.InvalidateTokenDTO;
@@ -10,6 +11,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * token 工具类
@@ -41,6 +43,23 @@ public class TokenUtil implements ApplicationContextAware {
             throw new ServiceException(result);
         }
         return result.getData();
+    }
+
+
+    /**
+     * 获取userId
+     *
+     * @param
+     * @return
+     */
+    public static Integer getUserIdByToken(String token) {
+        InvalidateTokenDTO invalidateTokenDTO = new InvalidateTokenDTO();
+        invalidateTokenDTO.setToken(token);
+        BaseResult<Integer> rst = authService.getUserIdByToken(invalidateTokenDTO);
+        if(!rst.isSuccess()){
+            throw new ServiceException(rst);
+        }
+        return rst. getData();
     }
 
     /**

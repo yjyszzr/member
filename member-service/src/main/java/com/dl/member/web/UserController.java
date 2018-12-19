@@ -59,6 +59,7 @@ public class UserController {
 		return userService.queryUserByToken(param);
 	}
 
+
 	@ApiOperation(value = "根据手机号和密码查询用户信息", notes = "根据手机号和密码查询用户信息")
 	@PostMapping("/queryUserByMobileAndPass")
 	public BaseResult<UserDTO> queryUserByMobileAndPass(@RequestBody MobileAndPassParam param) {
