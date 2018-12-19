@@ -143,12 +143,11 @@ public class UserService extends AbstractService<User> {
 		userDTO.setUserId(userId);
 		userDTO.setHasPass(StringUtils.isBlank(user.getPassword()) ? 0 : 1);
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
+		userDTO.setSalt(user.getSalt());
 		BigDecimal userMoney = user.getUserMoney();
 		String userMoneyStr = userMoney == null ? "0" : userMoney.toString();
 		String mobile = user.getMobile();
-		String strStar4 = RandomUtil.generateStarString(4);
-		String mobileStr = mobile.replace(mobile.substring(3, 7), strStar4);
-		userDTO.setMobile(mobileStr);
+		userDTO.setMobile(mobile);
 		userDTO.setUserMoney(userMoneyStr);
 		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
