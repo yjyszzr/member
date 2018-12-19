@@ -151,4 +151,8 @@
   <select id="getMobileById" resultType="string">
   	select mobile from dl_user where user_id =#{userId}
   </select>
+
+	<select id="queryUserByUserId" resultMap="BaseResultMap">
+		select * from dl_user where user_id =#{userId}
+	</select>
 </mapper>

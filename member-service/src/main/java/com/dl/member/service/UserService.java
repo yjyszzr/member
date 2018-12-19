@@ -127,7 +127,7 @@ public class UserService extends AbstractService<User> {
 			return ResultGenerator.genNeedLoginResult("请登录");
 		}
 
-		User user = userMapper.queryUserExceptPass(userId);
+		User user = userMapper.queryUserByUserId(userId);
 		if (user == null) {
 			return ResultGenerator.genFailResult("用户不存在");
 		}
