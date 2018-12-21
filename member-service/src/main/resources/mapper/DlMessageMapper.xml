@@ -39,8 +39,16 @@
   <select id="getUnReadMessageNum" resultType="int">
   	SELECT count(1) FROM dl_message WHERE receiver=#{userId} and is_read=0
   </select>
+
+    <select id="getUnReadMessageNumByObjType" resultType="int">
+        SELECT count(1) FROM dl_message WHERE receiver=#{userId} and object_type = #{objectType} and is_read = 0
+    </select>
   
   <update id="updateUnReadMessage">
-  	update dl_message set is_read = 1 where receiver=#{userId} and is_read=0
+    update dl_message set is_read = 1 where receiver=#{userId} and is_read=0
   </update>
+
+    <update id="updateUnReadMessageByObjType">
+        update dl_message set is_read = 1 where receiver=#{userId} and object_type = #{objectType} and is_read=0
+    </update>
 </mapper>

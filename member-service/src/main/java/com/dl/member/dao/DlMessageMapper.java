@@ -15,4 +15,8 @@ public interface DlMessageMapper extends Mapper<DlMessage> {
 	int getUnReadMessageNum(@Param("userId")Integer userId);
 	
 	int updateUnReadMessage(@Param("userId")Integer userId);
+
+	int updateUnReadMessageByObjType(@Param("userId")Integer userId,@Param("objectType")Integer objectType);
+
+	int getUnReadMessageNumByObjType(@Param("userId")Integer userId,@Param("objectType")Integer objectType);
 }

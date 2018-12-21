@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.dl.member.dto.UserNoticeDTO;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,5 +52,22 @@ public class DlMessageService extends AbstractService<DlMessage> {
     		return messageDTO;
     	}).collect(Collectors.toList());
     }
-    
+
+	/**
+	 * 根据消息类型获取用户通知信息
+	 *
+	 * @return
+	 */
+	public UserNoticeDTO queryUserNotice(Integer userId, Integer objType) {
+		UserNoticeDTO dto = new UserNoticeDTO();
+		int messageNum = dlMessageMapper.getUnReadMessageNumByObjType(userId,objType);
+		dto.setMessageNotice(messageNum);
+		return dto;
+	}
+
+	@Async
+	public void readMess(Integer userId, Integer objType) {
+		dlMessageMapper.updateUnReadMessageByObjType(userId,objType);
+	}
+
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.dl.member.dto.UserNoticeDTO;
+import com.dl.member.param.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,17 +20,13 @@ import com.dl.base.util.SessionUtil;
 import com.dl.member.dto.DlMessageDTO;
 import com.dl.member.model.DlMessage;
 import com.dl.member.model.UserMessageListParam;
-import com.dl.member.param.AddMessageParam;
-import com.dl.member.param.MessageAddParam;
-import com.dl.member.param.MessageListParam;
-import com.dl.member.param.PushMessageParam;
 import com.dl.member.service.DlMessageService;
 import com.dl.member.service.UserService;
 import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-
+import com.dl.store.param.
 import io.swagger.annotations.ApiOperation;
 
 /**
@@ -45,6 +43,8 @@ public class DlMessageController {
 
     @Resource
     private UserService userService;
+
+    @Resource DlMessageService dlMessageService;
     
     @ApiOperation(value = "用户消息列表", notes = "用户消息列表")
     @PostMapping("/list")
@@ -96,6 +96,7 @@ public class DlMessageController {
         return ResultGenerator.genSuccessResult();
     }
 
+
     @ApiOperation(value = "推送消息", notes = "推送消息")
     @PostMapping("/push")
     public BaseResult<String> pushMessage(@RequestBody PushMessageParam param) {
@@ -103,6 +104,7 @@ public class DlMessageController {
     	geTuiUtil.pushMessage(param.getClientId(), getuiMessage);
     	return ResultGenerator.genSuccessResult();
     }
+
    /* @PostMapping("/update")
     public BaseResult update(DlMessage dlMessage) {
         dlMessageService.update(dlMessage);
@@ -114,5 +116,23 @@ public class DlMessageController {
         DlMessage dlMessage = dlMessageService.findById(id);
         return ResultGenerator.genSuccessResult(null,dlMessage);
     }*/
+
+	@ApiOperation(value = "查询用户消息提示", notes = "查询用户消息提示")
+	@PostMapping("/queryUserNotice")
+	public BaseResult<UserNoticeDTO> queryUserNotice(@RequestBody NoticeParam param) {
+		Integer userId = SessionUtil.getUserId();
+		UserNoticeDTO queryUserNotice = userService.queryUserNotice(userId);
+		return ResultGenerator.genSuccessResult("success", queryUserNotice);
+	}
+
+	@ApiOperation(value = "已经读取用户消息提示", notes = "已经读取用户消息提示")
+	@PostMapping("/readUserNotice")
+	public BaseResult<String> readUserNotice(@RequestBody NoticeParam param) {
+		Integer userId = SessionUtil.getUserId();
+		dlMessageService.up
+		UserNoticeDTO queryUserNotice = userService.queryUserNotice(userId);
+		return ResultGenerator.genSuccessResult("success");
+	}
+
 
 }
