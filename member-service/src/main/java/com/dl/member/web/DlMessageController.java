@@ -43,8 +43,7 @@ public class DlMessageController {
     @Resource
     private UserService userService;
 
-    @Resource DlMessageService dlMessageService;
-    
+
     @ApiOperation(value = "用户消息列表", notes = "用户消息列表")
     @PostMapping("/list")
     public BaseResult<PageInfo<DlMessageDTO>> list(@RequestBody MessageListParam param) {
