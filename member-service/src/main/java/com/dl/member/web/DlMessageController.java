@@ -26,7 +26,6 @@ import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.dl.store.param.
 import io.swagger.annotations.ApiOperation;
 
 /**
@@ -129,8 +128,7 @@ public class DlMessageController {
 	@PostMapping("/readUserNotice")
 	public BaseResult<String> readUserNotice(@RequestBody NoticeParam param) {
 		Integer userId = SessionUtil.getUserId();
-		dlMessageService.up
-		UserNoticeDTO queryUserNotice = userService.queryUserNotice(userId);
+		dlMessageService.readMess(userId,Integer.valueOf(param.getObjType()));
 		return ResultGenerator.genSuccessResult("success");
 	}
 
