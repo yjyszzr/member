@@ -126,10 +126,8 @@ public class DlMessageController {
 	@ApiOperation(value = "已经读取用户消息提示", notes = "已经读取用户消息提示")
 	@PostMapping("/readUserNotice")
 	public BaseResult<String> readUserNotice(@RequestBody NoticeParam param) {
-		Integer userId = SessionUtil.getUserId();
-		dlMessageService.readMess(userId,Integer.valueOf(param.getObjType()));
+		dlMessageService.readMess(param.getUserId(),Integer.valueOf(param.getObjType()));
 		return ResultGenerator.genSuccessResult("success");
 	}
-
 
 }
