@@ -323,10 +323,6 @@ public class UserService extends AbstractService<User> {
 			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 		}
 
-		if(!mobile.equals(user.getMobile())){
-			return ResultGenerator.genResult(MemberEnums.SAME_MOBILE_WRONG.getcode(), MemberEnums.SAME_MOBILE_WRONG.getMsg());
-		}
-
 		if (!user.getPassword().equals(Encryption.encryption(pass, user.getSalt()))) {
 			return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), MemberEnums.WRONG_IDENTITY.getMsg());
 		}
