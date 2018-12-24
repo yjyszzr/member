@@ -118,8 +118,7 @@ public class DlMessageController {
 	@ApiOperation(value = "查询用户消息提示", notes = "查询用户消息提示")
 	@PostMapping("/queryUserNotice")
 	public BaseResult<UserNoticeDTO> queryUserNotice(@RequestBody NoticeParam param) {
-		Integer userId = SessionUtil.getUserId();
-		UserNoticeDTO queryUserNotice = userService.queryUserNotice(userId);
+		UserNoticeDTO queryUserNotice = dlMessageService.queryUserNotice(param.getUserId(),Integer.valueOf(param.getObjType()));
 		return ResultGenerator.genSuccessResult("success", queryUserNotice);
 	}
 
