@@ -33,6 +33,16 @@ public class User {
 
     private String email;
 
+    private String isSuperWhite;
+
+    public String getIsSuperWhite() {
+        return isSuperWhite;
+    }
+
+    public void setIsSuperWhite(String isSuperWhite) {
+        this.isSuperWhite = isSuperWhite;
+    }
+
     /**
      * 登录密码
      */

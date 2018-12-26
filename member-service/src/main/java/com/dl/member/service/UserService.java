@@ -196,6 +196,7 @@ public class UserService extends AbstractService<User> {
 		userDTO.setBalance(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setTotalMoney(String.valueOf(userMoney.add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setActivityDTOList(this.queryAppPromotion(userId));
+		userDTO.setIsSuperWhite(StringUtils.isEmpty(user.getIsSuperWhite())?"0":user.getIsSuperWhite());
 
 		Integer businessIdForwithdraw = 27;
 		Integer businessIdForrecharge = 28;
@@ -454,6 +455,7 @@ public class UserService extends AbstractService<User> {
 			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
 			BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
+            userDTO.setIsSuperWhite(user.getIsSuperWhite() == null?"0":user.getIsSuperWhite());
 			userDTO.setTotalMoney(String.valueOf(totalMoney));
 		} catch (Exception e) {
 			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());

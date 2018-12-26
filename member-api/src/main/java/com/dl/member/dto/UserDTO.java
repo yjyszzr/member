@@ -40,6 +40,8 @@ public class UserDTO {
     private String realName;
 
     private String realInfo;
+
+    private String isSuperWhite = "0";
     
     /**
      * 登录密码

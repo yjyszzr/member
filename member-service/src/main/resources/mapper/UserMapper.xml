@@ -39,6 +39,8 @@
     <result column="push_key" jdbcType="VARCHAR" property="pushKey" />
     <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel" />
     <result column="is_business" jdbcType="INTEGER" property="isBusiness" />
+	  <result column="is_super_white" jdbcType="INTEGER" property="isSuperWhite" />
+
   </resultMap>
   
   <insert id="insertWithReturnId"  parameterType="com.dl.member.model.User" useGeneratedKeys="true" keyProperty="userId">
@@ -113,7 +115,7 @@
   	 	headimg,user_money,user_money_limit,frozen_money,pay_point,rank_point,
 		reg_time,reg_ip,last_time,last_ip,mobile_supplier,mobile_province,mobile_city,
 		reg_from,user_status,password,
-		pass_wrong_count,user_type,is_real,user_remark,device_channel,is_business
+		pass_wrong_count,user_type,is_real,user_remark,device_channel,is_business,is_super_white
   	 	FROM dl_user WHERE user_id = #{userId}
   </select>
   
