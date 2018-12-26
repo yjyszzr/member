@@ -66,6 +66,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	 */
 	 public BaseResult<SwitchConfigDTO> querySwitch(){
 		 UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+		 SwitchConfigDTO switchConfig = new SwitchConfigDTO();
 		 String inPrams = JSON.toJSONString(userDevice);
 		 String logId = DateUtil.getCurrentDateTime();
 		 log.info(logId + "====================================版本参数:"+inPrams);
@@ -81,13 +82,11 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				 //判决是否需要回捞
 				 boolean isHuiLao = false;
 				 if(!isHuiLao) {//不需要，返回资讯
-					 SwitchConfigDTO switchConfig = new SwitchConfigDTO();
 					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 					 log.info(logId + "====非国内IP或别的区域=======判断用户ip为非需要打开交易,现执行关闭交易版返回");
 					 return ResultGenerator.genSuccessResult("success",switchConfig);
 				 }
 			 }
-
 		 }else if(userDevice.getPlat().equals("h5")) {
 			 plat = "2";
 		 }else {
@@ -96,7 +95,6 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 
 		 String version = userDevice.getAppv();
 		 String chanel = userDevice.getChannel();
-		 SwitchConfigDTO switchConfig = new SwitchConfigDTO();
 		 Integer userId = SessionUtil.getUserId();
 		 log.info("开关接口传的登录的userId:"+userId);
 		 if(userDevice.getPlat().equals("h5")) {//h5 的plat,version 和 channel 写死，分别为2和1.0.0和h5
@@ -107,41 +105,55 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 		 log.info("渠道开关:"+rst3);
 		 if(rst3 == 1) {//渠道开
 			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+			 if(userId != null) {//登录用户
+				 Integer rst1 = this.userSwitch(userId);
+				 log.info("用户终极开关:"+rst1);
+				 if(rst1 == 0) {//用户终极开关关闭
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+				 }else if(rst1 == 1) {//用户终极开关打开
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+				 }else {//用户终极开关取消，不起作用
+					 String mobile = userMapper.getMobileById(userId);
+					 if(userDevice.getPlat().equals("iphone")){//ios平台，白名单开，非白名单关（即新用户关）
+					 	boolean isWhite = this.checkUserWhiteList(mobile);
+					 	if(isWhite){
+							switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+						}else{
+							switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+						}
+					 }else{//非ios平台 黑名单关，非非名单开
+						 boolean isBlack = this.checkUserBlackList(mobile);
+						 if(isBlack){
+							 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+						 }else{
+							 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+						 }
+					 }
+
+					 //地理位置开关
+					 SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
+					 if(sysConfigDTO.getValue() != null && sysConfigDTO.getValue().equals(0)){
+						 UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+						 String province = userDeviceInfo.getProvince();
+						 if(province.equals("陕西")&&province.equals("陕西省")){
+							 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+						 }else{
+							 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+						 }
+					 }
+				 }
+			 }else{
+				 if(userDevice.getPlat().equals("iphone")){//非登录 ios平台，关
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+				 }else{//非登录，非ios平台 开
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+				 }
+			 }
 		 }else {//渠道关
 			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 		 }
 		 log.info("channel="+chanel + "  turnOn="+switchConfig.getTurnOn());
 
-		 if(userId != null) {//登录用户
-			 Integer rst1 = this.userSwitch(userId);
-			 log.info("用户终极开关:"+rst1);
-			 if(rst1 == 0) {//用户终极开关关闭
-				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-			 }else if(rst1 == 1) {//用户终极开关打开
-				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-			 }else {//用户终极开关取消，不起作用
-				 String mobile = userMapper.getMobileById(userId);
-				 //黑名单判断
-				 boolean isIn = this.checkUserBlackList(mobile);
-				 if(isIn) {
-					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-				 }
-
-				 //地理位置开关
-				 SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
-				 if(sysConfigDTO.getValue() != null && sysConfigDTO.getValue().equals(0)){
-					 UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-					 String province = userDeviceInfo.getProvince();
-					 if(province.equals("陕西")&&province.equals("陕西省")){
-						 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-					 }else{
-						 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-					 }
-				 }
-			 }
-		 }
-
-		 log.info("channel="+chanel + " turnOn="+switchConfig.getTurnOn());
 		 return ResultGenerator.genSuccessResult("success",switchConfig);
 	 }
 	
