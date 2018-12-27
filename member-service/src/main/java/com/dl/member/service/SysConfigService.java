@@ -26,7 +26,7 @@ public class SysConfigService extends AbstractService<SysConfig> {
     	}
 
 		SysConfigDTO sysConfigDTO = new SysConfigDTO();
-		BeanUtils.copyProperties(s, sysConfigDTO);
+		BeanUtils.copyProperties(sysConfig, sysConfigDTO);
 		return sysConfigDTO;
     }
 
