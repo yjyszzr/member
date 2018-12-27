@@ -1,14 +1,14 @@
 package com.dl.member.api;
 
+import com.dl.base.result.BaseResult;
+import com.dl.member.dto.SysConfigDTO;
+import com.dl.member.param.SysConfigParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.dl.base.result.BaseResult;
-import com.dl.member.dto.SwitchConfigDTO;
-import com.dl.member.dto.SysConfigDTO;
-import com.dl.member.param.SysConfigParam;
+import java.util.List;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
 //import com.pgt.shop.member.param.CancelChangeParam;
 //import com.pgt.shop.member.param.ConfirmOrderParam;
@@ -31,12 +31,12 @@ public interface ISysConfigService {
 	@RequestMapping(path = "/user/sys/querySysConfig", method = RequestMethod.POST)
 	public BaseResult<SysConfigDTO> querySysConfig(@RequestBody SysConfigParam sysConfigParam);
 
+
 	/**
-	 * 交易版本或者资讯版本
-	 * 
+	 * 查询多个开关或阀值
 	 * @return
 	 */
-	@RequestMapping(path = "/switch/config/query", method = RequestMethod.POST)
-	public BaseResult<SwitchConfigDTO> querySwitch();
+	@RequestMapping(path = "/user/sys/querySysConfigList", method = RequestMethod.POST)
+	public BaseResult<List<SysConfigDTO>> querySysConfigList();
 
 }

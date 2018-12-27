@@ -1,14 +1,17 @@
 package com.dl.member.service;
-import com.dl.member.model.SysConfig;
+
+import com.dl.base.service.AbstractService;
 import com.dl.member.dao.SysConfigMapper;
 import com.dl.member.dto.SysConfigDTO;
-import com.dl.base.service.AbstractService;
-
+import com.dl.member.model.SysConfig;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -21,9 +24,23 @@ public class SysConfigService extends AbstractService<SysConfig> {
     	if(null == sysConfig) {
     		return new SysConfigDTO();
     	}
-    	SysConfigDTO sysConfigDTO = new SysConfigDTO();
-    	BeanUtils.copyProperties(sysConfig, sysConfigDTO);
+
+		SysConfigDTO sysConfigDTO = new SysConfigDTO();
+		BeanUtils.copyProperties(s, sysConfigDTO);
 		return sysConfigDTO;
     }
+
+	public List<SysConfigDTO> querySysConfigList(List<Integer> businessIdList) {
+		List<SysConfigDTO> sysConfigDTOList = new ArrayList<SysConfigDTO>();
+    	if (CollectionUtils.isEmpty(businessIdList)) return sysConfigDTOList;
+
+		List<SysConfig> sysConfigList =  sysConfigMapper.queryBusiIds(businessIdList);
+		sysConfigList.stream().forEach(s->{
+			SysConfigDTO sysConfigDTO = new SysConfigDTO();
+			BeanUtils.copyProperties(s, sysConfigDTO);
+			sysConfigDTOList.add(sysConfigDTO);
+		});
+		return sysConfigDTOList;
+	}
 
 }
