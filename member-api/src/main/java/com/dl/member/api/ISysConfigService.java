@@ -2,6 +2,7 @@ package com.dl.member.api;
 
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.SysConfigDTO;
+import com.dl.member.param.BusiIdsListParam;
 import com.dl.member.param.SysConfigParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,6 @@ public interface ISysConfigService {
 	 * @return
 	 */
 	@RequestMapping(path = "/user/sys/querySysConfigList", method = RequestMethod.POST)
-	public BaseResult<List<SysConfigDTO>> querySysConfigList();
+	public BaseResult<List<SysConfigDTO>> querySysConfigList(@RequestBody BusiIdsListParam busiIdsListParam);
 
 }
