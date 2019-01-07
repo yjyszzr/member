@@ -1,28 +1,5 @@
 package com.dl.member.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.SNBusinessCodeEnum;
@@ -35,11 +12,7 @@ import com.dl.base.util.RandomUtil;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
-import com.dl.member.dao.ActivityBonusMapper;
-import com.dl.member.dao.DLActivityMapper;
-import com.dl.member.dao.DonationRechargeCardMapper;
-import com.dl.member.dao.UserBonusMapper;
-import com.dl.member.dao.UserMapper;
+import com.dl.member.dao.*;
 import com.dl.member.dto.DonationPriceDTO;
 import com.dl.member.dto.RechargeBonusLimitDTO;
 import com.dl.member.dto.UserBonusDTO;
@@ -49,23 +22,38 @@ import com.dl.member.model.DonationRechargeCard;
 import com.dl.member.model.User;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.BonusLimitConditionParam;
+import com.dl.member.param.OrderSnParam;
 import com.dl.member.param.UserBonusParam;
-import com.dl.member.param.UserIdParam;
 import com.dl.member.util.BonusUtil;
 import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
+import com.dl.order.api.IOrderService;
+import com.dl.order.dto.OrderDTO;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDTO;
 import com.dl.shop.payment.dto.PriceDTO;
 import com.dl.shop.payment.dto.YesOrNoDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
-import com.dl.shop.payment.param.StrParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -103,6 +91,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	
 	@Resource
 	private DonationRechargeCardMapper donationRechargeCardMapper;
+
+	@Resource
+	private IOrderService iOrderService;
 
 	/**
 	 * 下单时的账户变动：目前仅红包置为已使用
@@ -220,6 +211,45 @@ public class UserBonusService extends AbstractService<UserBonus> {
 
 	}
 
+
+	/**
+	 * 给支付提供查询用户可用的红包列表
+	 *
+	 * @return
+	 */
+	public List<UserBonusDTO> queryValidBonusListForPayV2(OrderSnParam orderSnParam,Integer userId) {
+		List<UserBonusDTO> userBonusDTOList = new ArrayList<UserBonusDTO>();
+		//根据订单号查询支付所用 余额
+		com.dl.order.param.OrderSnParam snParam = new com.dl.order.param.OrderSnParam();
+		snParam.setOrderSn(orderSnParam.getOrderSn());
+		BaseResult<OrderDTO> orderDTOBaseResult = iOrderService.getOrderInfoByOrderSn(snParam);
+		if(!orderDTOBaseResult.isSuccess()){
+			return userBonusDTOList;
+		}
+
+		BigDecimal moneyPaid= orderDTOBaseResult.getData().getMoneyPaid();
+		UserBonus userBonus = new UserBonus();
+		userBonus.setUserId(userId);
+		userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+		userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
+		userBonus.setStartTime(DateUtil.getCurrentTimeLong());
+		userBonus.setEndTime(DateUtil.getCurrentTimeLong());
+		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
+		if (CollectionUtils.isEmpty(userBonusList)) {
+			return userBonusDTOList;
+		}
+
+		userBonusList.forEach(s -> {
+			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(s);
+			if(s.getMinGoodsAmount().compareTo(moneyPaid) < 0){ userBonusDTO.setBonusStatus("3");}
+			userBonusDTOList.add(userBonusDTO);
+		});
+		return userBonusDTOList;
+
+	}
+
+
+
 	// /**
 	// * 支付红包排序
 	// * @param lhs
@@ -291,14 +321,17 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			log.error(e.getMessage());
 		}
 
-		if (ProjectConstant.BONUS_STATUS_UNUSED == userBonus.getBonusStatus()) {
-			Integer currentTime = DateUtil.getCurrentTimeLong();
-			userBonusDTO.setSoonExprireBz(this.createSoonExprireBz(currentTime, userBonus));
-			userBonusDTO.setLeaveTime(this.createLeaveTime(currentTime, userBonus));
-		} else {
-			userBonusDTO.setSoonExprireBz("");
-			userBonusDTO.setLeaveTime("");
-		}
+//		if (ProjectConstant.BONUS_STATUS_UNUSED == userBonus.getBonusStatus()) {
+//			Integer currentTime = DateUtil.getCurrentTimeLong();
+//			userBonusDTO.setSoonExprireBz(this.createSoonExprireBz(currentTime, userBonus));
+//			userBonusDTO.setLeaveTime(this.createLeaveTime(currentTime, userBonus));
+//		} else {
+//			userBonusDTO.setSoonExprireBz("");
+//			userBonusDTO.setLeaveTime("");
+//		}
+		userBonusDTO.setBonusName(userBonus.getBonusPrice()+"元代金券");
+		userBonusDTO.setShortDesc("去使用");
+		userBonusDTO.setBonusPriceStr(userBonus.getBonusPrice()+"元");
 		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
 		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
 		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());

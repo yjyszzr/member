@@ -1,12 +1,10 @@
 package com.dl.member.service;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
-import org.springframework.stereotype.Service;
-
 import com.dl.base.util.DateUtil;
 import com.dl.member.core.ProjectConstant;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 
 
@@ -20,9 +18,9 @@ public class UserBonusShowDescService {
 	 * @return
 	 */
 	public String getLimitTimeDesc(Integer startTimeInteger,Integer endTimeInteger) {
-		String startTime = DateUtil.getCurrentTimeString(Long.valueOf(startTimeInteger), DateUtil.date_sdf);
+		//String startTime = DateUtil.getCurrentTimeString(Long.valueOf(startTimeInteger), DateUtil.date_sdf);
 		String endTime = DateUtil.getCurrentTimeString(Long.valueOf(endTimeInteger), DateUtil.date_sdf);
-		return startTime+"~"+endTime;
+		return "有效期至:"+endTime;
 	}
 	
 	/**
@@ -35,7 +33,7 @@ public class UserBonusShowDescService {
 		if(minGoodsAmountParam.compareTo(BigDecimal.ZERO) == 0) {
 			return "无使用门槛";
 		}else {
-			return "购彩满"+minGoodsAmountParam+"元减"+bonusPrice;
+			return "单笔订单满"+minGoodsAmountParam+"元可用";
 		}
 	}
 	

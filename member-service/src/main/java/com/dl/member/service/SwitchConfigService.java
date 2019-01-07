@@ -113,22 +113,14 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				 }else if(rst1 == 1) {//用户终极开关打开
 					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 				 }else {//用户终极开关取消，不起作用
-					 String mobile = userMapper.getMobileById(userId);
-					 if(userDevice.getPlat().equals("iphone")){//ios平台，白名单开，非白名单关（即新用户关）
-					 	boolean isWhite = this.checkUserWhiteList(mobile);
-					 	if(isWhite){
-							switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-						}else{
-							switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-						}
-					 }else{//非ios平台 黑名单关，非非名单开
-						 boolean isBlack = this.checkUserBlackList(mobile);
-						 if(isBlack){
-							 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-						 }else{
-							 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-						 }
-					 }
+				 	String mobile = userMapper.getMobileById(userId);
+					//白名单开，非白名单关（即新用户关）
+					boolean isWhite = this.checkUserWhiteList(mobile);
+					if(isWhite){
+						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+					}else{
+						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+					}
 
 					 //地理位置开关
 					 SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
@@ -143,11 +135,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 					 }
 				 }
 			 }else{
-				 if(userDevice.getPlat().equals("iphone")){//非登录 ios平台，关
-					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-				 }else{//非登录，非ios平台 开
-					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-				 }
+			 	switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 			 }
 		 }else {//渠道关
 			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
