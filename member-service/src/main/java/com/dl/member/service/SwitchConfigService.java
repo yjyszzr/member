@@ -1,10 +1,8 @@
 package com.dl.member.service;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.annotation.Resource;
 import javax.websocket.Session;
-
 import com.dl.member.dto.SysConfigDTO;
 import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -12,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
@@ -29,7 +26,6 @@ import com.dl.member.model.SwitchConfig;
 import com.dl.member.model.User;
 import com.dl.member.param.QuerySwitchParam;
 import com.dl.shop.payment.api.IpaymentService;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -138,9 +134,20 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 			 	switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 			 }
 		 }else {//渠道关
-			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+			 if(userId != null) {//登录用户
+				 //白名单开，非白名单关（即新用户关）
+				 String mobile = userMapper.getMobileById(userId);
+				 boolean isWhite = this.checkUserWhiteList(mobile);
+				 if(isWhite){
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+				 }else{
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+				 }
+			 }else{
+				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+			 }
 		 }
-		 log.info("channel="+chanel + "  turnOn="+switchConfig.getTurnOn());
+		 log.info("channel="+chanel + "turnOn="+switchConfig.getTurnOn());
 
 		 return ResultGenerator.genSuccessResult("success",switchConfig);
 	 }
