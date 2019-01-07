@@ -66,10 +66,10 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 		 String inPrams = JSON.toJSONString(userDevice);
 		 String logId = DateUtil.getCurrentDateTime();
 		 log.info(logId + "====================================版本参数:"+inPrams);
-		 String plat = "";
-		 if(userDevice.getPlat().equals("android")) {
+		 String plat = userDevice.getPlat();
+		 if(plat.equals("android")) {
 			 plat = "1";
-		 }else if(userDevice.getPlat().equals("iphone")) {
+		 }else if(plat.equals("iphone")) {
 			 plat = "0";
 			 //黑名单判断
 			 Integer userSwitchByIp = this.userSwitchByIp();
@@ -83,7 +83,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 					 return ResultGenerator.genSuccessResult("success",switchConfig);
 				 }
 			 }
-		 }else if(userDevice.getPlat().equals("h5")) {
+		 }else if(plat.equals("h5")) {
 			 plat = "2";
 		 }else {
 			 return ResultGenerator.genFailResult("设备信息中的plat参数错误");
@@ -109,26 +109,30 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				 }else if(rst1 == 1) {//用户终极开关打开
 					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 				 }else {//用户终极开关取消，不起作用
-				 	String mobile = userMapper.getMobileById(userId);
-					//白名单开，非白名单关（即新用户关）
-					boolean isWhite = this.checkUserWhiteList(mobile);
-					if(isWhite){
-						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-					}else{
-						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-					}
+				 	if(!plat.equals("h5")){
+						String mobile = userMapper.getMobileById(userId);
+						//白名单开，非白名单关（即新用户关）
+						boolean isWhite = this.checkUserWhiteList(mobile);
+						if(isWhite){
+							switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+						}else{
+							switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+						}
 
-					 //地理位置开关
-					 SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
-					 if(sysConfigDTO.getValue() != null && sysConfigDTO.getValue().equals(0)){
-						 UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-						 String province = userDeviceInfo.getProvince();
-						 if(province.equals("陕西")&&province.equals("陕西省")){
-							 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-						 }else{
-							 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-						 }
-					 }
+						//地理位置开关
+						SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
+						if(sysConfigDTO.getValue() != null && sysConfigDTO.getValue().equals(0)){
+							UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+							String province = userDeviceInfo.getProvince();
+							if(province.equals("陕西")&&province.equals("陕西省")){
+								switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+							}else{
+								switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+							}
+						}
+				 	}else{
+						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+					}
 				 }
 			 }else{
 			 	switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
