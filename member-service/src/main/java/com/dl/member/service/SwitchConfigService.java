@@ -109,7 +109,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				 }else if(rst1 == 1) {//用户终极开关打开
 					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 				 }else {//用户终极开关取消，不起作用
-				 	if(!plat.equals("h5")){
+				 	if(!userDevice.getPlat().equals("h5")){
 						String mobile = userMapper.getMobileById(userId);
 						//白名单开，非白名单关（即新用户关）
 						boolean isWhite = this.checkUserWhiteList(mobile);
