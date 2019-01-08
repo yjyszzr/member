@@ -24,7 +24,7 @@ public interface IUserService {
 
 	@RequestMapping(path="/user/queryUserByMobileAndPass", method=RequestMethod.POST)
 	public BaseResult<UserDTO> queryUserByMobileAndPass(@RequestBody MobileAndPassParam param);
-
+	
 	@RequestMapping(path="/user/queryUserInfoByToken", method=RequestMethod.POST)
 	public BaseResult<UserDTO> queryUserInfoByToken(@RequestBody TokenParam param);
 
