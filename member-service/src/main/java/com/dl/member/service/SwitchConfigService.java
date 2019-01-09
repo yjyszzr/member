@@ -151,8 +151,12 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 			 }
 		 }
+		 //h5强行打开
+		 if("h5".equals(chanel)) {
+			 log.info("[querySwitch]" + " channel:" + chanel);
+			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+		 }
 		 log.info("channel="+chanel + "turnOn="+switchConfig.getTurnOn());
-
 		 return ResultGenerator.genSuccessResult("success",switchConfig);
 	 }
 	
