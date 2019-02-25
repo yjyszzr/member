@@ -1,5 +1,31 @@
 package com.dl.member.service;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
+
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.AccountEnum;
@@ -16,13 +42,26 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.LotteryWinningLogTempMapper;
 import com.dl.member.dao.UserAccountMapper;
 import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.*;
+import com.dl.member.dto.SurplusPaymentCallbackDTO;
+import com.dl.member.dto.SysConfigDTO;
+import com.dl.member.dto.UserAccountByTimeDTO;
+import com.dl.member.dto.UserAccountCurMonthDTO;
+import com.dl.member.dto.UserAccountDTO;
+import com.dl.member.dto.UserAccountListAndCountDTO;
+import com.dl.member.dto.UserIdAndRewardDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlMessage;
 import com.dl.member.model.LotteryWinningLogTemp;
 import com.dl.member.model.User;
 import com.dl.member.model.UserAccount;
-import com.dl.member.param.*;
+import com.dl.member.param.AmountTypeParam;
+import com.dl.member.param.MemRollParam;
+import com.dl.member.param.MemWithDrawSnParam;
+import com.dl.member.param.RecharegeParam;
+import com.dl.member.param.SurplusPayParam;
+import com.dl.member.param.UserAccountParam;
+import com.dl.member.param.UserAccountParamByType;
+import com.dl.member.param.WithDrawParam;
 import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
 import com.dl.order.api.IOrderService;
@@ -39,23 +78,6 @@ import com.dl.shop.payment.param.WithDrawSnParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Joiner;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
-
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -315,7 +337,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 		PageHelper.startPage(pageNum, pageSize);
 		List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
-
 		if (userAccountList.size() == 0) {
 			return new PageInfo<UserAccountDTO>(userAccountListDTO);
 		}
@@ -1605,4 +1626,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		List<UserAccount> list = userAccountMapper.findByUserIdsAndType(userIds, data, i);
 		return list;
 	}
+	
+	
+	public int updateUserMoneyAndUserMoneyLimit(User _user) {
+		return userMapper.updateUserMoneyAndUserMoneyLimit(_user);
+	}
+	
+	public int insertUserAccountBySelective(UserAccount userAccountParam) {
+		return userAccountMapper.insertUserAccountBySelective(userAccountParam);
+	}
+	
+	
 }
