@@ -23,6 +23,8 @@ import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserAccountListAndCountDTO;
 import com.dl.member.dto.UserIdAndRewardDTO;
+import com.dl.member.model.User;
+import com.dl.member.model.UserAccount;
 import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.MemRollParam;
 import com.dl.member.param.MemWithDrawSnParam;
@@ -32,9 +34,11 @@ import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.TimeTypeParam;
 import com.dl.member.param.UpdateUserAccountParam;
+import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserIdAndRewardListParam;
+import com.dl.member.param.UserParam;
 import com.dl.member.param.WithDrawParam;
 import com.dl.member.service.SysConfigService;
 import com.dl.member.service.UserAccountService;
@@ -272,4 +276,19 @@ public class UserAccountController {
 	public BaseResult<Object> rollbackUserMoneyOrderFailure(@Valid @RequestBody MemRollParam memRollParam) {
 		return userAccountService.rollbackUserMoneyOrderFailure(memRollParam);
 	}
+	
+//	@ApiOperation(value = "出票失败，回滚到可提现金额中", notes = "出票失败，回滚到可提现金额中", hidden = false)
+	@RequestMapping(path = "/updateUserMoneyAndUserMoneyLimit", method = RequestMethod.POST)
+	public  BaseResult<Integer> updateUserMoneyAndUserMoneyLimit(@Valid @RequestBody UserParam _user) {
+		int tag = userAccountService.updateUserMoneyAndUserMoneyLimit(_user);
+		return ResultGenerator.genSuccessResult("扣款", Integer.valueOf(tag));
+	}
+	
+//	@ApiOperation(value = "出票失败，回滚到可提现金额中", notes = "出票失败，回滚到可提现金额中", hidden = false)
+	@RequestMapping(path = "/insertUserAccountBySelective", method = RequestMethod.POST)
+	public BaseResult<Integer>  insertUserAccountBySelective(@Valid @RequestBody UserAccountParam userAccountParam) {
+		int tag = userAccountService.insertUserAccountBySelective(userAccountParam);
+		return ResultGenerator.genSuccessResult("记流水", Integer.valueOf(tag));
+	}
+	
 }
