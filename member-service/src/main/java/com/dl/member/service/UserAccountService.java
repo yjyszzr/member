@@ -1641,7 +1641,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		
 		UserAccount userAccount = new UserAccount();
 		try {
-			BeanUtils.copyProperties(userAccountParam, userAccount);
+//			BeanUtils.copyProperties(userAccountParam, userAccount);
+			BeanUtils.copyProperties(userAccount, userAccountParam);
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
