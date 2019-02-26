@@ -6,6 +6,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.SysConfigDTO;
@@ -15,24 +16,23 @@ import com.dl.member.param.AmountParam;
 import com.dl.member.param.MemRollParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
-import com.dl.member.param.RollackSurplusPayParam;
 //import com.pgt.shop.member.dto.UserCapitalDTO;
 //import com.pgt.shop.member.param.CancelChangeParam;
 //import com.pgt.shop.member.param.ConfirmOrderParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.UpdateUserAccountParam;
-import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
+import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserIdAndRewardListParam;
+import com.dl.member.param.UserParam;
 import com.dl.member.param.UserWithdrawParam;
 //import com.pgt.shop.member.param.UserCapitalParam;
 //import com.pgt.shop.member.param.UserRefundParam;
 import com.dl.member.param.WithDrawParam;
-
-import io.swagger.annotations.ApiOperation;
 
 /**
  * 用户账户接口
@@ -162,6 +162,13 @@ public interface IUserAccountService {
 	 */
 	@RequestMapping(path="/user/account/queryBusinessLimit", method=RequestMethod.POST)
 	public BaseResult<SysConfigDTO> queryBusinessLimit(@Valid @RequestBody SysConfigParam sysConfigParam);
+	
+	
+	@RequestMapping(path="/user/account/updateUserMoneyAndUserMoneyLimit", method=RequestMethod.POST)
+	public int updateUserMoneyAndUserMoneyLimit(@Valid @RequestBody UserParam _user); 
+	
+	@RequestMapping(path="/user/account/insertUserAccountBySelective", method=RequestMethod.POST)
+	public int insertUserAccountBySelective(@Valid @RequestBody UserAccountParam userAccountParam);
 	
 	//	
 //	/**
