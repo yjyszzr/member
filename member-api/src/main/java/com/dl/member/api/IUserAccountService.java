@@ -165,10 +165,10 @@ public interface IUserAccountService {
 	
 	
 	@RequestMapping(path="/user/account/updateUserMoneyAndUserMoneyLimit", method=RequestMethod.POST)
-	public int updateUserMoneyAndUserMoneyLimit(@Valid @RequestBody UserParam _user); 
+	public BaseResult<Integer> updateUserMoneyAndUserMoneyLimit(@Valid @RequestBody UserParam _user); 
 	
 	@RequestMapping(path="/user/account/insertUserAccountBySelective", method=RequestMethod.POST)
-	public int insertUserAccountBySelective(@Valid @RequestBody UserAccountParam userAccountParam);
+	public BaseResult<Integer> insertUserAccountBySelective(@Valid @RequestBody UserAccountParam userAccountParam);
 	
 	//	
 //	/**
