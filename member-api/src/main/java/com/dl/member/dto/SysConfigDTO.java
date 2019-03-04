@@ -13,11 +13,13 @@ public class SysConfigDTO {
 	@ApiModelProperty("业务id")
     private Integer businessId;
 	
-	@ApiModelProperty("业务值")
+	@ApiModelProperty("业务值：0-关 1-开")
     private BigDecimal value;
 	
 	@ApiModelProperty("业务描述")
-    private String desc;
+    private String describtion;
 
+	@ApiModelProperty("文本信息")
+	private String valueTxt;
 	
 }
