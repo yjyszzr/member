@@ -52,6 +52,7 @@ public class MediaController {
 				sysDTO = sysConfigService.querySysConfig(20);
 				break;
 		}
+		logger.info("[getMediaToken]" + " sysDTO:" + sysDTO);
 		if(sysDTO == null) {
 			return ResultGenerator.genFailResult();
 		}
