@@ -56,6 +56,7 @@ public class MediaController {
 			return ResultGenerator.genFailResult();
 		}
 		String valueTxt = sysDTO.getValueTxt();
+		logger.info("[getMediaToken]" + " valueTxt:" + valueTxt);
 		MediaTokenDTO tokenEntity = JSON.parseObject(valueTxt,MediaTokenDTO.class);
 		String fileName = MediaTokenDTO.buildFileName();
 		tokenEntity.fileName = fileName;
