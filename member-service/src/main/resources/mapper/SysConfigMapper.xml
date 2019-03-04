@@ -9,5 +9,13 @@
     <result column="business_id" jdbcType="INTEGER" property="businessId" />
     <result column="value" jdbcType="VARCHAR" property="value" />
     <result column="describtion" jdbcType="VARCHAR" property="describtion" />
+    <result column="value_txt" jdbcType="LONGVARCHAR" property="valueTxt" />
   </resultMap>
+
+  <select id="queryBusiIds" resultMap="BaseResultMap">
+    select * from dl_sys_config where business_id in
+    <foreach collection="businessIds" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
 </mapper>
