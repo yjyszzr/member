@@ -1,5 +1,6 @@
 package com.dl.member.service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
@@ -61,6 +62,7 @@ import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
+import com.dl.member.param.UserParam;
 import com.dl.member.param.WithDrawParam;
 import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
@@ -1625,5 +1627,35 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	public List<UserAccount> findByUserIdsAndType(List<String> userIds, String data, int i) {
 		List<UserAccount> list = userAccountMapper.findByUserIdsAndType(userIds, data, i);
 		return list;
+	}
+	
+	public int updateUserMoneyAndUserMoneyLimit(UserParam userParam) {
+		User user = new User();
+		try {
+			BeanUtils.copyProperties(user, userParam);
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return userMapper.updateUserMoneyAndUserMoneyLimit(user);
+	}
+	
+	public int insertUserAccountBySelective(UserAccountParam userAccountParam) {
+		
+		UserAccount userAccount = new UserAccount();
+		try {
+			BeanUtils.copyProperties(userAccount, userAccountParam);
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return userAccountMapper.insertUserAccountBySelective(userAccount);
 	}
 }

@@ -35,6 +35,7 @@ import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserIdAndRewardListParam;
+import com.dl.member.param.UserParam;
 import com.dl.member.param.WithDrawParam;
 import com.dl.member.service.SysConfigService;
 import com.dl.member.service.UserAccountService;
@@ -271,5 +272,12 @@ public class UserAccountController {
 	@RequestMapping(path = "/rollbackUserMoney", method = RequestMethod.POST)
 	public BaseResult<Object> rollbackUserMoneyOrderFailure(@Valid @RequestBody MemRollParam memRollParam) {
 		return userAccountService.rollbackUserMoneyOrderFailure(memRollParam);
+	}
+	
+//	@ApiOperation(value = "出票失败，回滚到可提现金额中", notes = "出票失败，回滚到可提现金额中", hidden = false)
+	@RequestMapping(path = "/updateUserMoneyAndUserMoneyLimit", method = RequestMethod.POST)
+	public  BaseResult<Integer> updateUserMoneyAndUserMoneyLimit(@Valid @RequestBody UserParam _user) {
+		int tag = userAccountService.updateUserMoneyAndUserMoneyLimit(_user);
+		return ResultGenerator.genSuccessResult("扣款", Integer.valueOf(tag));
 	}
 }
