@@ -25,8 +25,11 @@ import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UpdateUserRechargeParam;
 import com.dl.member.param.UpdateUserWithdrawParam;
+import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
+import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserIdAndRewardListParam;
+import com.dl.member.param.UserParam;
 import com.dl.member.param.UserWithdrawParam;
 //import com.pgt.shop.member.param.UserCapitalParam;
 //import com.pgt.shop.member.param.UserRefundParam;
@@ -162,6 +165,13 @@ public interface IUserAccountService {
 	 */
 	@RequestMapping(path="/user/account/queryBusinessLimit", method=RequestMethod.POST)
 	public BaseResult<SysConfigDTO> queryBusinessLimit(@Valid @RequestBody SysConfigParam sysConfigParam);
+	
+	
+	@RequestMapping(path="/user/account/updateUserMoneyAndUserMoneyLimit", method=RequestMethod.POST)
+	public BaseResult<Integer> updateUserMoneyAndUserMoneyLimit(@Valid @RequestBody UserParam _user); 
+	
+	@RequestMapping(path="/user/account/insertUserAccountBySelective", method=RequestMethod.POST)
+	public BaseResult<Integer> insertUserAccountBySelective(@Valid @RequestBody UserAccountParam userAccountParam);
 	
 	//	
 //	/**

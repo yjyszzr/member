@@ -65,10 +65,11 @@ public class UserAccountParam {
     @ApiModelProperty(value = "使用的红包的金额")
     private BigDecimal bonusPrice;
     
+    @ApiModelProperty(value = "入库时间")
+    private Integer addTime; 
     
-    
-    
-    
+    @ApiModelProperty(value = "processType")
+    private Integer processType; 
     
     
     
