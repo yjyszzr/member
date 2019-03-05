@@ -32,6 +32,7 @@ import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.TimeTypeParam;
 import com.dl.member.param.UpdateUserAccountParam;
+import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.param.UserIdAndRewardListParam;
@@ -279,5 +280,11 @@ public class UserAccountController {
 	public  BaseResult<Integer> updateUserMoneyAndUserMoneyLimit(@Valid @RequestBody UserParam _user) {
 		int tag = userAccountService.updateUserMoneyAndUserMoneyLimit(_user);
 		return ResultGenerator.genSuccessResult("扣款", Integer.valueOf(tag));
+	}
+	
+	@RequestMapping(path = "/insertUserAccountBySelective", method = RequestMethod.POST)
+	public BaseResult<Integer>  insertUserAccountBySelective(@Valid @RequestBody UserAccountParam userAccountParam) {
+		int tag = userAccountService.insertUserAccountBySelective(userAccountParam);
+		return ResultGenerator.genSuccessResult("记流水", Integer.valueOf(tag));
 	}
 }
