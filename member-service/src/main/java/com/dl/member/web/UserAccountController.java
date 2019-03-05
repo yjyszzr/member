@@ -280,7 +280,7 @@ public class UserAccountController {
 	public  BaseResult<Integer> updateUserMoneyAndUserMoneyLimit(@Valid @RequestBody UserParam _user) {
 		int tag = userAccountService.updateUserMoneyAndUserMoneyLimit(_user);
 		return ResultGenerator.genSuccessResult("扣款", Integer.valueOf(tag));
-	}
+	} 
 	
 	@RequestMapping(path = "/insertUserAccountBySelective", method = RequestMethod.POST)
 	public BaseResult<Integer>  insertUserAccountBySelective(@Valid @RequestBody UserAccountParam userAccountParam) {

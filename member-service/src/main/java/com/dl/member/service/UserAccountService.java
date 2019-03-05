@@ -1632,7 +1632,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	public int updateUserMoneyAndUserMoneyLimit(UserParam userParam) {
 		User user = new User();
 		try {
-			BeanUtils.copyProperties(user, userParam);
+//			BeanUtils.copyProperties(user, userParam);
+			BeanUtils.copyProperties(userParam, user);
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1645,10 +1646,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	}
 	
 	public int insertUserAccountBySelective(UserAccountParam userAccountParam) {
-		
 		UserAccount userAccount = new UserAccount();
 		try {
-			BeanUtils.copyProperties(userAccount, userAccountParam);
+//			BeanUtils.copyProperties(userAccount, userAccountParam);
+			BeanUtils.copyProperties(userAccountParam, userAccount);
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
