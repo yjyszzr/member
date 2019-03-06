@@ -1654,7 +1654,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}  
 		return userAccountMapper.insertUserAccountBySelective(userAccount);
 	}
 }
