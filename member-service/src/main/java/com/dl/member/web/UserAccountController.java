@@ -1,12 +1,11 @@
 package com.dl.member.web;
 
-import io.swagger.annotations.ApiOperation;
-
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +17,6 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dto.SurplusPaymentCallbackDTO;
 import com.dl.member.dto.SysConfigDTO;
-import com.dl.member.dto.UserAccountByTimeDTO;
 import com.dl.member.dto.UserAccountCurMonthDTO;
 import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserAccountListAndCountDTO;
@@ -30,7 +28,6 @@ import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.StrParam;
 import com.dl.member.param.SurplusPayParam;
 import com.dl.member.param.SysConfigParam;
-import com.dl.member.param.TimeTypeParam;
 import com.dl.member.param.UpdateUserAccountParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
@@ -44,12 +41,17 @@ import com.dl.member.service.UserBonusService;
 import com.dl.member.service.UserService;
 import com.github.pagehelper.PageInfo;
 
+import io.swagger.annotations.ApiOperation;
+
 /**
  * Created by zhangzirong on 2018/03/15.
  */
 @RestController
 @RequestMapping("/user/account")
 public class UserAccountController {
+	
+	private final static Logger logger = Logger.getLogger(UserAccountController.class);
+	
 	@Resource
 	private UserAccountService userAccountService;
 
@@ -278,6 +280,7 @@ public class UserAccountController {
 //	@ApiOperation(value = "出票失败，回滚到可提现金额中", notes = "出票失败，回滚到可提现金额中", hidden = false)
 	@RequestMapping(path = "/updateUserMoneyAndUserMoneyLimit", method = RequestMethod.POST)
 	public  BaseResult<Integer> updateUserMoneyAndUserMoneyLimit(@Valid @RequestBody UserParam _user) {
+		logger.info("userId:" + _user.getUserId() + "|userMoneyLimit:" + _user.getUserMoneyLimit());
 		int tag = userAccountService.updateUserMoneyAndUserMoneyLimit(_user);
 		return ResultGenerator.genSuccessResult("扣款", Integer.valueOf(tag));
 	} 

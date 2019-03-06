@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,7 @@ import com.dl.member.param.UserParam;
 import com.dl.member.param.WithDrawParam;
 import com.dl.member.util.GeTuiMessage;
 import com.dl.member.util.GeTuiUtil;
+import com.dl.member.web.UserAccountController;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnListParam;
@@ -84,6 +86,9 @@ import com.google.common.base.Joiner;
 @Service
 @Slf4j
 public class UserAccountService extends AbstractService<UserAccount> {
+	
+	private final static Logger logger = Logger.getLogger(UserAccountService.class);
+	
 	@Resource
 	private UserAccountMapper userAccountMapper;
 
@@ -1640,7 +1645,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		logger.info("userId:" + user.getUserId() + "|userMoneyLimit:" + user.getUserMoneyLimit());
 		return userMapper.updateUserMoneyAndUserMoneyLimit(user);
 	}
 	
@@ -1654,7 +1659,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}  
 		return userAccountMapper.insertUserAccountBySelective(userAccount);
 	}
 }
