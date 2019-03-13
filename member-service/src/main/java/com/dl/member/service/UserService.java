@@ -1,26 +1,5 @@
 package com.dl.member.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import com.dl.member.dto.*;
-import com.dl.member.param.*;
-import com.dl.member.util.TokenUtil;
-import com.dl.shop.auth.api.IAuthService;
-import com.dl.shop.auth.dto.InvalidateTokenDTO;
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import tk.mybatis.mapper.entity.Condition;
-
 import com.dl.base.enums.ActivityEnum;
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
@@ -37,11 +16,27 @@ import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
+import com.dl.member.dto.*;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
+import com.dl.member.param.*;
 import com.dl.member.util.Encryption;
+import com.dl.member.util.TokenUtil;
+import com.dl.shop.auth.api.IAuthService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Condition;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -295,6 +290,11 @@ public class UserService extends AbstractService<User> {
 			String channel = userDevice.getChannel();
 			user.setDeviceChannel(channel);
 		}
+
+		if(userParam.getLoginSource().equals("4")){//h5
+			userParam.setIsSuperWhite("1");
+		}
+
 		Integer insertRsult = userMapper.insertWithReturnId(user);
 		if (1 != insertRsult) {
 			log.error("注册用户失败");

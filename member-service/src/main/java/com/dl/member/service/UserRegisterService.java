@@ -1,10 +1,4 @@
 package com.dl.member.service;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
@@ -16,6 +10,11 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.param.UserParam;
 import com.dl.member.param.UserRegisterParam;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Transactional

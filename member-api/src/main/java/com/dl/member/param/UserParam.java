@@ -1,13 +1,12 @@
 package com.dl.member.param;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-
-import org.hibernate.validator.constraints.NotBlank;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.NotBlank;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 用户信息参数类
@@ -51,6 +50,9 @@ public class UserParam implements Serializable{
 	@ApiModelProperty("支付二维码")
 	private String payQRcodeUrl; 
 	@ApiModelProperty("消息推送key")
-	private String pushKey; 
-	
+	private String pushKey;
+
+	@ApiModelProperty("是否超级白名单")
+	private String isSuperWhite;
+
 }
