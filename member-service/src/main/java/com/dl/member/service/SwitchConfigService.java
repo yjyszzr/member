@@ -1,15 +1,4 @@
 package com.dl.member.service;
-import java.util.Arrays;
-import java.util.List;
-import javax.annotation.Resource;
-import javax.websocket.Session;
-import com.dl.member.dto.SysConfigDTO;
-import org.apache.catalina.manager.util.SessionUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
@@ -24,9 +13,16 @@ import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.SwitchConfigDTO;
 import com.dl.member.model.SwitchConfig;
 import com.dl.member.model.User;
-import com.dl.member.param.QuerySwitchParam;
 import com.dl.shop.payment.api.IpaymentService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 @Transactional
@@ -109,47 +105,13 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				 }else if(rst1 == 1) {//用户终极开关打开
 					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 				 }else {//用户终极开关取消，不起作用
-				 	if(!userDevice.getPlat().equals("h5")){
-						String mobile = userMapper.getMobileById(userId);
-						//白名单开，非白名单关（即新用户关）
-						boolean isWhite = this.checkUserWhiteList(mobile);
-						if(isWhite){
-							switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-						}else{
-							switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-						}
-
-						//地理位置开关
-						SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(24);
-						if(sysConfigDTO.getValue() != null && sysConfigDTO.getValue().equals(0)){
-							UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-							String province = userDeviceInfo.getProvince();
-							if(province.equals("陕西")&&province.equals("陕西省")){
-								switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-							}else{
-								switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-							}
-						}
-				 	}else{
-						switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-					}
+				 	switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 				 }
 			 }else{
 			 	switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 			 }
 		 }else {//渠道关
-			 if(userId != null) {//登录用户
-				 //白名单开，非白名单关（即新用户关）
-				 String mobile = userMapper.getMobileById(userId);
-				 boolean isWhite = this.checkUserWhiteList(mobile);
-				 if(isWhite){
-					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-				 }else{
-					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-				 }
-			 }else{
 				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-			 }
 		 }
 		 //h5强行打开
 		 if("h5".equals(chanel)) {
