@@ -97,6 +97,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 		 log.info("渠道开关:"+rst3);
 		 if(rst3 == 1) {//渠道开
 			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+		 }else {//渠道关
 			 if(userId != null) {//登录用户
 				 Integer rst1 = this.userSwitch(userId);
 				 log.info("用户终极开关:"+rst1);
@@ -105,14 +106,13 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				 }else if(rst1 == 1) {//用户终极开关打开
 					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 				 }else {//用户终极开关取消，不起作用
-				 	switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 				 }
 			 }else{
-			 	switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-			 }
-		 }else {//渠道关
 				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+			 }
 		 }
+
 		 //h5强行打开
 		 if("h5".equals(chanel)) {
 			 log.info("[querySwitch]" + " channel:" + chanel);
