@@ -1,9 +1,17 @@
 package com.dl.member.web;
 
+import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
+import com.dl.member.dto.UserLoginDTO;
+import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.User;
+import com.dl.member.param.*;
+import com.dl.member.service.UserLoginService;
+import com.dl.member.service.UserService;
+import com.dl.member.util.Encryption;
+import com.dl.member.util.TokenUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -12,22 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.dl.base.result.BaseResult;
-import com.dl.base.result.ResultGenerator;
-import com.dl.member.dto.UserLoginDTO;
-import com.dl.member.enums.MemberEnums;
-import com.dl.member.model.User;
-import com.dl.member.param.LoginLogParam;
-import com.dl.member.param.MobilePwdCreateParam;
-import com.dl.member.param.StrParam;
-import com.dl.member.param.UserLoginWithPassParam;
-import com.dl.member.param.UserLoginWithSmsParam;
-import com.dl.member.param.UserParam;
-import com.dl.member.param.UserRePwdParam;
-import com.dl.member.service.UserLoginService;
-import com.dl.member.service.UserService;
-import com.dl.member.util.Encryption;
-import com.dl.member.util.TokenUtil;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 用户登录接口 zhangzirong
@@ -42,7 +37,15 @@ public class UserLoginContorller {
 	private UserLoginService userLoginService;
 	@Resource 
 	private UserService userService;
-	
+
+
+	/**
+	 *  1.要优化的地方,前端密码要md5加密后传过来;
+	 *  2.通过UserDevice 中的appv 版本号来区分版本，让各自版本都按照以前和现在的逻辑运行
+	 * @param userLoginMobileParam
+	 * @param request
+	 * @return
+	 */
 	@ApiOperation(value = "密码登录", notes = "密码登录")
 	@PostMapping("/loginByPass")
 	public BaseResult<UserLoginDTO> loginByPass(@RequestBody UserLoginWithPassParam userLoginMobileParam, HttpServletRequest request) {
@@ -50,8 +53,10 @@ public class UserLoginContorller {
 		if (loginByPass.getCode() == 0) {
 			String token = loginByPass.getData().getToken();
 			request.getSession().setAttribute("user_token", token);
-			;
 		}
+
+
+
 		return loginByPass;
 	}
 
