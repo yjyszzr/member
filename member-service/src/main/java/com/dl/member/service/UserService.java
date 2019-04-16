@@ -295,6 +295,15 @@ public class UserService extends AbstractService<User> {
 			userParam.setIsSuperWhite("1");
 		}
 
+		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+		String appCodeName = userDeviceInfo.getAppCodeName();
+		log.info("appCodeName:"+appCodeName);
+		if(StringUtils.isEmpty(appCodeName)){
+			user.setAppCodeName("10");
+		}else{
+			user.setAppCodeName(appCodeName);
+		}
+
 		Integer insertRsult = userMapper.insertWithReturnId(user);
 		if (1 != insertRsult) {
 			log.error("注册用户失败");

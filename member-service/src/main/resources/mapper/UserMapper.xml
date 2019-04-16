@@ -39,6 +39,7 @@
     <result column="push_key" jdbcType="VARCHAR" property="pushKey" />
     <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel" />
     <result column="is_business" jdbcType="INTEGER" property="isBusiness" />
+	  <result column="app_code_name" jdbcType="VARCHAR" property="appCodeName" />
 	  <result column="is_super_white" jdbcType="INTEGER" property="isSuperWhite" />
 
   </resultMap>
@@ -47,10 +48,10 @@
 	INSERT INTO dl_user(user_name,mobile,
 	email,password,salt,nickname,sex,birthday,detail_address,headimg,pay_point,rank_point,
 	reg_time,reg_ip,last_time,last_ip,mobile_supplier,mobile_province,mobile_city,reg_from,
-	surplus_password,pay_pwd_salt,user_status,pass_wrong_count,user_type,is_real,user_remark,add_time,push_key,device_channel,is_super_white)
+	surplus_password,pay_pwd_salt,user_status,pass_wrong_count,user_type,is_real,user_remark,add_time,push_key,device_channel,is_super_white,app_code_name)
 	VALUES(#{userName},#{mobile},#{email},#{password},#{salt},#{nickName},#{sex},#{birthday},#{detailAddress},#{headImg},#{payPoint},#{rankPoint},
 	#{regTime},#{regIp},#{lastTime},#{lastIp},#{mobileSupplier},#{mobileProvince},#{mobileCity},#{regFrom},
-	#{surplusPassword},#{payPwdSalt},#{userStatus},#{passWrongCount},#{userType},#{isReal},#{userRemark},#{lastTime},#{pushKey},#{deviceChannel},#{isSuperWhite})
+	#{surplusPassword},#{payPwdSalt},#{userStatus},#{passWrongCount},#{userType},#{isReal},#{userRemark},#{lastTime},#{pushKey},#{deviceChannel},#{isSuperWhite},#{appCodeName})
   </insert>
   <select id="selectUserFoUpdateByUserId" resultMap="BaseResultMap">
   select * from dl_user where user_id=#{userId} for update

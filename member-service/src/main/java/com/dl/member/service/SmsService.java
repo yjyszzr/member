@@ -1,31 +1,7 @@
 package com.dl.member.service;
 
-import java.net.URLEncoder;
-import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-//import com.aliyuncs.DefaultAcsClient;
-//import com.aliyuncs.IAcsClient;
-//import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
-//import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
-//import com.aliyuncs.exceptions.ClientException;
-//import com.aliyuncs.http.MethodType;
-//import com.aliyuncs.profile.DefaultProfile;
-//import com.aliyuncs.profile.IClientProfile;
 import com.dl.base.configurer.RestTemplateConfig;
 import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.model.UserDeviceInfo;
@@ -41,6 +17,28 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
 import com.dl.member.param.SmsParam;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
+import java.net.URLEncoder;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
+
+//import com.aliyuncs.DefaultAcsClient;
+//import com.aliyuncs.IAcsClient;
+//import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
+//import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+//import com.aliyuncs.exceptions.ClientException;
+//import com.aliyuncs.http.MethodType;
+//import com.aliyuncs.profile.DefaultProfile;
+//import com.aliyuncs.profile.IClientProfile;
 
 @Service
 @Slf4j
@@ -135,9 +133,9 @@ public class SmsService {
 		UserDeviceInfo userDevice = SessionUtil.getUserDevice();
 		String platform = userDevice.getPlat();
 		// String platform = "h5";
-		Integer appCodeName = 1;// 给默认值
+		Integer appCodeName = 10;// 默认球多多
 		log.info("platform-------------:" + platform);
-		if (!"h5".equals(platform)) {// h5 短信模板都用彩小秘
+		if (!"h5".equals(platform)) {// h5 短信模板都用球多多
 			String channel = userDevice.getChannel();
 			appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
 		}
