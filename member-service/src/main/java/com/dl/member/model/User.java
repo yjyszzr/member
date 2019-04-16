@@ -1,7 +1,9 @@
 package com.dl.member.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
-import javax.persistence.*;
 
 @Table(name = "dl_user")
 public class User {
@@ -17,6 +19,10 @@ public class User {
      */
     @Column(name = "is_business")
     private Integer isBusiness;
+
+
+    @Column(name = "app_code_name")
+    private String appCodeName;
     
     
     /**
@@ -787,5 +793,14 @@ public class User {
      */
     public void setUserRemark(String userRemark) {
         this.userRemark = userRemark;
+    }
+
+
+    public String getAppCodeName() {
+        return appCodeName;
+    }
+
+    public void setAppCodeName(String appCodeName) {
+        this.appCodeName = appCodeName;
     }
 }
