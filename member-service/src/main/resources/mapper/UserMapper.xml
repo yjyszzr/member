@@ -158,4 +158,8 @@
 	<select id="queryUserByUserId" resultMap="BaseResultMap">
 		select * from dl_user where user_id =#{userId}
 	</select>
+
+	<select id="queryUserByMobileAndAppCdde" resultMap="BaseResultMap">
+		select * from dl_user where mobile =#{mobile} and app_code_name = #{appCodeName}
+	</select>
 </mapper>

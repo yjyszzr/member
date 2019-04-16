@@ -1,12 +1,11 @@
 package com.dl.member.dao;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import com.dl.base.mapper.Mapper;
 import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface UserMapper extends Mapper<User> {
 
@@ -58,5 +57,7 @@ public interface UserMapper extends Mapper<User> {
 	User selectUserFoUpdateByUserId(@Param("userId")Integer userId);
 
 	String getMobileById(@Param("userId") Integer userId);
+
+	User queryUserByMobileAndAppCdde(@Param("mobile") String mobile,@Param("appCodeName") String appCodeName);
 	
 }
