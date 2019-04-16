@@ -1,17 +1,5 @@
 package com.dl.member.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.dl.base.enums.ActivityEnum;
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
@@ -28,29 +16,28 @@ import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.ActivityDTO;
-import com.dl.member.dto.SysConfigDTO;
-import com.dl.member.dto.UserDTO;
-import com.dl.member.dto.UserNoticeDTO;
-import com.dl.member.dto.UserRealDTO;
+import com.dl.member.dto.*;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
-import com.dl.member.param.FindUserByMobileAndAppCodeParam;
-import com.dl.member.param.IDFACallBackParam;
-import com.dl.member.param.SetLoginPassParam;
-import com.dl.member.param.TokenParam;
-import com.dl.member.param.UserIdParam;
-import com.dl.member.param.UserIdRealParam;
-import com.dl.member.param.UserParam;
+import com.dl.member.param.*;
 import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
 import com.dl.shop.auth.api.IAuthService;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -87,12 +74,12 @@ public class UserService extends AbstractService<User> {
 	@Resource
 	private SysConfigService sysConfigService;
 
-    @Resource
-    private IAuthService iAuthService;
+	@Resource
+	private IAuthService iAuthService;
 
 	/**
 	 * real真实信息
-	 * 
+	 *
 	 * @return
 	 */
 	public BaseResult<UserDTO> queryUserByUserIdExceptPassReal() {
@@ -167,7 +154,7 @@ public class UserService extends AbstractService<User> {
 
 	/**
 	 * 查询用户信息 （除了密码）
-	 * 
+	 *
 	 * @param userId
 	 * @return
 	 */
@@ -218,7 +205,7 @@ public class UserService extends AbstractService<User> {
 
 	/**
 	 * 构造实名认证信息:包含了部分身份证号
-	 * 
+	 *
 	 * @return
 	 */
 	public String createRealInfo(UserRealDTO userRealDTO) {
@@ -232,7 +219,7 @@ public class UserService extends AbstractService<User> {
 
 	/**
 	 * 只有店员才展示有效的推广链接
-	 * 
+	 *
 	 * @param userId
 	 * @return
 	 */
@@ -252,9 +239,9 @@ public class UserService extends AbstractService<User> {
 						log.error("个人信息接口的DTO转换异常");
 					}
 					if (0 == s.getIsFinish()) {// 有效
-							activityMemDTOList.add(memActivityDTO);
-						}
-					});
+						activityMemDTOList.add(memActivityDTO);
+					}
+				});
 			}
 		}
 		return activityMemDTOList;
@@ -262,7 +249,7 @@ public class UserService extends AbstractService<User> {
 
 	/**
 	 * 保存用户
-	 * 
+	 *
 	 * @param uParams
 	 */
 	@Transactional
@@ -342,9 +329,9 @@ public class UserService extends AbstractService<User> {
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
 
-        UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-        String appCodeName = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
-        User user = userMapper.queryUserByMobileAndAppCdde(mobile,appCodeName);
+		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+		String appCodeName = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+		User user = userMapper.queryUserByMobileAndAppCdde(mobile,appCodeName);
 		if (null == user) {
 			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 		}
@@ -363,7 +350,7 @@ public class UserService extends AbstractService<User> {
 
 	/**
 	 * 校验用户的手机号
-	 * 
+	 *
 	 * @param mobileNumberParam
 	 * @return
 	 */
@@ -372,10 +359,7 @@ public class UserService extends AbstractService<User> {
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
 
-		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-		String appCodeName = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
-		User user = userMapper.queryUserByMobileAndAppCdde(mobileNumber,appCodeName);
-		if (null == user) {// 新用户注册并登录
+		User user = this.findBy("mobile", mobileNumber);
 		if (null == user) {
 			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
 		}
@@ -383,230 +367,232 @@ public class UserService extends AbstractService<User> {
 		return ResultGenerator.genSuccessResult("用户手机号校验成功");
 	}
 
-	/**
-	 * 更新用户登录密码
-	 * 
-	 * @param mobileNumberParam
-	 */
-	public BaseResult<String> updateUserLoginPass(String userLoginPass, String mobileNumber, String smsCode) {
-		if (!userLoginPass.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
-			return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
+		/**
+		 * 更新用户登录密码
+		 *
+		 * @param mobileNumberParam
+		 */
+		public BaseResult<String> updateUserLoginPass(String userLoginPass, String mobileNumber, String smsCode) {
+			if (!userLoginPass.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
+				return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
+			}
+
+			UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+			String appCodeName = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+			User user = userMapper.queryUserByMobileAndAppCdde(mobileNumber,appCodeName);
+			if (null == user) {
+				return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+			}
+
+			String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_RESETPASS + "_" + mobileNumber);
+			if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(smsCode)) {
+				return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+			}
+
+			User updateUser = new User();
+			updateUser.setUserId(user.getUserId());
+			updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
+			this.update(updateUser);
+
+			stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_RESETPASS + "_" + mobileNumber, "");
+			return ResultGenerator.genSuccessResult("更新用户登录密码成功");
 		}
 
-			mobileNumber
-		if (null == user) {
-			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+		/**
+		 * 设置密码
+		 *
+		 * @param userLoginPass
+		 * @param mobileNumber
+		 * @param smsCode
+		 * @return
+		 */
+		public BaseResult<String> setUserLoginPass(SetLoginPassParam param, Integer userId) {
+			if (param.getType() == 1 && StringUtils.isBlank(param.getOldLoginPass())) {
+				return ResultGenerator.genResult(MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getMsg());
+			}
+			String userLoginPass = param.getUserLoginPass();
+			if (StringUtils.isBlank(userLoginPass) || !userLoginPass.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
+				return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
+			}
+			User user = this.findById(userId);
+			if (null == user) {
+				return ResultGenerator.genResult(MemberEnums.USER_NOT_FOUND_ERROR.getcode(), MemberEnums.USER_NOT_FOUND_ERROR.getMsg());
+			}
+			if (param.getType() == 1) {
+				String oldPass = Encryption.encryption(param.getOldLoginPass(), user.getSalt());
+				if (!oldPass.equals(user.getPassword())) {
+					return ResultGenerator.genResult(MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getMsg());
+				}
+			}
+			User updateUser = new User();
+			updateUser.setUserId(user.getUserId());
+			updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
+			this.update(updateUser);
+
+			return ResultGenerator.genSuccessResult("用户登录密码设置成功");
 		}
 
-		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_RESETPASS + "_" + mobileNumber);
-		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(smsCode)) {
-			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+		/***
+		 * 获取真实的UserDTO
+		 *
+		 * @param params
+		 * @return
+		 */
+		public UserDTO queryUserInfoReal(UserIdRealParam params) {
+			Integer userId = params.getUserId();
+			User user = this.findById(userId);
+			UserDTO userDTO = new UserDTO();
+			try {
+				BeanUtils.copyProperties(userDTO, user);
+				String mobile = user.getMobile();
+				userDTO.setMobile(mobile);
+				userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+				userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
+				BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
+				userDTO.setTotalMoney(String.valueOf(totalMoney));
+				userDTO.setIsSuperWhite(user.getIsSuperWhite() == null?"0":user.getIsSuperWhite());
+			} catch (Exception e) {
+				throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
+			}
+			return userDTO;
 		}
 
-		User updateUser = new User();
-		updateUser.setUserId(user.getUserId());
-		updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
-		this.update(updateUser);
+		public UserDTO queryUserInfo(UserIdParam params) {
+			Integer userId = params.getUserId();
+			User user = this.findById(userId);
+			UserDTO userDTO = new UserDTO();
+			try {
+				BeanUtils.copyProperties(userDTO, user);
+				String strRandom4 = RandomUtil.generateUpperString(4);
+				String mobile = user.getMobile();
+				mobile = mobile.replace(mobile.substring(3, 7), strRandom4);
+				userDTO.setMobile(mobile);
+				userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
+				userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
+				BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
+				userDTO.setIsSuperWhite(user.getIsSuperWhite() == null?"0":user.getIsSuperWhite());
+				userDTO.setTotalMoney(String.valueOf(totalMoney));
+			} catch (Exception e) {
+				throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
+			}
+			return userDTO;
+		}
 
-		stringRedisTemplate.opsForValue().set(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_RESETPASS + "_" + mobileNumber, "");
-		return ResultGenerator.genSuccessResult("更新用户登录密码成功");
-	}
+		/**
+		 * 查询用户信息：所有字段
+		 *
+		 * @return
+		 */
+		public UserDTO queryUserInfo() {
+			Integer userId = SessionUtil.getUserId();
+			UserIdParam userIdParams = new UserIdParam();
+			userIdParams.setUserId(userId);
+			return queryUserInfo(userIdParams);
+		}
 
-	/**
-	 * 设置密码
-	 * 
-	 * @param userLoginPass
-	 * @param mobileNumber
-	 * @param smsCode
-	 * @return
-	 */
-	public BaseResult<String> setUserLoginPass(SetLoginPassParam param, Integer userId) {
-		if (param.getType() == 1 && StringUtils.isBlank(param.getOldLoginPass())) {
-			return ResultGenerator.genResult(MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.NO_OLD_LOGIN_PASS_ERROR.getMsg());
+		/**
+		 * 生成昵称：
+		 *
+		 * @param mobile
+		 * @return
+		 */
+		public String generateNickName(String mobile) {
+			if (StringUtils.isEmpty(mobile)) {
+				return "****彩主";
+			}
+			String userName = String.format("%s彩主", mobile.substring(mobile.length() - 4, mobile.length()));
+			return userName.toString();
 		}
-		String userLoginPass = param.getUserLoginPass();
-		if (StringUtils.isBlank(userLoginPass) || !userLoginPass.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
-			return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
-		}
-		User user = this.findById(userId);
-		if (null == user) {
-			return ResultGenerator.genResult(MemberEnums.USER_NOT_FOUND_ERROR.getcode(), MemberEnums.USER_NOT_FOUND_ERROR.getMsg());
-		}
-		if (param.getType() == 1) {
-			String oldPass = Encryption.encryption(param.getOldLoginPass(), user.getSalt());
-			if (!oldPass.equals(user.getPassword())) {
-				return ResultGenerator.genResult(MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getcode(), MemberEnums.ERR_OLD_LOGIN_PASS_ERROR.getMsg());
+
+		public void saveUserAndUpdateConsumer(User user) {
+			this.update(user);
+			Condition condition = new Condition(DlChannelConsumer.class);
+			condition.createCriteria().andCondition("user_id = ", user.getUserId());
+			List<DlChannelConsumer> channelConsumerlist = channelConsumerService.findByCondition(condition);
+			if (channelConsumerlist.size() > 0) {
+				if (channelConsumerlist.get(0).getFristLoginTime() == null) {
+					channelConsumerService.updateByUserId(user.getUserId());
+				}
 			}
 		}
-		User updateUser = new User();
-		updateUser.setUserId(user.getUserId());
-		updateUser.setPassword(Encryption.encryption(userLoginPass, user.getSalt()));
-		this.update(updateUser);
 
-		return ResultGenerator.genSuccessResult("用户登录密码设置成功");
-	}
-
-	/***
-	 * 获取真实的UserDTO
-	 * 
-	 * @param params
-	 * @return
-	 */
-	public UserDTO queryUserInfoReal(UserIdRealParam params) {
-		Integer userId = params.getUserId();
-		User user = this.findById(userId);
-		UserDTO userDTO = new UserDTO();
-		try {
-			BeanUtils.copyProperties(userDTO, user);
-			String mobile = user.getMobile();
-			userDTO.setMobile(mobile);
-			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
-			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
-			BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
-			userDTO.setTotalMoney(String.valueOf(totalMoney));
-            userDTO.setIsSuperWhite(user.getIsSuperWhite() == null?"0":user.getIsSuperWhite());
-		} catch (Exception e) {
-			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
-		}
-		return userDTO;
-	}
-
-	public UserDTO queryUserInfo(UserIdParam params) {
-		Integer userId = params.getUserId();
-		User user = this.findById(userId);
-		UserDTO userDTO = new UserDTO();
-		try {
-			BeanUtils.copyProperties(userDTO, user);
+		/**
+		 * 生成账号： 1.随机生成4位字母 2.生成用户名 3.查询重复的用户名条数 4.如果有重复用户名，则重新生成
+		 *
+		 * @param mobile
+		 * @return
+		 */
+		public String generateUserName(String mobile) {
+			StringBuffer userName = new StringBuffer("dl");
 			String strRandom4 = RandomUtil.generateUpperString(4);
-			String mobile = user.getMobile();
-			mobile = mobile.replace(mobile.substring(3, 7), strRandom4);
-			userDTO.setMobile(mobile);
-			userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
-			userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
-			BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
-            userDTO.setIsSuperWhite(user.getIsSuperWhite() == null?"0":user.getIsSuperWhite());
-			userDTO.setTotalMoney(String.valueOf(totalMoney));
-		} catch (Exception e) {
-			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
+			userName.append(mobile.replace(mobile.substring(3, 7), strRandom4));
+			User user = this.findBy("userName", userName.toString());
+			if (null != user) {
+				generateUserName(mobile);
+			}
+			return userName.toString();
 		}
-		return userDTO;
-	}
 
-	/**
-	 * 查询用户信息：所有字段
-	 * 
-	 * @return
-	 */
-	public UserDTO queryUserInfo() {
-		Integer userId = SessionUtil.getUserId();
-		UserIdParam userIdParams = new UserIdParam();
-		userIdParams.setUserId(userId);
-		return queryUserInfo(userIdParams);
-	}
-
-	/**
-	 * 生成昵称：
-	 *
-	 * @param mobile
-	 * @return
-	 */
-	public String generateNickName(String mobile) {
-		if (StringUtils.isEmpty(mobile)) {
-			return "****彩主";
+		/**
+		 * 获取用户通知信息
+		 *
+		 * @return
+		 */
+		public UserNoticeDTO queryUserNotice(Integer userId) {
+			UserNoticeDTO dto = new UserNoticeDTO();
+			int bonusNum = userBonusMapper.getUnReadBonusNum(userId);
+			dto.setBonusNotice(bonusNum);
+			int messageNum = messageMapper.getUnReadMessageNum(userId);
+			dto.setMessageNotice(messageNum);
+			return dto;
 		}
-		String userName = String.format("%s彩主", mobile.substring(mobile.length() - 4, mobile.length()));
-		return userName.toString();
-	}
 
-	public void saveUserAndUpdateConsumer(User user) {
-		this.update(user);
-		Condition condition = new Condition(DlChannelConsumer.class);
-		condition.createCriteria().andCondition("user_id = ", user.getUserId());
-		List<DlChannelConsumer> channelConsumerlist = channelConsumerService.findByCondition(condition);
-		if (channelConsumerlist.size() > 0) {
-			if (channelConsumerlist.get(0).getFristLoginTime() == null) {
-				channelConsumerService.updateByUserId(user.getUserId());
+		/**
+		 * 标识已读通知
+		 *
+		 * @param userId
+		 * @param type
+		 */
+		public int updateUnReadNotice(Integer userId, int type) {
+			int rst = 0;
+			if (type == 1) {
+				rst = userBonusMapper.updateUnReadBonus(userId);
+			} else if (type == 2) {
+				rst = messageMapper.updateUnReadMessage(userId);
+			}
+			return rst;
+		}
+
+		public List<String> getClientIds(List<Integer> userIds) {
+			return userMapper.getClientIds(userIds);
+		}
+
+		public Integer updateUserInfo(User user) {
+			return userMapper.updateUserInfo(user);
+		}
+
+		public User findByMobile(String mobile) {
+			Condition condition = new Condition(User.class);
+			condition.createCriteria().andCondition("mobile = ", mobile);
+			List<User> userList = userMapper.selectByCondition(condition);
+			if (userList.size() > 0) {
+				return userList.get(0);
+			} else {
+				return null;
+			}
+		}
+
+		public User findByMobileAndAppCode(FindUserByMobileAndAppCodeParam userFindParam) {
+			Condition condition = new Condition(User.class);
+
+			Criteria criteria = condition.createCriteria();
+			criteria.andCondition("mobile =", userFindParam.getMobile());
+			criteria.andCondition("app_code_name = ", userFindParam.getAppCodeName());
+			List<User> userList = userMapper.selectByCondition(condition);
+			if (userList.size() > 0) {
+				return userList.get(0);
+			} else {
+				return null;
 			}
 		}
 	}
-
-	/**
-	 * 生成账号： 1.随机生成4位字母 2.生成用户名 3.查询重复的用户名条数 4.如果有重复用户名，则重新生成
-	 * 
-	 * @param mobile
-	 * @return
-	 */
-	public String generateUserName(String mobile) {
-		StringBuffer userName = new StringBuffer("dl");
-		String strRandom4 = RandomUtil.generateUpperString(4);
-		userName.append(mobile.replace(mobile.substring(3, 7), strRandom4));
-		User user = this.findBy("userName", userName.toString());
-		if (null != user) {
-			generateUserName(mobile);
-		}
-		return userName.toString();
-	}
-
-	/**
-	 * 获取用户通知信息
-	 * 
-	 * @return
-	 */
-	public UserNoticeDTO queryUserNotice(Integer userId) {
-		UserNoticeDTO dto = new UserNoticeDTO();
-		int bonusNum = userBonusMapper.getUnReadBonusNum(userId);
-		dto.setBonusNotice(bonusNum);
-		int messageNum = messageMapper.getUnReadMessageNum(userId);
-		dto.setMessageNotice(messageNum);
-		return dto;
-	}
-
-	/**
-	 * 标识已读通知
-	 * 
-	 * @param userId
-	 * @param type
-	 */
-	public int updateUnReadNotice(Integer userId, int type) {
-		int rst = 0;
-		if (type == 1) {
-			rst = userBonusMapper.updateUnReadBonus(userId);
-		} else if (type == 2) {
-			rst = messageMapper.updateUnReadMessage(userId);
-		}
-		return rst;
-	}
-
-	public List<String> getClientIds(List<Integer> userIds) {
-		return userMapper.getClientIds(userIds);
-	}
-
-	public Integer updateUserInfo(User user) {
-		return userMapper.updateUserInfo(user);
-	}
-
-	public User findByMobile(String mobile) {
-		Condition condition = new Condition(User.class);
-		condition.createCriteria().andCondition("mobile = ", mobile);
-		List<User> userList = userMapper.selectByCondition(condition);
-		if (userList.size() > 0) {
-			return userList.get(0);
-		} else {
-			return null;
-		}
-	}
-
-	public User findByMobileAndAppCode(FindUserByMobileAndAppCodeParam userFindParam) {
-		Condition condition = new Condition(User.class);
-		
-		Criteria criteria = condition.createCriteria();
-		criteria.andCondition("mobile =", userFindParam.getMobile());
-		criteria.andCondition("app_code_name = ", userFindParam.getAppCodeName());
-		List<User> userList = userMapper.selectByCondition(condition);
-		if (userList.size() > 0) {
-			return userList.get(0);
-		} else {
-			return null;
-		}
-	}
-}

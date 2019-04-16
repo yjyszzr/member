@@ -83,8 +83,8 @@ public class SmsService {
 		}
 		String smsType = smsParam.getSmsType();
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-		String appCodeName = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
-		User user = userMapper.queryUserByMobileAndAppCdde(smsParam.getMobile(),appCodeName);
+		String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+		User user = userMapper.queryUserByMobileAndAppCdde(smsParam.getMobile(),appCodeNameStr);
 		if (ProjectConstant.VERIFY_TYPE_LOGIN.equals(smsType) || ProjectConstant.VERIFY_TYPE_FORGET.equals(smsType)) {// 登录，忘记密码
 			if (null == user) {
 				return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
