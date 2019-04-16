@@ -14,12 +14,9 @@ import com.dl.member.dto.SwitchConfigDTO;
 import com.dl.member.model.SwitchConfig;
 import com.dl.member.model.User;
 import com.dl.shop.payment.api.IpaymentService;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +28,6 @@ import java.util.List;
 @Transactional
 @Slf4j
 public class SwitchConfigService extends AbstractService<SwitchConfig> {
-	private final static Logger logger = LoggerFactory.getLogger(SwitchConfigService.class);
     @Resource
     private SwitchConfigMapper switchConfigMapper;
  
@@ -225,18 +221,14 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
      * @return
      */
     public Integer userDealAction(Integer userId) {
-    	logger.info("userDealAction()用户交易行为userId{}+++++++++"+userId);
     	if(null == userId) {
     		return  ProjectConstant.BISINESS_APP_OPEN;
     	}
-//    	 select count(1) from dl_user_account where user_id = #{userId}
 		Integer rst = userAccountMapper.countValidUserAccountByUserId(userId);
 		if(rst > 0) {
-//			select mobile from dl_user where user_id =#{userId}
 			String mobile = userMapper.getMobileById(userId);
 			//非白名单都记为黑名单(2018-09-26)
 			boolean isWhite = this.checkUserWhiteList(mobile);
-			logger.info("userDealAction()用户交易行为isWhite{}+++++++++"+isWhite);
 			if(!isWhite) {
 				return ProjectConstant.BISINESS_APP_CLOSE;
 			}
