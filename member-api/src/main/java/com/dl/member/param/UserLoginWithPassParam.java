@@ -1,11 +1,11 @@
 package com.dl.member.param;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 
 import org.hibernate.validator.constraints.NotBlank;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * 用户第三方登录类型参数
@@ -32,4 +32,7 @@ public class UserLoginWithPassParam implements Serializable {
     
     @ApiModelProperty("消息推送的唯一值")
     private String pushKey;
+    
+    @ApiModelProperty("平台Code:10 球多多 11 圣和")
+    private String appCodeName;
 }
