@@ -1,5 +1,17 @@
 package com.dl.member.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.dl.base.enums.ActivityEnum;
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
@@ -16,27 +28,29 @@ import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.*;
+import com.dl.member.dto.ActivityDTO;
+import com.dl.member.dto.SysConfigDTO;
+import com.dl.member.dto.UserDTO;
+import com.dl.member.dto.UserNoticeDTO;
+import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
-import com.dl.member.param.*;
+import com.dl.member.param.FindUserByMobileAndAppCodeParam;
+import com.dl.member.param.IDFACallBackParam;
+import com.dl.member.param.SetLoginPassParam;
+import com.dl.member.param.TokenParam;
+import com.dl.member.param.UserIdParam;
+import com.dl.member.param.UserIdRealParam;
+import com.dl.member.param.UserParam;
 import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
 import com.dl.shop.auth.api.IAuthService;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.entity.Condition;
 
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 @Transactional
@@ -560,6 +574,20 @@ public class UserService extends AbstractService<User> {
 	public User findByMobile(String mobile) {
 		Condition condition = new Condition(User.class);
 		condition.createCriteria().andCondition("mobile = ", mobile);
+		List<User> userList = userMapper.selectByCondition(condition);
+		if (userList.size() > 0) {
+			return userList.get(0);
+		} else {
+			return null;
+		}
+	}
+
+	public User findByMobileAndAppCode(FindUserByMobileAndAppCodeParam userFindParam) {
+		Condition condition = new Condition(User.class);
+		
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("mobile =", userFindParam.getMobile());
+		criteria.andCondition("app_code_name = ", userFindParam.getAppCodeName());
 		List<User> userList = userMapper.selectByCondition(condition);
 		if (userList.size() > 0) {
 			return userList.get(0);
