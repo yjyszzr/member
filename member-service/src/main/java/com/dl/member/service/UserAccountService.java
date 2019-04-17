@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -1353,6 +1354,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * @return
 	 */
 	public String saveUserAccountForThirdPay(UserAccountParamByType userAccountParamByType) {
+		log.info("支付流水生成begin**************************");
 		Condition condition = new Condition(UserAccount.class);
 		Criteria cri = condition.createCriteria();
 		cri.andCondition("user_id =", userAccountParamByType.getUserId());
@@ -1362,7 +1364,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (!CollectionUtils.isEmpty(userAccountList)) {
 			return "";
 		}
-
+		log.info("支付流水生成ing**************************");
 		UserAccount userAccount = new UserAccount();
 		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
 		userAccount.setAccountSn(accountSn);
@@ -1379,8 +1381,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccount.setThirdPartName(userAccountParamByType.getThirdPartName());
 		userAccount.setThirdPartPaid(userAccountParamByType.getThirdPartPaid());
 		userAccount.setStatus(Integer.valueOf(ProjectConstant.FINISH));
-
+		log.info("支付流水生成ing**************************userAccount="+JSONUtils.valueToString(userAccount));
 		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
+		log.info("支付流水生成end**************************rst="+rst);
 		if (rst != 1) {
 			log.error("生成流水账户失败");
 			return "";
