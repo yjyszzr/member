@@ -1,19 +1,5 @@
 package com.dl.member.service;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
@@ -31,16 +17,23 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.User;
 import com.dl.member.model.UserLoginLog;
-import com.dl.member.param.FindUserByMobileAndAppCodeParam;
-import com.dl.member.param.IDFACallBackParam;
-import com.dl.member.param.UserLoginWithPassParam;
-import com.dl.member.param.UserLoginWithSmsParam;
-import com.dl.member.param.UserRegisterParam;
+import com.dl.member.param.*;
 import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.List;
 
 /**
  * 用户登录服务
@@ -337,7 +330,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			this.loginLog(-1, 0, 1, loginParams, MemberEnums.SMSCODE_WRONG.getMsg());
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
-		User user = userService.findBy("mobile", mobile);
+		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+		String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+		User user = userMapper.queryUserByMobileAndAppCdde(userLoginMobileParam.getMobile(),appCodeNameStr);
 		Integer userStatus = user.getUserStatus();
 		logger.info("userStatus:============={}", userStatus);
 		if (userStatus.equals(ProjectConstant.USER_STATUS_NOMAL)) {// 账号正常
@@ -405,7 +400,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 * @return
 	 */
 	public UserLoginDTO queryUserLoginDTOByMobile(String mobile, String loginSource) {
-		User userInfo = userService.findBy("mobile", mobile);
+		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+		String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+		User userInfo = userMapper.queryUserByMobileAndAppCdde(mobile,appCodeNameStr);
 		UserLoginDTO userLoginDTO = new UserLoginDTO();
 		userLoginDTO.setMobile(userInfo.getMobile());
 		userLoginDTO.setHeadImg(userInfo.getHeadImg());
