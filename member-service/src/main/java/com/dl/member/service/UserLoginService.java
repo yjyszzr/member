@@ -81,10 +81,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		UserLoginDTO userLoginDTO = new UserLoginDTO();
 		userLoginMobileParam.setPassword("******"); 
 		String loginParams = JSONHelper.bean2json(userLoginMobileParam);
-		FindUserByMobileAndAppCodeParam userFindParam =new FindUserByMobileAndAppCodeParam();
-		userFindParam.setAppCodeName(userLoginMobileParam.getAppCodeName());
-		userFindParam.setMobile(mobile);
-		User user = userService.findByMobileAndAppCode(userFindParam);
+		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+		String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+		User user = userMapper.queryUserByMobileAndAppCdde(userLoginMobileParam.getMobile(),appCodeNameStr);
 		if (null == user) {
 			this.loginLog(-1, 0, 1, loginParams, MemberEnums.NO_REGISTER.getMsg());
 			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
@@ -206,12 +205,10 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 			this.loginLog(-1, 0, 1, loginParams, MemberEnums.SMSCODE_WRONG.getMsg());
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
 		}
-		
-		FindUserByMobileAndAppCodeParam userFindParam =new FindUserByMobileAndAppCodeParam();
-		userFindParam.setAppCodeName(userLoginMobileParam.getAppCodeName());
-		userFindParam.setMobile(mobile);
-		User user = userService.findByMobileAndAppCode(userFindParam);
-//		User user = userService.findBy("mobile", mobile);
+
+		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+		String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+		User user = userMapper.queryUserByMobileAndAppCdde(userLoginMobileParam.getMobile(),appCodeNameStr);
 		if (null == user) {// 新用户注册并登录
 			// return
 			// ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(),
@@ -332,6 +329,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		}
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
 		String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+		logger.info("appCodeNameStr:"+appCodeNameStr);
 		User user = userMapper.queryUserByMobileAndAppCdde(userLoginMobileParam.getMobile(),appCodeNameStr);
 		Integer userStatus = user.getUserStatus();
 		logger.info("userStatus:============={}", userStatus);

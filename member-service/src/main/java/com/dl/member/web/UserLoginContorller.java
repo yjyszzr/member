@@ -1,8 +1,20 @@
 package com.dl.member.web;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
+import com.dl.base.model.UserDeviceInfo;
+import com.dl.base.result.BaseResult;
+import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.SessionUtil;
+import com.dl.member.dto.UserLoginDTO;
+import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.User;
+import com.dl.member.param.*;
+import com.dl.member.service.UserLoginService;
+import com.dl.member.service.UserService;
+import com.dl.member.util.Encryption;
+import com.dl.member.util.TokenUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,28 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dl.base.model.UserDeviceInfo;
-import com.dl.base.result.BaseResult;
-import com.dl.base.result.ResultGenerator;
-import com.dl.base.util.SessionUtil;
-import com.dl.member.dto.UserLoginDTO;
-import com.dl.member.enums.MemberEnums;
-import com.dl.member.model.User;
-import com.dl.member.param.LoginLogParam;
-import com.dl.member.param.MobilePwdCreateParam;
-import com.dl.member.param.StrParam;
-import com.dl.member.param.UserLoginWithPassParam;
-import com.dl.member.param.UserLoginWithSmsParam;
-import com.dl.member.param.UserParam;
-import com.dl.member.param.UserRePwdParam;
-import com.dl.member.service.UserLoginService;
-import com.dl.member.service.UserService;
-import com.dl.member.util.Encryption;
-import com.dl.member.util.TokenUtil;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 用户登录接口 zhangzirong
@@ -61,9 +53,6 @@ public class UserLoginContorller {
 	@PostMapping("/loginByPass")
 	public BaseResult<UserLoginDTO> loginByPass(@RequestBody UserLoginWithPassParam userLoginMobileParam, HttpServletRequest request) {
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-		String appCodeName = userDeviceInfo.getAppCodeName();
-		logger.info("appCodeName=================={}",appCodeName);
-		userLoginMobileParam.setAppCodeName(appCodeName);
 		BaseResult<UserLoginDTO> loginByPass = userLoginService.loginByPass(userLoginMobileParam);
 		if (loginByPass.getCode() == 0) {
 			String token = loginByPass.getData().getToken();
@@ -79,9 +68,6 @@ public class UserLoginContorller {
 	@PostMapping("/loginBySms")
 	public BaseResult<UserLoginDTO> loginBySms(@RequestBody UserLoginWithSmsParam userLoginMobileParam, HttpServletRequest request) {
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-		String appCodeName = userDeviceInfo.getAppCodeName();
-		logger.info("appCodeName=================={}",appCodeName);
-		userLoginMobileParam.setAppCodeName(appCodeName);
 		BaseResult<UserLoginDTO> loginBySms = userLoginService.loginBySms(userLoginMobileParam, request);
 		if (loginBySms.getCode() == 0) {
 			String token = loginBySms.getData().getToken();
