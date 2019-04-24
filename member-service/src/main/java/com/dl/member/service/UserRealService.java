@@ -12,12 +12,15 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.configurer.RestTemplateConfig;
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.exception.ServiceException;
+import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
@@ -102,11 +105,15 @@ public class UserRealService extends AbstractService<UserReal> {
 			return ResultGenerator.genResult(MemberEnums.COMMON_ERROR.getcode(), "实名认证的名字包含特殊符号");
 		}
     	
+    	UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+		String appCodeNameStr = userDeviceInfo.getAppCodeName();
+		String appCodeName = StringUtils.isEmpty(appCodeNameStr)?"10":appCodeNameStr;
     	//一个身份证最多绑定2个用户
     	Condition condition = new Condition(UserReal.class);
     	Criteria criteria = condition.createCriteria();
     	criteria.andCondition("id_code = ", iDCode);
     	criteria.andCondition("is_delete = ", 0);
+		criteria.andCondition("app_code_name = ", appCodeName);
     	List<UserReal> userRealList = this.findByCondition(condition);
     	if(userRealList.size() >= 2) {
 			return ResultGenerator.genResult(MemberEnums.USER_REAL_COUNTLIMIT.getcode(),MemberEnums.USER_REAL_COUNTLIMIT.getMsg());

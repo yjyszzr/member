@@ -18,6 +18,7 @@
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="reason" jdbcType="VARCHAR" property="reason" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="app_code_name" jdbcType="INTEGER" property="appCodeName" />
   </resultMap>
   
   <select id = "queryUserRealByUserId" resultMap="BaseResultMap">
