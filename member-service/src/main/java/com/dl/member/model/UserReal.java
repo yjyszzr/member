@@ -75,14 +75,26 @@ public class UserReal {
      */
     @Column(name = "is_delete")
     private Integer isDelete;
-    
-    
     /**
+     * app标识
+     */
+    @Column(name = "app_code_name")
+    private String appCodeName;
+    
+
+	/**
      * 拒绝原因
      */
     private String reason;
 
     
+    public String getAppCodeName() {
+		return appCodeName;
+	}
+
+	public void setAppCodeName(String appCodeName) {
+		this.appCodeName = appCodeName;
+	}
     
     public Integer getIsDelete() {
 		return isDelete;
