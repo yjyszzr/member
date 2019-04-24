@@ -61,7 +61,7 @@ public class UserRealService extends AbstractService<UserReal> {
 	private UserMapper userMapper;
     
     @Transactional
-    public void saveUserReal(String realName,String idCode) {
+    public void saveUserReal(String realName,String idCode,String appCodeName) {
     	UserReal userReal = new UserReal();
     	userReal.setRealName(realName);
     	userReal.setIdCode(idCode);
@@ -74,6 +74,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	userReal.setCardPic3("");
     	userReal.setReason("");
     	userReal.setIsDelete(0);
+    	userReal.setAppCodeName(appCodeName);
     	userReal.setStatus(ProjectConstant.USER_IS_REAL);
     	this.save(userReal);
     }
@@ -136,7 +137,7 @@ public class UserRealService extends AbstractService<UserReal> {
     	
 		int updateRst = userMapper.updateIsReal0to1(userId);
 		if(1 == updateRst) {
-			this.saveUserReal(realName,iDCode);
+			this.saveUserReal(realName,iDCode,appCodeName);
 		}
     	return ResultGenerator.genSuccessResult("实名认证成功");
     }
