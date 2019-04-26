@@ -155,7 +155,12 @@ public class User {
      */
     @Column(name = "mobile_city")
     private String mobileCity;
-
+    
+    @Column(name = "merchant_no")
+    private String merchantNo;
+    
+    @Column(name = "merchant_pass")
+    private String merchantPass;
     /**
      * 注册来源
      */
@@ -221,7 +226,23 @@ public class User {
     @Column(name = "device_channel")
     private String deviceChannel;
     
-    public String getDeviceChannel() {
+    public String getMerchantNo() {
+		return merchantNo;
+	}
+
+	public void setMerchantNo(String merchantNo) {
+		this.merchantNo = merchantNo;
+	}
+
+	public String getMerchantPass() {
+		return merchantPass;
+	}
+
+	public void setMerchantPass(String merchantPass) {
+		this.merchantPass = merchantPass;
+	}
+
+	public String getDeviceChannel() {
 		return deviceChannel;
 	}
 

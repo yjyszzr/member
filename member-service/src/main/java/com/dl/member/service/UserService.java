@@ -474,6 +474,8 @@ public class UserService extends AbstractService<User> {
 				BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());
 				userDTO.setIsSuperWhite(user.getIsSuperWhite() == null?"0":user.getIsSuperWhite());
 				userDTO.setTotalMoney(String.valueOf(totalMoney));
+				userDTO.setMerchantNo(user.getMerchantNo());
+				userDTO.setMerchantPass(user.getMerchantPass());
 			} catch (Exception e) {
 				throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 			}

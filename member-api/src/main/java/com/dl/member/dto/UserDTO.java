@@ -200,6 +200,8 @@ public class UserDTO {
     @Column(name = "pass_wrong_count")
     private Integer passWrongCount;
 
+    private String merchantNo;
+    private String merchantPass;
     public Integer getUserId() {
         return userId;
     }
