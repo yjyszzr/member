@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface SysConfigMapper extends Mapper<SysConfig> {
     public List<SysConfig> queryBusiIds(@Param("businessIds") List<Integer> businessIds);
-
+    
+    public List<SysConfig> queryBusiIdsByOrderBid(@Param("businessIds") List<Integer> businessIds);
 }
