@@ -194,12 +194,26 @@ public class UserService extends AbstractService<User> {
 		userDTO.setActivityDTOList(this.queryAppPromotion(userId));
 		userDTO.setIsSuperWhite(StringUtils.isEmpty(user.getIsSuperWhite())?"0":user.getIsSuperWhite());
 
-		Integer businessIdForwithdraw = 27;
-		Integer businessIdForrecharge = 28;
-		SysConfigDTO wDTO = sysConfigService.querySysConfig(27);
-		SysConfigDTO rDTO = sysConfigService.querySysConfig(28);
-		userDTO.setRecharegeTurnOn(rDTO.getValue().compareTo(BigDecimal.ZERO) == 0?"0":"1");
-		userDTO.setWithdrawTurnOn(wDTO.getValue().compareTo(BigDecimal.ZERO) == 0?"0":"1");
+		List<Integer> bidList = new ArrayList<>();
+		bidList.add(27);
+		bidList.add(28);
+		bidList.add(59);
+		bidList.add(60);
+		List<SysConfigDTO> sysConfigDTOS = sysConfigService.querySysConfigListByBid(bidList);
+		SysConfigDTO sDto0 = sysConfigDTOS.get(0);
+		SysConfigDTO sDto1 = sysConfigDTOS.get(1);
+		SysConfigDTO sDto2 = sysConfigDTOS.get(2);
+		SysConfigDTO sDto3 = sysConfigDTOS.get(3);
+		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+		String appCodeNameStr = userDeviceInfo.getAppCodeName();
+		String appCodeName = StringUtils.isEmpty(appCodeNameStr)?"10":appCodeNameStr;
+		if(appCodeName.equals("10")){
+			userDTO.setRecharegeTurnOn(String.valueOf(sDto0.getValue().intValue()));
+			userDTO.setWithdrawTurnOn(String.valueOf(sDto1.getValue().intValue()));
+		}else if(appCodeName.equals("11")){
+			userDTO.setRecharegeTurnOn(String.valueOf(sDto2.getValue().intValue()));
+			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
+		}
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
 
