@@ -42,5 +42,18 @@ public class SysConfigService extends AbstractService<SysConfig> {
 		});
 		return sysConfigDTOList;
 	}
+	
+	public List<SysConfigDTO> querySysConfigListByBid(List<Integer> businessIdList) {
+		List<SysConfigDTO> sysConfigDTOList = new ArrayList<SysConfigDTO>();
+		if (CollectionUtils.isEmpty(businessIdList)) return sysConfigDTOList;
+
+		List<SysConfig> sysConfigList =  sysConfigMapper.queryBusiIdsByOrderBid(businessIdList);
+		sysConfigList.stream().forEach(s->{
+			SysConfigDTO sysConfigDTO = new SysConfigDTO();
+			BeanUtils.copyProperties(s, sysConfigDTO);
+			sysConfigDTOList.add(sysConfigDTO);
+		});
+		return sysConfigDTOList;
+	}
 
 }
