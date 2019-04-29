@@ -18,4 +18,13 @@
       #{item}
     </foreach>
   </select>
+  
+  <select id="queryBusiIdsByOrderBid" resultMap="BaseResultMap">
+    select * from dl_sys_config where business_id in
+    <foreach collection="businessIds" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    order by business_id asc
+  </select>
+  
 </mapper>
