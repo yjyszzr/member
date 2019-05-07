@@ -662,8 +662,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
+		double readmoney = recharegeParam.getAmount().doubleValue();//不可提现余额
+		double givemoney = Double.parseDouble(recharegeParam.getGiveAmount());//本次充值赠送的金额
 		User updateUser = new User();
-		updateUser.setUserMoneyLimit(recharegeParam.getAmount());
+		updateUser.setUserMoneyLimit(BigDecimal.valueOf(readmoney+givemoney));
 		updateUser.setUserId(userId);
 
 		int moneyRst = userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
@@ -677,6 +679,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
 		userAccount.setAccountSn(accountSn);
 		userAccount.setAmount(recharegeParam.getAmount());
+		userAccount.setDonationMoney(recharegeParam.getGiveAmount());
 		userAccount.setProcessType(ProjectConstant.RECHARGE);
 		userAccount.setThirdPartName(recharegeParam.getThirdPartName());
 		userAccount.setThirdPartPaid(recharegeParam.getThirdPartPaid());

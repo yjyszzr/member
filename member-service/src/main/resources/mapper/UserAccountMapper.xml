@@ -24,6 +24,7 @@
     <result column="third_part_paid" jdbcType="VARCHAR" property="thirdPartPaid" />
     <result column="note" jdbcType="LONGVARCHAR" property="note" />
     <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="donation_money" jdbcType="VARCHAR" property="donationMoney" />
     
   </resultMap>
   
@@ -152,7 +153,10 @@
         </if>  
         <if test="status!=null">
             status,
-        </if>                             
+        </if> 
+        <if test="donationMoney!=null">
+            donation_money,
+        </if>               
       </trim>
     </sql>
 
@@ -209,7 +213,10 @@
         </if>  
         <if test="status!=null">
             #{status},
-        </if>                             
+        </if>       
+        <if test="donationMoney!=null">
+            #{donationMoney},
+        </if>                       
       </trim>
     </sql>
     
@@ -222,12 +229,12 @@
   	dl_user_account(account_sn,user_id,admin_user,amount,
   	cur_balance,add_time,last_time,process_type,
   	payment_name,order_sn,parent_sn,note,pay_id,third_part_name,
-  	user_surplus,user_surplus_limit,third_part_paid,status)
+  	user_surplus,user_surplus_limit,third_part_paid,status,donation_money)
   	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},
   	#{curBalance},#{addTime},#{lastTime},#{processType},
   	#{paymentName},#{orderSn},#{parentSn},
   	#{note},#{payId},#{thirdPartName},#{userSurplus},
-  	#{userSurplusLimit},#{thirdPartPaid},#{status});
+  	#{userSurplusLimit},#{thirdPartPaid},#{status},#{donationMoney});
   </insert> 
   
   <update id="updateUserAccountBySelective" parameterType="com.dl.member.model.UserAccount">

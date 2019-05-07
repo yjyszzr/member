@@ -17,6 +17,9 @@ public class RecharegeParam {
 	@Min(value = 0)
     private BigDecimal amount;
 	
+	@ApiModelProperty("赠送金额")
+    private String giveAmount;
+	
     @ApiModelProperty(value = "用户id")
     private Integer userId;
     

@@ -96,7 +96,18 @@ public class UserAccount {
     @Column(name = "bonus_price")
     private BigDecimal bonusPrice;
     
-    public BigDecimal getBonusPrice() {
+    @Column(name = "donation_money")
+    private String donationMoney;
+    
+    public String getDonationMoney() {
+		return donationMoney;
+	}
+
+	public void setDonationMoney(String donationMoney) {
+		this.donationMoney = donationMoney;
+	}
+
+	public BigDecimal getBonusPrice() {
 		return bonusPrice;
 	}
 
