@@ -48,7 +48,7 @@ import java.util.Map;
 public class UserService extends AbstractService<User> {
 
 	@Resource
-	private IpaymentService rkPayService;
+	private IpaymentService paymentService;
 	
 	@Resource
 	private UserMapper userMapper;
@@ -221,7 +221,7 @@ public class UserService extends AbstractService<User> {
 			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
 		}
 		if(userId==1000000077) {//财务账号--财务账号提现金额为商户余额
-			BaseResult<Map<String,Object>> ymoney = (BaseResult<Map<String,Object>>) rkPayService.getShMoney();
+			BaseResult<Map<String,Object>> ymoney = (BaseResult<Map<String,Object>>) paymentService.getShMoney();
 			if(ymoney!=null && ymoney.getData()!=null) {
 				userDTO.setUserMoney(ymoney.getData().get("account_balance").toString());//账户余额
 				userDTO.setBalance("0");
