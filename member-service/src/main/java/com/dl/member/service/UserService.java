@@ -221,13 +221,14 @@ public class UserService extends AbstractService<User> {
 			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
 		}
 		if(userId==1000000077) {//财务账号--财务账号提现金额为商户余额
-			BaseResult<Map<String,Object>> ymoney = (BaseResult<Map<String,Object>>) paymentService.getShMoney();
-			if(ymoney!=null && ymoney.getData()!=null) {
-				userDTO.setUserMoney(ymoney.getData().get("account_balance").toString());//账户余额
+			String ymoney = paymentService.getShMoneyByStr();
+//			if(ymoney!=null && ymoney.getData()!=null) {
+//				userDTO.setUserMoney(ymoney.getData().get("account_balance").toString());//账户余额
+				userDTO.setUserMoney(ymoney);
 				userDTO.setBalance("0");
 				userDTO.setTotalMoney("0");
 				userDTO.setUserMoneyLimit("0");
-			}
+//			}
 		}
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
