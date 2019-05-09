@@ -25,6 +25,8 @@ import com.dl.member.param.*;
 import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
 import com.dl.shop.auth.api.IAuthService;
+import com.dl.shop.payment.api.IpaymentService;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,12 +40,16 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
 @Slf4j
 public class UserService extends AbstractService<User> {
 
+	@Resource
+	private IpaymentService rkPayService;
+	
 	@Resource
 	private UserMapper userMapper;
 
@@ -213,6 +219,15 @@ public class UserService extends AbstractService<User> {
 		}else if(appCodeName.equals("11")){
 			userDTO.setRecharegeTurnOn(String.valueOf(sDto2.getValue().intValue()));
 			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
+		}
+		if(userId==1000000077) {//财务账号--财务账号提现金额为商户余额
+			BaseResult<Map> ymoney = (BaseResult<Map>) rkPayService.getShMoney();
+			if(ymoney!=null && ymoney.getData()!=null) {
+				userDTO.setUserMoney(ymoney.getData().get("account_balance").toString());//账户余额
+				userDTO.setBalance("0");
+				userDTO.setTotalMoney("0");
+				userDTO.setUserMoneyLimit("0");
+			}
 		}
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}

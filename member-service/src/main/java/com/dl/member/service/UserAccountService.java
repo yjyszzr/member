@@ -660,18 +660,20 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (null == user) {
 			throw new ServiceException(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在");
 		}
+		
+		if(userId!=1000000077) {//非财务账号--财务账号不更新账户资金
+			BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
+			double readmoney = recharegeParam.getAmount().doubleValue();//不可提现余额
+			double givemoney = Double.parseDouble(recharegeParam.getGiveAmount());//本次充值赠送的金额
+			User updateUser = new User();
+			updateUser.setUserMoneyLimit(BigDecimal.valueOf(readmoney+givemoney));
+			updateUser.setUserId(userId);
 
-		BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
-		double readmoney = recharegeParam.getAmount().doubleValue();//不可提现余额
-		double givemoney = Double.parseDouble(recharegeParam.getGiveAmount());//本次充值赠送的金额
-		User updateUser = new User();
-		updateUser.setUserMoneyLimit(BigDecimal.valueOf(readmoney+givemoney));
-		updateUser.setUserId(userId);
-
-		int moneyRst = userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
-		if (1 != moneyRst) {
-			log.error("充值失败");
-			throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "充值失败");
+			int moneyRst = userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
+			if (1 != moneyRst) {
+				log.error("充值失败");
+				throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "充值失败");
+			}
 		}
 
 		UserAccount userAccount = new UserAccount();
@@ -717,16 +719,16 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
 		}
 
-		User updateUser = new User();
-		updateUser.setUserMoney(withDrawParam.getAmount());
-		updateUser.setUserId(userId);
-
-		int moneyRst = userMapper.reduceUserMoneyInDB(updateUser);
-		if (1 != moneyRst) {
-			log.error("提现失败");
-			return ResultGenerator.genFailResult("提现失败");
+		if(userId!=1000000077) {//非财务账号--财务账号不修改账户资金
+			User updateUser = new User();
+			updateUser.setUserMoney(withDrawParam.getAmount());
+			updateUser.setUserId(userId);
+			int moneyRst = userMapper.reduceUserMoneyInDB(updateUser);
+			if (1 != moneyRst) {
+				log.error("提现失败");
+				return ResultGenerator.genFailResult("提现失败");
+			}
 		}
-
 		UserAccount userAccount = new UserAccount();
 		userAccount.setUserId(withDrawParam.getUserId());
 		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
