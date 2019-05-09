@@ -106,7 +106,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 				 }else if(rst1 == 1) {//用户终极开关打开
 					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
 				 }else {//用户终极开关取消，不起作用
-					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+					 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
 				 }
 			 }else{
 				 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
