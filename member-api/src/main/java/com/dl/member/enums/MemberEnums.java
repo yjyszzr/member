@@ -53,8 +53,8 @@ public enum MemberEnums {
 	NO_UPDATE(301060,"无最新版本"),
 	OLD_PWD_WRONG(301061,"旧密码不匹配"),
 	SAME_MOBILE_WRONG(301062,"绑定的手机号应为同一个"),
-	NOT_VALID_PAY(301063,"请勿多次支付");
-
+	NOT_VALID_PAY(301063,"请勿多次支付"),
+	MESSAGE_COUNT_FUND_ERROR(301064,"您今天已发送预警，请明天再试");
 	
 //	MOBILE_ERROR(301012,"手机号码格式错误"),
 //	ALREADY_SMS_VERIFY(301013,"手机号已经验证过"),	

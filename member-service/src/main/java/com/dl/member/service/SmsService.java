@@ -82,89 +82,130 @@ public class SmsService {
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
 		String smsType = smsParam.getSmsType();
-		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-		String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
-		User user = userMapper.queryUserByMobileAndAppCdde(smsParam.getMobile(),appCodeNameStr);
-		if (ProjectConstant.VERIFY_TYPE_LOGIN.equals(smsType) || ProjectConstant.VERIFY_TYPE_FORGET.equals(smsType)) {// 登录，忘记密码
-			if (null == user) {
-				return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+		if("4".equals(smsType)) {//商户余额预警
+			int num = 0;
+			String sendNumKey = "num_send_yj_" + smsParam.getMobile();
+			try {
+				String sendNumValue = stringRedisTemplate.opsForValue().get(sendNumKey);
+				if (StringUtils.isNotBlank(sendNumValue)) {
+					num = Integer.parseInt(sendNumValue);
+				}
+			} catch (NumberFormatException e) {
+				log.error("发送短信获取redis中短信发送的数量异常", e);
+				return ResultGenerator.genFailResult("获取短信发送数量异常");
 			}
-		} else if (ProjectConstant.VERIFY_TYPE_REG.equals(smsType)) {// 注册
-			if (null != user) {
-				return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
+			
+			if (num >=1) {//每天预警异常
+				return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_FUND_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_FUND_ERROR.getMsg());
 			}
-		}
-
-		int num = 0;
-		String sendNumKey = "num_send_" + smsParam.getMobile();
-		String sendNum3Key = sendNumKey + "_3";
-		String sendNum4Key = sendNumKey + "_4";
-		try {
-			String sendNumValue = stringRedisTemplate.opsForValue().get(sendNumKey);
-			if (StringUtils.isNotBlank(sendNumValue)) {
-				num = Integer.parseInt(sendNumValue);
+			String tplId = "";
+			String tplValue = "商户余额不足，请尽快充值。";
+			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+			String platform = userDevice.getPlat();
+			Integer appCodeName = 10;// 默认球多多
+			log.info("platform-------------:" + platform);
+			if (!"h5".equals(platform)) {// h5 短信模板都用球多多
+				String channel = userDevice.getChannel();
+				appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
 			}
-		} catch (NumberFormatException e) {
-			log.error("发送短信获取redis中短信发送的数量异常", e);
-			return ResultGenerator.genFailResult("获取短信发送数量异常");
+			Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
+			if (null == smsTemplateId) {
+				log.warn("未查询到短信模板id的配置，请检查数据库");
+				return ResultGenerator.genFailResult("短信发送异常,请联系管理员");
+			}
+			tplId = String.valueOf(smsTemplateId);
+			BaseResult<String> smsRst = smsService.sendJuheSms(smsParam.getMobile(), tplId, tplValue);
+			if (smsRst.getCode() != 0) {
+				return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
+			}
+			num++;
+			int sendNumExpire = this.todayEndTime();
+			stringRedisTemplate.opsForValue().set(sendNumKey, num + "", sendNumExpire, TimeUnit.DAYS);
+		} else {
+			UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+			String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+			User user = userMapper.queryUserByMobileAndAppCdde(smsParam.getMobile(),appCodeNameStr);
+			if (ProjectConstant.VERIFY_TYPE_LOGIN.equals(smsType) || ProjectConstant.VERIFY_TYPE_FORGET.equals(smsType)) {// 登录，忘记密码
+				if (null == user) {
+					return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+				}
+			} else if (ProjectConstant.VERIFY_TYPE_REG.equals(smsType)) {// 注册
+				if (null != user) {
+					return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
+				}
+			}
+	
+			int num = 0;
+			String sendNumKey = "num_send_" + smsParam.getMobile();
+			String sendNum3Key = sendNumKey + "_3";
+			String sendNum4Key = sendNumKey + "_4";
+			try {
+				String sendNumValue = stringRedisTemplate.opsForValue().get(sendNumKey);
+				if (StringUtils.isNotBlank(sendNumValue)) {
+					num = Integer.parseInt(sendNumValue);
+				}
+			} catch (NumberFormatException e) {
+				log.error("发送短信获取redis中短信发送的数量异常", e);
+				return ResultGenerator.genFailResult("获取短信发送数量异常");
+			}
+	
+			// 短信api规定,参考https://www.juhe.cn/docs/api/id/54
+			Long expireTimeLimit10 = stringRedisTemplate.getExpire(sendNum3Key);
+			if (num == 3 && expireTimeLimit10 < 600 && expireTimeLimit10 > 0) {// 聚合规定：10min
+																				// 内不能超过3条
+				return ResultGenerator.genResult(MemberEnums.MESSAGE_10MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_10MIN_COUNT_ERROR.getMsg());
+			}
+			Long expireTimeLimit60 = stringRedisTemplate.getExpire(sendNum4Key);
+			if (num == 4 && expireTimeLimit60 < 3600 && expireTimeLimit60 > 0) {// 聚合规定：60min
+																				// 内不能超过4条
+				return ResultGenerator.genResult(MemberEnums.MESSAGE_60MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_60MIN_COUNT_ERROR.getMsg());
+			}
+			if (num >= 10) {
+				return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_ERROR.getMsg());
+			}
+			String sameMobileKey = ProjectConstant.SMS_PREFIX + smsParam.getMobile();
+			Long expireTime = stringRedisTemplate.getExpire(sameMobileKey);
+			if (null != expireTime && expireTime < 60 && expireTime > 0) {
+				return ResultGenerator.genResult(MemberEnums.MESSAGE_SENDLOT_ERROR.getcode(), MemberEnums.MESSAGE_SENDLOT_ERROR.getMsg());
+			}
+	
+			String tplId = "";
+			String tplValue = "";
+			String strRandom4 = RandomUtil.getRandNum(4);
+			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+			String platform = userDevice.getPlat();
+			// String platform = "h5";
+			Integer appCodeName = 10;// 默认球多多
+			log.info("platform-------------:" + platform);
+			if (!"h5".equals(platform)) {// h5 短信模板都用球多多
+				String channel = userDevice.getChannel();
+				appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
+			}
+			Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
+			if (null == smsTemplateId) {
+				log.warn("未查询到短信模板id的配置，请检查数据库");
+				return ResultGenerator.genFailResult("短信发送异常,请联系管理员");
+			}
+			tplId = String.valueOf(smsTemplateId);
+			tplValue = "#code#=" + strRandom4 + "&#m#=" + 5;
+	
+			// 缓存验证码
+			int defineExpiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
+			String key = ProjectConstant.SMS_PREFIX + smsType + "_" + smsParam.getMobile();
+			stringRedisTemplate.opsForValue().set(sameMobileKey, strRandom4, 300, TimeUnit.SECONDS);
+	
+			BaseResult<String> smsRst = smsService.sendJuheSms(smsParam.getMobile(), tplId, tplValue);
+			if (smsRst.getCode() != 0) {
+				return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
+			}
+	
+			num++;
+			stringRedisTemplate.opsForValue().set(key, strRandom4, defineExpiredTime, TimeUnit.SECONDS);
+			int sendNumExpire = this.todayEndTime();
+			stringRedisTemplate.opsForValue().set(sendNumKey, num + "", sendNumExpire, TimeUnit.SECONDS);
+			stringRedisTemplate.opsForValue().set(sendNum3Key, num + "", 600, TimeUnit.SECONDS);
+			stringRedisTemplate.opsForValue().set(sendNum4Key, num + "", 3600, TimeUnit.SECONDS);
 		}
-
-		// 短信api规定,参考https://www.juhe.cn/docs/api/id/54
-		Long expireTimeLimit10 = stringRedisTemplate.getExpire(sendNum3Key);
-		if (num == 3 && expireTimeLimit10 < 600 && expireTimeLimit10 > 0) {// 聚合规定：10min
-																			// 内不能超过3条
-			return ResultGenerator.genResult(MemberEnums.MESSAGE_10MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_10MIN_COUNT_ERROR.getMsg());
-		}
-		Long expireTimeLimit60 = stringRedisTemplate.getExpire(sendNum4Key);
-		if (num == 4 && expireTimeLimit60 < 3600 && expireTimeLimit60 > 0) {// 聚合规定：60min
-																			// 内不能超过4条
-			return ResultGenerator.genResult(MemberEnums.MESSAGE_60MIN_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_60MIN_COUNT_ERROR.getMsg());
-		}
-		if (num >= 10) {
-			return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_ERROR.getMsg());
-		}
-		String sameMobileKey = ProjectConstant.SMS_PREFIX + smsParam.getMobile();
-		Long expireTime = stringRedisTemplate.getExpire(sameMobileKey);
-		if (null != expireTime && expireTime < 60 && expireTime > 0) {
-			return ResultGenerator.genResult(MemberEnums.MESSAGE_SENDLOT_ERROR.getcode(), MemberEnums.MESSAGE_SENDLOT_ERROR.getMsg());
-		}
-
-		String tplId = "";
-		String tplValue = "";
-		String strRandom4 = RandomUtil.getRandNum(4);
-		UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-		String platform = userDevice.getPlat();
-		// String platform = "h5";
-		Integer appCodeName = 10;// 默认球多多
-		log.info("platform-------------:" + platform);
-		if (!"h5".equals(platform)) {// h5 短信模板都用球多多
-			String channel = userDevice.getChannel();
-			appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
-		}
-		Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
-		if (null == smsTemplateId) {
-			log.warn("未查询到短信模板id的配置，请检查数据库");
-			return ResultGenerator.genFailResult("短信发送异常,请联系管理员");
-		}
-		tplId = String.valueOf(smsTemplateId);
-		tplValue = "#code#=" + strRandom4 + "&#m#=" + 5;
-
-		// 缓存验证码
-		int defineExpiredTime = ProjectConstant.SMS_REDIS_EXPIRED;
-		String key = ProjectConstant.SMS_PREFIX + smsType + "_" + smsParam.getMobile();
-		stringRedisTemplate.opsForValue().set(sameMobileKey, strRandom4, 300, TimeUnit.SECONDS);
-
-		BaseResult<String> smsRst = smsService.sendJuheSms(smsParam.getMobile(), tplId, tplValue);
-		if (smsRst.getCode() != 0) {
-			return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
-		}
-
-		num++;
-		stringRedisTemplate.opsForValue().set(key, strRandom4, defineExpiredTime, TimeUnit.SECONDS);
-		int sendNumExpire = this.todayEndTime();
-		stringRedisTemplate.opsForValue().set(sendNumKey, num + "", sendNumExpire, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(sendNum3Key, num + "", 600, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(sendNum4Key, num + "", 3600, TimeUnit.SECONDS);
 		return ResultGenerator.genSuccessResult("发送短信验证码成功");
 	}
 
