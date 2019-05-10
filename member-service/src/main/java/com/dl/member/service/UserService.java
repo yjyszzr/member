@@ -16,7 +16,6 @@ import com.dl.base.enums.ActivityEnum;
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.model.UserDeviceInfo;
-import com.dl.base.param.EmptyParam;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
@@ -50,6 +49,7 @@ import com.dl.member.util.TokenUtil;
 import com.dl.shop.auth.api.IAuthService;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.RspOrderQueryDTO;
+import com.dl.shop.payment.param.StrParam;
 
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
@@ -234,7 +234,7 @@ public class UserService extends AbstractService<User> {
 			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
 		}
 		if(userId==1000000077) {//财务账号--财务账号提现金额为商户余额
-			EmptyParam emptyParam = new EmptyParam();
+			StrParam emptyParam = new StrParam();
 			BaseResult<RspOrderQueryDTO> ymoney = paymentService.getShMoney(emptyParam);
 			if(ymoney!=null && ymoney.getData()!=null) {
 				userDTO.setUserMoney(ymoney.getData().getDonationPrice()!=null?ymoney.getData().getDonationPrice():"获取失败");//账户余额
