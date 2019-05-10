@@ -31,6 +31,8 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.SessionUtil;
+import com.dl.lottery.enums.LotteryResultEnum;
+import com.dl.member.api.IUserAccountService;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserBankCodeMapper;
@@ -45,7 +47,11 @@ import com.dl.member.model.User;
 import com.dl.member.model.UserBank;
 import com.dl.member.model.UserBankCode;
 import com.dl.member.param.DeleteBankCardParam;
+import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.UserBankQueryParam;
+import com.dl.shop.payment.api.IpaymentService;
+import com.dl.shop.payment.dto.PayLogDTO;
+import com.dl.shop.payment.param.PayLogIdParam;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,6 +83,12 @@ public class UserBankService extends AbstractService<UserBank> {
 	@Resource
 	private UserMapper userMapper;
 
+	@Resource
+    private IUserAccountService iUserAccountService;
+	
+	@Resource
+	private IpaymentService paymentService;
+	
 	private static Map<String,String> mMap = new HashMap<String,String>();
 	
     @Transactional
@@ -421,7 +433,17 @@ public class UserBankService extends AbstractService<UserBank> {
 			withDrawShowDTO.setDefaultBankLabel("");
 			withDrawShowDTO.setUserBankId("");
 		}
-
+		SysConfigParam cfg = new SysConfigParam();
+		cfg.setBusinessId(67);//读取财务账号id
+		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
+    	if(userId==cwuserId) {//财务账号--提现余额展示为商户余额
+    		PayLogIdParam emptyParam = new PayLogIdParam();
+			emptyParam.setPayLogId(1000000077);
+			BaseResult<PayLogDTO> ymoney = paymentService.queryPayLogByPayLogId(emptyParam);
+			if(ymoney!=null && ymoney.getData()!=null) {
+				withDrawShowDTO.setUserMoney(ymoney.getData().getOrderAmount()!=null?ymoney.getData().getOrderAmount().toString():"获取失败");//账户余额
+			}
+    	}
 		return ResultGenerator.genSuccessResult("查询提现界面的数据显示信息成功",withDrawShowDTO);
 	}
 	
