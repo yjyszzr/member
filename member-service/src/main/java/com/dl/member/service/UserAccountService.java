@@ -40,6 +40,7 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
 import com.dl.base.util.SessionUtil;
+import com.dl.member.api.IUserAccountService;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.LotteryWinningLogTempMapper;
 import com.dl.member.dao.UserAccountMapper;
@@ -61,6 +62,7 @@ import com.dl.member.param.MemRollParam;
 import com.dl.member.param.MemWithDrawSnParam;
 import com.dl.member.param.RecharegeParam;
 import com.dl.member.param.SurplusPayParam;
+import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.UserAccountParam;
 import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserParam;
@@ -85,6 +87,9 @@ import com.google.common.base.Joiner;
 @Service
 @Slf4j
 public class UserAccountService extends AbstractService<UserAccount> {
+	@Resource
+    private IUserAccountService iUserAccountService;
+	
 	@Resource
 	private UserAccountMapper userAccountMapper;
 
@@ -660,8 +665,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (null == user) {
 			throw new ServiceException(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在");
 		}
-		
-		if(userId!=1000000077) {//非财务账号--财务账号不更新账户资金
+		SysConfigParam cfg = new SysConfigParam();
+		cfg.setBusinessId(67);//读取财务账号id
+		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
+		if(userId!=cwuserId) {//非财务账号--财务账号不更新账户资金
 			BigDecimal frozenMoney = user.getFrozenMoney();// 冻结的资金
 			double readmoney = recharegeParam.getAmount().doubleValue();//不可提现余额
 			double givemoney = Double.parseDouble(recharegeParam.getGiveAmount());//本次充值赠送的金额
@@ -718,8 +725,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (user.getUserMoney().compareTo(withDrawParam.getAmount()) < 0) {
 			return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
 		}
-
-		if(userId!=1000000077) {//非财务账号--财务账号不修改账户资金
+		SysConfigParam cfg = new SysConfigParam();
+		cfg.setBusinessId(67);//读取财务账号id
+		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
+		if(userId!=cwuserId) {//非财务账号--财务账号不修改账户资金
 			User updateUser = new User();
 			updateUser.setUserMoney(withDrawParam.getAmount());
 			updateUser.setUserId(userId);

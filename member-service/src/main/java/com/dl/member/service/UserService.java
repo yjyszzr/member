@@ -23,6 +23,7 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
 import com.dl.base.util.SessionUtil;
+import com.dl.member.api.IUserAccountService;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
@@ -40,6 +41,7 @@ import com.dl.member.model.User;
 import com.dl.member.param.FindUserByMobileAndAppCodeParam;
 import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.SetLoginPassParam;
+import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.TokenParam;
 import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserIdRealParam;
@@ -60,7 +62,9 @@ import tk.mybatis.mapper.entity.Example.Criteria;
 @Transactional
 @Slf4j
 public class UserService extends AbstractService<User> {
-
+	@Resource
+    private IUserAccountService iUserAccountService;
+	
 	@Resource
 	private IpaymentService paymentService;
 	
@@ -234,7 +238,10 @@ public class UserService extends AbstractService<User> {
 			userDTO.setRecharegeTurnOn(String.valueOf(sDto2.getValue().intValue()));
 			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
 		}
-		if(userId==1000000077) {//财务账号--财务账号提现金额为商户余额
+		SysConfigParam cfg = new SysConfigParam();
+		cfg.setBusinessId(67);//读取财务账号id
+		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
+		if(userId==cwuserId) {//财务账号--财务账号提现金额为商户余额
 			PayLogIdParam emptyParam = new PayLogIdParam();
 			emptyParam.setPayLogId(1000000077);
 			BaseResult<PayLogDTO> ymoney = paymentService.queryPayLogByPayLogId(emptyParam);
