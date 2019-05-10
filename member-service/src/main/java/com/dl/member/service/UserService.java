@@ -225,7 +225,7 @@ public class UserService extends AbstractService<User> {
 		if(userId==1000000077) {//财务账号--财务账号提现金额为商户余额
 			StrParam strParam = new StrParam();
 			BaseResult<UserRechargeDTO> se = paymentService.queryUserRechargeListByUserId(strParam);
-//			BaseResult<Map<String,Object>> ymoney = (BaseResult<Map<String,Object>>) paymentService.getShMoney();
+			BaseResult<Map<String,Object>> ymoney = (BaseResult<Map<String,Object>>) paymentService.getShMoney();
 //			if(ymoney!=null && ymoney.getData()!=null) {
 //				userDTO.setUserMoney(ymoney.getData().get("account_balance").toString());//账户余额
 //				userDTO.setBalance("0");
