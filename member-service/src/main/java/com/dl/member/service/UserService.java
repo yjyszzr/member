@@ -224,9 +224,9 @@ public class UserService extends AbstractService<User> {
 			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
 		}
 		if(userId==1000000077) {//财务账号--财务账号提现金额为商户余额
-			com.dl.shop.payment.param.PayLogIdParam strParam = new com.dl.shop.payment.param.PayLogIdParam();
-			BaseResult<PayLogDTO> se = paymentService.queryPayLogByPayLogId(strParam);
-//			BaseResult<Map<String,Object>> ymoney = (BaseResult<Map<String,Object>>) paymentService.getShMoney();
+//			com.dl.shop.payment.param.PayLogIdParam strParam = new PayLogIdParam();
+//			BaseResult<PayLogDTO> se = paymentService.queryPayLogByPayLogId(strParam);
+			BaseResult<Map<String,Object>> ymoney = paymentService.getShMoney();
 //			if(ymoney!=null && ymoney.getData()!=null) {
 //				userDTO.setUserMoney(ymoney.getData().get("account_balance").toString());//账户余额
 //				userDTO.setBalance("0");
