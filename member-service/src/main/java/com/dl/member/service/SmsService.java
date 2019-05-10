@@ -83,6 +83,7 @@ public class SmsService {
 		}
 		String smsType = smsParam.getSmsType();
 		if("4".equals(smsType)) {//商户余额预警
+			log.info("sendSms()执行商户余额预警：one");
 			int num = 0;
 			String sendNumKey = "num_send_yj_" + smsParam.getMobile();
 			try {
@@ -94,29 +95,31 @@ public class SmsService {
 				log.error("发送短信获取redis中短信发送的数量异常", e);
 				return ResultGenerator.genFailResult("获取短信发送数量异常");
 			}
-			
+			log.info("sendSms()执行商户余额预警：two");
 			if (num >=1) {//每天预警异常
 				return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_FUND_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_FUND_ERROR.getMsg());
 			}
 			String tplId = "";
-			String tplValue = "商户余额不足，请尽快充值。";
+			String tplValue = "圣和彩店商户余额不足，请立即充值。";
 			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-			String platform = userDevice.getPlat();
-			Integer appCodeName = 10;// 默认球多多
-			log.info("platform-------------:" + platform);
-			if (!"h5".equals(platform)) {// h5 短信模板都用球多多
-				String channel = userDevice.getChannel();
-				appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
-			}
-			Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
+//			String platform = userDevice.getPlat();
+			String appCodeName = userDevice!=null?(org.apache.commons.lang.StringUtils.isEmpty(userDevice.getAppCodeName())?"10":userDevice.getAppCodeName()):"10";// 默认球多多
+//			log.info("platform-------------:" + platform);
+//			if (!"h5".equals(platform)) {// h5 短信模板都用球多多
+//				String channel = userDevice.getChannel();
+//				appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
+//			}
+			Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(Integer.parseInt(appCodeName));
 			if (null == smsTemplateId) {
 				log.warn("未查询到短信模板id的配置，请检查数据库");
 				return ResultGenerator.genFailResult("短信发送异常,请联系管理员");
 			}
+			log.info("sendSms()执行商户余额预警：three");
 			tplId = String.valueOf(smsTemplateId);
 			BaseResult<String> smsRst = smsService.sendJuheSms(smsParam.getMobile(), tplId, tplValue);
+			log.info("sendSms()执行商户余额预警：smsRst="+smsRst.getCode());
 			if (smsRst.getCode() != 0) {
-				return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
+				return ResultGenerator.genFailResult("商户预警失败", smsRst.getData());
 			}
 			num++;
 			int sendNumExpire = this.todayEndTime();
@@ -249,6 +252,7 @@ public class SmsService {
 			json = JSON.parseObject(rst);
 		} catch (Exception e) {
 			log.error(e.getMessage());
+			log.error("短信发送失败。");
 		}
 
 		JSONObject json_tmp = (JSONObject) json.get("result");
