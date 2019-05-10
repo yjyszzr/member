@@ -10,6 +10,7 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
 import com.dl.base.util.SessionUtil;
+import com.dl.member.api.IUserAccountService;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
@@ -17,6 +18,8 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
 import com.dl.member.param.SmsParam;
+import com.dl.member.param.SysConfigParam;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -44,6 +47,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SmsService {
 
+	@Resource
+    private IUserAccountService iUserAccountService;
+	
 	@Resource
 	private RestTemplateConfig restTemplateConfig;
 
@@ -100,17 +106,11 @@ public class SmsService {
 				return ResultGenerator.genResult(MemberEnums.MESSAGE_COUNT_FUND_ERROR.getcode(), MemberEnums.MESSAGE_COUNT_FUND_ERROR.getMsg());
 			}
 			String tplId = "";
-			String tplValue = "圣和彩店商户余额不足，请立即充值。";
-			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-//			String platform = userDevice.getPlat();
-			String appCodeName = userDevice!=null?(org.apache.commons.lang.StringUtils.isEmpty(userDevice.getAppCodeName())?"10":userDevice.getAppCodeName()):"10";// 默认球多多
-//			log.info("platform-------------:" + platform);
-//			if (!"h5".equals(platform)) {// h5 短信模板都用球多多
-//				String channel = userDevice.getChannel();
-//				appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
-//			}
-			Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(Integer.parseInt(appCodeName));
-			if (null == smsTemplateId) {
+			String tplValue = "";
+			SysConfigParam cfg = new SysConfigParam();
+			cfg.setBusinessId(68);//读取财务账号id
+			Integer smsTemplateId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
+			if (0 == smsTemplateId) {
 				log.warn("未查询到短信模板id的配置，请检查数据库");
 				return ResultGenerator.genFailResult("短信发送异常,请联系管理员");
 			}
