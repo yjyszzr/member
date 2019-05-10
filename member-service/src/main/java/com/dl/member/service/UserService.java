@@ -49,6 +49,7 @@ import com.dl.member.util.TokenUtil;
 import com.dl.shop.auth.api.IAuthService;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.RspOrderQueryDTO;
+import com.dl.shop.payment.dto.YesOrNoDTO;
 import com.dl.shop.payment.param.StrParam;
 
 import lombok.extern.slf4j.Slf4j;
@@ -234,10 +235,10 @@ public class UserService extends AbstractService<User> {
 			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
 		}
 		if(userId==1000000077) {//财务账号--财务账号提现金额为商户余额
-			StrParam emptyParam = new StrParam();
-			BaseResult<RspOrderQueryDTO> ymoney = paymentService.getShMoney(emptyParam);
+			com.dl.shop.payment.param.UserIdParam emptyParam = new com.dl.shop.payment.param.UserIdParam();
+			BaseResult<YesOrNoDTO> ymoney = paymentService.countUserRecharge(emptyParam);
 			if(ymoney!=null && ymoney.getData()!=null) {
-				userDTO.setUserMoney(ymoney.getData().getDonationPrice()!=null?ymoney.getData().getDonationPrice():"获取失败");//账户余额
+				userDTO.setUserMoney(ymoney.getData().getYmoney()!=null?ymoney.getData().getYmoney():"获取失败");//账户余额
 				userDTO.setBalance("0");
 				userDTO.setTotalMoney("0");
 				userDTO.setUserMoneyLimit("0");
