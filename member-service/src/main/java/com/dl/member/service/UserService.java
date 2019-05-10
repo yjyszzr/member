@@ -1,9 +1,22 @@
 package com.dl.member.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.dl.base.enums.ActivityEnum;
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.model.UserDeviceInfo;
+import com.dl.base.param.EmptyParam;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
@@ -16,34 +29,31 @@ import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.*;
+import com.dl.member.dto.ActivityDTO;
+import com.dl.member.dto.SysConfigDTO;
+import com.dl.member.dto.UserDTO;
+import com.dl.member.dto.UserNoticeDTO;
+import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
-import com.dl.member.param.*;
+import com.dl.member.param.FindUserByMobileAndAppCodeParam;
+import com.dl.member.param.IDFACallBackParam;
+import com.dl.member.param.SetLoginPassParam;
+import com.dl.member.param.TokenParam;
+import com.dl.member.param.UserIdParam;
+import com.dl.member.param.UserIdRealParam;
+import com.dl.member.param.UserParam;
 import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
 import com.dl.shop.auth.api.IAuthService;
 import com.dl.shop.payment.api.IpaymentService;
-import com.dl.shop.payment.dto.PayLogDTO;
-import com.dl.shop.payment.dto.UserRechargeDTO;
-import com.dl.shop.payment.param.StrParam;
+import com.dl.shop.payment.dto.YmoneyDTO;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
-
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional
@@ -224,15 +234,14 @@ public class UserService extends AbstractService<User> {
 			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
 		}
 		if(userId==1000000077) {//财务账号--财务账号提现金额为商户余额
-//			com.dl.shop.payment.param.PayLogIdParam strParam = new PayLogIdParam();
-//			BaseResult<PayLogDTO> se = paymentService.queryPayLogByPayLogId(strParam);
-			BaseResult<Map<String,Object>> ymoney = paymentService.getShMoney();
-//			if(ymoney!=null && ymoney.getData()!=null) {
-//				userDTO.setUserMoney(ymoney.getData().get("account_balance").toString());//账户余额
-//				userDTO.setBalance("0");
-//				userDTO.setTotalMoney("0");
-//				userDTO.setUserMoneyLimit("0");
-//			}
+			EmptyParam emptyParam = new EmptyParam();
+			BaseResult<YmoneyDTO> ymoney = paymentService.getShMoney(emptyParam);
+			if(ymoney!=null && ymoney.getData()!=null) {
+				userDTO.setUserMoney(ymoney.getData().getAccount_balance()!=null?ymoney.getData().getAccount_balance():"获取失败");//账户余额
+				userDTO.setBalance("0");
+				userDTO.setTotalMoney("0");
+				userDTO.setUserMoneyLimit("0");
+			}
 		}
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
