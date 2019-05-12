@@ -252,9 +252,6 @@ public class UserService extends AbstractService<User> {
 				userDTO.setTotalMoney("0");
 				userDTO.setUserMoneyLimit("0");
 			}
-			
-			paymentService.getShMoney(null);
-			YmoneyDTO s = new YmoneyDTO();
 		}
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
