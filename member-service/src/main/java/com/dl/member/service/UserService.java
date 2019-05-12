@@ -52,6 +52,7 @@ import com.dl.shop.auth.api.IAuthService;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDTO;
 import com.dl.shop.payment.dto.YesOrNoDTO;
+import com.dl.shop.payment.dto.YmoneyDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
 
 import lombok.extern.slf4j.Slf4j;
@@ -251,6 +252,9 @@ public class UserService extends AbstractService<User> {
 				userDTO.setTotalMoney("0");
 				userDTO.setUserMoneyLimit("0");
 			}
+			
+			paymentService.getShMoney(null);
+			YmoneyDTO s = new YmoneyDTO();
 		}
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
