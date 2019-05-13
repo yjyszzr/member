@@ -699,7 +699,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
 		userAccount.setCurBalance(updatedUser.getUserMoney().add(updatedUser.getUserMoneyLimit()));
 		userAccount.setStatus(Integer.valueOf(ProjectConstant.FINISH));
-
+		userAccount.setOrderSn(recharegeParam.getOrderSn());
 		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
 		if (rst != 1) {
 			log.error("生成充值流水失败");

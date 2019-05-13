@@ -33,5 +33,8 @@ public class RecharegeParam {
     
     @ApiModelProperty(value = "第三方支付金额")
     private BigDecimal thirdPartPaid;
+    
+    @ApiModelProperty(value = "订单编号")
+    private String orderSn;
 	
 }
