@@ -242,7 +242,7 @@ public class UserService extends AbstractService<User> {
 		SysConfigParam cfg = new SysConfigParam();
 		cfg.setBusinessId(67);//读取财务账号id
 		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
-		if(userId!=null && userId==cwuserId) {//财务账号--财务账号提现金额为商户余额
+		if(userId!=null && userId==cwuserId) { //财务账号--财务账号提现金额为商户余额
 			PayLogIdParam emptyParam = new PayLogIdParam();
 			emptyParam.setPayLogId(1000000077);
 			BaseResult<PayLogDTO> ymoney = paymentService.queryPayLogByPayLogId(emptyParam);
