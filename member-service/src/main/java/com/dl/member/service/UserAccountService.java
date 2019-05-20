@@ -718,16 +718,21 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	public BaseResult<String> withdrawUserMoney(WithDrawParam withDrawParam) {
 		Integer userId = withDrawParam.getUserId();
 		User user = userService.findById(userId);
+		log.info("withdrawUserMoney打印user="+user);
 		if (null == user) {
 			throw new ServiceException(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在");
-		}
-
-		if (user.getUserMoney().compareTo(withDrawParam.getAmount()) < 0) {
-			return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
 		}
 		SysConfigParam cfg = new SysConfigParam();
 		cfg.setBusinessId(67);//读取财务账号id
 		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
+		
+		if(userId!=cwuserId) {//非财务账号--判断账户余额
+			if (user.getUserMoney().compareTo(withDrawParam.getAmount()) < 0) {
+				return ResultGenerator.genResult(MemberEnums.MONEY_IS_NOT_ENOUGH.getcode(), MemberEnums.MONEY_IS_NOT_ENOUGH.getMsg());
+			}
+		}
+		
+		log.info("withdrawUserMoney打印userId="+userId+"****cwuserId="+cwuserId);
 		if(userId!=cwuserId) {//非财务账号--财务账号不修改账户资金
 			User updateUser = new User();
 			updateUser.setUserMoney(withDrawParam.getAmount());
@@ -750,10 +755,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccount.setAddTime(DateUtil.getCurrentTimeLong());
 		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
 		User userUpdated = userMapper.queryUserExceptPass(userId);
+		log.info("withdrawUserMoney打印提现单userUpdated="+userUpdated);
 		userAccount.setCurBalance(userUpdated.getUserMoney().add(userUpdated.getUserMoneyLimit()));
 		userAccount.setStatus(1);
 		userAccount.setNote(withDrawParam.getThirdPartName() + "提现" + String.format("%.2f", withDrawParam.getThirdPartPaid().doubleValue()) + "元");
 		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
+		log.info("withdrawUserMoney打印提现单流水生产="+rst);
 		if (rst != 1) {
 			log.error("生成提现流水账户失败");
 			return ResultGenerator.genFailResult("生成提现流水账户失败");
