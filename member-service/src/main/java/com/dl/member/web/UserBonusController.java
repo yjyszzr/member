@@ -43,7 +43,7 @@ public class UserBonusController {
     	//参数中存放userid字段节用
     	UserBonusDTO userBonusDTO = userBonusService.getBonusByUserId(userBonusIdParam.getUserBonusId());
     	if(null == userBonusDTO) {
-    		return ResultGenerator.genFailResult("未查询到user_id="+userBonusIdParam+"的红包");
+    		return ResultGenerator.genFailResult("未查询到 user_id="+userBonusIdParam+"的红包");
     	}
     	return ResultGenerator.genSuccessResult("根据user_id查询单个红包成功",userBonusDTO);
     }
