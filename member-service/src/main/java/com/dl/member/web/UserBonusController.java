@@ -37,6 +37,17 @@ public class UserBonusController {
     	return ResultGenerator.genSuccessResult("根据userBonusId查询单个红包成功",userBonusDTO);
     }
     
+    @ApiOperation(value="根据userId查询单个红包", notes="根据userId查询单个红包",hidden=false)
+    @PostMapping("/queryUserBonusNumAndPrice")
+    public BaseResult<UserBonusDTO> queryUserBonusNumAndPrice(@RequestBody UserBonusIdParam userBonusIdParam) {
+    	//参数中存放userid字段节用
+    	UserBonusDTO userBonusDTO = userBonusService.getBonusByUserId(userBonusIdParam.getUserBonusId());
+    	if(null == userBonusDTO) {
+    		return ResultGenerator.genFailResult("未查询到user_id="+userBonusIdParam+"的红包");
+    	}
+    	return ResultGenerator.genSuccessResult("根据user_id查询单个红包成功",userBonusDTO);
+    }
+    
     @ApiOperation(value="根据状态查询有效的红包集合", notes="根据状态查询有效的红包集合",hidden=false)
     @PostMapping("/queryBonusListByStatus")
     public BaseResult<PageInfo<UserBonusDTO>> queryBonusListByStatus(@RequestBody UserBonusStatusParam userBonusStatusParam) {

@@ -767,6 +767,18 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	}
 
 	/**
+	 * 根据用户id查询有效红包数量和可用红包总金额
+	 */
+	public UserBonusDTO getBonusByUserId(Integer userId) {
+		UserBonus userBonus = userBonusMapper.getBonusByUserId(userId);
+		UserBonusDTO userBonusDTO = new UserBonusDTO();
+		userBonusDTO.setBonusPrice(userBonus!=null?userBonus.getBonusPrice():BigDecimal.ZERO);
+		userBonusDTO.setBonusId(userBonus!=null?userBonus.getBonusId():0);//存放红包数量  字段节用
+		return userBonusDTO;
+	}
+	
+	
+	/**
 	 * 定时任务 针对过期红包发送push消息
 	 * 
 	 * @param userBonusIdList

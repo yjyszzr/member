@@ -195,4 +195,9 @@
   	update dl_user_bonus set is_read = 1 where user_id=#{userId} and is_read=0
   </update>
   
+  <select id="getBonusByUserId" resultType="BaseResultMap">
+  		 SELECT count(1) bonus_id,SUM(bonus_price) bonus_price FROM dl_user_bonus where bonus_status=0 and user_id=#{userId}
+  </select>
+ 
+  
 </mapper>

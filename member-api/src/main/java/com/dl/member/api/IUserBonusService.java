@@ -31,7 +31,13 @@ public interface IUserBonusService {
 	  */
 	 @PostMapping("/user/bonus/queryUserBonus")    
 	 BaseResult<UserBonusDTO> queryUserBonus(@RequestBody UserBonusIdParam userBonusIdParam);
-	 
+	 /**
+	  * 根userBonusId查询有效红包数量和红包总金额
+	  *
+	  * @return
+	  */
+	 @PostMapping("/user/bonus/queryUserBonusNumAndPrice")    
+	 BaseResult<UserBonusDTO> queryUserBonusNumAndPrice(@RequestBody UserBonusIdParam userBonusIdParam);
 	 /**
 	  * 查询用户所有有效的红包列表
 	  * @param userBonusStatusParam
