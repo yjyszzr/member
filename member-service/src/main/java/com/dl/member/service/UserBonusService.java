@@ -368,8 +368,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}else {
 			userBonusDTO.setThisStatus("1");
 		}
-		
-		
+		userBonusDTO.setMinAmount(userBonus.getMinGoodsAmount());
 		userBonusDTO.setBonusName(userBonus.getBonusPrice()+"元代金券");
 		userBonusDTO.setShortDesc("去使用");
 		userBonusDTO.setBonusPriceStr(userBonus.getBonusPrice()+"元");
