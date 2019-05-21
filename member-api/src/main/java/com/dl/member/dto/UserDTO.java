@@ -202,6 +202,12 @@ public class UserDTO {
 
     private String merchantNo;
     private String merchantPass;
+    
+    /**
+     * 用户持有有效卡券数量
+     */
+    private Integer bonusNumber;
+    
     public Integer getUserId() {
         return userId;
     }

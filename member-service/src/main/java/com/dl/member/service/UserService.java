@@ -2,6 +2,7 @@ package com.dl.member.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -24,6 +25,7 @@ import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.api.IUserAccountService;
+import com.dl.member.api.IUserBonusService;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
@@ -31,6 +33,7 @@ import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.ActivityDTO;
 import com.dl.member.dto.SysConfigDTO;
+import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserNoticeDTO;
 import com.dl.member.dto.UserRealDTO;
@@ -43,6 +46,7 @@ import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.SetLoginPassParam;
 import com.dl.member.param.SysConfigParam;
 import com.dl.member.param.TokenParam;
+import com.dl.member.param.UserBonusIdParam;
 import com.dl.member.param.UserIdParam;
 import com.dl.member.param.UserIdRealParam;
 import com.dl.member.param.UserParam;
@@ -101,7 +105,9 @@ public class UserService extends AbstractService<User> {
 
 	@Resource
 	private IAuthService iAuthService;
-
+	
+	@Resource
+    private IUserBonusService iUserBonusService;
 	/**
 	 * real真实信息
 	 *
@@ -253,6 +259,13 @@ public class UserService extends AbstractService<User> {
 				userDTO.setUserMoneyLimit("0");
 			}
 		}
+		
+		//查询当前用户对于的卡券信息
+		UserBonusIdParam userBonusIdParam = new UserBonusIdParam();
+        userBonusIdParam.setUserBonusId(userId);
+		BaseResult<UserBonusDTO> userBonus = iUserBonusService.queryUserBonusNumAndPrice(userBonusIdParam);
+		userDTO.setBonusNumber(userBonus.getData()!=null?userBonus.getData().getBonusId():0);
+		
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
 
