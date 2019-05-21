@@ -64,5 +64,9 @@ public class UserBonusDTO {
 
     @ApiModelProperty(value = "快过期标志：1-快过期   2-未生效：暂不使用")
     private String soonExprireBz;
+    
+    @ApiModelProperty(value = "当前订单是否可用：0-可用  1-不可用")
+    private String thisStatus;
 
+    
 }

@@ -196,7 +196,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
 		userBonus.setStartTime(DateUtil.getCurrentTimeLong());
 		userBonus.setEndTime(DateUtil.getCurrentTimeLong());
-		userBonus.setMinGoodsAmount(bonusLimitConditionParam.getOrderMoneyPaid());
+//		userBonus.setMinGoodsAmount(bonusLimitConditionParam.getOrderMoneyPaid());//门槛查询去掉
 		List<UserBonus> userBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
 		List<UserBonusDTO> userBonusDTOList = new ArrayList<UserBonusDTO>();
 		if (CollectionUtils.isEmpty(userBonusList)) {
@@ -204,7 +204,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		}
 
 		userBonusList.forEach(s -> {
-			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(s);
+			UserBonusDTO userBonusDTO = this.createReturnUserBonusDTO(s,bonusLimitConditionParam.getOrderMoneyPaid());
 			userBonusDTOList.add(userBonusDTO);
 		});
 		return userBonusDTOList;
@@ -305,10 +305,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		result.setList(userBonusDTOList);
 		return result;
 	}
-
 	/**
 	 * 统一构造返回前台红包列表的数据结构
-	 * 
+	 * @param mixMoney 当前订单金额
 	 * @param shopBonusDTOList
 	 * @param userBonusList
 	 * @return
@@ -329,6 +328,48 @@ public class UserBonusService extends AbstractService<UserBonus> {
 //			userBonusDTO.setSoonExprireBz("");
 //			userBonusDTO.setLeaveTime("");
 //		}
+		userBonusDTO.setBonusName(userBonus.getBonusPrice()+"元代金券");
+		userBonusDTO.setShortDesc("去使用");
+		userBonusDTO.setBonusPriceStr(userBonus.getBonusPrice()+"元");
+		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
+		userBonusDTO.setBonusStatus(String.valueOf(userBonus.getBonusStatus()));
+		userBonusDTO.setBonusPrice(userBonus.getBonusPrice());
+		userBonusDTO.setLimitTime(userBonusShowDescService.getLimitTimeDesc(userBonus.getStartTime(), userBonus.getEndTime()));
+		userBonusDTO.setBonusEndTime(DateUtil.getCurrentTimeString(Long.valueOf(userBonus.getEndTime()), DateUtil.date_sdf));
+		userBonusDTO.setMinGoodsAmount(userBonusShowDescService.getLimitOrderAmountDesc(userBonus.getMinGoodsAmount(), userBonus.getBonusPrice()));
+		return userBonusDTO;
+	}
+	/**
+	 * 统一构造返回前台红包列表的数据结构
+	 * @param mixMoney 当前订单金额
+	 * @param shopBonusDTOList
+	 * @param userBonusList
+	 * @return
+	 */
+	public UserBonusDTO createReturnUserBonusDTO(UserBonus userBonus,BigDecimal mixMoney) {
+		UserBonusDTO userBonusDTO = new UserBonusDTO();
+		try {
+			BeanUtils.copyProperties(userBonus, userBonusDTO);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
+
+//		if (ProjectConstant.BONUS_STATUS_UNUSED == userBonus.getBonusStatus()) {
+//			Integer currentTime = DateUtil.getCurrentTimeLong();
+//			userBonusDTO.setSoonExprireBz(this.createSoonExprireBz(currentTime, userBonus));
+//			userBonusDTO.setLeaveTime(this.createLeaveTime(currentTime, userBonus));
+//		} else {
+//			userBonusDTO.setSoonExprireBz("");
+//			userBonusDTO.setLeaveTime("");
+//		}
+		//判断红包门槛是否适配当前订单
+		if(mixMoney.subtract(userBonus.getMinGoodsAmount()).doubleValue()>=0) {//达到使用门槛
+			userBonusDTO.setThisStatus("0");
+		}else {
+			userBonusDTO.setThisStatus("1");
+		}
+		
+		
 		userBonusDTO.setBonusName(userBonus.getBonusPrice()+"元代金券");
 		userBonusDTO.setShortDesc("去使用");
 		userBonusDTO.setBonusPriceStr(userBonus.getBonusPrice()+"元");
