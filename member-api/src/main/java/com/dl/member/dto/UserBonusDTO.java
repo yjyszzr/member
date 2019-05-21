@@ -67,6 +67,9 @@ public class UserBonusDTO {
     
     @ApiModelProperty(value = "当前订单是否可用：0-可用  1-不可用")
     private String thisStatus;
+    
+    @ApiModelProperty(value = "最小订单金额")
+    private BigDecimal minAmount;
 
     
 }
