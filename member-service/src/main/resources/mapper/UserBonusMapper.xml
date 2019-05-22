@@ -64,7 +64,7 @@
 		        AND end_time &gt;= #{endTime}
 		    </if>
 	    </where>
-	    order by min_goods_amount asc,end_time asc,bonus_price desc
+	    order by end_time asc,bonus_price desc
 <!-- 	    order by add_time DESC,start_time ASC,end_time ASC,bonus_price ASC,min_goods_amount ASC -->
   </select>
   
@@ -96,7 +96,7 @@
 		        AND end_time &gt;= #{endTime}
 		    </if>
 	    </where>
-	    order by min_goods_amount asc,end_time asc,bonus_price desc
+	    order by end_time asc,bonus_price desc
 <!-- 	    order by bonus_price DESC,min_goods_amount ASC,end_time ASC -->
   </select>
   
