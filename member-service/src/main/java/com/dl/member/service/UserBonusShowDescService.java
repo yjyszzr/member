@@ -44,9 +44,11 @@ public class UserBonusShowDescService {
 	 */
 	public String getUseRange(Integer useRange) {
 		if(ProjectConstant.ALL_LOTERRY_TYPE.equals(useRange)) {
-			return "不限彩种";
+			return "";
+//			return "不限彩种";
 		}else {
-			return "指定彩种";
+			return "";
+//			return "指定彩种";
 		}
 	}
 
