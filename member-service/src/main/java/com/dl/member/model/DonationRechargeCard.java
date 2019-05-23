@@ -56,10 +56,24 @@ public class DonationRechargeCard {
      */
     @Column(name = "type")
     private Integer type;
+    /**
+     * 最低充值金额（即红包生效金额）
+     */
+    @Column(name = "limit_recharge_money")
+    private Integer limitRechargeMoney;
+    
+    
+    
+    public Integer getLimitRechargeMoney() {
+		return limitRechargeMoney;
+	}
 
-    
-    
-    public Integer getType() {
+	public void setLimitRechargeMoney(Integer limitRechargeMoney) {
+		if(limitRechargeMoney==null) {limitRechargeMoney = 0;}
+		this.limitRechargeMoney = limitRechargeMoney;
+	}
+
+	public Integer getType() {
 		return type;
 	}
 

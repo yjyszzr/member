@@ -63,7 +63,17 @@ public interface IUserBonusService {
       */
      @PostMapping("/user/bonus/reiceiveBonusAfterRechargeNew")
      public BaseResult<DonationPriceDTO> reiceiveBonusAfterRechargeNew(@RequestBody PayLogIdParam payLogIdParam);
+     /**
+      * 充值成功后领取充值送随机红包
+      * @param payLogIdParam
+      * @return
+      */
+     @PostMapping("/user/bonus/createRechargeUserBonusNew")
+     public BaseResult<Integer> createRechargeUserBonusNew(@RequestBody PayLogIdParam payLogIdParam);
 
+     
+     
+     
   	/**
   	 * 更新红包的过期状态
   	 * @param UserBonusParam

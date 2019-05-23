@@ -15,6 +15,7 @@
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
     <result column="real_value" jdbcType="DECIMAL" property="realValue" />
     <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="limit_recharge_money" jdbcType="INTEGER" property="type" />
   </resultMap>
   
   <select id="queryRechargeCardList" resultMap="BaseResultMap">

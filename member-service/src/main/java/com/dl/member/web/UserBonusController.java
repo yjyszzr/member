@@ -88,5 +88,9 @@ public class UserBonusController {
     	userBonusService.updateBonusExpire();
 		return ResultGenerator.genSuccessResult("更新过期红包成功");
 	}
-    
+    @ApiOperation(value="领取充值红包", notes="领取充值红包",hidden=false)
+	@RequestMapping(path="/createRechargeUserBonusNew", method=RequestMethod.POST)
+	public BaseResult<Integer> createRechargeUserBonusNew(@RequestBody PayLogIdParam payLogIdParam) {
+    	return userBonusService.createRechargeUserBonusNew(payLogIdParam);
+	}
 }
