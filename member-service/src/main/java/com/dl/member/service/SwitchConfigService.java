@@ -56,64 +56,63 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
 	 * @param chanel
 	 * @return 目前返回对象只用到了trunon字段
 	 */
-		 public BaseResult<SwitchConfigDTO> querySwitch(){
-		 UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-		 SwitchConfigDTO switchConfig = new SwitchConfigDTO();
-		 String inPrams = JSON.toJSONString(userDevice);
-		 String logId = DateUtil.getCurrentDateTime();
-		 log.info(logId + "====================================版本参数:"+inPrams);
-		 String plat = userDevice.getPlat();
-		 if(plat.equals("android")) {
-			 plat = "1";
-		 }else if(plat.equals("iphone")) {
-			 plat = "0";
-		 }else if(plat.equals("h5")) {
-			 plat = "2";
-		 }else {
-			 return ResultGenerator.genFailResult("设备信息中的plat参数错误");
-		 }
+	    public BaseResult<SwitchConfigDTO> querySwitch() {
+        UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+        SwitchConfigDTO switchConfig = new SwitchConfigDTO();
+        String inPrams = JSON.toJSONString(userDevice);
+        String logId = DateUtil.getCurrentDateTime();
+        log.info(logId + "====================================版本参数:" + inPrams);
+        String plat = userDevice.getPlat();
+        if (plat.equals("android")) {
+            plat = "1";
+        } else if (plat.equals("iphone")) {
+            plat = "0";
+        } else if (plat.equals("h5")) {
+            plat = "2";
+        } else {
+            return ResultGenerator.genFailResult("设备信息中的plat参数错误");
+        }
 
-		 String version = userDevice.getAppv();
-		 String chanel = userDevice.getChannel();
-		 Integer userId = SessionUtil.getUserId();
-		 log.info("开关接口传的登录的userId:"+userId);
-		 if(userDevice.getPlat().equals("h5")) {//h5 的plat,version 和 channel 写死，分别为2和1.0.0和h5
-			 version = "1.0.0";
-			 chanel = "h5";
-		 }
-		Integer rst3 = this.channelSwitch(plat, version, chanel);
-        log.info("渠道开关:"+rst3);
-        if(rst3 == 1) {//渠道开
+        String version = userDevice.getAppv();
+        String chanel = userDevice.getChannel();
+        Integer userId = SessionUtil.getUserId();
+        log.info("开关接口传的登录的userId:" + userId);
+        if (userDevice.getPlat().equals("h5")) {//h5 的plat,version 和 channel 写死，分别为2和1.0.0和h5
+            version = "1.0.0";
+            chanel = "h5";
+        }
+        Integer rst3 = this.channelSwitch(plat, version, chanel);
+        log.info("渠道开关:" + rst3);
+        if (rst3 == 1) {//渠道开
             switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-        }else {//渠道关
+        } else {//渠道关
             if (userId == null) {//未登录
                 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-            }else{
+            } else {
                 SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(70);//用户开关
                 Integer userTurnOn = sysConfigDTO.getValue().intValue();
-                if(userTurnOn == 0){//关
+                if (userTurnOn == 0) {//关
                     switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-                }else{//开
+                } else {//开
                     switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
                 }
             }
-          }
         }
 
-		 Integer rst1 = this.userSwitch(userId);
-         log.info("用户终极开关:"+rst1);
-         if(rst1 == 0) {//用户终极开关关闭,对过审用户限制
-             switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
-         }
+        Integer rst1 = this.userSwitch(userId);
+        log.info("用户终极开关:"+rst1);
+        if(rst1 ==0){//用户终极开关关闭,对过审用户限制
+            switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+        }
 
-		 //h5强行打开
-		 if("h5".equals(chanel)) {
-			 log.info("[querySwitch]" + " channel:" + chanel);
-			 switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
-		 }
-		 log.info("channel="+chanel + "turnOn="+switchConfig.getTurnOn());
-		 return ResultGenerator.genSuccessResult("success",switchConfig);
-	 }
+        //h5强行打开
+        if("h5".equals(chanel)) {
+            log.info("[querySwitch]" + " channel:" + chanel);
+            switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_OPEN);
+        }
+        log.info("channel="+chanel + "turnOn="+switchConfig.getTurnOn());
+        return ResultGenerator.genSuccessResult("success",switchConfig);
+    }
 
     /**
      * 用户超级开关
