@@ -99,10 +99,12 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
             }
         }
 
-        Integer rst1 = this.userSwitch(userId);
-        log.info("用户终极开关:"+rst1);
-        if(rst1 != null && rst1 ==0){//用户终极开关关闭,对过审用户限制
-            switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+        if(userId != null){
+            Integer rst1 = this.userSwitch(userId);
+            log.info("用户终极开关:"+rst1);
+            if(rst1 != null && rst1 ==0){//用户终极开关关闭,对过审用户限制
+                switchConfig.setTurnOn(ProjectConstant.BISINESS_APP_CLOSE);
+            }
         }
 
         //h5强行打开
