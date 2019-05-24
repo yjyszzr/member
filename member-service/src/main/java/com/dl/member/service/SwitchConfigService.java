@@ -121,7 +121,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
      */
     public Integer userSwitch(Integer userId) {
     	User user = userMapper.queryUserExceptPass(userId);
-    	return user.getIsBusiness() == null? 2:user.getIsBusiness();
+    	return user == null? 2:user.getIsBusiness();
     }
     
     /**
