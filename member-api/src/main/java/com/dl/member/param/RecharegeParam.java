@@ -2,6 +2,7 @@ package com.dl.member.param;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -36,5 +37,10 @@ public class RecharegeParam {
     
     @ApiModelProperty(value = "订单编号")
     private String orderSn;
+    
+    private Integer rechargeCardId;
+    
+    private BigDecimal rechargeCardRealValue;
+    
 	
 }

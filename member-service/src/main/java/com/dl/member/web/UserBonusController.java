@@ -5,6 +5,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.dto.DonationPriceDTO;
 import com.dl.member.dto.UserBonusDTO;
+import com.dl.member.model.UserBonus;
 import com.dl.member.param.BonusLimitConditionParam;
 import com.dl.member.param.PayLogIdParam;
 import com.dl.member.param.UserBonusIdParam;
@@ -15,6 +16,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -90,7 +93,7 @@ public class UserBonusController {
 	}
     @ApiOperation(value="领取充值红包", notes="领取充值红包",hidden=false)
 	@RequestMapping(path="/createRechargeUserBonusNew", method=RequestMethod.POST)
-	public BaseResult<Integer> createRechargeUserBonusNew(@RequestBody PayLogIdParam payLogIdParam) {
+	public BaseResult<HashMap<String,Object>> createRechargeUserBonusNew(@RequestBody PayLogIdParam payLogIdParam) {
     	return userBonusService.createRechargeUserBonusNew(payLogIdParam);
 	}
 }

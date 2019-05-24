@@ -1,5 +1,6 @@
 package com.dl.member.api;
 
+import java.util.HashMap;
 import java.util.List;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,7 +70,7 @@ public interface IUserBonusService {
       * @return
       */
      @PostMapping("/user/bonus/createRechargeUserBonusNew")
-     public BaseResult<Integer> createRechargeUserBonusNew(@RequestBody PayLogIdParam payLogIdParam);
+     public BaseResult<HashMap<String,Object>> createRechargeUserBonusNew(@RequestBody PayLogIdParam payLogIdParam);
 
      
      

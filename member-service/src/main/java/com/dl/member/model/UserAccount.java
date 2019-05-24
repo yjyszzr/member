@@ -99,7 +99,30 @@ public class UserAccount {
     @Column(name = "donation_money")
     private String donationMoney;
     
-    public String getDonationMoney() {
+    @Column(name = "recharge_card_id")
+    private Integer rechargeCardId;
+    @Column(name = "recharge_card_real_value")
+    private BigDecimal rechargeCardRealValue;
+    
+    
+    
+    public BigDecimal getRechargeCardRealValue() {
+		return rechargeCardRealValue;
+	}
+
+	public void setRechargeCardRealValue(BigDecimal rechargeCardRealValue) {
+		this.rechargeCardRealValue = rechargeCardRealValue;
+	}
+
+	public Integer getRechargeCardId() {
+		return rechargeCardId;
+	}
+
+	public void setRechargeCardId(Integer rechargeCardId) {
+		this.rechargeCardId = rechargeCardId;
+	}
+
+	public String getDonationMoney() {
 		return donationMoney;
 	}
 

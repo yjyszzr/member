@@ -707,7 +707,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * 根据后台设置的充值卡对应的红包，构建送给用户的红包 new
 	 * @return
 	 */
-	public BaseResult<Integer> createRechargeUserBonusNew(com.dl.member.param.PayLogIdParam payLogIdParam) {
+	public BaseResult<HashMap<String,Object>> createRechargeUserBonusNew(com.dl.member.param.PayLogIdParam payLogIdParam) {
 		BigDecimal bonusPrice = payLogIdParam.getOrderAmount();
 		Integer userId = payLogIdParam.getUserId();
 		Integer payLogId = Integer.valueOf(payLogIdParam.getPayLogId());
@@ -718,14 +718,40 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		rechargeCardList.stream().forEach(dto -> {
 				if(dto.getStatus()==0 && dto.getType().equals(30) && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//单笔 满足充值赠送金额  且红包处于有效期
-					if(dto.getRechargeCardId()!=null) {
-						List<ActivityBonus> activityBonusList = activityBonusMapper.queryActivityBonusListByRechargeCardId(dto.getRechargeCardId());
-						for(ActivityBonus activityBonus:activityBonusList) {
+					List<ActivityBonus> activityBonusList = activityBonusMapper.queryActivityBonusListByRechargeCardId(dto.getRechargeCardId());
+					for(ActivityBonus activityBonus:activityBonusList) {
+						Integer now = DateUtil.getCurrentTimeLong();
+						Date currentTime = new Date();
+						UserBonus userBonus = new UserBonus();
+						userBonus.setUserId(userId);
+						userBonus.setBonusId(activityBonus.getBonusId());
+						userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
+						userBonus.setBonusPrice(activityBonus.getBonusAmount());
+						userBonus.setAddTime(now);
+						userBonus.setReceiveTime(now);
+						userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, activityBonus.getStartTime(), 0, 0, 0));
+						userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, activityBonus.getEndTime(), 23, 59, 59));
+						userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
+						userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
+						userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
+						userBonus.setMinGoodsAmount(activityBonus.getMinGoodsAmount());
+						userBonus.setPayLogId(payLogId);
+						userBonus.setRechargeCardId(dto.getRechargeCardId());
+						userBonus.setRechargeCardRealValue(dto.getRealValue());
+						userBonusList.add(userBonus);
+						log.info("createRechargeUserBonusNew单笔充值");
+					}
+				} else if(dto.getStatus()==0 && dto.getType().equals(20) && 
+						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//首充  满足充值赠送金额  且红包处于有效期
+					List<ActivityBonus> activityBonusList = activityBonusMapper.queryActivityBonusListByRechargeCardId(dto.getRechargeCardId());
+					for(ActivityBonus activityBonus:activityBonusList) {
+						UserBonus userBonus = new UserBonus();
+						userBonus.setUserId(userId);
+						userBonus.setBonusId(activityBonus.getBonusId());
+						List<UserBonus> isBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
+						if(isBonusList==null || isBonusList.size()<=0) { //判断 首充是否拿过  如果数据为空则没拿过首充奖励
 							Integer now = DateUtil.getCurrentTimeLong();
 							Date currentTime = new Date();
-							UserBonus userBonus = new UserBonus();
-							userBonus.setUserId(userId);
-							userBonus.setBonusId(activityBonus.getBonusId());
 							userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
 							userBonus.setBonusPrice(activityBonus.getBonusAmount());
 							userBonus.setAddTime(now);
@@ -737,40 +763,25 @@ public class UserBonusService extends AbstractService<UserBonus> {
 							userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
 							userBonus.setMinGoodsAmount(activityBonus.getMinGoodsAmount());
 							userBonus.setPayLogId(payLogId);
+							userBonus.setRechargeCardId(dto.getRechargeCardId());
+							userBonus.setRechargeCardRealValue(dto.getRealValue());
 							userBonusList.add(userBonus);
-							log.info("createRechargeUserBonusNew单笔充值");
-						}
-					} else if(dto.getStatus()==0 && dto.getType().equals(20) && 
-							dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//首充  满足充值赠送金额  且红包处于有效期
-						List<ActivityBonus> activityBonusList = activityBonusMapper.queryActivityBonusListByRechargeCardId(dto.getRechargeCardId());
-						for(ActivityBonus activityBonus:activityBonusList) {
-							UserBonus userBonus = new UserBonus();
-							userBonus.setUserId(userId);
-							userBonus.setBonusId(activityBonus.getBonusId());
-							List<UserBonus> isBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
-							if(isBonusList==null || isBonusList.size()<=0) { //判断 首充是否拿过  如果数据为空则没拿过首充奖励
-								Integer now = DateUtil.getCurrentTimeLong();
-								Date currentTime = new Date();
-								userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
-								userBonus.setBonusPrice(activityBonus.getBonusAmount());
-								userBonus.setAddTime(now);
-								userBonus.setReceiveTime(now);
-								userBonus.setStartTime(DateUtil.getTimeAfterDays(currentTime, activityBonus.getStartTime(), 0, 0, 0));
-								userBonus.setEndTime(DateUtil.getTimeAfterDays(currentTime, activityBonus.getEndTime(), 23, 59, 59));
-								userBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
-								userBonus.setIsDelete(ProjectConstant.NOT_DELETE);
-								userBonus.setUseRange(ProjectConstant.BONUS_USE_RANGE_ALL);
-								userBonus.setMinGoodsAmount(activityBonus.getMinGoodsAmount());
-								userBonus.setPayLogId(payLogId);
-								userBonusList.add(userBonus);
-								log.info("createRechargeUserBonusNew首次充值");
-							}
+							log.info("createRechargeUserBonusNew首次充值");
 						}
 					}
 				}
 			}
 		);
-		return ResultGenerator.genSuccessResult("success", userBonusMapper.insertBatchUserBonusForRecharge(userBonusList));
+		
+		if(userBonusList.size()>0) {
+			userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
+			HashMap<String,Object> rmap = new HashMap();
+			rmap.put("rechargeCardId", userBonusList.stream().findFirst().get().getRechargeCardId());
+			rmap.put("rechargeCardRealValue", userBonusList.stream().findFirst().get().getRechargeCardRealValue());
+			return ResultGenerator.genSuccessResult("success", rmap);
+		}else {
+			return ResultGenerator.genSuccessResult("success", null);
+		}
 	}
 	
 	/**

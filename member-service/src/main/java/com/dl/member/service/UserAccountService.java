@@ -700,6 +700,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccount.setCurBalance(updatedUser.getUserMoney().add(updatedUser.getUserMoneyLimit()));
 		userAccount.setStatus(Integer.valueOf(ProjectConstant.FINISH));
 		userAccount.setOrderSn(recharegeParam.getOrderSn());
+		userAccount.setRechargeCardId(recharegeParam.getRechargeCardId());
+		userAccount.setRechargeCardRealValue(recharegeParam.getRechargeCardRealValue());
 		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
 		if (rst != 1) {
 			log.error("生成充值流水失败");
