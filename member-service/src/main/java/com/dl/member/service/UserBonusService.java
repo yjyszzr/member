@@ -738,6 +738,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 							userBonus.setMinGoodsAmount(activityBonus.getMinGoodsAmount());
 							userBonus.setPayLogId(payLogId);
 							userBonusList.add(userBonus);
+							log.info("createRechargeUserBonusNew单笔充值");
 						}
 					} else if(dto.getStatus()==0 && dto.getType().equals(20) && 
 							dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//首充  满足充值赠送金额  且红包处于有效期
@@ -762,6 +763,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 								userBonus.setMinGoodsAmount(activityBonus.getMinGoodsAmount());
 								userBonus.setPayLogId(payLogId);
 								userBonusList.add(userBonus);
+								log.info("createRechargeUserBonusNew首次充值");
 							}
 						}
 					}
