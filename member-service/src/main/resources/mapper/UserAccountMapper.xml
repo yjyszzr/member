@@ -226,10 +226,10 @@
             #{donationMoney},
         </if>          
         <if test="rechargeCardId!=null">
-            #{recharge_card_id},
+            #{rechargeCardId},
         </if>  
         <if test="rechargeCardRealValue!=null">
-            #{recharge_card_real_value},
+            #{rechargeCardRealValue},
         </if>                
       </trim>
     </sql>

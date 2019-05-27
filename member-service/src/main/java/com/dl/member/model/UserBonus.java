@@ -101,8 +101,10 @@ public class UserBonus {
     @Column(name = "pay_log_id")
     private Integer payLogId;
     
+    @Column(name = "pay_log_id")
     private Integer rechargeCardId;
     
+    @Column(name = "pay_log_id")
     private BigDecimal rechargeCardRealValue;
     
     public BigDecimal getRechargeCardRealValue() {
