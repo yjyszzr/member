@@ -719,6 +719,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		rechargeCardList = rechargeCardList==null?new ArrayList<DonationRechargeCard>():rechargeCardList;
 		log.info("createRechargeUserBonusNew数据集size(2)="+rechargeCardList.size());
 		rechargeCardList.stream().forEach(dto -> {
+			log.info("createRechargeUserBonusNew对象DTO=："+dto.getStatus()+"&&"+dto.getType()+"&&"+dto.getLimitRechargeMoney());
+			log.info("createRechargeUserBonusNew条件："+(dto.getStatus()==0)+(dto.getType()==30)+
+						(dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()));
 				if(dto.getStatus()==0 && dto.getType()==30 && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//单笔 满足充值赠送金额  且红包处于有效期
 					List<ActivityBonus> activityBonusList = activityBonusMapper.queryActivityBonusListByRechargeCardId(dto.getRechargeCardId());
@@ -747,6 +750,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 					}
 				} else if(dto.getStatus()==0 && dto.getType()==20 && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//首充  满足充值赠送金额  且红包处于有效期
+					log.info("createRechargeUserBonusNew条件："+(dto.getStatus()==0)+(dto.getType()==20)+ 
+							(dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()));
 					List<ActivityBonus> activityBonusList = activityBonusMapper.queryActivityBonusListByRechargeCardId(dto.getRechargeCardId());
 					log.info("createRechargeUserBonusNew数据集size(5)="+activityBonusList.size());
 					for(ActivityBonus activityBonus:activityBonusList) {
