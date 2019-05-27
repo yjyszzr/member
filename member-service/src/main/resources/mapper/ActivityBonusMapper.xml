@@ -49,7 +49,7 @@
   </select>
   
   <select id = "queryActivityBonusListByRechargeCardId" resultMap="BaseResultMap">
-  	select * from dl_activity_bonus where recharge_card_id = #{rechargeCardId} and is_enable = 1 and is_delete = 0 order by recharge_chance asc
+  	select * from dl_activity_bonus where recharge_card_id = #{rechargeCardId} and is_delete = 0 order by recharge_chance asc
   </select>
   
 </mapper>
