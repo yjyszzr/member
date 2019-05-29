@@ -407,6 +407,14 @@ public class UserBankService extends AbstractService<UserBank> {
 	 * @return
 	 */
 	public BaseResult<WithDrawShowDTO> queryWithDrawShow(Integer purpose){
+		
+		SysConfigParam cfg = new SysConfigParam();
+		cfg.setBusinessId(70);//提现功能是否打开
+		int istx = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():1;
+		if(istx==0) {
+			return ResultGenerator.genResult(304080,"银联系统升级，暂无法使用！请联系微信：xiancaipaidian");
+		}
+		
 		Integer userId = SessionUtil.getUserId();
 		User user = userService.findById(userId);
 		
@@ -433,7 +441,6 @@ public class UserBankService extends AbstractService<UserBank> {
 			withDrawShowDTO.setDefaultBankLabel("");
 			withDrawShowDTO.setUserBankId("");
 		}
-		SysConfigParam cfg = new SysConfigParam();
 		cfg.setBusinessId(67);//读取财务账号id
 		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
     	if(userId!=null && userId==cwuserId) {// 财务账 号--提 现余额展示为商户余额
