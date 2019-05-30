@@ -758,6 +758,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 						amountTypeParam.setAmountType("2");//充值
 						amountTypeParam.setTimeType("0");//全部
 						PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(Integer.valueOf(amountTypeParam.getAmountType()),amountTypeParam.getPageNum(), amountTypeParam.getPageSize());
+						log.info("createRechargeUserBonusNew:="+rst.getList().size());
 						if(rst.getList().size()<=0) {//如果大于0则表示已经有充值记录
 //						if(isBonusList==null || isBonusList.size()<=0) { //判断 首充是否拿过  如果数据为空则没拿过首充奖励
 							Integer now = DateUtil.getCurrentTimeLong();
