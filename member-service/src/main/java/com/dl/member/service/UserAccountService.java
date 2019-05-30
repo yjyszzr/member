@@ -344,16 +344,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccount.setProcessType(processType);
 		}
 		PageHelper.startPage(pageNum, pageSize);
-		log.info("getUserAccountList:"+userAccount.getUserId()+"&&&&&"+userAccount.getProcessType());
 		List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
-		log.info("getUserAccountList:"+userAccountList.size());
 		if (userAccountList.size() == 0) {
 			return new PageInfo<UserAccountDTO>(userAccountListDTO);
 		}
 
 		PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
 		for (UserAccount ua : userAccountList) {
-			log.info("getUserAccountList:"+ua.getRechargeCardId());
 			UserAccountDTO userAccountDTO = new UserAccountDTO();
 			userAccountDTO.setId(ua.getId());
 			userAccountDTO.setPayId(ua.getPayId());

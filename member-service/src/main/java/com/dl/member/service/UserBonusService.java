@@ -21,6 +21,7 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.ActivityBonus;
 import com.dl.member.model.DonationRechargeCard;
 import com.dl.member.model.User;
+import com.dl.member.model.UserAccount;
 import com.dl.member.model.UserBonus;
 import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.BonusLimitConditionParam;
@@ -98,7 +99,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	private IOrderService iOrderService;
 	
 	@Resource
-	private UserAccountService userAccountService;
+	private UserAccountMapper userAccountMapper;
 
 	/**
 	 * 下单时的账户变动：目前仅红包置为已使用
@@ -753,13 +754,12 @@ public class UserBonusService extends AbstractService<UserBonus> {
 						userBonus.setUserId(userId);
 						userBonus.setBonusId(activityBonus.getBonusId());
 //						List<UserBonus> isBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
-						
-						AmountTypeParam amountTypeParam = new AmountTypeParam();
-						amountTypeParam.setAmountType("2");//充值
-						amountTypeParam.setTimeType("0");//全部
-						PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(Integer.valueOf(amountTypeParam.getAmountType()),amountTypeParam.getPageNum(), amountTypeParam.getPageSize());
-						log.info("getUserAccountList--createRechargeUserBonusNew:="+rst.getList().size());
-						if(rst.getList().size()<=0) {//如果大于0则表示已经有充值记录
+						UserAccount userAccount = new UserAccount();
+						userAccount.setUserId(userId);
+						userAccount.setProcessType(2);
+						List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
+						log.info("createRechargeUserBonusNew:="+userAccountList.size()+"*******"+userId);
+						if(userAccountList.size()<=0) {//如果大于0则表示已经有充值记录
 //						if(isBonusList==null || isBonusList.size()<=0) { //判断 首充是否拿过  如果数据为空则没拿过首充奖励
 							Integer now = DateUtil.getCurrentTimeLong();
 							Date currentTime = new Date();
