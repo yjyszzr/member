@@ -353,6 +353,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 		PageInfo<UserAccount> pageInfo = new PageInfo<UserAccount>(userAccountList);
 		for (UserAccount ua : userAccountList) {
+			log.info("getUserAccountList:"+ua.getRechargeCardId());
 			UserAccountDTO userAccountDTO = new UserAccountDTO();
 			userAccountDTO.setId(ua.getId());
 			userAccountDTO.setPayId(ua.getPayId());
