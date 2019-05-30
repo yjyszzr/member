@@ -15,12 +15,14 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.*;
 import com.dl.member.dto.DonationPriceDTO;
 import com.dl.member.dto.RechargeBonusLimitDTO;
+import com.dl.member.dto.UserAccountDTO;
 import com.dl.member.dto.UserBonusDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.ActivityBonus;
 import com.dl.member.model.DonationRechargeCard;
 import com.dl.member.model.User;
 import com.dl.member.model.UserBonus;
+import com.dl.member.param.AmountTypeParam;
 import com.dl.member.param.BonusLimitConditionParam;
 import com.dl.member.param.OrderSnParam;
 import com.dl.member.param.UserBonusParam;
@@ -94,6 +96,9 @@ public class UserBonusService extends AbstractService<UserBonus> {
 
 	@Resource
 	private IOrderService iOrderService;
+	
+	@Resource
+	private UserAccountService userAccountService;
 
 	/**
 	 * 下单时的账户变动：目前仅红包置为已使用
@@ -747,8 +752,14 @@ public class UserBonusService extends AbstractService<UserBonus> {
 						UserBonus userBonus = new UserBonus();
 						userBonus.setUserId(userId);
 						userBonus.setBonusId(activityBonus.getBonusId());
-						List<UserBonus> isBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
-						if(isBonusList==null || isBonusList.size()<=0) { //判断 首充是否拿过  如果数据为空则没拿过首充奖励
+//						List<UserBonus> isBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
+						
+						AmountTypeParam amountTypeParam = new AmountTypeParam();
+						amountTypeParam.setAmountType("2");//充值
+						amountTypeParam.setTimeType("0");//全部
+						PageInfo<UserAccountDTO> rst = userAccountService.getUserAccountList(Integer.valueOf(amountTypeParam.getAmountType()),amountTypeParam.getPageNum(), amountTypeParam.getPageSize());
+						if(rst.getList().size()<=0) {
+//						if(isBonusList==null || isBonusList.size()<=0) { //判断 首充是否拿过  如果数据为空则没拿过首充奖励
 							Integer now = DateUtil.getCurrentTimeLong();
 							Date currentTime = new Date();
 							userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
