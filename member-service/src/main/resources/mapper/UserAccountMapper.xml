@@ -62,6 +62,7 @@
 		    process_type = #{processType} AND
 		</if>
   		user_id = #{userId} AND
+  		process_type not in(10,11,12) AND
   		add_time BETWEEN  #{startTime} AND #{endTime}
   		ORDER BY add_time DESC
   </select>
