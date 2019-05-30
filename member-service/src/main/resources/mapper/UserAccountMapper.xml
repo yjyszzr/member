@@ -38,7 +38,7 @@
   		SELECT *  FROM dl_user_account 
 	  	<where>
 		  	<if test="userId != null">
-		        AND user_id = #{userId}
+		        AND user_id = #{userId} AND process_type not in(10,11,12)
 		    </if>
 		    <if test="processType != null">
 		        AND process_type = #{processType}
