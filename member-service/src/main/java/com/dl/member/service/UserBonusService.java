@@ -760,6 +760,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 					userAccount.setUserId(userId);
 					userAccount.setProcessType(2);
 					List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
+					log.info("createRechargeUserBonusNew:userid="+userId+"**&***size="+userAccountList.size());
 					if(userAccountList.size()<=0) {//如果大于0则表示已经有充值记录
 						UserBonus userBonus2 = new UserBonus();
 						userBonus2.setRechargeCardId(dto.getRechargeCardId());
@@ -797,7 +798,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		);
 		log.info("createRechargeUserBonusNew数据集size(99)="+userBonusList.size());
 		log.info("createRechargeUserBonusNew数据集size(100)="+userBonusList2.size());
-		if(userBonusList.size()>0) {
+		if(userBonusList2.size()>0) {
 			userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
 			userBonusMapper.insertRechargeCardAccountRelation(userBonusList2);
 			HashMap<String,Object> rmap = new HashMap<String,Object>();
