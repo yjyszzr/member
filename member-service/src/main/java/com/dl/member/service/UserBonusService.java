@@ -721,10 +721,16 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		//查询充值卡
 		List<DonationRechargeCard> rechargeCardList = donationRechargeCardMapper.queryRechargeCardList();
 		List<UserBonus> userBonusList = new ArrayList<>();
+		List<UserBonus> userBonusList2 = new ArrayList<>();
 		rechargeCardList = rechargeCardList==null?new ArrayList<DonationRechargeCard>():rechargeCardList;
 		rechargeCardList.stream().forEach(dto -> {
 				if(dto.getStatus()==0 && dto.getType()==30 && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//单笔 满足充值赠送金额  且红包处于有效期
+					UserBonus userBonus2 = new UserBonus();
+					userBonus2.setRechargeCardId(dto.getRechargeCardId());
+					userBonus2.setRechargeCardRealValue(dto.getRealValue());
+					userBonus2.setAccountSn(accountSn);
+					userBonusList2.add(userBonus2);
 					List<ActivityBonus> activityBonusList = activityBonusMapper.queryActivityBonusListByRechargeCardId(dto.getRechargeCardId());
 					for(ActivityBonus activityBonus:activityBonusList) {
 						Integer now = DateUtil.getCurrentTimeLong();
@@ -750,19 +756,23 @@ public class UserBonusService extends AbstractService<UserBonus> {
 					}
 				} else if(dto.getStatus()==0 && dto.getType()==20 && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//首充  满足充值赠送金额  且红包处于有效期
-					List<ActivityBonus> activityBonusList = activityBonusMapper.queryActivityBonusListByRechargeCardId(dto.getRechargeCardId());
-					for(ActivityBonus activityBonus:activityBonusList) {
-						UserBonus userBonus = new UserBonus();
-						userBonus.setUserId(userId);
-						userBonus.setBonusId(activityBonus.getBonusId());
-//						List<UserBonus> isBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
-						UserAccount userAccount = new UserAccount();
-						userAccount.setUserId(userId);
-						userAccount.setProcessType(2);
-						List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
-						log.info("createRechargeUserBonusNew:="+userAccountList.size()+"*******"+userId);
-						if(userAccountList.size()<=0) {//如果大于0则表示已经有充值记录
-//						if(isBonusList==null || isBonusList.size()<=0) { //判断 首充是否拿过  如果数据为空则没拿过首充奖励
+					UserAccount userAccount = new UserAccount();
+					userAccount.setUserId(userId);
+					userAccount.setProcessType(2);
+					List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
+					if(userAccountList.size()<=0) {//如果大于0则表示已经有充值记录
+						UserBonus userBonus2 = new UserBonus();
+						userBonus2.setRechargeCardId(dto.getRechargeCardId());
+						userBonus2.setRechargeCardRealValue(dto.getRealValue());
+						userBonus2.setAccountSn(accountSn);
+						userBonusList2.add(userBonus2);
+						List<ActivityBonus> activityBonusList = activityBonusMapper.queryActivityBonusListByRechargeCardId(dto.getRechargeCardId());
+						for(ActivityBonus activityBonus:activityBonusList) {
+							UserBonus userBonus = new UserBonus();
+							userBonus.setUserId(userId);
+							userBonus.setBonusId(activityBonus.getBonusId());
+	//						List<UserBonus> isBonusList = userBonusMapper.queryUserBonusForPay(userBonus);
+	//						if(isBonusList==null || isBonusList.size()<=0) { //判断 首充是否拿过  如果数据为空则没拿过首充奖励
 							Integer now = DateUtil.getCurrentTimeLong();
 							Date currentTime = new Date();
 							userBonus.setBonusSn(SNGenerator.nextSN(SNBusinessCodeEnum.BONUS_SN.getCode()));
@@ -786,9 +796,10 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			}
 		);
 		log.info("createRechargeUserBonusNew数据集size(99)="+userBonusList.size());
+		log.info("createRechargeUserBonusNew数据集size(100)="+userBonusList2.size());
 		if(userBonusList.size()>0) {
 			userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
-			userBonusMapper.insertRechargeCardAccountRelation(userBonusList);
+			userBonusMapper.insertRechargeCardAccountRelation(userBonusList2);
 			HashMap<String,Object> rmap = new HashMap<String,Object>();
 //			rmap.put("rechargeCardId", userBonusList.stream().findFirst().get().getRechargeCardId());
 //			rmap.put("rechargeCardRealValue", userBonusList.stream().findFirst().get().getRechargeCardRealValue());
