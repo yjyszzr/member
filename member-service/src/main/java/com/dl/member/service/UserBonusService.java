@@ -39,6 +39,8 @@ import com.dl.shop.payment.dto.YesOrNoDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.util.StringUtil;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -715,8 +717,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 */
 	public BaseResult<HashMap<String,Object>> createRechargeUserBonusNew(com.dl.member.param.PayLogIdParam payLogIdParam) {
 		BigDecimal bonusPrice = payLogIdParam.getOrderAmount();
-		Integer userId = payLogIdParam.getUserId()==null?SessionUtil.getUserId():payLogIdParam.getUserId();
-		Integer payLogId = Integer.valueOf(payLogIdParam.getPayLogId());
+		Integer userId = payLogIdParam.getUserId();
+		Integer payLogId = Integer.valueOf(StringUtil.isEmpty(payLogIdParam.getPayLogId())?"0":payLogIdParam.getPayLogId());
 		String accountSn = payLogIdParam.getAccountSn();
 		//查询充值卡
 		List<DonationRechargeCard> rechargeCardList = donationRechargeCardMapper.queryRechargeCardList();
@@ -799,14 +801,19 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		log.info("createRechargeUserBonusNew数据集size(99)="+userBonusList.size());
 		log.info("createRechargeUserBonusNew数据集size(100)="+userBonusList2.size());
 		if(userBonusList2.size()>0) {
-			userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
-			userBonusMapper.insertRechargeCardAccountRelation(userBonusList2);
-			HashMap<String,Object> rmap = new HashMap<String,Object>();
-//			rmap.put("rechargeCardId", userBonusList.stream().findFirst().get().getRechargeCardId());
-//			rmap.put("rechargeCardRealValue", userBonusList.stream().findFirst().get().getRechargeCardRealValue());
-			return ResultGenerator.genSuccessResult("success", rmap);
+			try {
+				userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
+				userBonusMapper.insertRechargeCardAccountRelation(userBonusList2);
+				HashMap<String,Object> rmap = new HashMap<String,Object>();
+//				rmap.put("rechargeCardId", userBonusList.stream().findFirst().get().getRechargeCardId());
+//				rmap.put("rechargeCardRealValue", userBonusList.stream().findFirst().get().getRechargeCardRealValue());
+				return ResultGenerator.genSuccessResult("success", rmap);
+			} catch (Exception e) {
+				return ResultGenerator.genFailResult("红包赠送异常！");
+			}
+			
 		}else {
-			return ResultGenerator.genSuccessResult("success", null);
+			return ResultGenerator.genResult(MemberEnums.ACTIVITY_NOT_VALID.getcode(), MemberEnums.ACTIVITY_NOT_VALID.getMsg(),null);
 		}
 	}
 	
