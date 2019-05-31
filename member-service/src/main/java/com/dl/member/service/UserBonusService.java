@@ -761,7 +761,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 					userAccount.setProcessType(2);
 					List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
 					log.info("createRechargeUserBonusNew:userid="+userId+"**&***size="+userAccountList.size());
-					if(userAccountList.size()<=0) {//如果大于0则表示已经有充值记录
+					if(userAccountList.size()<=1) {//如果大于1则表示之前有过充值有充值记录 （在此处送红包  此时充值记录已经写入数据库  所以判断的时候  判断是否大于1）
 						UserBonus userBonus2 = new UserBonus();
 						userBonus2.setRechargeCardId(dto.getRechargeCardId());
 						userBonus2.setRechargeCardRealValue(dto.getRealValue());
