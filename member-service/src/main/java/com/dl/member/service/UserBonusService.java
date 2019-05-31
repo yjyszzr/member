@@ -715,7 +715,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 */
 	public BaseResult<HashMap<String,Object>> createRechargeUserBonusNew(com.dl.member.param.PayLogIdParam payLogIdParam) {
 		BigDecimal bonusPrice = payLogIdParam.getOrderAmount();
-		Integer userId = payLogIdParam.getUserId();
+		Integer userId = payLogIdParam.getUserId()==null?SessionUtil.getUserId():payLogIdParam.getUserId();
 		Integer payLogId = Integer.valueOf(payLogIdParam.getPayLogId());
 		String accountSn = payLogIdParam.getAccountSn();
 		//查询充值卡
