@@ -101,13 +101,24 @@ public class UserBonus {
     @Column(name = "pay_log_id")
     private Integer payLogId;
     
-    @Column(name = "pay_log_id")
+    @Column(name = "pay_log_id")//加这个避免没字段报错，不影响业务
     private Integer rechargeCardId;
     
-    @Column(name = "pay_log_id")
+    @Column(name = "pay_log_id")//加这个避免没字段报错，不影响业务
     private BigDecimal rechargeCardRealValue;
+
+    @Column(name = "pay_log_id")//加这个避免没字段报错，不影响业务
+    private String accountSn;
     
-    public BigDecimal getRechargeCardRealValue() {
+    public String getAccountSn() {
+		return accountSn;
+	}
+
+	public void setAccountSn(String accountSn) {
+		this.accountSn = accountSn;
+	}
+
+	public BigDecimal getRechargeCardRealValue() {
 		return rechargeCardRealValue;
 	}
 

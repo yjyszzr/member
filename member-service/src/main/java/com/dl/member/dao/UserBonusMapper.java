@@ -10,7 +10,9 @@ public interface UserBonusMapper extends Mapper<UserBonus> {
 	 int insertBatchUserBonus(List<UserBonus> list);
 	 
 	 int insertBatchUserBonusForRecharge(List<UserBonus> list);
-	
+	 
+	 int insertRechargeCardAccountRelation(List<UserBonus> list);
+	 
 	 List<UserBonus> queryUserBonusList(@Param("userBonusIds") Integer[] userBonusIds,@Param("userId")Integer userId,@Param("curTime") Integer curTime);
 
 	 List<UserBonus> queryUserBonusBySelective(UserBonus userBonus);

@@ -200,6 +200,17 @@
   <select id="getBonusByUserId" resultMap="BaseResultMap">
   		 SELECT count(1) bonus_id,SUM(bonus_price) bonus_price FROM dl_user_bonus where bonus_status=0 and user_id=#{userId}
   </select>
- 
+<!--  增加大礼包派送记录 便于统计派发次数 -->
+  <insert id ="insertRechargeCardAccountRelation" parameterType="java.util.List" >
+      insert into dl_recharge_card_account_relation(account_sn,recharge_card_id,recharge_card_real_value)
+            values
+            <foreach collection ="list" item="item" index= "index" separator =",">
+                (
+                #{item.accountSn},
+                #{item.rechargeCardId},
+                #{item.rechargeCardRealValue}
+                )
+            </foreach >
+   </insert >
   
 </mapper>

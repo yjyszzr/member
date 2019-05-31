@@ -19,5 +19,8 @@ public class PayLogIdParam {
     
     @ApiModelProperty(value = "支付用户id")
     private Integer userId;
+    
+    @ApiModelProperty(value = "充值流水号")
+    private String accountSn;
 
 }

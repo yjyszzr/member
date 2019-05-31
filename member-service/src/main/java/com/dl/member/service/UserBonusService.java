@@ -717,6 +717,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		BigDecimal bonusPrice = payLogIdParam.getOrderAmount();
 		Integer userId = payLogIdParam.getUserId();
 		Integer payLogId = Integer.valueOf(payLogIdParam.getPayLogId());
+		String accountSn = payLogIdParam.getAccountSn();
 		//查询充值卡
 		List<DonationRechargeCard> rechargeCardList = donationRechargeCardMapper.queryRechargeCardList();
 		List<UserBonus> userBonusList = new ArrayList<>();
@@ -744,6 +745,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 						userBonus.setPayLogId(payLogId);
 						userBonus.setRechargeCardId(dto.getRechargeCardId());
 						userBonus.setRechargeCardRealValue(dto.getRealValue());
+						userBonus.setAccountSn(accountSn);
 						userBonusList.add(userBonus);
 					}
 				} else if(dto.getStatus()==0 && dto.getType()==20 && 
@@ -776,6 +778,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 							userBonus.setPayLogId(payLogId);
 							userBonus.setRechargeCardId(dto.getRechargeCardId());
 							userBonus.setRechargeCardRealValue(dto.getRealValue());
+							userBonus.setAccountSn(accountSn);
 							userBonusList.add(userBonus);
 						}
 					}
@@ -785,9 +788,10 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		log.info("createRechargeUserBonusNew数据集size(99)="+userBonusList.size());
 		if(userBonusList.size()>0) {
 			userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
+			userBonusMapper.insertRechargeCardAccountRelation(userBonusList);
 			HashMap<String,Object> rmap = new HashMap<String,Object>();
-			rmap.put("rechargeCardId", userBonusList.stream().findFirst().get().getRechargeCardId());
-			rmap.put("rechargeCardRealValue", userBonusList.stream().findFirst().get().getRechargeCardRealValue());
+//			rmap.put("rechargeCardId", userBonusList.stream().findFirst().get().getRechargeCardId());
+//			rmap.put("rechargeCardRealValue", userBonusList.stream().findFirst().get().getRechargeCardRealValue());
 			return ResultGenerator.genSuccessResult("success", rmap);
 		}else {
 			return ResultGenerator.genSuccessResult("success", null);
