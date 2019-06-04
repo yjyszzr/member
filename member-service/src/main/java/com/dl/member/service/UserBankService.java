@@ -409,7 +409,7 @@ public class UserBankService extends AbstractService<UserBank> {
 	public BaseResult<WithDrawShowDTO> queryWithDrawShow(Integer purpose){
 		
 		SysConfigParam cfg = new SysConfigParam();
-		cfg.setBusinessId(70);//提现功能是否打开
+		cfg.setBusinessId(72);//提现功能是否打开
 		int istx = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():1;
 		if(istx==0) {
 			return ResultGenerator.genResult(304080,"银联系统升级，暂无法使用！请联系微信：xiancaipaidian");
