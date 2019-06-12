@@ -10,4 +10,8 @@ public class MacParam {
     @ApiModelProperty(value = "mac")
     @NotBlank(message = "mac不能为空")
     private String mac;
+    
+    @ApiModelProperty(value = "busiType")
+    @NotBlank(message = "busiType不能为空")
+    private Integer busiType;
 }

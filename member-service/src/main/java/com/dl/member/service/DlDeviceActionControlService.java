@@ -13,12 +13,12 @@ public class DlDeviceActionControlService extends AbstractService<DlDeviceAction
     @Resource
     private DlDeviceActionControlMapper dlDeviceActionControlMapper;
 
-    public DlDeviceActionControl queryDeviceByIMEI(String mac){
-       return dlDeviceActionControlMapper.queryDeviceByIMEI(mac);
+    public DlDeviceActionControl queryDeviceByIMEI(String mac,Integer busiType){
+       return dlDeviceActionControlMapper.queryDeviceByIMEI(mac,busiType);
     }
 
-    public Integer updateDeviceCtrlUpdteTime(Integer updateTime,String mac){
-        return dlDeviceActionControlMapper.updateDeviceUpdateTime(updateTime,mac);
+    public Integer updateDeviceCtrlUpdteTime(Integer updateTime,String mac,Integer busiType){
+        return dlDeviceActionControlMapper.updateDeviceUpdateTime(updateTime,mac,busiType);
     }
 
 }

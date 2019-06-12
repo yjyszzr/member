@@ -6,8 +6,8 @@ import org.apache.ibatis.annotations.Param;
 
 public interface DlDeviceActionControlMapper extends Mapper<DlDeviceActionControl> {
 
-    DlDeviceActionControl queryDeviceByIMEI(@Param("mac") String mac);
+    DlDeviceActionControl queryDeviceByIMEI(@Param("mac") String mac,@Param("busiType") Integer busiType);
 
-    int updateDeviceUpdateTime(@Param("updateTime") Integer updateTime,@Param("mac") String mac);
+    int updateDeviceUpdateTime(@Param("updateTime") Integer updateTime,@Param("mac") String mac,@Param("busiType") Integer busiType);
 
 }

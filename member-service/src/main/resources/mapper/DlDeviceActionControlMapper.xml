@@ -14,11 +14,11 @@
   </resultMap>
 
   <select id = "queryDeviceByIMEI" resultMap="BaseResultMap">
-    select * from dl_device_action_control where mac = #{mac}
+    select * from dl_device_action_control where mac = #{mac} and busi_type=#{busiType}
   </select>
 
   <update id="updateDeviceUpdateTime">
-    update dl_device_action_control set update_time = #{updateTime} where mac = #{mac}
+    update dl_device_action_control set update_time = #{updateTime} where mac = #{mac} and busi_type=#{busiType}
   </update>
 
 </mapper>

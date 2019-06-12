@@ -39,14 +39,14 @@ public class DlDeviceActionControlController {
     @PostMapping("/updateDeviceControlUpdteTime")
     public BaseResult<String> updateDeviceControlUpdteTime(@RequestBody MacParam param) {
         DlDeviceActionControl dctrl = new DlDeviceActionControl();
-        dlDeviceActionControlService.updateDeviceCtrlUpdteTime(DateUtil.getCurrentTimeLong(),param.getMac());
+        dlDeviceActionControlService.updateDeviceCtrlUpdteTime(DateUtil.getCurrentTimeLong(),param.getMac(),param.getBusiType());
         return ResultGenerator.genSuccessResult();
     }
 
     @PostMapping("queryDeviceByIMEI")
     public BaseResult<DlDeviceActionControlDTO> queryDeviceByIMEI(@RequestBody MacParam macParam){
         DlDeviceActionControlDTO deviceCtrlDto = new DlDeviceActionControlDTO();
-        DlDeviceActionControl deviveCtrl = dlDeviceActionControlService.queryDeviceByIMEI(macParam.getMac());
+        DlDeviceActionControl deviveCtrl = dlDeviceActionControlService.queryDeviceByIMEI(macParam.getMac(),macParam.getBusiType());
         if(deviveCtrl != null && deviveCtrl.getUpdateTime() != null){
             try {
                 BeanUtils.copyProperties(deviceCtrlDto,deviveCtrl);
