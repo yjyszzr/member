@@ -235,19 +235,24 @@
       </trim>
     </sql>
     
-<!--   <insert id="insertUserAccountBySelective"> -->
-<!--   	INSERT INTO dl_user_account(<include refid="key"/>) values(<include refid="value"/>); -->
-<!--   </insert> -->
   <insert id="insertUserAccountBySelective">
-  	INSERT INTO dl_user_account(account_sn,user_id,admin_user,amount,cur_balance,add_time,last_time,process_type,payment_name,order_sn,parent_sn,note,pay_id,third_part_name,user_surplus,user_surplus_limit,status,donation_money,recharge_card_id,recharge_card_real_value)
-	values(#{accountSn},#{userId},#{adminUser},#{amount},#{curBalance},#{addTime},#{lastTime},#{processType},#{paymentName},#{orderSn},#{parentSn},#{note},#{payId},#{thirdPartName},#{userSurplus},#{userSurplusLimit},#{status},#{donationMoney},#{rechargeCardId},#{rechargeCardRealValue});
+  	INSERT INTO dl_user_account(<include refid="key"/>) values(<include refid="value"/>);
   </insert>
-  
+<!--   <insert id="insertUserAccountBySelective"> -->
+<!--   	INSERT INTO dl_user_account(account_sn,user_id,admin_user,amount,cur_balance,add_time,last_time,process_type,payment_name,order_sn,parent_sn,note,pay_id,third_part_name,user_surplus,user_surplus_limit,status,donation_money,recharge_card_id,recharge_card_real_value) -->
+<!-- 	values(#{accountSn},#{userId},#{adminUser},#{amount},#{curBalance},#{addTime},#{lastTime},#{processType},#{paymentName},#{orderSn},#{parentSn},#{note},#{payId},#{thirdPartName},#{userSurplus},#{userSurplusLimit},#{status},#{donationMoney},#{rechargeCardId},#{rechargeCardRealValue}); -->
+<!--   </insert> -->
   <insert id="insertUserAccount">
   	INSERT INTO 
-  	dl_user_account(account_sn,user_id,admin_user,amount,cur_balance,add_time,last_time,process_type,payment_name,order_sn,parent_sn,note,pay_id,third_part_name,user_surplus,user_surplus_limit,third_part_paid,status,donation_money,recharge_card_id,recharge_card_real_value)
-  	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},#{curBalance},#{addTime},#{lastTime},#{processType},#{paymentName},#{orderSn},#{parentSn},
-  	#{note},#{payId},#{thirdPartName},#{userSurplus},#{userSurplusLimit},#{thirdPartPaid},#{status},#{donationMoney},#{rechargeCardId},#{rechargeCardRealValue});
+  	dl_user_account(account_sn,user_id,admin_user,amount,
+  	cur_balance,add_time,last_time,process_type,
+  	payment_name,order_sn,parent_sn,note,pay_id,third_part_name,
+  	user_surplus,user_surplus_limit,third_part_paid,status,donation_money,recharge_card_id,recharge_card_real_value)
+  	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},
+  	#{curBalance},#{addTime},#{lastTime},#{processType},
+  	#{paymentName},#{orderSn},#{parentSn},
+  	#{note},#{payId},#{thirdPartName},#{userSurplus},
+  	#{userSurplusLimit},#{thirdPartPaid},#{status},#{donationMoney},#{rechargeCardId},#{rechargeCardRealValue});
   </insert> 
   
   <update id="updateUserAccountBySelective" parameterType="com.dl.member.model.UserAccount">
