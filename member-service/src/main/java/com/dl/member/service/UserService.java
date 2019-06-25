@@ -414,25 +414,25 @@ public class UserService extends AbstractService<User> {
 		return ResultGenerator.genSuccessResult("success",uDto);
 	}
 
-	public BaseResult<UserDTO> queryUserByMobile(String mobile) {
-		UserDTO uDto = new UserDTO();
-		if (!RegexUtil.checkMobile(mobile)) {
-			return ResultGenerator.genSuccessResult("success",null);
-		}
-
-		String appCodeName = "11";
-		User user = userMapper.queryUserByMobileAndAppCdde(mobile,appCodeName);
-		if (null == user) {
-			return ResultGenerator.genSuccessResult("success",null);
-		}
-
-		uDto.setMobile(user.getMobile());
-		uDto.setPassword(user.getPassword());
-		uDto.setSalt(user.getSalt());
-		uDto.setUserId(user.getUserId());
-
-		return ResultGenerator.genSuccessResult("success",uDto);
-	}
+//	public BaseResult<UserDTO> queryUserByMobile(String mobile) {
+//		UserDTO uDto = new UserDTO();
+//		if (!RegexUtil.checkMobile(mobile)) {
+//			return ResultGenerator.genSuccessResult("success",null);
+//		}
+//
+//		String appCodeName = "11";
+//		User user = userMapper.queryUserByMobileAndAppCdde(mobile,appCodeName);
+//		if (null == user) {
+//			return ResultGenerator.genSuccessResult("success",null);
+//		}
+//
+//		uDto.setMobile(user.getMobile());
+//		uDto.setPassword(user.getPassword());
+//		uDto.setSalt(user.getSalt());
+//		uDto.setUserId(user.getUserId());
+//
+//		return ResultGenerator.genSuccessResult("success",uDto);
+//	}
 	
 	/**
 	 * 校验用户的手机号

@@ -65,11 +65,11 @@ public class UserController {
 	public BaseResult<UserDTO> queryUserByMobileAndPass(@RequestBody MobileAndPassParam param) {
 		return userService.queryUserByMobileAndPass(param.getMobile(),param.getPass());
 	}
-	@ApiOperation(value = "根据手机号查询用户信息", notes = "根据手机号查询用户信息")
-	@PostMapping("/queryUserByMobile")
-	public BaseResult<UserDTO> queryUserByMobile(@RequestBody MobileAndPassParam param) {
-		return userService.queryUserByMobile(param.getMobile());
-	}
+//	@ApiOperation(value = "根据手机号查询用户信息", notes = "根据手机号查询用户信息")
+//	@PostMapping("/queryUserByMobile")
+//	public BaseResult<UserDTO> queryUserByMobile(@RequestBody MobileAndPassParam param) {
+//		return userService.queryUserByMobile(param.getMobile());
+//	}
 	/**
 	 * 校验手机号
 	 * 
