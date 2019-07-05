@@ -724,10 +724,16 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		List<DonationRechargeCard> rechargeCardList = donationRechargeCardMapper.queryRechargeCardList();
 		List<UserBonus> userBonusList = new ArrayList<>();
 		List<UserBonus> userBonusList2 = new ArrayList<>();
+		String dbgiveBonusNum = "";
+		String scgiveBonusNum = "";
 		rechargeCardList = rechargeCardList==null?new ArrayList<DonationRechargeCard>():rechargeCardList;
+		//按充值金额赠送条件倒序排序
+		rechargeCardList.stream().sorted(Comparator.comparing(DonationRechargeCard::getLimitRechargeMoney).reversed()).collect(Collectors.toList());
 		rechargeCardList.stream().forEach(dto -> {
-				if(dto.getStatus()==0 && dto.getType()==30 && 
+				if(dto.getStatus()==0 && dto.getType()==30 && StringUtil.isEmpty(dbgiveBonusNum) && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//单笔 满足充值赠送金额  且红包处于有效期
+					//如果多个单笔礼包满足赠送条件  取礼包价值最大的1个
+					dbgiveBonusNum.concat("Not Null");//给值  破坏判断条件
 					UserBonus userBonus2 = new UserBonus();
 					userBonus2.setRechargeCardId(dto.getRechargeCardId());
 					userBonus2.setRechargeCardRealValue(dto.getRealValue());
@@ -756,8 +762,10 @@ public class UserBonusService extends AbstractService<UserBonus> {
 						userBonus.setAccountSn(accountSn);
 						userBonusList.add(userBonus);
 					}
-				} else if(dto.getStatus()==0 && dto.getType()==20 && 
+				} else if(dto.getStatus()==0 && dto.getType()==20 && StringUtil.isEmpty(scgiveBonusNum) && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//首充  满足充值赠送金额  且红包处于有效期
+					//如果多个礼包满足赠送条件  取礼包价值最大的1个
+					scgiveBonusNum.concat("Not Null");//给值  破坏判断条件
 					UserAccount userAccount = new UserAccount();
 					userAccount.setUserId(userId);
 					userAccount.setProcessType(2);
