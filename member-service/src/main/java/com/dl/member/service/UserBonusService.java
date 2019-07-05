@@ -764,7 +764,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 					}
 				} else if(dto.getStatus()==0 && dto.getType()==20 && StringUtil.isEmpty(scgiveBonusNum) && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//首充  满足充值赠送金额  且红包处于有效期
-					//如果多个礼包满足赠送条件  取礼包价值最大的1个
+					//如果多个首充礼包满足赠送条件  取礼包价值最大的1个
 					scgiveBonusNum.concat("Not Null");//给值  破坏判断条件
 					UserAccount userAccount = new UserAccount();
 					userAccount.setUserId(userId);
