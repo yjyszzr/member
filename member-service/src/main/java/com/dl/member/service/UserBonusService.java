@@ -728,10 +728,11 @@ public class UserBonusService extends AbstractService<UserBonus> {
 		String scgiveBonusNum = "";
 		rechargeCardList = rechargeCardList==null?new ArrayList<DonationRechargeCard>():rechargeCardList;
 		//按充值金额赠送条件倒序排序
-		rechargeCardList.stream().sorted(Comparator.comparing(DonationRechargeCard::getLimitRechargeMoney).reversed()).collect(Collectors.toList());
-		rechargeCardList.stream().forEach(dto -> {
+		rechargeCardList.stream().sorted(Comparator.comparing(DonationRechargeCard::getLimitRechargeMoney).reversed())
+			.forEach(dto -> {
 				if(dto.getStatus()==0 && dto.getType()==30 && StringUtil.isEmpty(dbgiveBonusNum) && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//单笔 满足充值赠送金额  且红包处于有效期
+					log.info("userbonus:赠送：bounsId="+dto.getRechargeCardId()+"；revalue"+dto.getLimitRechargeMoney().doubleValue()+"；isNull"+dbgiveBonusNum);
 					//如果多个单笔礼包满足赠送条件  取礼包价值最大的1个
 					dbgiveBonusNum.concat("Not Null");//给值  破坏判断条件
 					UserBonus userBonus2 = new UserBonus();
@@ -764,13 +765,13 @@ public class UserBonusService extends AbstractService<UserBonus> {
 					}
 				} else if(dto.getStatus()==0 && dto.getType()==20 && StringUtil.isEmpty(scgiveBonusNum) && 
 						dto.getLimitRechargeMoney().doubleValue() <= bonusPrice.doubleValue()) {//首充  满足充值赠送金额  且红包处于有效期
+					log.info("userbonus:赠送：bounsId="+dto.getRechargeCardId()+"；revalue"+dto.getLimitRechargeMoney().doubleValue()+"；isNull"+scgiveBonusNum);
 					//如果多个首充礼包满足赠送条件  取礼包价值最大的1个
 					scgiveBonusNum.concat("Not Null");//给值  破坏判断条件
 					UserAccount userAccount = new UserAccount();
 					userAccount.setUserId(userId);
 					userAccount.setProcessType(2);
 					List<UserAccount> userAccountList = userAccountMapper.queryUserAccountBySelective(userAccount);
-					log.info("createRechargeUserBonusNew:userid="+userId+"**&***size="+userAccountList.size());
 					if(userAccountList.size()<=1) {//如果大于1则表示之前有过充值有充值记录 （在此处送红包  此时充值记录已经写入数据库  所以判断的时候  判断是否大于1）
 						UserBonus userBonus2 = new UserBonus();
 						userBonus2.setRechargeCardId(dto.getRechargeCardId());
@@ -806,8 +807,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
 				}
 			}
 		);
-		log.info("createRechargeUserBonusNew数据集size(99)="+userBonusList.size());
-		log.info("createRechargeUserBonusNew数据集size(100)="+userBonusList2.size());
+//		log.info("createRechargeUserBonusNew数据集size(99)="+userBonusList.size());
+//		log.info("createRechargeUserBonusNew数据集size(100)="+userBonusList2.size());
 		if(userBonusList2.size()>0) {
 			try {
 				userBonusMapper.insertBatchUserBonusForRecharge(userBonusList);
