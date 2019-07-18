@@ -336,7 +336,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 //			userBonusDTO.setSoonExprireBz("");
 //			userBonusDTO.setLeaveTime("");
 //		}
-		userBonusDTO.setBonusName(userBonus.getBonusPrice()+"元代金券");
+		userBonusDTO.setBonusName(userBonus.getBonusPrice()+"元优惠券");
 		userBonusDTO.setShortDesc("去使用");
 		userBonusDTO.setBonusPriceStr(userBonus.getBonusPrice()+"元");
 		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
@@ -377,7 +377,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			userBonusDTO.setThisStatus("1");
 		}
 		userBonusDTO.setMinAmount(userBonus.getMinGoodsAmount());
-		userBonusDTO.setBonusName(userBonus.getBonusPrice()+"元代金券");
+		userBonusDTO.setBonusName(userBonus.getBonusPrice()+"元优惠券");
 		userBonusDTO.setShortDesc("去使用");
 		userBonusDTO.setBonusPriceStr(userBonus.getBonusPrice()+"元");
 		userBonusDTO.setUseRange(userBonusShowDescService.getUseRange(userBonus.getUseRange()));
