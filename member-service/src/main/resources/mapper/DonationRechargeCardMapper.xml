@@ -19,6 +19,6 @@
   </resultMap>
   
   <select id="queryRechargeCardList" resultMap="BaseResultMap">
-	  	select * from dl_donation_recharge_card
+	  	select * from dl_donation_recharge_card where is_delete=0
   </select>
 </mapper>
