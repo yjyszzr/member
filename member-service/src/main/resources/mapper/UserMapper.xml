@@ -43,6 +43,8 @@
 	  <result column="is_super_white" jdbcType="INTEGER" property="isSuperWhite" />
     <result column="merchant_pass" jdbcType="VARCHAR" property="merchantPass" />
     <result column="merchant_no" jdbcType="VARCHAR" property="merchantNo" />
+    <result column="parent_user_id" jdbcType="INTEGER" property="parentUserId" />
+    <result column="is_status" jdbcType="INTEGER" property="isStatus" />
   </resultMap>
   
   <insert id="insertWithReturnId"  parameterType="com.dl.member.model.User" useGeneratedKeys="true" keyProperty="userId">

@@ -562,6 +562,9 @@ public class UserService extends AbstractService<User> {
 				userDTO.setTotalMoney(String.valueOf(totalMoney));
 				userDTO.setMerchantNo(user.getMerchantNo());
 				userDTO.setMerchantPass(user.getMerchantPass());
+				userDTO.setRegTime(user.getRegTime());
+				userDTO.setParentUserId(user.getParentUserId());
+				userDTO.setIsStatus(user.getIsStatus());
 			} catch (Exception e) {
 				throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 			}

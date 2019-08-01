@@ -209,7 +209,28 @@ public class User {
     @Column(name = "user_remark")
     private String userRemark;
   
-    public Integer getIsBusiness() {
+    /**
+     * 邀请人ID
+     * @return
+     */
+    @Column(name = "parent_user_id")
+    private Integer parentUserId;
+    /**
+     * 邀请奖励是否已生效
+     * @return
+     */
+    @Column(name = "is_status")
+    private Integer isStatus;
+    
+    public Integer getIsStatus() {
+		return isStatus;
+	}
+
+	public void setIsStatus(Integer isStatus) {
+		this.isStatus = isStatus;
+	}
+
+	public Integer getIsBusiness() {
 		return isBusiness;
 	}
 
@@ -807,7 +828,15 @@ public class User {
         return userRemark;
     }
 
-    /**
+    public Integer getParentUserId() {
+		return parentUserId;
+	}
+
+	public void setParentUserId(Integer parentUserId) {
+		this.parentUserId = parentUserId;
+	}
+
+	/**
      * 设置会员备注
      *
      * @param userRemark 会员备注
