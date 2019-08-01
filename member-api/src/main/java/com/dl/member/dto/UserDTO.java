@@ -207,6 +207,17 @@ public class UserDTO {
      * 用户持有有效卡券数量
      */
     private Integer bonusNumber;
+    /**
+     * 邀请人ID
+     * @return
+     */
+    private Integer parentUserId;
+    
+    /**
+     * 邀请奖励是否已生效
+     * @return
+     */
+    private Integer isStatus;
     
     public Integer getUserId() {
         return userId;
