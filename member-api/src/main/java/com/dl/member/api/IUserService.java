@@ -28,7 +28,8 @@ public interface IUserService {
 //	public BaseResult<UserDTO> queryUserByMobile(@RequestBody MobileAndPassParam param);
 	@RequestMapping(path="/user/queryUserInfoByToken", method=RequestMethod.POST)
 	public BaseResult<UserDTO> queryUserInfoByToken(@RequestBody TokenParam param);
-
+	@RequestMapping(path="/user/updateUserInfoByUserId", method=RequestMethod.POST)
+	public BaseResult<Integer> updateUserInfoByUserId(@RequestBody UserIdParam param);
 	/**
 	 * 查询用户接口
 	 * @param UserBonusParam

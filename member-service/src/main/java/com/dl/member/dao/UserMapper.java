@@ -23,6 +23,7 @@ public interface UserMapper extends Mapper<User> {
 	 */
 	int updateUserMoneyAndUserMoneyLimit(User user);
 
+	int updateUserInfoStatusByUserId(@Param("userId") Integer userId);
 	/**
 	 * 在数据库中更新用户账户资金
 	 * 

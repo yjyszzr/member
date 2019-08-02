@@ -571,6 +571,10 @@ public class UserService extends AbstractService<User> {
 			return userDTO;
 		}
 
+		public Integer updateUserInfoByUserId(UserIdParam params) {
+			return userMapper.updateUserInfoStatusByUserId(params.getUserId());
+		}
+		
 		/**
 		 * 查询用户信息：所有字段
 		 *

@@ -136,6 +136,13 @@ public class UserController {
 		return ResultGenerator.genSuccessResult("succ", userDTO);
 	}
 
+	@ApiOperation(value = "根据用户ID修改用户信息", notes = "根据用户ID修改用户信息")
+	@PostMapping("/updateUserInfoByUserId")
+	public BaseResult<Integer> updateUserInfoByUserId(@RequestBody UserIdParam param) {
+		Integer result = userService.updateUserInfoByUserId(param);
+		return ResultGenerator.genSuccessResult("succ", result);
+	}
+	
 	@ApiOperation(value = "根据用户ID查询真实信息", notes = "根据用户ID查询")
 	@PostMapping("/queryUserInfoReal")
 	public BaseResult<UserDTO> queryUserInfoReal(@RequestBody UserIdRealParam param) {
