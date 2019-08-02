@@ -228,7 +228,11 @@ public class UserAccountController {
 	public BaseResult<String> withdrawUserMoney(@Valid @RequestBody WithDrawParam withdrawParam) {
 		return userAccountService.withdrawUserMoney(withdrawParam);
 	}
-
+	@ApiOperation(value = "活动收益提取", notes = "活动收益提取", hidden = false)
+	@RequestMapping(path = "/activityRewardUserMoney", method = RequestMethod.POST)
+	public BaseResult<String> activityRewardUserMoney(@Valid @RequestBody RecharegeParam recharegeParam) {
+		return userAccountService.activityRewardUserMoney(recharegeParam);
+	}
 	/**
 	 * 给第三方支付成功后提供的记录账户流水
 	 * 

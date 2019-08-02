@@ -99,6 +99,14 @@ public interface IUserAccountService {
 	@RequestMapping(path="/user/account/createUserWithdraw", method=RequestMethod.POST)
 	public BaseResult<UserWithdrawDTO> createUserWithdraw(@RequestBody UserWithdrawParam userWithdrawParam);
 	
+	/**
+	 * 活动收益提取
+	 * @param amountParam
+	 * @return
+	 */	
+	@RequestMapping(path="/user/account/activityRewardUserMoney", method=RequestMethod.POST)
+	public BaseResult<UserRechargeDTO> activityRewardUserMoney(@RequestBody RecharegeParam recharegeParam);
+	
 	
 	/**
 	 * 更新用户提现单

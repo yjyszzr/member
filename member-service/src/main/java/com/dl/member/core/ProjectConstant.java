@@ -77,7 +77,8 @@ public class ProjectConstant {
 	public static final Integer BONUS = 5;// 红包
 	public static final Integer ACCOUNT_ROLLBACK = 6;// 账户回滚
 	public static final Integer REFOUND = 7;
-
+	public static final Integer ACTIVITY_REWARD = 8;// 活动收益
+	
 	public static final Integer aliPay = 0;
 	public static final Integer weixinPay = 1;
 	public static final Integer yuePay = 2;

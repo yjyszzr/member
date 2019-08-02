@@ -772,6 +772,72 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	}
 
 	/**
+	 * 提取活动收益至可提现余额并记录账户流水
+	 * 
+	 * @param rechargeMoney
+	 * @return
+	 */
+	@Transactional
+	public BaseResult<String> activityRewardUserMoney(RecharegeParam recharegeParam) {
+		Condition condition = new Condition(UserAccount.class);
+		Criteria cri = condition.createCriteria();
+		cri.andCondition("user_id =", recharegeParam.getUserId());
+		cri.andCondition("pay_id =", recharegeParam.getPayId());
+		cri.andCondition("process_type =", ProjectConstant.ACTIVITY_REWARD);
+		List<UserAccount> userAccountList = this.findByCondition(condition);
+		if (!CollectionUtils.isEmpty(userAccountList)) {
+			return ResultGenerator.genResult(MemberEnums.DATA_ALREADY_EXIT_IN_DB.getcode(), MemberEnums.DATA_ALREADY_EXIT_IN_DB.getMsg());
+		}
+
+		Integer userId = recharegeParam.getUserId();
+		User user = userService.findById(userId);
+		if (null == user) {
+			throw new ServiceException(MemberEnums.DBDATA_IS_NULL.getcode(), "用户不存在");
+		}
+		SysConfigParam cfg = new SysConfigParam();
+		cfg.setBusinessId(67);//读取财务账号id
+		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
+		if(userId!=cwuserId) {//非财务账号--财务账号不更新账户资金
+			User updateUser = new User();
+			updateUser.setUserMoney(recharegeParam.getAmount());
+			updateUser.setUserId(userId);
+
+			int moneyRst = userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUser);
+			if (1 != moneyRst) {
+				log.error("充值失败");
+				throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "充值失败");
+			}
+		}
+
+		UserAccount userAccount = new UserAccount();
+		userAccount.setUserId(userId);
+		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+		userAccount.setAccountSn(accountSn);
+		userAccount.setAmount(recharegeParam.getAmount());
+		userAccount.setDonationMoney(recharegeParam.getGiveAmount());
+		userAccount.setProcessType(ProjectConstant.ACTIVITY_REWARD);
+		userAccount.setThirdPartName(recharegeParam.getThirdPartName());
+		userAccount.setThirdPartPaid(recharegeParam.getThirdPartPaid());
+		userAccount.setPayId(recharegeParam.getPayId());
+		User updatedUser = userMapper.queryUserExceptPass(userId);
+		userAccount.setNote(recharegeParam.getThirdPartName() + "充值" + recharegeParam.getAmount() + "元");
+		userAccount.setAddTime(DateUtil.getCurrentTimeLong());
+		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
+		userAccount.setCurBalance(updatedUser.getUserMoney().add(updatedUser.getUserMoneyLimit()));
+		userAccount.setStatus(Integer.valueOf(ProjectConstant.FINISH));
+		userAccount.setOrderSn(recharegeParam.getOrderSn());
+		userAccount.setRechargeCardId(recharegeParam.getRechargeCardId());
+		userAccount.setRechargeCardRealValue(recharegeParam.getRechargeCardRealValue());
+		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
+		if (rst != 1) {
+			log.error("生成充值流水失败");
+			throw new ServiceException(MemberEnums.COMMON_ERROR.getcode(), "生成充值流水失败");
+		}
+
+		return ResultGenerator.genSuccessResult("充值成功", accountSn);
+	}
+	
+	/**
 	 * 中奖后批量更新用户账户的可提现余额,dealType = 1,自动；dealType = 2,手动
 	 * 
 	 * @param userIdAndRewardList
