@@ -133,7 +133,7 @@ public class UserRegisterController {
             actUserInitParam.setMobile(userRegisterParam.getMobile());
             BaseResult<Integer> actUserRst = iActService.initActUserInfo(actUserInitParam);
             if(actUserRst.isSuccess()){
-                userService.updateParentUserId(userRegisterParam.getInvitCode(),userId);
+                userService.updateParentUserId(Integer.valueOf(userRegisterParam.getInvitCode()),userId);
             }
         }
 
