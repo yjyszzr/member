@@ -1,14 +1,12 @@
 package com.dl.member.dto;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import javax.persistence.*;
-
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import javax.persistence.Column;
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 用户信息
@@ -139,6 +137,7 @@ public class UserDTO {
      */
     @Column(name = "reg_ip")
     private String regIp;
+
 
     /**
      * 最近登录时间
