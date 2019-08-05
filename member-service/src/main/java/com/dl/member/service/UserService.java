@@ -1,18 +1,5 @@
 package com.dl.member.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.dl.base.enums.ActivityEnum;
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
@@ -31,37 +18,31 @@ import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
 import com.dl.member.dao.UserBonusMapper;
 import com.dl.member.dao.UserMapper;
-import com.dl.member.dto.ActivityDTO;
-import com.dl.member.dto.SysConfigDTO;
-import com.dl.member.dto.UserBonusDTO;
-import com.dl.member.dto.UserDTO;
-import com.dl.member.dto.UserNoticeDTO;
-import com.dl.member.dto.UserRealDTO;
+import com.dl.member.dto.*;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DlChannelConsumer;
 import com.dl.member.model.DlChannelDistributor;
 import com.dl.member.model.User;
-import com.dl.member.param.FindUserByMobileAndAppCodeParam;
-import com.dl.member.param.IDFACallBackParam;
-import com.dl.member.param.SetLoginPassParam;
-import com.dl.member.param.SysConfigParam;
-import com.dl.member.param.TokenParam;
-import com.dl.member.param.UserBonusIdParam;
-import com.dl.member.param.UserIdParam;
-import com.dl.member.param.UserIdRealParam;
-import com.dl.member.param.UserParam;
+import com.dl.member.param.*;
 import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
 import com.dl.shop.auth.api.IAuthService;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDTO;
-import com.dl.shop.payment.dto.YesOrNoDTO;
-import com.dl.shop.payment.dto.YmoneyDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -135,6 +116,7 @@ public class UserService extends AbstractService<User> {
 		userDTO.setRealInfo(this.createRealInfo(userRealDTO));
 		String mobile = user.getMobile();
 		userDTO.setMobile(mobile);
+        userDTO.setUserId(user.getUserId());
 		userDTO.setRealName(userRealDTO != null ? userRealDTO.getRealName() : "");
 		userDTO.setTotalMoney(String.valueOf(user.getUserMoney().add(user.getUserMoneyLimit()).subtract(user.getFrozenMoney())));
 		userDTO.setActivityDTOList(this.queryAppPromotion(userId));
@@ -692,4 +674,8 @@ public class UserService extends AbstractService<User> {
 				return null;
 			}
 		}
+
+		public Integer updateParentUserId(Integer parentUserId,Integer userId){
+		    return userMapper.updateParentUserId(parentUserId,userId);
+        }
 	}

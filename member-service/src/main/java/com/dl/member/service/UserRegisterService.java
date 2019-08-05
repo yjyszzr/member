@@ -74,6 +74,8 @@ public class UserRegisterService extends AbstractService<User> {
 		}else {
 			userParam.setPushKey("");
 		}
+
+		userParam.setInvitCode(userRegisterParam.getInvitCode());
 		
     	Integer userId = userService.saveUser(userParam);
    	

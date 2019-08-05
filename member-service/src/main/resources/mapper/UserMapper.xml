@@ -6,6 +6,7 @@
       WARNING - @mbg.generated
     -->
     <id column="user_id" jdbcType="INTEGER" property="userId" />
+    <id column="parent_user_id" jdbcType="INTEGER" property="parentUserId" />
     <result column="user_name" jdbcType="VARCHAR" property="userName" />
     <result column="mobile" jdbcType="VARCHAR" property="mobile" />
     <result column="email" jdbcType="VARCHAR" property="email" />
@@ -45,6 +46,7 @@
     <result column="merchant_no" jdbcType="VARCHAR" property="merchantNo" />
     <result column="parent_user_id" jdbcType="INTEGER" property="parentUserId" />
     <result column="is_status" jdbcType="INTEGER" property="isStatus" />
+
   </resultMap>
   
   <insert id="insertWithReturnId"  parameterType="com.dl.member.model.User" useGeneratedKeys="true" keyProperty="userId">
@@ -161,6 +163,10 @@
   
   <update id="updateIsReal0to1">
   	update dl_user set is_real = 1 where  user_id = #{userId} and is_real = 0
+  </update>
+
+    <update id="updateParentUserId">
+  	update dl_user set parent_user_id = #{parentUserId} where  user_id = #{userId} and app_code_name = 11
   </update>
   
   <select id="getMobileById" resultType="string">

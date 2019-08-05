@@ -23,6 +23,12 @@
             <artifactId>order-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.dl</groupId>
+            <artifactId>activity-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     
         <dependency>
             <groupId>com.dl</groupId>
