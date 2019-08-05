@@ -33,6 +33,10 @@ public class UserRegisterParam {
 	
     @ApiModelProperty("消息推送的唯一值")
     private String pushKey;
+
+	@ApiModelProperty("邀请码")
+	private String invitCode;
+
 //	
 //    @ApiModelProperty(value = "手机设备信息", required = false)
 //    private UserDeviceParam device;	

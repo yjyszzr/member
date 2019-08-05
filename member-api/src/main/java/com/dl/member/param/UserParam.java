@@ -55,4 +55,7 @@ public class UserParam implements Serializable{
 	@ApiModelProperty("是否超级白名单")
 	private String isSuperWhite;
 
+	@ApiModelProperty("邀请码")
+	private String invitCode;
+
 }
