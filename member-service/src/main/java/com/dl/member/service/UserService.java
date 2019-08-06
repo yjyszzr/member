@@ -345,13 +345,15 @@ public class UserService extends AbstractService<User> {
 		}
 
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-		String appCodeName = userDeviceInfo.getAppCodeName();
+		String appCodeName = "11";//userDeviceInfo.getAppCodeName();
 		log.info("appCodeName:"+appCodeName);
 		if(StringUtils.isEmpty(appCodeName)){
 			user.setAppCodeName("10");
 		}else{
 			user.setAppCodeName(appCodeName);
 		}
+
+        user.setParentUserId(StringUtils.isEmpty(userParam.getInvitCode())?null:Integer.valueOf(userParam.getInvitCode()));
 
 		Integer insertRsult = userMapper.insertWithReturnId(user);
 		if (1 != insertRsult) {

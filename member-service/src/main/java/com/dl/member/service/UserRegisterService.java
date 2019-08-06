@@ -12,7 +12,6 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.User;
 import com.dl.member.param.UserParam;
 import com.dl.member.param.UserRegisterParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +41,7 @@ public class UserRegisterService extends AbstractService<User> {
     	}
 
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-    	String appCodeName = StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+    	String appCodeName = "11";//StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
     	User user = userMapper.queryUserByMobileAndAppCdde(userRegisterParam.getMobile(),appCodeName);
 		if(user != null){
 			return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());

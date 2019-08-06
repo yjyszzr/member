@@ -1,6 +1,7 @@
 package com.dl.member.web;
 import com.dl.activity.api.IActService;
 import com.dl.activity.dto.ActivityDTO;
+import com.dl.activity.param.ActTypeParam;
 import com.dl.activity.param.ActUserInitParam;
 import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
@@ -18,7 +19,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
 * Created by CodeGenerator on 2018/03/08.
@@ -109,10 +108,10 @@ public class UserRegisterController {
     @ApiOperation(value = "新用户注册V2,含有邀请码", notes = "新用户注册V2,含有邀请码")
     @PostMapping("/registerV2")
     public BaseResult<UserLoginDTO> registerV2(@RequestBody UserRegisterParam userRegisterParam, HttpServletRequest request) {
-        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
-        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
-            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-        }
+//        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
+//        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
+//            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+//        }
         String passWord = userRegisterParam.getPassWord();
         if(passWord.equals("-1")) {
             userRegisterParam.setPassWord("");
@@ -159,17 +158,17 @@ public class UserRegisterController {
         Integer currentTime = DateUtilNew.getCurrentTimeLong();
         Boolean withInDuring = false;
 
-        BaseResult<List<ActivityDTO>> tg2Rst = iActService.queryActsByType(2);
-        BaseResult<List<ActivityDTO>> tg3Rst = iActService.queryActsByType(3);
+        ActTypeParam actTypeParam2 = new ActTypeParam();
+        actTypeParam2.setActType(2);
+        ActTypeParam actTypeParam3 = new ActTypeParam();
+        actTypeParam2.setActType(3);
+        BaseResult<ActivityDTO> tg2Rst = iActService.queryActsByType(actTypeParam2);
+        BaseResult<ActivityDTO> tg3Rst = iActService.queryActsByType(actTypeParam3);
         if(tg2Rst.isSuccess() && tg3Rst.isSuccess()){
-            List<ActivityDTO> tg2List = tg2Rst.getData();
-            List<ActivityDTO> tg3List = tg3Rst.getData();
-            ActivityDTO tg2DTO = CollectionUtils.isEmpty(tg2List)?null: tg2List.get(0);
-            ActivityDTO tg3DTO = CollectionUtils.isEmpty(tg3List)?null: tg3List.get(0);
-            if(tg2DTO.getStatus() == 1 || tg3DTO.getStatus() == 1){
-                if((tg2DTO.getStartTime() < currentTime && tg2DTO.getEndTime() > currentTime) || (tg3DTO.getStartTime() < currentTime && tg3DTO.getEndTime() > currentTime)){
-                    withInDuring = false;
-                }
+            ActivityDTO tg2DTO = tg2Rst.getData();
+            ActivityDTO tg3DTO = tg3Rst.getData();
+            if(tg2DTO != null|| tg3DTO !=null){
+                withInDuring = false;
             }
         }
         return withInDuring;
