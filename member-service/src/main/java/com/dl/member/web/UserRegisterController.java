@@ -128,8 +128,11 @@ public class UserRegisterController {
         Boolean validAct = this.validTgAct();
         if(validAct){
             ActUserInitParam actUserInitParam = new ActUserInitParam();
-            actUserInitParam.setUserId(userId);
+            actUserInitParam.setUserId(userRegisterParam.getInvitCode());
+            actUserInitParam.setSonUserId(userId);
             actUserInitParam.setMobile(userRegisterParam.getMobile());
+
+            //被邀请人未被邀请
             BaseResult<Integer> actUserRst = iActService.initActUserInfo(actUserInitParam);
             if(StringUtils.isNotEmpty(userRegisterParam.getInvitCode())){
                 if(actUserRst.isSuccess()){
