@@ -54,10 +54,12 @@ public class Encryption {
     }
 
     public static void main(String[] args) {
-        String str1 = MD5("111111");
-        String str2 = MD5(str1 + "234567");
-
-        System.out.println("str2 = " + str2);
+//        String str1 = MD5("111111");
+//        String str2 = MD5(str1 + "234567");
+//        System.out.println("str2 = " + str2);
         //pass = 18bae7fd13f7e119de1efcfc5b175fb5
+
+        Double d = Double.valueOf("-5.5");
+        System.out.print("d:"+d);
     }
 }

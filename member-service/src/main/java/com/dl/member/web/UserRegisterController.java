@@ -1,4 +1,5 @@
 package com.dl.member.web;
+
 import com.dl.activity.api.IActService;
 import com.dl.activity.dto.ActivityDTO;
 import com.dl.activity.param.ActTypeParam;
@@ -125,16 +126,14 @@ public class UserRegisterController {
         }
         Integer userId = regRst.getData();
 
-        Boolean validAct = this.validTgAct();
-        if(validAct){
-            ActUserInitParam actUserInitParam = new ActUserInitParam();
-            actUserInitParam.setUserId(Integer.valueOf(userRegisterParam.getInvitCode()));
-            actUserInitParam.setSonUserId(userId);
-            actUserInitParam.setMobile(userRegisterParam.getMobile());
-
-            //被邀请人未被邀请
-            BaseResult<Integer> actUserRst = iActService.initActUserInfo(actUserInitParam);
-            if(StringUtils.isNotEmpty(userRegisterParam.getInvitCode())){
+        if(StringUtils.isNotEmpty(userRegisterParam.getInvitCode())){
+            Boolean validAct = this.validTgAct();
+            if(validAct){
+                ActUserInitParam actUserInitParam = new ActUserInitParam();
+                actUserInitParam.setUserId(Integer.valueOf(userRegisterParam.getInvitCode()));
+                actUserInitParam.setSonUserId(userId);
+                actUserInitParam.setMobile(userRegisterParam.getMobile());
+                BaseResult<String> actUserRst = iActService.initActUserInfo(actUserInitParam);
                 if(actUserRst.isSuccess()){
                     userService.updateParentUserId(Integer.valueOf(userRegisterParam.getInvitCode()),userId);
                 }
