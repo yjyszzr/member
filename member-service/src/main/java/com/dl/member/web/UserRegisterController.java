@@ -128,7 +128,7 @@ public class UserRegisterController {
         Boolean validAct = this.validTgAct();
         if(validAct){
             ActUserInitParam actUserInitParam = new ActUserInitParam();
-            actUserInitParam.setUserId(userRegisterParam.getInvitCode());
+            actUserInitParam.setUserId(Integer.valueOf(userRegisterParam.getInvitCode()));
             actUserInitParam.setSonUserId(userId);
             actUserInitParam.setMobile(userRegisterParam.getMobile());
 
