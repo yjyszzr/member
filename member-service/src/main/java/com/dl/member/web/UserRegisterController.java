@@ -131,8 +131,10 @@ public class UserRegisterController {
             actUserInitParam.setUserId(userId);
             actUserInitParam.setMobile(userRegisterParam.getMobile());
             BaseResult<Integer> actUserRst = iActService.initActUserInfo(actUserInitParam);
-            if(actUserRst.isSuccess()){
-                userService.updateParentUserId(Integer.valueOf(userRegisterParam.getInvitCode()),userId);
+            if(StringUtils.isNotEmpty(userRegisterParam.getInvitCode())){
+                if(actUserRst.isSuccess()){
+                    userService.updateParentUserId(Integer.valueOf(userRegisterParam.getInvitCode()),userId);
+                }
             }
         }
 
@@ -159,16 +161,16 @@ public class UserRegisterController {
         Boolean withInDuring = false;
 
         ActTypeParam actTypeParam2 = new ActTypeParam();
-        actTypeParam2.setActType(2);
-        ActTypeParam actTypeParam3 = new ActTypeParam();
         actTypeParam2.setActType(3);
+        ActTypeParam actTypeParam3 = new ActTypeParam();
+        actTypeParam2.setActType(4);
         BaseResult<ActivityDTO> tg2Rst = iActService.queryActsByType(actTypeParam2);
         BaseResult<ActivityDTO> tg3Rst = iActService.queryActsByType(actTypeParam3);
         if(tg2Rst.isSuccess() && tg3Rst.isSuccess()){
             ActivityDTO tg2DTO = tg2Rst.getData();
             ActivityDTO tg3DTO = tg3Rst.getData();
             if(tg2DTO != null|| tg3DTO !=null){
-                withInDuring = false;
+                withInDuring = true;
             }
         }
         return withInDuring;
