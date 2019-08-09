@@ -10,8 +10,10 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
+import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.User;
 import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.UserRegisterParam;
 import com.dl.member.service.*;
@@ -58,6 +60,9 @@ public class UserRegisterController {
 
     @Resource
     private IActService iActService;
+
+    @Resource
+    private UserMapper userMapper;
     /**
      * 新用户注册:
      * @param userRegisterParam
@@ -127,6 +132,10 @@ public class UserRegisterController {
         Integer userId = regRst.getData();
 
         if(StringUtils.isNotEmpty(userRegisterParam.getInvitCode())){
+            User inviteUser = userMapper.queryUserByUserId(Integer.valueOf(userRegisterParam.getInvitCode()));
+            if(inviteUser == null){
+                return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(),"邀请码不存在");
+            }
             Boolean validAct = this.validTgAct();
             if(validAct){
                 ActUserInitParam actUserInitParam = new ActUserInitParam();

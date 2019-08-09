@@ -345,7 +345,7 @@ public class UserService extends AbstractService<User> {
 		}
 
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-		String appCodeName = "11";//userDeviceInfo.getAppCodeName();
+		String appCodeName = userDeviceInfo.getAppCodeName();
 		log.info("appCodeName:"+appCodeName);
 		if(StringUtils.isEmpty(appCodeName)){
 			user.setAppCodeName("10");
