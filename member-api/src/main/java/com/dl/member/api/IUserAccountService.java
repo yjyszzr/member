@@ -105,7 +105,7 @@ public interface IUserAccountService {
 	 * @return
 	 */	
 	@RequestMapping(path="/user/account/activityRewardUserMoney", method=RequestMethod.POST)
-	public BaseResult<UserRechargeDTO> activityRewardUserMoney(@RequestBody RecharegeParam recharegeParam);
+	public BaseResult<String> activityRewardUserMoney(@RequestBody RecharegeParam recharegeParam);
 	
 	
 	/**
