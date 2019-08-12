@@ -537,8 +537,8 @@ public class UserService extends AbstractService<User> {
 				BeanUtils.copyProperties(userDTO, user);
 				String strRandom4 = RandomUtil.generateUpperString(4);
 				String mobile = user.getMobile();
-				mobile = mobile.replace(mobile.substring(3, 7), strRandom4);
-				userDTO.setMobile(mobile);
+				userDTO.setRealmobile(mobile);
+				userDTO.setMobile(mobile.replace(mobile.substring(3, 7), strRandom4));
 				userDTO.setUserMoney(String.valueOf(user.getUserMoney()));
 				userDTO.setUserMoneyLimit(String.valueOf(user.getUserMoneyLimit()));
 				BigDecimal totalMoney = user.getUserMoney().add(user.getUserMoneyLimit());

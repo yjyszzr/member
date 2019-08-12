@@ -32,6 +32,11 @@ public class UserDTO {
      * 手机号码
      */
     private String mobile;
+    
+    /**
+     * 手机号码未替换
+     */
+    private String realmobile;
 
     private String email;
     
