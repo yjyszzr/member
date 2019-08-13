@@ -222,7 +222,21 @@ public class UserDTO {
      * @return
      */
     private Integer isStatus;
-    
+
+    /**
+     * 推广连接
+     * @return
+     */
+    public String inviteUrl;
+
+    public String getInviteUrl() {
+        return inviteUrl;
+    }
+
+    public void setInviteUrl(String inviteUrl) {
+        this.inviteUrl = inviteUrl;
+    }
+
     public Integer getUserId() {
         return userId;
     }
