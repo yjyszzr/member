@@ -241,6 +241,14 @@ public class UserService extends AbstractService<User> {
 				userDTO.setUserMoneyLimit("0");
 			}
 		}
+
+		//推广活动url
+        String inviteUrl = "";
+        SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(73);
+		if(sysConfigDTO != null){
+            inviteUrl = sysConfigDTO.getValueTxt();
+        }
+        userDTO.setInviteUrl(inviteUrl);
 		
 		//查询当前用户对于的卡券信息
 		UserBonusIdParam userBonusIdParam = new UserBonusIdParam();
