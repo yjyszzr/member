@@ -93,9 +93,13 @@ public class UserRegisterController {
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
 
-        DLActivity activity = dLActivityService.queryActivityByActType(0);
-        if(activity != null && activity.getIsFinish() == 0){
-            userBonusService.receiveUserBonus(1,userId);
+    	UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+    	String appCodeName = userDeviceInfo.getAppCodeName();
+    	if(appCodeName.equals("11")){
+            DLActivity activity = dLActivityService.queryActivityByActType(0);
+            if(activity != null && activity.getIsFinish() == 0){
+                userBonusService.receiveUserBonus(1,userId);
+            }
         }
 
     	stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
@@ -155,9 +159,13 @@ public class UserRegisterController {
             }
         }
 
-        DLActivity activity = dLActivityService.queryActivityByActType(0);
-        if(activity != null && activity.getIsFinish() == 0){
-            userBonusService.receiveUserBonus(1,userId);
+        UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+        String appCodeName = userDeviceInfo.getAppCodeName();
+        if(appCodeName.equals("11")){
+            DLActivity activity = dLActivityService.queryActivityByActType(0);
+            if(activity != null && activity.getIsFinish() == 0){
+                userBonusService.receiveUserBonus(1,userId);
+            }
         }
 
         TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
