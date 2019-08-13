@@ -13,6 +13,7 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.model.DLActivity;
 import com.dl.member.model.User;
 import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.UserRegisterParam;
@@ -91,7 +92,12 @@ public class UserRegisterController {
     	
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
-		
+
+        DLActivity activity = dLActivityService.queryActivityByActType(0);
+        if(activity != null && activity.getIsFinish() == 0){
+            userBonusService.receiveUserBonus(1,userId);
+        }
+
     	stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
     	
     	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
@@ -147,6 +153,11 @@ public class UserRegisterController {
                     userService.updateParentUserId(Integer.valueOf(userRegisterParam.getInvitCode()),userId);
                 }
             }
+        }
+
+        DLActivity activity = dLActivityService.queryActivityByActType(0);
+        if(activity != null && activity.getIsFinish() == 0){
+            userBonusService.receiveUserBonus(1,userId);
         }
 
         TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
