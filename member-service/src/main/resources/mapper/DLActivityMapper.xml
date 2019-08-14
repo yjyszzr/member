@@ -20,7 +20,7 @@
   </resultMap>
   
   <select id="queryActivityByType" parameterType="java.lang.Integer"  resultMap="BaseResultMap">
-  	SELECT * FROM dl_activity WHERE act_type = #{actType}
+  	SELECT * FROM dl_activity WHERE act_type = #{actType} and UNIX_TIMESTAMP(now()) between  start_time and end_time
   </select>
   
   <select id="countRechargeActivity" parameterType="java.lang.Integer" resultType="java.lang.Integer">
