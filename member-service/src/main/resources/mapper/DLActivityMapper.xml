@@ -11,7 +11,7 @@
     <result column="act_type" jdbcType="INTEGER" property="actType" />
     <result column="act_img" jdbcType="VARCHAR" property="actImg" />
     <result column="act_url" jdbcType="VARCHAR" property="actUrl" />
-    <result column="start_time" jdbcType="INTEGER" property="startTime" />R
+    <result column="start_time" jdbcType="INTEGER" property="startTime" />
     <result column="end_time" jdbcType="INTEGER" property="endTime" />
     <result column="is_finish" jdbcType="BIT" property="isFinish" />
     <result column="purchase_num" jdbcType="INTEGER" property="purchaseNum" />
