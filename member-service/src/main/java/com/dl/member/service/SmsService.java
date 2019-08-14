@@ -178,7 +178,7 @@ public class SmsService {
 			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
 			String platform = userDevice.getPlat();
 			// String platform = "h5";
-			Integer appCodeName = 10;// 默认球多多
+			Integer appCodeName = 11;// 默认球多多
 			log.info("platform-------------:" + platform);
 			if (!"h5".equals(platform)) {// h5 短信模板都用球多多
 				String channel = userDevice.getChannel();
