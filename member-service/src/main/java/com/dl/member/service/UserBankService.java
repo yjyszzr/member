@@ -1,23 +1,4 @@
 package com.dl.member.service;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -31,7 +12,6 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.SessionUtil;
-import com.dl.lottery.enums.LotteryResultEnum;
 import com.dl.member.api.IUserAccountService;
 import com.dl.member.configurer.MemberConfig;
 import com.dl.member.core.ProjectConstant;
@@ -52,8 +32,20 @@ import com.dl.member.param.UserBankQueryParam;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -329,7 +321,6 @@ public class UserBankService extends AbstractService<UserBank> {
 		url.append("&realname=" + realName);
 		url.append("&bankcard=" + cardNo);
 		url.append("&idcard=" + idcard);
-		url.append("&sign=" + memberConfig.getBankAuth3Sign());
 		log.info("三要素认证请求realName={},cardNo={},idCard={},url={}",realName,cardNo,idcard,url.toString());
 		String rst = rest.getForObject(url.toString(), String.class);
 		JSONObject json = null;
