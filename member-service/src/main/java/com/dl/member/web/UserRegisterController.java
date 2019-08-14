@@ -1,15 +1,5 @@
 package com.dl.member.web;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.dl.base.enums.ActivityEnum;
 import com.dl.base.model.UserDeviceInfo;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -20,16 +10,18 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DLActivity;
 import com.dl.member.param.IDFACallBackParam;
 import com.dl.member.param.UserRegisterParam;
-import com.dl.member.service.DLActivityService;
-import com.dl.member.service.IDFAService;
-import com.dl.member.service.UserBonusService;
-import com.dl.member.service.UserLoginService;
-import com.dl.member.service.UserRegisterService;
-import com.dl.member.service.UserService;
+import com.dl.member.service.*;
 import com.dl.member.util.TokenUtil;
-
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * Created by CodeGenerator on 2018/03/08.
@@ -67,10 +59,10 @@ public class UserRegisterController {
     @ApiOperation(value = "新用户注册", notes = "新用户注册")
     @PostMapping("/register")
     public BaseResult<UserLoginDTO> register(@RequestBody UserRegisterParam userRegisterParam, HttpServletRequest request) {
-        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
-        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
-            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-        }
+//        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
+//        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
+//            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+//        }
         String passWord = userRegisterParam.getPassWord();
         if(passWord.equals("-1")) {
         	userRegisterParam.setPassWord("");
@@ -88,7 +80,16 @@ public class UserRegisterController {
 //    	if(0 == act.getIsFinish()) {//有效
 //    		userBonusService.receiveUserBonus(ProjectConstant.REGISTER,userId);
 //    	}
-    	
+
+        UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+        String appCodeName = "11";//userDeviceInfo.getAppCodeName();
+        if(appCodeName.equals("11") || userDeviceInfo.getPlat().equals("h5")){
+            DLActivity activity = dLActivityService.queryActivityByType(0);
+            if(activity != null && activity.getIsFinish() == 0){
+                userBonusService.receiveUserBonus(1,userId);
+            }
+        }
+
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
 		
