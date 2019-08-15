@@ -109,7 +109,7 @@
   		user_id = #{userId}
   </update>
   
-   <update id="updateUserInfoStatusByUserId" parameterType="java.lang.String" >
+   <update id="updateUserInfoStatusByUserId" parameterType="INTEGER" >
   	UPDATE 
   		dl_user  
 	SET

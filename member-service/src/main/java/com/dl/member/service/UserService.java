@@ -564,7 +564,9 @@ public class UserService extends AbstractService<User> {
 		}
 
 		public Integer updateUserInfoByUserId(UserIdParam params) {
-			return userMapper.updateUserInfoStatusByUserId(params.getUserId());
+			Integer result = userMapper.updateUserInfoStatusByUserId(params.getUserId());
+			log.info("updateUserInfoByUserId():result="+result);
+			return result;
 		}
 		
 		/**
