@@ -93,9 +93,8 @@ public class UserRegisterController {
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
 
-    	UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-    	String appCodeName = userDeviceInfo.getAppCodeName();
-    	if(appCodeName.equals("11") || userDeviceInfo.getPlat().equals("h5")){
+    	String appCodeName = "11";
+    	if(appCodeName.equals("11")){
             DLActivity activity = dLActivityService.queryActivityByType(0);
             if(activity != null && activity.getIsFinish() == 0){
                 userBonusService.receiveUserBonus(1,userId);
