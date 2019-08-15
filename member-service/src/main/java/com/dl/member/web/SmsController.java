@@ -1,22 +1,5 @@
 package com.dl.member.web;
 
-import io.swagger.annotations.ApiOperation;
-
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.http.util.TextUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.member.configurer.MemberConfig;
@@ -29,6 +12,19 @@ import com.dl.member.service.DlPhoneChannelService;
 import com.dl.member.service.SmsService;
 import com.dl.member.service.SmsTemplateService;
 import com.dl.member.service.UserService;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.util.TextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/sms")
@@ -96,6 +92,7 @@ public class SmsController {
 		if (!TextUtils.isEmpty(tplValue)) {
 			BaseResult<String> smsRst = smsService.sendJuheSms(smsParam.getMobile(), tplId, tplValue);
 			if (smsRst.getCode() != 0) {
+			    log.error(smsRst.getData());
 				return ResultGenerator.genFailResult("发送短信验证码失败", smsRst.getData());
 			}
 			// 缓存验证码

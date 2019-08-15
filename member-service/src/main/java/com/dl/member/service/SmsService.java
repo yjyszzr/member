@@ -126,7 +126,7 @@ public class SmsService {
 			stringRedisTemplate.opsForValue().set(sendNumKey, num + "", sendNumExpire, TimeUnit.DAYS);
 		} else {
 			UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-			String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+			String appCodeNameStr = "11";//org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
 			User user = userMapper.queryUserByMobileAndAppCdde(smsParam.getMobile(),appCodeNameStr);
 			if (ProjectConstant.VERIFY_TYPE_LOGIN.equals(smsType) || ProjectConstant.VERIFY_TYPE_FORGET.equals(smsType)) {// 登录，忘记密码
 				if (null == user) {
@@ -176,14 +176,7 @@ public class SmsService {
 			String tplValue = "";
 			String strRandom4 = RandomUtil.getRandNum(4);
 			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-			String platform = userDevice.getPlat();
-			// String platform = "h5";
 			Integer appCodeName = 11;// 默认球多多
-			log.info("platform-------------:" + platform);
-			if (!"h5".equals(platform)) {// h5 短信模板都用球多多
-				String channel = userDevice.getChannel();
-				appCodeName = dlPhoneChannelService.queryAppCodeName(channel);
-			}
 			Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
 			if (null == smsTemplateId) {
 				log.warn("未查询到短信模板id的配置，请检查数据库");
