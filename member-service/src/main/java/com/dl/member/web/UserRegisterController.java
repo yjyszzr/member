@@ -124,13 +124,13 @@ public class UserRegisterController {
     @ApiOperation(value = "新用户注册V2,含有邀请码", notes = "新用户注册V2,含有邀请码")
     @PostMapping("/registerV2")
     public BaseResult<UserLoginDTO> registerV2(@RequestBody UserRegisterParam userRegisterParam, HttpServletRequest request) {
-//        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
-//        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
-//            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-//        }
+        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
+        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
+            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+        }
         String passWord = userRegisterParam.getPassWord();
-        if(passWord.equals("-1")) {
-            userRegisterParam.setPassWord("");
+        if(passWord.equals("")) {
+            userRegisterParam.setPassWord("123456a");
         } else if(!passWord.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
             return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
         }
