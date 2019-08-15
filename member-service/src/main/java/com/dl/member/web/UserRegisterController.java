@@ -161,7 +161,7 @@ public class UserRegisterController {
 
         UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
         String appCodeName = userDeviceInfo.getAppCodeName();
-        if(appCodeName.equals("11")|| userDeviceInfo.getPlat().equals("h5")){
+        if(userDeviceInfo.getPlat().equals("h5") || appCodeName.equals("11")){
             DLActivity activity = dLActivityService.queryActivityByType(0);
             if(activity != null && activity.getIsFinish() == 0){
                 userBonusService.receiveUserBonus(1,userId);
