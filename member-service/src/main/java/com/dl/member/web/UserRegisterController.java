@@ -93,9 +93,8 @@ public class UserRegisterController {
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
 
-    	UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-    	String appCodeName = userDeviceInfo.getAppCodeName();
-    	if(appCodeName.equals("11") || userDeviceInfo.getPlat().equals("h5")){
+    	String appCodeName = "11";
+    	if(appCodeName.equals("11")){
             DLActivity activity = dLActivityService.queryActivityByType(0);
             if(activity != null && activity.getIsFinish() == 0){
                 userBonusService.receiveUserBonus(1,userId);
@@ -124,13 +123,13 @@ public class UserRegisterController {
     @ApiOperation(value = "新用户注册V2,含有邀请码", notes = "新用户注册V2,含有邀请码")
     @PostMapping("/registerV2")
     public BaseResult<UserLoginDTO> registerV2(@RequestBody UserRegisterParam userRegisterParam, HttpServletRequest request) {
-//        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
-//        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
-//            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
-//        }
+        String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
+        if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
+            return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+        }
         String passWord = userRegisterParam.getPassWord();
-        if(passWord.equals("-1")) {
-            userRegisterParam.setPassWord("");
+        if(passWord.equals("")) {
+            userRegisterParam.setPassWord("678910a");
         } else if(!passWord.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
             return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
         }
@@ -161,7 +160,7 @@ public class UserRegisterController {
 
         UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
         String appCodeName = userDeviceInfo.getAppCodeName();
-        if(appCodeName.equals("11")|| userDeviceInfo.getPlat().equals("h5")){
+        if(userDeviceInfo.getPlat().equals("h5") || appCodeName.equals("11")){
             DLActivity activity = dLActivityService.queryActivityByType(0);
             if(activity != null && activity.getIsFinish() == 0){
                 userBonusService.receiveUserBonus(1,userId);

@@ -352,8 +352,7 @@ public class UserService extends AbstractService<User> {
 			userParam.setIsSuperWhite("1");
 		}
 
-		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-		String appCodeName = userDeviceInfo.getAppCodeName();
+		String appCodeName = "11";
 		log.info("appCodeName:"+appCodeName);
 		if(StringUtils.isEmpty(appCodeName)){
 			user.setAppCodeName("10");

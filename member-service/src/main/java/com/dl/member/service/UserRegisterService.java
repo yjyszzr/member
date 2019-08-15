@@ -41,7 +41,7 @@ public class UserRegisterService extends AbstractService<User> {
     	}
 
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-    	String appCodeName = "11";//StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+    	String appCodeName = "11";
     	User user = userMapper.queryUserByMobileAndAppCdde(userRegisterParam.getMobile(),appCodeName);
 		if(user != null){
 			return ResultGenerator.genResult(MemberEnums.ALREADY_REGISTER.getcode(), MemberEnums.ALREADY_REGISTER.getMsg());
