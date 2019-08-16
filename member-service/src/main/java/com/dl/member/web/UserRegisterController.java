@@ -129,7 +129,7 @@ public class UserRegisterController {
         }
         String passWord = userRegisterParam.getPassWord();
         if(passWord.equals("")) {
-            userRegisterParam.setPassWord("678910a");
+            userRegisterParam.setPassWord("");
         } else if(!passWord.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$")) {
             return ResultGenerator.genResult(MemberEnums.PASS_FORMAT_ERROR.getcode(), MemberEnums.PASS_FORMAT_ERROR.getMsg());
         }
