@@ -77,6 +77,12 @@ public class UserBank {
     @Column(name = "purpose")
     private Integer purpose;
     
+    /**
+     * 银行卡用途 0提现使用  1支付使用
+     */
+    @Column(name = "密文")
+    private String password;
+    
     public Integer getType() {
     	return type;
     }
@@ -237,4 +243,13 @@ public class UserBank {
     public void setStatus(String status) {
         this.status = status;
     }
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+    
 }

@@ -41,7 +41,17 @@ public class User {
 
     private String isSuperWhite;
 
-    public String getIsSuperWhite() {
+    private String passsign;
+    
+    public String getPasssign() {
+		return passsign;
+	}
+
+	public void setPasssign(String passsign) {
+		this.passsign = passsign;
+	}
+
+	public String getIsSuperWhite() {
         return isSuperWhite;
     }
 

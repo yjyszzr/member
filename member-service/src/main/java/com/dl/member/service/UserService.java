@@ -8,6 +8,7 @@ import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
+import com.dl.base.util.MD5Util;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
 import com.dl.base.util.SessionUtil;
@@ -367,8 +368,18 @@ public class UserService extends AbstractService<User> {
 			log.error("注册用户失败");
 			return null;
 		}
+		
 		Integer userId = user.getUserId();
-
+		user.setPasssign(MD5Util.crypt("*"+userId+"^&$"+user.getMobile()+"@$"));
+		
+		Integer updateRsult = userMapper.updateUserOnPassSignByUserId(user);
+		
+		if (1 != updateRsult) {
+			log.error("注册用户失败");
+			userMapper.deleteUserByUserId(userId);
+			return null;
+		}
+		
 		if (userDevice != null && userDevice.getPlat() != null && userDevice.getPlat().equals("iphone")) {
 			// idfa 回调、存储 （lidelin）
 			IDFACallBackParam idfaParam = new IDFACallBackParam();

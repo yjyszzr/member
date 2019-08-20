@@ -17,6 +17,7 @@
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
     <result column="abbreviation" jdbcType="VARCHAR" property="abbreviation" />
     <result column="purpose" jdbcType="VARCHAR" property="purpose" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
   </resultMap>
   
   <update id="batchUpdateUserBankStatus">

@@ -45,4 +45,7 @@ public class UserBankDTO {
 	
 	@ApiModelProperty("银行卡用途")
 	private Integer purpose;
+	
+	@ApiModelProperty("密文")
+	private String password;
 }

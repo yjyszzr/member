@@ -46,7 +46,7 @@
     <result column="merchant_no" jdbcType="VARCHAR" property="merchantNo" />
     <result column="parent_user_id" jdbcType="INTEGER" property="parentUserId" />
     <result column="is_status" jdbcType="INTEGER" property="isStatus" />
-
+	<result column="passsign" jdbcType="VARCHAR" property="passsign" />
   </resultMap>
   
   <insert id="insertWithReturnId"  parameterType="com.dl.member.model.User" useGeneratedKeys="true" keyProperty="userId">
@@ -78,6 +78,16 @@
 			  <if test="push_key!=null">push_key=#{pushKey},</if>
 			 </trim>
 		 WHERE user_id=#{userId}  
+  </update>
+  
+  <update id="updateUserOnPassSignByUserId" parameterType="com.dl.member.model.User">
+    	 UPDATE dl_user set 
+			 passsign=#{passsign}
+		 WHERE user_id=#{userId}  
+  </update>
+  
+  <update id="deleteUserByUserId" parameterType="Integer">
+    	 delete from dl_user WHERE user_id=#{userId}  
   </update>
   
   <update id="updateUserMoneyAndUserMoneyLimit" parameterType="com.dl.member.model.User" >

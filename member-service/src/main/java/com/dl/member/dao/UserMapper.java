@@ -11,10 +11,13 @@ public interface UserMapper extends Mapper<User> {
 
 	int insertWithReturnId(User user);
 
+	int updateUserOnPassSignByUserId(User user);
+	
 	User queryUserByUserId(@Param("userId") Integer userId);
 
 	User queryUserExceptPass(@Param("userId") Integer userId);
-
+	
+	int deleteUserByUserId(@Param("userId") Integer userId);
 	/**
 	 * 更新用户账户资金
 	 * 
