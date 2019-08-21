@@ -80,7 +80,7 @@ public class UserBank {
     /**
      * 银行卡用途 0提现使用  1支付使用
      */
-    @Column(name = "密文")
+    @Column(name = "password")
     private String password;
     
     public Integer getType() {
