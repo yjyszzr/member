@@ -370,7 +370,7 @@ public class UserService extends AbstractService<User> {
 		}
 		
 		Integer userId = user.getUserId();
-		user.setPasssign(MD5Util.crypt("*"+userId+"^&$"+user.getMobile()+"@$"));
+		user.setPasssign(MD5Util.cryptForUTF("*"+userId+"^&$"+user.getMobile()+"@$"));
 		
 		Integer updateRsult = userMapper.updateUserOnPassSignByUserId(user);
 		

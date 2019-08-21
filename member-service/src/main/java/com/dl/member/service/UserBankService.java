@@ -99,8 +99,7 @@ public class UserBankService extends AbstractService<UserBank> {
     	userBank.setAbbreviation(userBankDTO.getAbbreviation());
     	userBank.setType(userBankDTO.getType());
     	userBank.setPurpose(userBankDTO.getPurpose());
-    	userBank.setPassword(userBankDTO.getPassword());
-    	userBankDTO.setPassword(MD5Util.crypt("*"+userId+"#@"+userBankDTO.getRealName()+"$%"+userBankDTO.getCardNo()+"^&"+userBankDTO.getBankName()+"*"));
+    	userBank.setPassword(MD5Util.cryptForUTF("*"+userId+"#@"+userBankDTO.getRealName()+"$%"+userBankDTO.getCardNo()+"^&"+userBankDTO.getBankName()+"*"));
     	try {
     		this.save(userBank);
     	}catch (Exception e) {
