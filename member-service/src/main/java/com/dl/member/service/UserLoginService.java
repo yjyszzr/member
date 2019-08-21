@@ -399,7 +399,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 */
 	public UserLoginDTO queryUserLoginDTOByMobile(String mobile, String loginSource) {
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
-		String appCodeNameStr = "11";
+		String appCodeNameStr = userDeviceInfo.getAppCodeName();
 		User userInfo = userMapper.queryUserByMobileAndAppCdde(mobile,appCodeNameStr);
 		UserLoginDTO userLoginDTO = new UserLoginDTO();
 		userLoginDTO.setMobile(userInfo.getMobile());
