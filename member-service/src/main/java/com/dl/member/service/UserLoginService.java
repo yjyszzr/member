@@ -400,7 +400,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	public UserLoginDTO queryUserLoginDTOByMobile(String mobile, String loginSource) {
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
 		String appCodeNameStr = userDeviceInfo.getAppCodeName();
-		if(appCodeNameStr == null){
+		if(StringUtils.isEmpty(appCodeNameStr)){
             appCodeNameStr = "10";
         }
 		User userInfo = userMapper.queryUserByMobileAndAppCdde(mobile,appCodeNameStr);
