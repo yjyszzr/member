@@ -80,13 +80,18 @@ public class UserRegisterController {
     
     @ApiOperation(value = "生成短链接", notes = "生成短链接")
 	@PostMapping("/addSUrl")
-	public BaseResult<String> addSUrl(@RequestBody SoUrlParam param) {
+	public BaseResult<Map<String, String>> addSUrl(@RequestBody SoUrlParam param) {
 		Map<String, String> params = new HashMap<>();
 		params.put("link", param.getLink());//商品描述
 		params.put("info", "短链接服务平台");
 		String jsonStr = JSONUtils.toJSONString(params);
 		String url="https://3url.cn/apis/add?apikey=Zw4bl3&apisecret=60c2cb0c555391c30983ec2f61263970";
-		return ResultGenerator.genSuccessResult("succ", HttpClient.setPostMessage(url, jsonStr));
+		String resultJson = HttpClient.setPostMessage(url, jsonStr);
+		params = new HashMap<>();
+		if(resultJson!=null && resultJson.length()>0) {
+			params = (Map<String, String>) JSONUtils.parse(resultJson);
+		}
+		return ResultGenerator.genSuccessResult("succ", null);
 	}
     
     /**

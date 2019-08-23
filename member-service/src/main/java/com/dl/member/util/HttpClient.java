@@ -56,7 +56,7 @@ public class HttpClient {
 	                resultJson = new String(data1);
 	            } catch (Exception e1) {
 	                e1.printStackTrace();
-	                resultJson="500";
+	                resultJson=null;
 	                
 	            }
 	        } else {
@@ -64,7 +64,7 @@ public class HttpClient {
 	        }
 		} catch (Exception e) {
 			e.printStackTrace();
-			resultJson="500";
+			resultJson=null;
 		}
 		return resultJson;
 	}
