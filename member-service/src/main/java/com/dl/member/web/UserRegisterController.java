@@ -104,13 +104,13 @@ public class UserRegisterController {
     			params = (Map<String, String>) JSONUtils.parse(resultJson);
     			User user = new User();
     			user.setUserId(param.getUserId());
-    			user.setProvince(params.get("link"));
+    			user.setProvince(params.get("shorturl"));
     			userService.updateUserInfoDlj(user);
     			return ResultGenerator.genSuccessResult("succ", params);
     		}
     	}else {
     		params.put("short_key", "");
-    		params.put("link", userDto.getProvince());
+    		params.put("shorturl", userDto.getProvince());
     		return ResultGenerator.genSuccessResult("succ", params);
     	}
 		return ResultGenerator.genSuccessResult("succ", null);
