@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.support.json.JSONUtils;
@@ -46,7 +47,6 @@ public class HttpClient {
 	        out.close();
 	        // 请求返回的状态
 	        if (conn.getResponseCode() == 200) {
-	            System.out.println("连接成功");
 	            // 请求返回的数据
 	            InputStream in = conn.getInputStream();
 	            try {
@@ -67,6 +67,20 @@ public class HttpClient {
 			resultJson=null;
 		}
 		return resultJson;
+	}
+	public static void main(String[] args) {
+		String url="https://3url.cn/apis/add?apikey=Zw4bl3&apisecret=60c2cb0c555391c30983ec2f61263970";
+		Map<String, String> params = new HashMap<>();
+    		params.put("link", "http:baidu");//商品描述
+    		params.put("info", "短链接服务平台");
+    		String jsonStr = JSONUtils.toJSONString(params);
+		String resultJson = HttpClient.setPostMessage(url, jsonStr);
+		System.out.println(resultJson);
+		Map<String, Object> m = (Map<String, Object>) JSONUtils.parse(resultJson);
+		System.out.println(m);
+		Map<String, String> s = (Map<String, String>) m.get("data");
+		System.out.println(s);
+		System.out.println(s.get("shorturl"));
 	}
 }
  

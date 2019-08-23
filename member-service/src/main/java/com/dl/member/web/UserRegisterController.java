@@ -101,12 +101,18 @@ public class UserRegisterController {
     		String resultJson = HttpClient.setPostMessage(url, jsonStr);
     		params = new HashMap<>();
     		if(resultJson!=null && resultJson.length()>0) {
-    			params = (Map<String, String>) JSONUtils.parse(resultJson);
-    			User user = new User();
-    			user.setUserId(param.getUserId());
-    			user.setProvince(params.get("shorturl"));
-    			userService.updateUserInfoDlj(user);
-    			return ResultGenerator.genSuccessResult("succ", params);
+    			Map<String, Object> resultMap = (Map<String, Object>) JSONUtils.parse(resultJson);
+    			if("0".equals(resultMap.get("result"))) {
+    				params =  (Map<String, String>) resultMap.get("data");
+        			User user = new User();
+        			user.setUserId(param.getUserId());
+        			user.setProvince(params.get("shorturl"));
+        			userService.updateUserInfoDlj(user);
+        			return ResultGenerator.genSuccessResult("succ", params);
+    			}else {
+    				return ResultGenerator.genFailResult("接口返回错误");
+    			}
+    			
     		}
     	}else {
     		params.put("short_key", "");
