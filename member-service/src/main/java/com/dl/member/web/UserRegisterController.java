@@ -27,7 +27,6 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
-import com.dl.member.httpclient.HttpClient;
 import com.dl.member.model.DLActivity;
 import com.dl.member.model.User;
 import com.dl.member.param.IDFACallBackParam;
@@ -39,6 +38,7 @@ import com.dl.member.service.UserBonusService;
 import com.dl.member.service.UserLoginService;
 import com.dl.member.service.UserRegisterService;
 import com.dl.member.service.UserService;
+import com.dl.member.util.HttpClient;
 import com.dl.member.util.TokenUtil;
 
 import io.swagger.annotations.ApiOperation;

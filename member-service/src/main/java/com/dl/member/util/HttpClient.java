@@ -13,7 +13,7 @@ import com.alibaba.druid.support.json.JSONUtils;
 @Component
 public class HttpClient {
 	
-	public String setPostMessage(String paramUrl,String paramObject) {
+	public static String setPostMessage(String paramUrl,String paramObject) {
 		String resultJson = "";
 		try {
 			// 创建url资源
