@@ -1,5 +1,19 @@
 package com.dl.member.web;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.druid.support.json.JSONUtils;
 import com.dl.activity.api.IActService;
 import com.dl.activity.dto.ActivityDTO;
 import com.dl.activity.param.ActTypeParam;
@@ -13,23 +27,22 @@ import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
+import com.dl.member.httpclient.HttpClient;
 import com.dl.member.model.DLActivity;
 import com.dl.member.model.User;
 import com.dl.member.param.IDFACallBackParam;
+import com.dl.member.param.SoUrlParam;
 import com.dl.member.param.UserRegisterParam;
-import com.dl.member.service.*;
+import com.dl.member.service.DLActivityService;
+import com.dl.member.service.IDFAService;
+import com.dl.member.service.UserBonusService;
+import com.dl.member.service.UserLoginService;
+import com.dl.member.service.UserRegisterService;
+import com.dl.member.service.UserService;
 import com.dl.member.util.TokenUtil;
+
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 /**
 * Created by CodeGenerator on 2018/03/08.
@@ -64,6 +77,18 @@ public class UserRegisterController {
 
     @Resource
     private UserMapper userMapper;
+    
+    @ApiOperation(value = "生成短链接", notes = "生成短链接")
+	@PostMapping("/addSUrl")
+	public BaseResult<String> addSUrl(@RequestBody SoUrlParam param) {
+		Map<String, String> params = new HashMap<>();
+		params.put("link", param.getLink());//商品描述
+		params.put("info", "短链接服务平台");
+		String jsonStr = JSONUtils.toJSONString(params);
+		String url="https://3url.cn/apis/add?apikey=Zw4bl3&apisecret=60c2cb0c555391c30983ec2f61263970";
+		return ResultGenerator.genSuccessResult("succ", HttpClient.setPostMessage(url, jsonStr));
+	}
+    
     /**
      * 新用户注册:
      * @param userRegisterParam

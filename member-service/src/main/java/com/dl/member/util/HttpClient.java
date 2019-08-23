@@ -1,4 +1,4 @@
-package com.dl.member.httpclient;
+package com.dl.member.util;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,8 +7,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.alibaba.druid.support.json.JSONUtils;
+import org.springframework.stereotype.Component;
 
+import com.alibaba.druid.support.json.JSONUtils;
+@Component
 public class HttpClient {
 	
 	public String setPostMessage(String paramUrl,String paramObject) {
@@ -66,17 +68,5 @@ public class HttpClient {
 		}
 		return resultJson;
 	}
-	
-    public static void main(String args[])
-    {
-    	HttpClient cl = new HttpClient();
-    	Map<String, String> params = new HashMap<>();
-		params.put("link", "http://3url.cn");//商品描述
-		params.put("info", "短链接服务平台");//商品附加数据
-		String obj = JSONUtils.toJSONString(params);
-		String url="https://3url.cn/apis/add?apikey=Zw4bl3&apisecret=60c2cb0c555391c30983ec2f61263970";
-        System.out.println(cl.setPostMessage(url, obj));
-
-    }
 }
  
