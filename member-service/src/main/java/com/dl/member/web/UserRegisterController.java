@@ -90,6 +90,7 @@ public class UserRegisterController {
 		params = new HashMap<>();
 		if(resultJson!=null && resultJson.length()>0) {
 			params = (Map<String, String>) JSONUtils.parse(resultJson);
+			return ResultGenerator.genSuccessResult("succ", params);
 		}
 		return ResultGenerator.genSuccessResult("succ", null);
 	}
