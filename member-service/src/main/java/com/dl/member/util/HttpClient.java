@@ -77,10 +77,8 @@ public class HttpClient {
 		String resultJson = HttpClient.setPostMessage(url, jsonStr);
 		System.out.println(resultJson);
 		Map<String, Object> m = (Map<String, Object>) JSONUtils.parse(resultJson);
-		System.out.println(m);
-		Map<String, String> s = (Map<String, String>) m.get("data");
-		System.out.println(s);
-		System.out.println(s.get("shorturl"));
+		System.out.println(m.get("result"));
+		System.out.println("0".equals(m.get("result").toString()));
 	}
 }
  

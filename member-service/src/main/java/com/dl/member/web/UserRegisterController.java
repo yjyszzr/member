@@ -102,7 +102,7 @@ public class UserRegisterController {
     		params = new HashMap<>();
     		if(resultJson!=null && resultJson.length()>0) {
     			Map<String, Object> resultMap = (Map<String, Object>) JSONUtils.parse(resultJson);
-    			if("0".equals(resultMap.get("result"))) {
+    			if("0".equals(resultMap.get("result").toString())) {
     				params =  (Map<String, String>) resultMap.get("data");
         			User user = new User();
         			user.setUserId(param.getUserId());
