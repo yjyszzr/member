@@ -43,6 +43,12 @@ public class User {
 
     private String passsign;
     
+    /**
+     * 短链接地址（冗余字段借用）
+     */
+    @Column(name = "province")
+    private String province;
+    
     public String getPasssign() {
 		return passsign;
 	}
@@ -844,6 +850,14 @@ public class User {
 
 	public void setParentUserId(Integer parentUserId) {
 		this.parentUserId = parentUserId;
+	}
+
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
 	}
 
 	/**

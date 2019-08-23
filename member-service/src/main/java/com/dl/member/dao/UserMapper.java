@@ -18,6 +18,8 @@ public interface UserMapper extends Mapper<User> {
 	User queryUserExceptPass(@Param("userId") Integer userId);
 	
 	int deleteUserByUserId(@Param("userId") Integer userId);
+	
+	int updateUserInfoDlj(User user);
 	/**
 	 * 更新用户账户资金
 	 * 

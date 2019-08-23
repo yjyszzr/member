@@ -25,6 +25,7 @@ import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.SessionUtil;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.UserMapper;
+import com.dl.member.dto.UserDTO;
 import com.dl.member.dto.UserLoginDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.DLActivity;
@@ -40,6 +41,7 @@ import com.dl.member.service.UserRegisterService;
 import com.dl.member.service.UserService;
 import com.dl.member.util.HttpClient;
 import com.dl.member.util.TokenUtil;
+import com.dl.shop.payment.param.UserIdParam;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -81,17 +83,36 @@ public class UserRegisterController {
     @ApiOperation(value = "生成短链接", notes = "生成短链接")
 	@PostMapping("/addSUrl")
 	public BaseResult<Map<String, String>> addSUrl(@RequestBody SoUrlParam param) {
-		Map<String, String> params = new HashMap<>();
-		params.put("link", param.getLink());//商品描述
-		params.put("info", "短链接服务平台");
-		String jsonStr = JSONUtils.toJSONString(params);
-		String url="https://3url.cn/apis/add?apikey=Zw4bl3&apisecret=60c2cb0c555391c30983ec2f61263970";
-		String resultJson = HttpClient.setPostMessage(url, jsonStr);
-		params = new HashMap<>();
-		if(resultJson!=null && resultJson.length()>0) {
-			params = (Map<String, String>) JSONUtils.parse(resultJson);
-			return ResultGenerator.genSuccessResult("succ", params);
-		}
+    	if(param.getUserId()==null || "".equals(param.getUserId())) {
+    		return ResultGenerator.genFailResult("用户ID不能为空");
+    	}
+    	com.dl.member.param.UserIdParam userIdParam = new com.dl.member.param.UserIdParam();
+    	userIdParam.setUserId(param.getUserId());
+    	UserDTO userDto = userService.queryUserInfo(userIdParam);
+    	if(userDto==null) {
+    		return ResultGenerator.genFailResult("用户ID错误");
+    	}
+    	Map<String, String> params = new HashMap<>();
+    	if(StringUtils.isEmpty(userDto.getProvince())) {
+    		params.put("link", param.getLink());//商品描述
+    		params.put("info", "短链接服务平台");
+    		String jsonStr = JSONUtils.toJSONString(params);
+    		String url="https://3url.cn/apis/add?apikey=Zw4bl3&apisecret=60c2cb0c555391c30983ec2f61263970";
+    		String resultJson = HttpClient.setPostMessage(url, jsonStr);
+    		params = new HashMap<>();
+    		if(resultJson!=null && resultJson.length()>0) {
+    			params = (Map<String, String>) JSONUtils.parse(resultJson);
+    			User user = new User();
+    			user.setUserId(param.getUserId());
+    			user.setProvince(params.get("link"));
+    			userService.updateUserInfoDlj(user);
+    			return ResultGenerator.genSuccessResult("succ", params);
+    		}
+    	}else {
+    		params.put("short_key", "");
+    		params.put("link", userDto.getProvince());
+    		return ResultGenerator.genSuccessResult("succ", params);
+    	}
 		return ResultGenerator.genSuccessResult("succ", null);
 	}
     

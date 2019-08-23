@@ -167,6 +167,11 @@ public class UserDTO {
      */
     @Column(name = "mobile_province")
     private String mobileProvince;
+    /**
+     * 短链接地址（冗余字段借用）
+     */
+    @Column(name = "province")
+    private String province;
 
     /**
      * 归属市

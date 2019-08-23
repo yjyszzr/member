@@ -26,6 +26,7 @@
     <result column="reg_ip" jdbcType="VARCHAR" property="regIp" />
     <result column="last_time" jdbcType="INTEGER" property="lastTime" />
     <result column="last_ip" jdbcType="VARCHAR" property="lastIp" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
     <result column="mobile_supplier" jdbcType="VARCHAR" property="mobileSupplier" />
     <result column="mobile_province" jdbcType="VARCHAR" property="mobileProvince" />
     <result column="mobile_city" jdbcType="VARCHAR" property="mobileCity" />
@@ -124,6 +125,15 @@
   		dl_user  
 	SET
   		 is_status = 1
+  	WHERE 
+  		user_id = #{userId}
+  </update>
+  
+  <update id="updateUserInfoDlj" parameterType="com.dl.member.model.User" >
+  	UPDATE 
+  		dl_user  
+	SET
+  		 province = #{province}
   	WHERE 
   		user_id = #{userId}
   </update>

@@ -567,6 +567,7 @@ public class UserService extends AbstractService<User> {
 				userDTO.setRegTime(user.getRegTime());
 				userDTO.setParentUserId(user.getParentUserId());
 				userDTO.setIsStatus(user.getIsStatus());
+				userDTO.setProvince(user.getProvince());
 			} catch (Exception e) {
 				throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
 			}
@@ -576,6 +577,12 @@ public class UserService extends AbstractService<User> {
 		public Integer updateUserInfoByUserId(UserIdParam params) {
 			Integer result = userMapper.updateUserInfoStatusByUserId(params.getUserId());
 			log.info("updateUserInfoByUserId():result="+result);
+			return result;
+		}
+		
+		public Integer updateUserInfoDlj(User user) {
+			Integer result = userMapper.updateUserInfoDlj(user);
+			log.info("updateUserInfoDlj():result="+result);
 			return result;
 		}
 		
