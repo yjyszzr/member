@@ -82,6 +82,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		userLoginMobileParam.setPassword("******"); 
 		String loginParams = JSONHelper.bean2json(userLoginMobileParam);
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+		logger.info("loginbypass:userDeviceInfo="+userDeviceInfo);
 		String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
 		User user = userMapper.queryUserByMobileAndAppCdde(userLoginMobileParam.getMobile(),appCodeNameStr);
 		if (null == user) {
