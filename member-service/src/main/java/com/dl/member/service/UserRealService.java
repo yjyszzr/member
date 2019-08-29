@@ -1,18 +1,4 @@
 package com.dl.member.service;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.List;
-
-import javax.annotation.Resource;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -36,8 +22,20 @@ import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
 import com.dl.member.model.UserReal;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
+
+import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -109,14 +107,14 @@ public class UserRealService extends AbstractService<UserReal> {
     	UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
 		String appCodeNameStr = userDeviceInfo.getAppCodeName();
 		String appCodeName = StringUtils.isEmpty(appCodeNameStr)?"10":appCodeNameStr;
-    	//一个身份证最多绑定2个用户
+    	//一个身份证最多绑定1个用户
     	Condition condition = new Condition(UserReal.class);
     	Criteria criteria = condition.createCriteria();
     	criteria.andCondition("id_code = ", iDCode);
     	criteria.andCondition("is_delete = ", 0);
 		criteria.andCondition("app_code_name = ", appCodeName);
     	List<UserReal> userRealList = this.findByCondition(condition);
-    	if(userRealList.size() >= 2) {
+    	if(userRealList.size() >= 1) {
 			return ResultGenerator.genResult(MemberEnums.USER_REAL_COUNTLIMIT.getcode(),MemberEnums.USER_REAL_COUNTLIMIT.getMsg());
     	}
     		
