@@ -4,6 +4,8 @@ import com.dl.base.result.BaseResult;
 import com.dl.member.dto.DlDeviceActionControlDTO;
 import com.dl.member.param.DlDeviceActionControlParam;
 import com.dl.member.param.MacParam;
+import com.dl.member.param.UpdateAppParam;
+
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,5 +28,8 @@ public interface IDeviceControlService {
 
 	@RequestMapping(path="/dl/deviceActionControl/updateDeviceControlUpdteTime", method=RequestMethod.POST)
 	public BaseResult<String> updateDeviceControlUpdteTime(@RequestBody MacParam macParam);
+	
+	@RequestMapping(path="/user/app/queryUpdateAppI", method=RequestMethod.POST)
+	public BaseResult<Integer> queryUpdateAppI(@RequestBody UpdateAppParam updateAppParam);
 
 }

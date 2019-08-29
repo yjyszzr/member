@@ -35,4 +35,10 @@ public class DLAppController {
     public BaseResult<UpdateAppDTO> updateApp(@RequestBody @Valid UpdateAppParam updateAppParam) {
     	return dLAppService.queryUpdateApp(updateAppParam.getChannel(), updateAppParam.getVersion());
     }
+    
+    @ApiOperation(value = "升级app", notes = "升级app")
+    @PostMapping("/queryUpdateAppI")
+    public BaseResult<Integer> queryUpdateAppI(@RequestBody @Valid UpdateAppParam updateAppParam) {
+    	return dLAppService.queryUpdateAppI(updateAppParam.getChannel(), updateAppParam.getVersion());
+    }
 }

@@ -71,4 +71,22 @@ public class DLAppService extends AbstractService<DLApp> {
     	return ResultGenerator.genSuccessResult("success",updateAppDTO);
     }
 
+    
+    public BaseResult<Integer> queryUpdateAppI(String channel,String version) {
+    	BaseResult<Integer> baseresult = null;
+    	log.info("android版本升级接口入参,channel={},version={}",channel,version);
+    	List<String> updateLogList = new ArrayList<>();
+    	//DlPhoneChannel dlPhoneChannel = dlPhoneChannelMapper.queryPhoneChannelByChannel(channel);
+    	DLAppUpdateLog dLAppUpdateLog = dLAppUpdateLogService.queryUpdateAppLog(channel, version);
+    	if(null == dLAppUpdateLog) {
+    		log.info("android版本升级接口返回数据判断接口没有最新版本");
+    		return baseresult.setData(1);
+    	}
+    	int diff = CompareUtil.compareVersion(version, dLAppUpdateLog.getVersion());
+    	if(diff >= 0) {
+    		log.info("android版本升级接口返回数据判断接口没有最新版本");
+    		return baseresult.setData(1);
+    	}
+    	return baseresult.setData(0);
+    }
 }
