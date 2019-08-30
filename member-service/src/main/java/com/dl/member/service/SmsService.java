@@ -84,10 +84,16 @@ public class SmsService {
 	 * @return
 	 */
 	public BaseResult<String> sendSms(SmsParam smsParam) {
+		
+		
+		
 		if (!RegexUtil.checkMobile(smsParam.getMobile())) {
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
 		String smsType = smsParam.getSmsType();
+		if("1".equals(smsType)) {
+			return ResultGenerator.genResult(301065, "注册系统正在维护!，请稍后再试");
+		} 
 		if("4".equals(smsType)) {//商户余额预警
 			log.info("sendSms()执行商户余额预警：one");
 			int num = 0;
