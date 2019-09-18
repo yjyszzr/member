@@ -37,7 +37,7 @@ import freemarker.template.TemplateExceptionHandler;
 
 public class CodeGenerator {
 
-	private static final String JDBC_URL = "jdbc:mysql://39.106.18.39:3306/cxm_test";
+	private static final String JDBC_URL = "jdbc:mysql://49.232.65.109:3306/cxm_test";
     private static final String JDBC_USERNAME = "caixiaomi";
     private static final String JDBC_PASSWORD = "caixiaomi";
     private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
