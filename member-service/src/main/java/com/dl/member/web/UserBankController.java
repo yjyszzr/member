@@ -78,7 +78,7 @@ public class UserBankController {
 	  * @return
 	  */
      @ApiOperation(value = "根据userID和银行卡号查询银行卡信息", notes = "根据userID和银行卡号查询银行卡信息")
-	 @PostMapping("/queryUserBankByCondition")    
+	 @PostMapping("/queryUserBankByUserId")    
 	 public BaseResult<UserBankDTO> queryUserBankByUserId(@RequestBody UserBankQueryParam userBankQueryParam){
 		 return userBankService.queryUserBankByUserId(userBankQueryParam);
 	 }
