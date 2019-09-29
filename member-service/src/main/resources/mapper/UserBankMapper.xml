@@ -18,6 +18,7 @@
     <result column="abbreviation" jdbcType="VARCHAR" property="abbreviation" />
     <result column="purpose" jdbcType="VARCHAR" property="purpose" />
     <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="is_sign" jdbcType="INTEGER" property="isSign" />
   </resultMap>
   
   <update id="batchUpdateUserBankStatus">

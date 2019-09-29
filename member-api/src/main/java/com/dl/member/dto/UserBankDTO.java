@@ -1,6 +1,8 @@
 package com.dl.member.dto;
 
 
+import javax.persistence.Column;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -48,4 +50,6 @@ public class UserBankDTO {
 	
 	@ApiModelProperty("密文")
 	private String password;
+	@ApiModelProperty("是否签约")
+    private Integer isSign;
 }

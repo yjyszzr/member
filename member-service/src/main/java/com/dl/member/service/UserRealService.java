@@ -21,6 +21,8 @@ import com.dl.member.enums.MemberEnums;
 import com.dl.member.model.MemberThirdApiLog;
 import com.dl.member.model.User;
 import com.dl.member.model.UserReal;
+import com.dl.member.param.UserIdRealParam;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
@@ -179,6 +182,29 @@ public class UserRealService extends AbstractService<UserReal> {
      */
     public UserRealDTO queryUserReal(){
     	Integer userId = SessionUtil.getUserId();
+    	UserReal userReal = userRealMapper.queryUserRealByUserId(userId);
+    	log.info("[queryUserReal]" + " userId:" + userId + " userReal:" + userReal);
+    	UserRealDTO userRealDTO = new UserRealDTO();
+    	if(null == userReal) {
+    		return null;
+    	}
+    	
+    	try {
+			BeanUtils.copyProperties(userRealDTO, userReal);
+		} catch (Exception e) {
+			throw new ServiceException(RespStatusEnum.SERVER_ERROR.getCode(), RespStatusEnum.SERVER_ERROR.getMsg());
+		} 
+    	return userRealDTO;
+    }
+    /**
+     * 查询用户真实信息
+     * @return
+     */
+    public UserRealDTO queryUserRealByUserId(UserIdRealParam param){
+    	Integer userId = param.getUserId();
+    	if(userId==null) {
+    		userId = SessionUtil.getUserId();
+    	}
     	UserReal userReal = userRealMapper.queryUserRealByUserId(userId);
     	log.info("[queryUserReal]" + " userId:" + userId + " userReal:" + userReal);
     	UserRealDTO userRealDTO = new UserRealDTO();

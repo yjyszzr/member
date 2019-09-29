@@ -1,17 +1,22 @@
 package com.dl.member.api;
 
 
-import com.dl.member.param.*;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import com.dl.base.result.BaseResult;
 import com.dl.member.dto.ChannelCustomerBindDTO;
 import com.dl.member.dto.MediaTokenDTO;
 import com.dl.member.dto.UserDTO;
+import com.dl.member.dto.UserRealDTO;
+import com.dl.member.param.MediaTokenParam;
+import com.dl.member.param.MobileAndPassParam;
+import com.dl.member.param.StrParam;
+import com.dl.member.param.TokenParam;
+import com.dl.member.param.UserIdParam;
+import com.dl.member.param.UserIdRealParam;
 
 
 /**
@@ -85,4 +90,11 @@ public interface IUserService {
 	 */
 	@RequestMapping(path="/media/getToken", method=RequestMethod.POST)
 	public BaseResult<MediaTokenDTO> getMediaTokenInfo(@RequestBody MediaTokenParam params);
+	/**
+	 * 查询用户实名认证信息
+	 * @param UserBonusParam
+	 * @return
+	 */
+	@RequestMapping(path="/user/real/queryUserRealByUserId", method=RequestMethod.POST)
+	public BaseResult<UserRealDTO> queryUserRealByUserId(@RequestBody UserIdRealParam params);
 }

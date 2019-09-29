@@ -37,6 +37,14 @@ public interface IUserBankService {
 	  */
 	 @PostMapping("/user/bank/queryUserBankByCondition")    
 	 BaseResult<UserBankDTO> queryUserBankByCondition(@RequestBody UserBankQueryParam userBankQueryParam);
+	 
+	 /**
+	  * 查询银行卡信息
+	  *
+	  * @return
+	  */
+	 @PostMapping("/user/bank/queryUserBankByUserId")    
+	 BaseResult<UserBankDTO> queryUserBankByUserId(@RequestBody UserBankQueryParam userBankQueryParam);
     
 	 
 	 /**

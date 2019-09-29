@@ -62,7 +62,6 @@ public class UserBankController {
     	return userBankService.queryUserBankList(ProjectConstant.BANK_PURPOSE_WITHDRAW);
     }
     
-    
 	  /**
 	  * 根据userID和银行卡号查询银行卡信息
 	  *
@@ -72,6 +71,16 @@ public class UserBankController {
 	 @PostMapping("/queryUserBankByCondition")    
 	 public BaseResult<UserBankDTO> queryUserBankByCondition(@RequestBody UserBankQueryParam userBankQueryParam){
 		 return userBankService.queryUserBankByCondition(userBankQueryParam);
+	 }
+     /**
+	  * 根据userID查询默认银行卡信息
+	  *
+	  * @return
+	  */
+     @ApiOperation(value = "根据userID和银行卡号查询银行卡信息", notes = "根据userID和银行卡号查询银行卡信息")
+	 @PostMapping("/queryUserBankByCondition")    
+	 public BaseResult<UserBankDTO> queryUserBankByUserId(@RequestBody UserBankQueryParam userBankQueryParam){
+		 return userBankService.queryUserBankByUserId(userBankQueryParam);
 	 }
     
     /**

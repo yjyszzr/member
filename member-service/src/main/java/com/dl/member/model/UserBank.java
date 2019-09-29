@@ -83,7 +83,21 @@ public class UserBank {
     @Column(name = "password")
     private String password;
     
-    public Integer getType() {
+    /**
+     *是否签约（市民卡支付专用）1-签约  0-未签约
+     */
+    @Column(name = "is_sign")
+    private Integer isSign;
+    
+    public Integer getIsSign() {
+		return isSign;
+	}
+
+	public void setIsSign(Integer isSign) {
+		this.isSign = isSign;
+	}
+
+	public Integer getType() {
     	return type;
     }
     

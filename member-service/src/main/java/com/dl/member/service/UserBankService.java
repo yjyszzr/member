@@ -1,4 +1,23 @@
 package com.dl.member.service;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -33,20 +52,9 @@ import com.dl.member.param.UserBankQueryParam;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
+import com.dl.shop.payment.param.StrParam;
 
-import javax.annotation.Resource;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -241,6 +249,31 @@ public class UserBankService extends AbstractService<UserBank> {
     	return ResultGenerator.genSuccessResult("查询银行卡成功", userBankDTO);
     }
     
+    /**
+     * 根据userId和卡号查询银行卡
+     * @param userBankQueryParam
+     * @return
+     */
+    public BaseResult<UserBankDTO> queryUserBankByUserId(UserBankQueryParam userBankQueryParam) {
+    	UserBank userBankQuery = new UserBank();
+    	userBankQuery.setUserId(userBankQueryParam.getUserId());
+    	userBankQuery.setCardNo(null);
+    	userBankQuery.setIsDelete(ProjectConstant.NOT_DELETE);
+    	userBankQuery.setStatus("1");//默认卡
+    	List<UserBank> userBankList = userBankMapper.queryUserBankBySelective(userBankQuery);
+    	if(CollectionUtils.isEmpty(userBankList)) {
+    		return ResultGenerator.genResult(MemberEnums.DBDATA_IS_NULL.getcode(), MemberEnums.DBDATA_IS_NULL.getMsg());
+    	}
+    	UserBankDTO userBankDTO = new UserBankDTO();
+    	UserBank userBank = userBankList.get(0);
+    	try {
+			BeanUtils.copyProperties(userBankDTO, userBank);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return ResultGenerator.genFailResult("查询银行卡异常");
+		} 
+    	return ResultGenerator.genSuccessResult("查询银行卡成功", userBankDTO);
+    }
     
     /**
      * 查询有效的银行卡根据默认或非默认状态

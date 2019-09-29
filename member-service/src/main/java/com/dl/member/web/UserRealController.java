@@ -6,6 +6,7 @@ import com.dl.member.dto.UserRealDTO;
 import com.dl.member.enums.MemberEnums;
 import com.dl.member.param.RealNameAuthParam;
 import com.dl.member.param.StrParam;
+import com.dl.member.param.UserIdRealParam;
 import com.dl.member.service.UserRealService;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -139,6 +140,15 @@ public class UserRealController {
     @PostMapping("/userRealInfo")
     public BaseResult<UserRealDTO> queryUserReal(@RequestBody StrParam strParam){
     	UserRealDTO userRealDTO = userRealService.queryUserReal();
+    	return ResultGenerator.genSuccessResult("查询实名认证信息成功", userRealDTO);
+    }
+    /**
+     * 查询实名认证信息
+     */
+    @ApiOperation(value = "查询实名认证信息", notes = "查询实名认证信息")
+    @PostMapping("/queryUserRealByUserId")
+    public BaseResult<UserRealDTO> queryUserRealByUserId(@RequestBody UserIdRealParam param){
+    	UserRealDTO userRealDTO = userRealService.queryUserRealByUserId(param);
     	return ResultGenerator.genSuccessResult("查询实名认证信息成功", userRealDTO);
     }
 }
