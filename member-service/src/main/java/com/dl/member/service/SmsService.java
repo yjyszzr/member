@@ -91,12 +91,12 @@ public class SmsService {
 			return ResultGenerator.genResult(MemberEnums.MOBILE_VALID_ERROR.getcode(), MemberEnums.MOBILE_VALID_ERROR.getMsg());
 		}
 		String smsType = smsParam.getSmsType();
-		if("1".equals(smsType)) {
-			//判断当前注册手机号是否为app_code_name=10
-			if(userMapper.queryUserByMobileAndAppCdde(smsParam.getMobile(), "10")==null) {
-				return ResultGenerator.genResult(301065, "注册系统正在维护，请稍后再试");
-			}
-		} 
+//		if("1".equals(smsType)) {
+//			//判断当前注册手机号是否为app_code_name=10
+//			if(userMapper.queryUserByMobileAndAppCdde(smsParam.getMobile(), "10")==null) {
+//				return ResultGenerator.genResult(301065, "注册系统正在维护，请稍后再试");
+//			}
+//		} 
 		if("4".equals(smsType)) {//商户余额预警
 			log.info("sendSms()执行商户余额预警：one");
 			int num = 0;
