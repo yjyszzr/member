@@ -77,10 +77,10 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
         String chanel = userDevice.getChannel();
         Integer userId = SessionUtil.getUserId();
         log.info("开关接口传的登录的userId:" + userId);
-        if (userDevice.getPlat().equals("h5")) {//h5 的plat,version 和 channel 写死，分别为2和1.0.0和h5
-            version = "1.0.0";
-            chanel = "h5";
-        }
+        // if (userDevice.getPlat().equals("h5")) {//h5 的plat,version 和 channel 写死，分别为2和1.0.0和h5
+        //     version = "1.0.0";
+        //     chanel = "h5";
+        // }
         Integer rst3 = this.channelSwitch(plat, version, chanel);
         log.info("渠道开关:" + rst3);
         if (rst3 == 1) {//渠道开
