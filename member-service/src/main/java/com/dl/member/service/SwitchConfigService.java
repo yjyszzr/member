@@ -182,7 +182,7 @@ public class SwitchConfigService extends AbstractService<SwitchConfig> {
     public Integer channelSwitch(String platform,String version,String chanel) {
     	List<SwitchConfig> switchConfigList = switchConfigMapper.querySwitchConfigTurnOff(platform,version,chanel);
     	if(CollectionUtils.isEmpty(switchConfigList)) {
-    		return ProjectConstant.BISINESS_APP_CLOSE;
+    		return ProjectConstant.BISINESS_APP_OPEN;
     	}
     	SwitchConfig switchConfig = switchConfigList.get(0);
     	Integer turnOn = switchConfig.getTurnOn();
