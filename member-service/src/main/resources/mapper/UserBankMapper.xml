@@ -28,6 +28,10 @@
     </foreach>
   </update>
   
+  <update id="batchUpdateUserBankIsSign">
+  	UPDATE dl_user_bank SET is_sign = #{isSign}  WHERE user_id=#{userId} and status=1
+  </update>
+  
   <update id="updateUserBank" parameterType="com.dl.member.model.UserBank">
   	UPDATE dl_user_bank 
 		 <trim prefix="set" suffixOverrides=",">

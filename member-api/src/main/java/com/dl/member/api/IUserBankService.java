@@ -30,6 +30,13 @@ public interface IUserBankService {
 	 @PostMapping("/user/bank/queryUserBank")    
 	 BaseResult<UserBankDTO> queryUserBank(@RequestBody IDParam idParam);
 	 
+	 /**
+	  * 查询根据userBankId查询银行卡信息
+	  * @return
+	  */
+	 @PostMapping("/user/bank/updateUserBankIsSign")    
+	 BaseResult<UserBankDTO> updateUserBankIsSign(@RequestBody UserBankQueryParam userBankQueryParam);
+	 
 	  /**
 	  * 查询银行卡信息
 	  *

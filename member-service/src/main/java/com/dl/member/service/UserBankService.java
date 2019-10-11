@@ -634,7 +634,22 @@ public class UserBankService extends AbstractService<UserBank> {
 
 		return ResultGenerator.genSuccessResult("更改银行卡状态成功");
 	}
-	
+	/**
+	 * 更改银行卡状态为已签约
+	 * @return
+	 */
+	@Transactional
+	public BaseResult<String> updateUserBankIsSign(Integer userId,Integer purpose){
+		BaseResult<UserBankDTO> userBankDTORst = this.updateAlreadyAddCardStatus(ProjectConstant.USER_BANK_DEFAULT,purpose);
+		if(userBankDTORst.getCode() != 0) {
+			log.error(userBankDTORst.getMsg());
+		}
+		int updateRst = userBankMapper.batchUpdateUserBankIsSign(userId,purpose);
+		if(1 != updateRst) {
+			log.error("更新数据库银行卡状态失败");
+		}
+		return ResultGenerator.genSuccessResult("更改银行卡状态成功");
+	}
 	public String getAbbrByMap(String bankName) {
 		if(mMap == null || mMap.size() <= 0) {
 			List<UserBankCode> mList = userBankCodeMapper.listAll();

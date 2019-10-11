@@ -102,7 +102,15 @@ public class UserBankController {
     public BaseResult<String> updateUserBankDefault(@RequestBody IDParam iDParam){
     	return userBankService.updateUserBankDefault(iDParam.getId(),0);
     }
-    
+    /**
+     * 设置银行卡为已签约
+     * @return
+     */
+    @ApiOperation(value = "设置银行卡为已签约", notes = "设置银行卡为已签约")
+    @PostMapping("/updateUserBankIsSign")
+    public BaseResult<String> updateUserBankIsSign(@RequestBody UserBankQueryParam userBankQueryParam){
+    	return userBankService.updateUserBankIsSign(userBankQueryParam.getUserId(),1);
+    }
     /**
      * 提现界面的数据显示：当前可提现余额和当前默认银行卡信息
      * @return
