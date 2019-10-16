@@ -121,7 +121,6 @@ public class UserRegisterController {
     	}
     	Map<String, String> params =  new HashMap<String, String>();
     	if(StringUtils.isEmpty(userDto.getProvince())) {
-    		log.info("addSUrl====2");
     		String host = "https://fshorturl.market.alicloudapi.com";
 		    String path = "/shorturlss";
 		    String method = "GET";
@@ -136,10 +135,8 @@ public class UserRegisterController {
 //    	            //状态码: 200 正常；400 URL无效；401 appCode错误； 403 次数用完； 500 API网管错误
 //    		    	//获取response的body
 		    	String resultJson = EntityUtils.toString(response.getEntity());
-		    	log.info("addSUrl====resultJson="+resultJson);
 		    	if(resultJson!=null && resultJson.length()>0) {
 		    		Map<String, String> resultMap = (Map<String, String>) JSONUtils.parse(resultJson);
-		    		log.info("addSUrl====resultMap="+resultMap);
 	    			if("100".equals(resultMap.get("status"))) {
 	    				params.put("short_key", "");
 	    				params.put("shorturl", resultMap.get("url"));
@@ -147,13 +144,11 @@ public class UserRegisterController {
 	        			user.setUserId(param.getUserId());
 	        			user.setProvince(resultMap.get("url"));
 	        			userService.updateUserInfoDlj(user);
-	        			log.info("addSUrl====3");
 	        			return ResultGenerator.genSuccessResult("succ", params);
 	    			}else {
 	    				return ResultGenerator.genFailResult("接口返回错误");
 	    			}
 	    		}else {
-	    			log.info("addSUrl====4");
 	    			return ResultGenerator.genSuccessResult("succ", null);
 	    		}
 		    } catch (Exception e) {
@@ -162,10 +157,8 @@ public class UserRegisterController {
     	}else {
     		params.put("short_key", "");
     		params.put("shorturl", userDto.getProvince());
-    		log.info("addSUrl====5");
     		return ResultGenerator.genSuccessResult("succ", params);
     	}
-    	log.info("addSUrl====6");
 		return ResultGenerator.genSuccessResult("succ", null);
 	}
     
