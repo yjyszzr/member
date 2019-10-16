@@ -94,10 +94,13 @@ public class UserRegisterController {
 	    querys.put("url", "https://market.aliyun.com/products/56928004/cmapi025335.html"); //需要缩短的原网址
 	    try {
 	    	HttpResponse response = HttpUtils.doGet(host, path, method, headers, querys);
-//	    	System.out.println(response.toString());//如不输出json, 请打开这行代码，打印调试头部状态码。
+	    	System.out.println(response.toString());//如不输出json, 请打开这行代码，打印调试头部状态码。
 //            //状态码: 200 正常；400 URL无效；401 appCode错误； 403 次数用完； 500 API网管错误
 //	    	//获取response的body
-	    	System.out.println(EntityUtils.toString(response.getEntity()));
+	    	String json = EntityUtils.toString(response.getEntity());
+	    	System.out.println(json);
+	    	Map<String, Object> resultMap = (Map<String, Object>) JSONUtils.parse(json);
+	    	System.out.println(resultMap.get("url"));
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }
@@ -115,28 +118,40 @@ public class UserRegisterController {
     	if(userDto==null) {
     		return ResultGenerator.genFailResult("用户ID错误");
     	}
-    	Map<String, String> params = new HashMap<>();
+    	Map<String, String> params =  new HashMap<String, String>();
     	if(StringUtils.isEmpty(userDto.getProvince())) {
-    		params.put("link", param.getLink());//商品描述
-    		params.put("info", "短链接服务平台");
-    		String jsonStr = JSONUtils.toJSONString(params);
-    		String url="http(s)://fshorturl.market.alicloudapi.com/shorturlss";
-    		String resultJson = HttpClient.setPostMessage(url, jsonStr);
-    		params = new HashMap<>();
-    		if(resultJson!=null && resultJson.length()>0) {
-    			Map<String, Object> resultMap = (Map<String, Object>) JSONUtils.parse(resultJson);
-    			if("0".equals(resultMap.get("result").toString())) {
-    				params =  (Map<String, String>) resultMap.get("data");
-        			User user = new User();
-        			user.setUserId(param.getUserId());
-        			user.setProvince(params.get("shorturl"));
-        			userService.updateUserInfoDlj(user);
-        			return ResultGenerator.genSuccessResult("succ", params);
-    			}else {
-    				return ResultGenerator.genFailResult("接口返回错误");
-    			}
-    			
-    		}
+    		String host = "https://fshorturl.market.alicloudapi.com";
+		    String path = "/shorturlss";
+		    String method = "GET";
+		    String appcode = "82a6721c023e440e8a77ce2ae7b6ebd7";
+		    Map<String, String> headers = new HashMap<String, String>();
+		    headers.put("Authorization", "APPCODE " + appcode);
+		    Map<String, String> querys = new HashMap<String, String>();
+		    querys.put("url", param.getLink()); //需要缩短的原网址
+		    try {
+		    	HttpResponse response = HttpUtils.doGet(host, path, method, headers, querys);
+//    		    	System.out.println(response.toString());//如不输出json, 请打开这行代码，打印调试头部状态码。
+//    	            //状态码: 200 正常；400 URL无效；401 appCode错误； 403 次数用完； 500 API网管错误
+//    		    	//获取response的body
+		    	String resultJson = EntityUtils.toString(response.getEntity());
+		    	if(resultJson!=null && resultJson.length()>0) {
+		    		Map<String, String> resultMap = (Map<String, String>) JSONUtils.parse(resultJson);
+	    			if("100".equals(resultMap.get("status"))) {
+	    				params.put("short_key", "");
+	    				params.put("shorturl", resultMap.get("url"));
+	        			User user = new User();
+	        			user.setUserId(param.getUserId());
+	        			user.setProvince(resultMap.get("url"));
+	        			userService.updateUserInfoDlj(user);
+	        			return ResultGenerator.genSuccessResult("succ", params);
+	    			}else {
+	    				return ResultGenerator.genFailResult("接口返回错误");
+	    			}
+	    			
+	    		}
+		    } catch (Exception e) {
+		    	e.printStackTrace();
+		    }
     	}else {
     		params.put("short_key", "");
     		params.put("shorturl", userDto.getProvince());
