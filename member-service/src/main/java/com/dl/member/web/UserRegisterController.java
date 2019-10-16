@@ -111,7 +111,6 @@ public class UserRegisterController {
     @ApiOperation(value = "token鉴权", notes = "token鉴权")
    	@PostMapping("/checkToken")
    	public BaseResult<Map<String, String>> checkToken(@RequestBody SoUrlParam param) {
-       	log.info("addSUrl====1");
    		String host = "http://account.6873.com/2.0/423";
 	    String path = "/checkUserToken";
 	    String method = "GET";
@@ -139,7 +138,6 @@ public class UserRegisterController {
     @ApiOperation(value = "生成短链接", notes = "生成短链接")
 	@PostMapping("/addSUrl")
 	public BaseResult<Map<String, String>> addSUrl(@RequestBody SoUrlParam param) {
-    	log.info("addSUrl====1");
     	if(param.getUserId()==null || "".equals(param.getUserId())) {
     		return ResultGenerator.genFailResult("用户ID不能为空");
     	}
