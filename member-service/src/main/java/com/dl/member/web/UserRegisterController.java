@@ -7,6 +7,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +42,7 @@ import com.dl.member.service.UserLoginService;
 import com.dl.member.service.UserRegisterService;
 import com.dl.member.service.UserService;
 import com.dl.member.util.HttpClient;
+import com.dl.member.util.HttpUtils;
 import com.dl.member.util.TokenUtil;
 import com.dl.shop.payment.param.UserIdParam;
 
@@ -80,6 +83,26 @@ public class UserRegisterController {
     @Resource
     private UserMapper userMapper;
     
+    public static void main(String[] args) {
+	    String host = "https://fshorturl.market.alicloudapi.com";
+	    String path = "/shorturlss";
+	    String method = "GET";
+	    String appcode = "82a6721c023e440e8a77ce2ae7b6ebd7";
+	    Map<String, String> headers = new HashMap<String, String>();
+	    headers.put("Authorization", "APPCODE " + appcode);
+	    Map<String, String> querys = new HashMap<String, String>();
+	    querys.put("url", "https://market.aliyun.com/products/56928004/cmapi025335.html"); //需要缩短的原网址
+	    try {
+	    	HttpResponse response = HttpUtils.doGet(host, path, method, headers, querys);
+//	    	System.out.println(response.toString());//如不输出json, 请打开这行代码，打印调试头部状态码。
+//            //状态码: 200 正常；400 URL无效；401 appCode错误； 403 次数用完； 500 API网管错误
+//	    	//获取response的body
+	    	System.out.println(EntityUtils.toString(response.getEntity()));
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+	}
+    
     @ApiOperation(value = "生成短链接", notes = "生成短链接")
 	@PostMapping("/addSUrl")
 	public BaseResult<Map<String, String>> addSUrl(@RequestBody SoUrlParam param) {
@@ -97,7 +120,7 @@ public class UserRegisterController {
     		params.put("link", param.getLink());//商品描述
     		params.put("info", "短链接服务平台");
     		String jsonStr = JSONUtils.toJSONString(params);
-    		String url="https://3url.cn/apis/add?apikey=Zw4bl3&apisecret=60c2cb0c555391c30983ec2f61263970";
+    		String url="http(s)://fshorturl.market.alicloudapi.com/shorturlss";
     		String resultJson = HttpClient.setPostMessage(url, jsonStr);
     		params = new HashMap<>();
     		if(resultJson!=null && resultJson.length()>0) {
