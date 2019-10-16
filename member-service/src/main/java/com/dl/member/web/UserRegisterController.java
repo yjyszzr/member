@@ -83,6 +83,8 @@ public class UserRegisterController {
     @Resource
     private UserMapper userMapper;
     
+    
+    
     public static void main(String[] args) {
 	    String host = "https://fshorturl.market.alicloudapi.com";
 	    String path = "/shorturlss";
@@ -105,6 +107,34 @@ public class UserRegisterController {
 	    	e.printStackTrace();
 	    }
 	}
+    
+    @ApiOperation(value = "token鉴权", notes = "token鉴权")
+   	@PostMapping("/checkToken")
+   	public BaseResult<Map<String, String>> checkToken(@RequestBody SoUrlParam param) {
+       	log.info("addSUrl====1");
+   		String host = "http://account.6873.com/2.0/423";
+	    String path = "/checkUserToken";
+	    String method = "GET";
+	    Map<String, String> querys = new HashMap<String, String>();
+	    querys.put("token", param.getToken()); //需要缩短的原网址
+	    try {
+	    	HttpResponse response = HttpUtils.doGet(host, path, method, null, querys);
+	    	log.info("checkToken&&&&&&==="+response.toString());
+//       		    	System.out.println(response.toString());//如不输出json, 请打开这行代码，打印调试头部状态码。
+	    	String resultJson = EntityUtils.toString(response.getEntity());
+	    	log.info("checkToken&&&&&&==resultJson="+resultJson);
+	    	if(resultJson!=null && resultJson.length()>0) {
+	    		Map<String, String> resultMap = (Map<String, String>) JSONUtils.parse(resultJson);
+	    		return ResultGenerator.genSuccessResult("succ", resultMap);
+    		}else {
+    			return ResultGenerator.genSuccessResult("succ", null);
+    		}
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+   		return ResultGenerator.genSuccessResult("succ", null);
+   	}
+       
     
     @ApiOperation(value = "生成短链接", notes = "生成短链接")
 	@PostMapping("/addSUrl")
