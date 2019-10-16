@@ -51,10 +51,11 @@ public class HttpUtils {
     	HttpClient httpClient = wrapClient(host);
 
     	HttpGet request = new HttpGet(buildUrl(host, path, querys));
-        for (Map.Entry<String, String> e : headers.entrySet()) {
-        	request.addHeader(e.getKey(), e.getValue());
-        }
-        
+    	if(headers!=null) {
+	        for (Map.Entry<String, String> e : headers.entrySet()) {
+	        	request.addHeader(e.getKey(), e.getValue());
+	        }
+    	}
         return httpClient.execute(request);
     }
 	
