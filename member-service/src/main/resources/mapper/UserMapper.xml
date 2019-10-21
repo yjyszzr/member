@@ -200,4 +200,9 @@
 	<select id="queryUserByMobileAndAppCdde" resultMap="BaseResultMap">
 		select * from dl_user where mobile =#{mobile} and app_code_name = #{appCodeName}
 	</select>
+
+	<!-- 查询用户信息-->
+	<select id="getUserByMobile" resultMap="BaseResultMap">
+		select * from dl_user where mobile =#{mobile}
+	</select>
 </mapper>

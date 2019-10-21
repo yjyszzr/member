@@ -67,4 +67,11 @@ public interface UserMapper extends Mapper<User> {
 	User queryUserByMobileAndAppCdde(@Param("mobile") String mobile,@Param("appCodeName") String appCodeName);
 
 	Integer updateParentUserId(@Param("parentUserId")Integer parentUserId,@Param("userId")Integer userId);
+
+	/**
+	 * 查询用户信息
+	 * @param mobile
+	 * @return
+	 */
+	User getUserByMobile(String mobile);
 }

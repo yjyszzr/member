@@ -19,6 +19,7 @@ import com.dl.member.model.User;
 import com.dl.member.model.UserLoginLog;
 import com.dl.member.param.*;
 import com.dl.member.util.Encryption;
+import com.dl.member.util.RanCodeUtil;
 import com.dl.member.util.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -420,7 +421,6 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	 *
 	 * @param userId
 	 *            用户ID
-	 * @param device
 	 *            登录设备类型
 	 * @param loginType
 	 *            登录类型
@@ -478,5 +478,25 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 				userLoginMapper.updateLogOutTime(ull);
 			}
 		}
+	}
+
+	public BaseResult<UserLoginDTO> loginMobile(UserLoginInfo userLoginInfo, HttpServletRequest request) {
+		// 查询用户信息是否存在
+		User user = userMapper.getUserByMobile(userLoginInfo.getMobile());
+		log.info("用户信息：{}",JSON.toJSONString(user));
+		if (org.springframework.util.StringUtils.isEmpty(user)) {
+			return ResultGenerator.genResult(MemberEnums.NO_REGISTER.getcode(), MemberEnums.NO_REGISTER.getMsg());
+		} else if (!user.getPassword().equals(Encryption.encryption(userLoginInfo.getPassword(), user.getSalt()))) {
+			return ResultGenerator.genResult(MemberEnums.WRONG_IDENTITY.getcode(), "登录密码不正确");
+		} else if (!RanCodeUtil.getInstance().checkCaptcha(userLoginInfo.getAuthCode(), request)) {
+			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
+		}
+		// 封装登录成功后信息
+		UserLoginDTO userLoginDTO = new UserLoginDTO();
+		userLoginDTO.setMobile(user.getMobile());
+		userLoginDTO.setHeadImg(user.getHeadImg());
+		userLoginDTO.setNickName(user.getNickname());
+		userLoginDTO.setToken(TokenUtil.genToken(user.getUserId(), Integer.parseInt(user.getSalt())));
+		return ResultGenerator.genSuccessResult("登录成功", userLoginDTO);
 	}
 }
