@@ -49,7 +49,7 @@
 		<dsn>http://042f4979b3284d11800236e86b1c3d74:01764949f0dc45838c7b8b4bad065e5e@49.232.65.109:9000/3</dsn>
 		<tags>tag1:value1,tag2:value2</tags>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>ERROR</level>
+			<level>WARN</level>
 		</filter>
 	</appender>
 
@@ -60,7 +60,7 @@
 
 	<!-- 开发、测试环境日志配置-->
 	<springProfile name="dev">
-		<root level="info">
+		<root level="INFO">
 			<appender-ref ref="console"/>
 			<appender-ref ref="rollingFileINFO"/>
 			<appender-ref ref="rollingFileERROR"/>
