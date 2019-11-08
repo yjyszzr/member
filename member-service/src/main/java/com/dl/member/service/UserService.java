@@ -174,11 +174,13 @@ public class UserService extends AbstractService<User> {
 	 */
 	public BaseResult<UserDTO> queryUserByUserIdExceptPass() {
 		Integer userId = SessionUtil.getUserId();
+		log.info("pay-------1-------userid="+userId);
 		if (null == userId) {
 			return ResultGenerator.genNeedLoginResult("请登录");
 		}
 
 		User user = userMapper.queryUserExceptPass(userId);
+		log.info("pay-------2-------user="+user);
 		if (user == null) {
 			return ResultGenerator.genFailResult("用户不存在");
 		}
@@ -190,7 +192,7 @@ public class UserService extends AbstractService<User> {
 			log.error("个人信息接口的DTO转换异常");
 			return ResultGenerator.genFailResult("个人信息接口的DTO转换异常");
 		}
-
+		log.info("pay-------3-------user="+user);
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		userDTO.setHasPass(StringUtils.isBlank(user.getPassword()) ? 0 : 1);
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
