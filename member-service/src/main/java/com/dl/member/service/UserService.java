@@ -192,7 +192,7 @@ public class UserService extends AbstractService<User> {
 			log.error("个人信息接口的DTO转换异常");
 			return ResultGenerator.genFailResult("个人信息接口的DTO转换异常");
 		}
-		log.info("pay-------3-------user="+user);
+		log.info("pay-------3--------user="+user);
 		UserRealDTO userRealDTO = userRealService.queryUserReal();
 		userDTO.setHasPass(StringUtils.isBlank(user.getPassword()) ? 0 : 1);
 		userDTO.setIsReal(user.getIsReal().equals("1") ? "1" : "0");
