@@ -20,8 +20,7 @@
 			<level>INFO</level>
 		</filter> 
 	</appender>
-	
-	
+
 	<appender name="rollingFileERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${LOG_DIR}/member-error.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -36,14 +35,46 @@
 		</filter> 
 	</appender>
 
+	<!-- 测试环境，配置sentry用来收集日志-->
+	<appender name="sentry-dev" class="com.getsentry.raven.logback.SentryAppender">
+		<dsn>http://d310fa98fc4f4c5f8bfe5f408d4ab5d1:040bbf8398d440f597cadc5ba1ab62d3@49.232.65.109:9000/4</dsn>
+		<tags>tag1:value1,tag2:value2</tags>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>WARN</level>
+		</filter>
+	</appender>
+
+	<!-- 生产环境，配置sentry用来收集日志-->
+	<appender name="sentry-prod" class="com.getsentry.raven.logback.SentryAppender">
+		<dsn>http://042f4979b3284d11800236e86b1c3d74:01764949f0dc45838c7b8b4bad065e5e@49.232.65.109:9000/3</dsn>
+		<tags>tag1:value1,tag2:value2</tags>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>WARN</level>
+		</filter>
+	</appender>
+
 	<logger name="com.dl.member" level="INFO" />
 	<logger name="org.springframework" level="INFO"/>
 	<logger name="com.dl.base.mapper" level="debug" />
 	<logger name="com.alibaba.druid" level="WARN" />
 
-	<root level="ERROR">
-		<appender-ref ref="console" />
-		<appender-ref ref="rollingFileINFO" />
-		<appender-ref ref="rollingFileERROR" />
-	</root>
+	<!-- 开发、测试环境日志配置-->
+	<springProfile name="dev">
+		<root level="INFO">
+			<appender-ref ref="console"/>
+			<appender-ref ref="rollingFileINFO"/>
+			<appender-ref ref="rollingFileERROR"/>
+			<appender-ref ref="sentry-dev"/>
+		</root>
+	</springProfile>
+
+	<!-- 生产环境日志配置-->
+	<springProfile name="prod">
+		<root level="ERROR">
+			<appender-ref ref="console"/>
+			<appender-ref ref="rollingFileINFO"/>
+			<appender-ref ref="rollingFileERROR"/>
+			<appender-ref ref="sentry-prod"/>
+		</root>
+	</springProfile>
 </configuration>
