@@ -13,7 +13,7 @@ import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
 import com.dl.base.util.SessionUtil;
 //import com.dl.member.api.IUserAccountService;
-import com.dl.member.api.IUserBonusService;
+//import com.dl.member.api.IUserBonusService;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelDistributorMapper;
 import com.dl.member.dao.DlMessageMapper;
@@ -51,7 +51,10 @@ import java.util.List;
 public class UserService extends AbstractService<User> {
 //	@Resource
 //    private IUserAccountService iUserAccountService;
-	
+
+    @Resource
+    private UserBonusService userBonusService;
+
 	@Resource
 	private IpaymentService paymentService;
 	
@@ -88,8 +91,8 @@ public class UserService extends AbstractService<User> {
 	@Resource
 	private IAuthService iAuthService;
 	
-	@Resource
-    private IUserBonusService iUserBonusService;
+//	@Resource
+//    private IUserBonusService iUserBonusService;
 	/**
 	 * real真实信息
 	 *
@@ -253,12 +256,15 @@ public class UserService extends AbstractService<User> {
         }
         userDTO.setInviteUrl(inviteUrl);
 		
-		//查询当前用户对于的卡券信息
-		UserBonusIdParam userBonusIdParam = new UserBonusIdParam();
-        userBonusIdParam.setUserBonusId(userId);
-		BaseResult<UserBonusDTO> userBonus = iUserBonusService.queryUserBonusNumAndPrice(userBonusIdParam);
-		userDTO.setBonusNumber(userBonus.getData()!=null?userBonus.getData().getBonusId():0);
-		
+//		//查询当前用户对于的卡券信息
+//		UserBonusIdParam userBonusIdParam = new UserBonusIdParam();
+//        userBonusIdParam.setUserBonusId(userId);
+//		BaseResult<UserBonusDTO> userBonus = iUserBonusService.queryUserBonusNumAndPrice(userBonusIdParam);
+//		userDTO.setBonusNumber(userBonus.getData()!=null?userBonus.getData().getBonusId():0);
+
+        UserBonusDTO userBonus = userBonusService.getBonusByUserId(userId);
+        userDTO.setBonusNumber(userBonus !=null ? userBonus.getBonusId():0);
+
 		return ResultGenerator.genSuccessResult("查询用户信息成功", userDTO);
 	}
 
