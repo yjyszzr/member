@@ -10,10 +10,7 @@
 
     <name>member-service</name>
     <description>member project for Spring Boot</description>
-    <properties>
-        <skip>true</skip>
-        <docker.push>false</docker.push>
-    </properties>
+
     <parent>
         <groupId>com.dl</groupId>
         <artifactId>member</artifactId>
