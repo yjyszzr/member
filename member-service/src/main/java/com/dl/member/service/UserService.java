@@ -12,7 +12,7 @@ import com.dl.base.util.MD5Util;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
 import com.dl.base.util.SessionUtil;
-import com.dl.member.api.IUserAccountService;
+//import com.dl.member.api.IUserAccountService;
 import com.dl.member.api.IUserBonusService;
 import com.dl.member.core.ProjectConstant;
 import com.dl.member.dao.DlChannelDistributorMapper;
@@ -49,8 +49,8 @@ import java.util.List;
 @Transactional
 @Slf4j
 public class UserService extends AbstractService<User> {
-	@Resource
-    private IUserAccountService iUserAccountService;
+//	@Resource
+//    private IUserAccountService iUserAccountService;
 	
 	@Resource
 	private IpaymentService paymentService;
@@ -230,9 +230,11 @@ public class UserService extends AbstractService<User> {
 			userDTO.setRecharegeTurnOn(String.valueOf(sDto2.getValue().intValue()));
 			userDTO.setWithdrawTurnOn(String.valueOf(sDto3.getValue().intValue()));
 		}
-		SysConfigParam cfg = new SysConfigParam();
-		cfg.setBusinessId(67);//读取财务账号id
-		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
+//		SysConfigParam cfg = new SysConfigParam();
+//		cfg.setBusinessId(67);//读取财务账号id
+//		int cwuserId = iUserAccountService.queryBusinessLimit(cfg).getData()!=null?iUserAccountService.queryBusinessLimit(cfg).getData().getValue().intValue():0;
+        SysConfigDTO sysDTO = sysConfigService.querySysConfig(67);
+        int cwuserId = sysDTO.getValue() != null?sysDTO.getValue().intValue():0;
 		if(userId!=null && userId==cwuserId) {// 财务账 号--财 务账号提现金额为商户余额
 			PayLogIdParam emptyParam = new PayLogIdParam();
 			emptyParam.setPayLogId(1000000077);
