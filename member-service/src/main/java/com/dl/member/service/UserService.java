@@ -27,7 +27,8 @@ import com.dl.member.model.User;
 import com.dl.member.param.*;
 import com.dl.member.util.Encryption;
 import com.dl.member.util.TokenUtil;
-import com.dl.shop.auth.api.IAuthService;
+//import com.dl.shop.auth.api.IAuthService;
+//import com.dl.shop.auth.api.IAuthService;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.shop.payment.dto.PayLogDTO;
 import com.dl.shop.payment.param.PayLogIdParam;
@@ -88,8 +89,8 @@ public class UserService extends AbstractService<User> {
 	@Resource
 	private SysConfigService sysConfigService;
 
-	@Resource
-	private IAuthService iAuthService;
+//	@Resource
+//	private IAuthService iAuthService;
 	
 //	@Resource
 //    private IUserBonusService iUserBonusService;
