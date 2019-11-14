@@ -1,80 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-	<property name="LOG_DIR" value="/a/logs/app/member" />
-	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] - %msg %n</pattern>
-		</encoder>
-	</appender>
+    <property name="LOG_DIR" value="/a/logs/app/member"/>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] - %msg %n</pattern>
+        </encoder>
+    </appender>
 
-	<appender name="rollingFileINFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_DIR}/member-info.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_DIR}/info/member-info.%d{yyyy-MM-dd}.log</fileNamePattern>
-			<maxHistory>30</maxHistory>		
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] - %msg %n</pattern>
-		</encoder>
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>INFO</level>
-		</filter> 
-	</appender>
+    <appender name="rollingFileINFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/member-info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/info/member-info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] - %msg %n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
 
-	<appender name="rollingFileERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_DIR}/member-error.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_DIR}/error/member-error.%d{yyyy-MM-dd}.log</fileNamePattern>
-			<maxHistory>30</maxHistory>		
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] - %msg %n</pattern>
-		</encoder>
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>WARN</level>
-		</filter> 
-	</appender>
+    <appender name="rollingFileERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/member-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/error/member-error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] - %msg %n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
 
-	<!-- 生产环境，配置sentry用来收集日志-->
-	<appender name="sentry-dev" class="com.getsentry.raven.logback.SentryAppender">
-		<dsn>http://be87329ec1f84c7ab72685c803d01197:b68486c288fd415e8640b6ed0c0d25db@49.232.65.109:9000/44</dsn>
-		<tags>tag1:value1,tag2:value2</tags>
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>error</level>
-		</filter>
-	</appender>
+    <!-- 生产环境，配置sentry用来收集日志-->
+    <appender name="sentry-dev" class="com.getsentry.raven.logback.SentryAppender">
+        <dsn>http://be87329ec1f84c7ab72685c803d01197:b68486c288fd415e8640b6ed0c0d25db@49.232.65.109:9000/44</dsn>
+        <tags>tag1:value1,tag2:value2</tags>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>error</level>
+        </filter>
+    </appender>
 
-	<!-- 生产环境，配置sentry用来收集日志-->
-	<appender name="sentry-prod" class="com.getsentry.raven.logback.SentryAppender">
-		<dsn>http://32f144669ae54da3afa948dc1aaccbaa:165418de480e4c569cf6d8d607cf04e0@49.232.65.109:9000/45</dsn>
-		<tags>tag1:value1,tag2:value2</tags>
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>error</level>
-		</filter>
-	</appender>
+    <!-- 生产环境，配置sentry用来收集日志-->
+    <appender name="sentry-prod" class="com.getsentry.raven.logback.SentryAppender">
+        <dsn>http://32f144669ae54da3afa948dc1aaccbaa:165418de480e4c569cf6d8d607cf04e0@49.232.65.109:9000/45</dsn>
+        <tags>tag1:value1,tag2:value2</tags>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>error</level>
+        </filter>
+    </appender>
 
-	<logger name="com.dl.member" level="INFO" />
-	<logger name="org.springframework" level="INFO"/>
-	<logger name="com.dl.base.mapper" level="debug" />
-	<logger name="com.alibaba.druid" level="WARN" />
+    <logger name="com.dl.member" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="com.dl.base.mapper" level="debug"/>
+    <logger name="com.alibaba.druid" level="WARN"/>
 
-	<!-- 开发、测试环境日志配置-->
-	<springProfile name="dev">
-		<root level="ERROR">
-			<appender-ref ref="console"/>
-			<appender-ref ref="rollingFileINFO"/>
-			<appender-ref ref="rollingFileERROR"/>
-			<appender-ref ref="sentry-dev"/>
-		</root>
-	</springProfile>
+    <!-- 开发、测试环境日志配置-->
+    <springProfile name="dev">
+        <root level="ERROR">
+            <appender-ref ref="console"/>
+            <appender-ref ref="rollingFileINFO"/>
+            <appender-ref ref="rollingFileERROR"/>
+            <appender-ref ref="sentry-dev"/>
+        </root>
+    </springProfile>
 
-	<!-- 生产环境日志配置-->
-	<springProfile name="prod">
-		<root level="ERROR">
-			<appender-ref ref="console"/>
-			<appender-ref ref="rollingFileINFO"/>
-			<appender-ref ref="rollingFileERROR"/>
-			<appender-ref ref="sentry-prod"/>
-		</root>
-	</springProfile>
+    <!-- 生产环境日志配置-->
+    <springProfile name="prod">
+        <root level="ERROR">
+            <appender-ref ref="console"/>
+            <appender-ref ref="rollingFileINFO"/>
+            <appender-ref ref="rollingFileERROR"/>
+            <appender-ref ref="sentry-prod"/>
+        </root>
+    </springProfile>
 </configuration>
