@@ -220,7 +220,7 @@ public class UserRegisterController {
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
 
         UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-        String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+        String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDevice.getAppCodeName())?"10":userDevice.getAppCodeName();
     	if(appCodeNameStr.equals("11")){
             DLActivity activity = dLActivityService.queryActivityByType(0);
             if(activity != null && activity.getIsFinish() == 0){
