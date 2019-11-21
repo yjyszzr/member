@@ -219,8 +219,9 @@ public class UserRegisterController {
     	TokenUtil.genToken(userId, Integer.valueOf(userRegisterParam.getLoginSource()));
     	UserLoginDTO userLoginDTO = userLoginService.queryUserLoginDTOByMobile(userRegisterParam.getMobile(), userRegisterParam.getLoginSource());
 
-    	String appCodeName = "11";
-    	if(appCodeName.equals("11")){
+        UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+        String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
+    	if(appCodeNameStr.equals("11")){
             DLActivity activity = dLActivityService.queryActivityByType(0);
             if(activity != null && activity.getIsFinish() == 0){
                 userBonusService.receiveUserBonus(1,userId);
@@ -228,8 +229,7 @@ public class UserRegisterController {
         }
 
     	stringRedisTemplate.delete(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
-    	
-    	UserDeviceInfo userDevice = SessionUtil.getUserDevice();
+
     	if(userDevice.getPlat().equals("iphone")) {
     		//idfa 回调、存储  （lidelin）
     		IDFACallBackParam idfaParam = new IDFACallBackParam();
