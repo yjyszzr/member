@@ -108,16 +108,16 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 					this.updatePushKey(userLoginMobileParam.getPushKey(), user);
 				}
 			}
-			Condition condition = new Condition(DlChannelConsumer.class);
+//			Condition condition = new Condition(DlChannelConsumer.class);
 			// condition.createCriteria().andCondition("user_id = ",
 			// user.getUserId());
-			condition.createCriteria().andEqualTo("userId", user.getUserId());
-			List<DlChannelConsumer> channelConsumerlist = channelConsumerService.findByCondition(condition);
-			if (channelConsumerlist.size() > 0) {
-				if (channelConsumerlist.get(0).getFristLoginTime() == null) {
-					channelConsumerService.updateByUserId(user.getUserId());
-				}
-			}
+//			condition.createCriteria().andEqualTo("userId", user.getUserId());
+//			List<DlChannelConsumer> channelConsumerlist = channelConsumerService.findByCondition(condition);
+//			if (channelConsumerlist.size() > 0) {
+//				if (channelConsumerlist.get(0).getFristLoginTime() == null) {
+//					channelConsumerService.updateByUserId(user.getUserId());
+//				}
+//			}
 
 			this.loginLog(user.getUserId(), 0, 0, loginParams, JSONHelper.bean2json(userLoginDTO));
 
