@@ -402,9 +402,9 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
         String appCodeNameStr = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
 		logger.warn("20191121的app_code_name:"+appCodeNameStr);
-		if(StringUtils.isEmpty(appCodeNameStr)){
-            appCodeNameStr = "10";
-        }
+//		if(StringUtils.isEmpty(appCodeNameStr)){
+//            appCodeNameStr = "10";
+//        }
 		User userInfo = userMapper.queryUserByMobileAndAppCdde(mobile,appCodeNameStr);
 		UserLoginDTO userLoginDTO = new UserLoginDTO();
 		userLoginDTO.setMobile(userInfo.getMobile());
