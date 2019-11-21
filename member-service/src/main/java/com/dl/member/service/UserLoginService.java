@@ -60,8 +60,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 
 	@Resource
 	private UserRegisterService userRegisterService;
-    UserLoginService
-	@Resource
+
 	private DlChannelConsumerService channelConsumerService;
 
 	@Resource
