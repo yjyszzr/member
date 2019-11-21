@@ -185,9 +185,15 @@ public class SmsService {
 			String tplValue = "";
 			String strRandom4 = RandomUtil.getRandNum(4);
 			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-			//Integer appCodeName = 11;// 默认球多多
             String appCodeName = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
-			Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
+            Integer appCodeNameInt  = Integer.valueOf(appCodeName);
+            String platform = userDevice.getPlat();
+            if(10 == appCodeNameInt) {//球多多系列
+                String channel = userDevice.getChannel();
+                appCodeNameInt = dlPhoneChannelService.queryAppCodeName(channel);
+            }
+
+            Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeNameInt);
 			if (null == smsTemplateId) {
 				log.warn("未查询到短信模板id的配置，请检查数据库");
 				return ResultGenerator.genFailResult("短信发送异常,请联系管理员");
