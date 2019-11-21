@@ -60,7 +60,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 
 	@Resource
 	private UserRegisterService userRegisterService;
-
+    UserLoginService
 	@Resource
 	private DlChannelConsumerService channelConsumerService;
 
@@ -402,6 +402,7 @@ public class UserLoginService extends AbstractService<UserLoginLog> {
 	public UserLoginDTO queryUserLoginDTOByMobile(String mobile, String loginSource) {
 		UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
 		String appCodeNameStr = userDeviceInfo.getAppCodeName();
+		logger.warn("20191121的app_code_name:"+appCodeNameStr);
 		if(StringUtils.isEmpty(appCodeNameStr)){
             appCodeNameStr = "10";
         }
