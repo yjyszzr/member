@@ -185,7 +185,8 @@ public class SmsService {
 			String tplValue = "";
 			String strRandom4 = RandomUtil.getRandNum(4);
 			UserDeviceInfo userDevice = SessionUtil.getUserDevice();
-			Integer appCodeName = 11;// 默认球多多
+			//Integer appCodeName = 11;// 默认球多多
+            String appCodeName = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
 			Integer smsTemplateId = smsTemplateService.querySmsByAppCodeName(appCodeName);
 			if (null == smsTemplateId) {
 				log.warn("未查询到短信模板id的配置，请检查数据库");
