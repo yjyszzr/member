@@ -362,7 +362,8 @@ public class UserService extends AbstractService<User> {
 			userParam.setIsSuperWhite("1");
 		}
 
-		String appCodeName = "11";
+        UserDeviceInfo userDeviceInfo = SessionUtil.getUserDevice();
+        String appCodeName = org.apache.commons.lang.StringUtils.isEmpty(userDeviceInfo.getAppCodeName())?"10":userDeviceInfo.getAppCodeName();
 		log.info("appCodeName:"+appCodeName);
 		if(StringUtils.isEmpty(appCodeName)){
 			user.setAppCodeName("10");
