@@ -197,13 +197,12 @@ public class UserRegisterController {
 	@ApiOperation(value = "大转盘用户注册", notes = "大转盘用户注册")
 	@PostMapping("/turntableRegister")
 	public BaseResult<UserLoginDTO> turntableRegister(@RequestBody UserRegisterParam userRegisterParam, HttpServletRequest request) {
-
+		String phone = "";
 		try {
 			String decryptData = RSACryptDecrypt.decrypt(RSACryptDecrypt.loadPrivateKey(ProjectConstant.PRIVATE_KEY_STR), RSACryptDecrypt.strToBase64(userRegisterParam.getEncryptionStr()));
-			System.out.println("解密后：" + decryptData);
 			JSONObject jsonObj = new JSONObject(decryptData);
 			log.info("解密后的json串==============" + jsonObj.toString());
-			String phone = (String) jsonObj.get("phone");
+			phone = (String) jsonObj.get("phone");
 			int money = jsonObj.getInt("money");
 			log.info("大转盘导流用户注册成功获得 " + money + "元钱,=========添加到流水中!!!");
 
@@ -211,7 +210,9 @@ public class UserRegisterController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		if (phone.equals(userRegisterParam.getMobile())) {
+			return ResultGenerator.genResult(MemberEnums.MOBILE_MISMATCH_WRONG.getcode(), MemberEnums.MOBILE_MISMATCH_WRONG.getMsg());
+		}
 		String cacheSmsCode = stringRedisTemplate.opsForValue().get(ProjectConstant.SMS_PREFIX + ProjectConstant.SMS_TYPE_REGISTER + "_" + userRegisterParam.getMobile());
 		if (StringUtils.isEmpty(cacheSmsCode) || !cacheSmsCode.equals(userRegisterParam.getSmsCode())) {
 			return ResultGenerator.genResult(MemberEnums.SMSCODE_WRONG.getcode(), MemberEnums.SMSCODE_WRONG.getMsg());
