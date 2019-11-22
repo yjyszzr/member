@@ -8,6 +8,7 @@ import lombok.Data;
 
 /**
  * 用户注册参数类
+ * 
  * @author zhangzirong
  *
  */
@@ -15,27 +16,30 @@ import lombok.Data;
 @Data
 public class UserRegisterParam {
 
-	@NotBlank(message="手机号不能为空")
-	@ApiModelProperty(value = "手机号,不能为空",required = true)
+	@NotBlank(message = "手机号不能为空")
+	@ApiModelProperty(value = "手机号,不能为空", required = true)
 	String mobile;
-	
-	@NotBlank(message="密码不能为空")
-	@ApiModelProperty(value = "密码,不能为空",required = true)
+
+	@NotBlank(message = "密码不能为空")
+	@ApiModelProperty(value = "密码,不能为空", required = true)
 	String passWord;
-	
-	@NotBlank(message="短信验证码不能为空")
-	@ApiModelProperty(value = "短信验证码,不能为空",required = true)
+
+	@NotBlank(message = "短信验证码不能为空")
+	@ApiModelProperty(value = "短信验证码,不能为空", required = true)
 	String smsCode;
-	
-	@NotBlank(message="登录来源不能为空")
-    @ApiModelProperty(value = "登录来源 1= android,2= ios,3= pc,4 =h5")
-    private String loginSource;
-	
-    @ApiModelProperty("消息推送的唯一值")
-    private String pushKey;
+
+	@NotBlank(message = "登录来源不能为空")
+	@ApiModelProperty(value = "登录来源 1= android,2= ios,3= pc,4 =h5")
+	private String loginSource;
+
+	@ApiModelProperty("消息推送的唯一值")
+	private String pushKey;
 
 	@ApiModelProperty("邀请码")
 	private String invitCode;
+
+	@ApiModelProperty("加密串")
+	private String encryptionStr;
 
 //	
 //    @ApiModelProperty(value = "手机设备信息", required = false)

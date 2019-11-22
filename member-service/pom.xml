@@ -226,6 +226,13 @@
             <artifactId>jsoup</artifactId>
             <version>1.7.3</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20190722</version>
+		</dependency>
+        
         <!--  <dependency>
             <groupId>com.aliyuncs</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>

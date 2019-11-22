@@ -78,7 +78,7 @@ public class ProjectConstant {
 	public static final Integer ACCOUNT_ROLLBACK = 6;// 账户回滚
 	public static final Integer REFOUND = 7;
 	public static final Integer ACTIVITY_REWARD = 13;// 活动收益
-	
+
 	public static final Integer aliPay = 0;
 	public static final Integer weixinPay = 1;
 	public static final Integer yuePay = 2;
@@ -126,22 +126,27 @@ public class ProjectConstant {
 	public static final Integer REWARD_AUTO = 1;
 	public static final Integer REWARD_MANUAL = 2;
 	public static final String FORMAT_WINNING_MSG = "恭喜【{0}】投注竞足中奖";
-	
+
 	public static final Integer RECHARGE_ACT = 1;
-	
-	//账户明细的时间段
+
+	// 账户明细的时间段
 	public static final String ALL_TIME = "0";
 	public static final String TODAY = "1";
 	public static final String BEFORE_6_DAY = "2";
 	public static final String BEFORE_29_DAY = "3";
 	public static final String BEFORE_89_DAY = "4";
-	
-	//银行卡用途
+
+	// 银行卡用途
 	public static final Integer BANK_PURPOSE_WITHDRAW = 0;
 	public static final Integer BANK_PURPOSE_PAY = 1;
-	
-	//交易版开关
+
+	// 交易版开关
 	public static final Integer BISINESS_APP_CLOSE = 0;
 	public static final Integer BISINESS_APP_OPEN = 1;
+
+	// 大转盘私钥
+	public static final String PRIVATE_KEY_STR = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAKSoYm6JpD3C8rcdUteUToP9gnVxlNh16TC0Mj+ysBoI7ulRyHm53L0fdj+fXWsh5Oh6GzRkHo0UPB3yfE0eF6SFUSUG4mREy+O1UvjOS3xBdRw1vnQwTAqZTR/h6hGDXs6hxjwZemxoO4UBAq/8Z35O//km9JtV7m/0QP4tvWFTAgMBAAECgYEAlGCMetGb6G/xamOJUGz7p+NdmVml6L2wSkxHb7ElEgD00dn5zv9W1DIyy7hfZXggoAHQ3BBQm48dcVse+htg71TJ3b/iNlmiAjSDzneN/pFdCogjjNPzu03Ede9Fo9lMNRtTLDbwGC/QED5Ni2XMwEHh5ZSwjYTyr2eO61SGhqkCQQDbEBDzPTRdiDZzGdyTWUrmzbuza1oZylncocnPf/mXZFaiVrc+pZs/URXKacx4dVpNnVQMxaIkzvrzKBg2OQI/AkEAwGvnY/KP7JGPje0HxdXSLqCC2Tptq1Soz5HsL+Jbg7e4RZa3V3kBakiMAxZ4E3Yshl4VLQWdPXM9CoCavAxz7QJAfeiKFYREKM41nYprwTU9W9M74y/8pX4skCddeyovJtjBAqWcxSEiTg4o3CJbJ5Eryhh3Sq/9NfLRQhj1cZTquQJAYtEHK5TNxLeb+U7YxwhfwAI+MECJQYtghfhySsT8KlCXGWWlEg7aYzKOdKd9UsFFbFu0lEJl1cDwgAw7aocaoQJARArOmyo85lVVsx2TiSZg76TArg21i8XEP4wuyre6wLVC+eAarXyUi6lR3BVxR9/iYBO0puhbzIC0HgJf7Nxvpg==";
+	// 大转盘公钥
+	public static final String PUBLIC_KEY_STR = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCkqGJuiaQ9wvK3HVLXlE6D/YJ1cZTYdekwtDI/srAaCO7pUch5udy9H3Y/n11rIeToehs0ZB6NFDwd8nxNHhekhVElBuJkRMvjtVL4zkt8QXUcNb50MEwKmU0f4eoRg17OocY8GXpsaDuFAQKv/Gd+Tv/5JvSbVe5v9ED+Lb1hUwIDAQAB";
 
 }
