@@ -68,7 +68,7 @@ import com.dl.member.param.UserAccountParamByType;
 import com.dl.member.param.UserParam;
 import com.dl.member.param.WithDrawParam;
 import com.dl.member.util.GeTuiMessage;
-import com.dl.member.util.GeTuiUtil;
+// import com.dl.member.util.GeTuiUtil;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
 import com.dl.order.param.OrderSnListParam;
@@ -126,8 +126,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	@Resource
 	private DlMessageService userMessageService;
 
-	@Resource
-	private GeTuiUtil geTuiUtil;
+// 	@Resource
+// 	private GeTuiUtil geTuiUtil;
 
 	/**
 	 * @param SurplusPayParam
@@ -1039,7 +1039,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			if (StringUtils.isNotBlank(clientId)) {
 				String content = MessageFormat.format(CommonConstants.FORMAT_REWARD_PUSH_DESC,gameDesc, u.getReward());
 				GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_REWARD_PUSH_TITLE, content, DateUtil.getCurrentTimeLong());
-				geTuiUtil.pushMessage(clientId, getuiMessage);
+// 				geTuiUtil.pushMessage(clientId, getuiMessage);
 			}
 		}
 	}
