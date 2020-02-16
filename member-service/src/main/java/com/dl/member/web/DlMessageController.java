@@ -23,7 +23,7 @@ import com.dl.member.model.UserMessageListParam;
 import com.dl.member.service.DlMessageService;
 import com.dl.member.service.UserService;
 import com.dl.member.util.GeTuiMessage;
-import com.dl.member.util.GeTuiUtil;
+// import com.dl.member.util.GeTuiUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
@@ -37,8 +37,8 @@ public class DlMessageController {
     @Resource
     private DlMessageService dlMessageService;
     
-    @Resource
-    private GeTuiUtil geTuiUtil;
+//     @Resource
+//     private GeTuiUtil geTuiUtil;
 
     @Resource
     private UserService userService;
@@ -88,7 +88,7 @@ public class DlMessageController {
     		List<String> clientIds = userService.getClientIds(lotteryFailUserIds);
     		for(String clientId : clientIds) {
     			GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_PRINTLOTTERY_PUSH_TITLE, CommonConstants.FORMAT_PRINTLOTTERY_PUSH_DESC, DateUtil.getCurrentTimeLong());
-    			geTuiUtil.pushMessage(clientId, getuiMessage);
+//     			geTuiUtil.pushMessage(clientId, getuiMessage);
     		}
     	}
         return ResultGenerator.genSuccessResult();
@@ -99,7 +99,7 @@ public class DlMessageController {
     @PostMapping("/push")
     public BaseResult<String> pushMessage(@RequestBody PushMessageParam param) {
     	GeTuiMessage getuiMessage = new GeTuiMessage(param);
-    	geTuiUtil.pushMessage(param.getClientId(), getuiMessage);
+//     	geTuiUtil.pushMessage(param.getClientId(), getuiMessage);
     	return ResultGenerator.genSuccessResult();
     }
 
