@@ -18,6 +18,7 @@ import com.dl.member.param.UserBankPurposeQueryParam;
 import com.dl.member.param.UserBankQueryParam;
 import com.dl.member.service.UserBankService;
 // import com.gexin.fastjson.JSON;
+import com.alibaba.fastjson.JSON;
 
 import ch.qos.logback.classic.Logger;
 import io.swagger.annotations.ApiOperation;
