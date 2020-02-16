@@ -29,7 +29,7 @@ import com.dl.member.param.OrderSnParam;
 import com.dl.member.param.UserBonusParam;
 import com.dl.member.util.BonusUtil;
 import com.dl.member.util.GeTuiMessage;
-import com.dl.member.util.GeTuiUtil;
+// import com.dl.member.util.GeTuiUtil;
 import com.dl.order.api.IOrderService;
 import com.dl.order.dto.OrderDTO;
 import com.dl.shop.payment.api.IpaymentService;
@@ -88,8 +88,8 @@ public class UserBonusService extends AbstractService<UserBonus> {
     @Resource
     private DLActivityService activityService;
 
-	@Resource
-	private GeTuiUtil geTuiUtil;
+// 	@Resource
+// 	private GeTuiUtil geTuiUtil;
 	
 	@Resource
 	private StringRedisTemplate stringRedisTemplate;
@@ -966,7 +966,7 @@ public class UserBonusService extends AbstractService<UserBonus> {
 			String clientId = item.getPushKey();
 			if (StringUtils.isNotBlank(clientId)) {
 				GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_BONUS_TITLE, CommonConstants.FORMAT_BONUS_DESC, DateUtil.getCurrentTimeLong());
-				geTuiUtil.pushMessage(clientId, getuiMessage);
+// 				geTuiUtil.pushMessage(clientId, getuiMessage);
 			}
 		});
 	}
