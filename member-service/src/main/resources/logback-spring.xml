@@ -44,15 +44,6 @@
         </filter>
     </appender>
 
-    <!-- 生产环境，配置sentry用来收集日志-->
-    <appender name="sentry-prod" class="com.getsentry.raven.logback.SentryAppender">
-        <dsn>http://32f144669ae54da3afa948dc1aaccbaa:165418de480e4c569cf6d8d607cf04e0@49.232.65.109:9000/45</dsn>
-        <tags>tag1:value1,tag2:value2</tags>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>error</level>
-        </filter>
-    </appender>
-
     <logger name="com.dl.member" level="INFO"/>
     <logger name="org.springframework" level="INFO"/>
     <logger name="com.dl.base.mapper" level="debug"/>
@@ -64,7 +55,6 @@
             <appender-ref ref="console"/>
             <appender-ref ref="rollingFileINFO"/>
             <appender-ref ref="rollingFileERROR"/>
-            <appender-ref ref="sentry-dev"/>
         </root>
     </springProfile>
 
@@ -74,7 +64,6 @@
             <appender-ref ref="console"/>
             <appender-ref ref="rollingFileINFO"/>
             <appender-ref ref="rollingFileERROR"/>
-            <appender-ref ref="sentry-prod"/>
         </root>
     </springProfile>
 </configuration>
